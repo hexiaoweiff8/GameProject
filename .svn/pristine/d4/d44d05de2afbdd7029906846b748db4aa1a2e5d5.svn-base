@@ -1,0 +1,140 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+
+public class LuaAAttrLibs
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+    public const string LIB_NAME = "AAttr";
+
+    public static int OpenLib(ILuaState lua)
+    {
+         
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        { 
+            new NameFuncPair("GetAddV",M_GetAddV),
+            new NameFuncPair("SetAddV",M_SetAddV),
+            new NameFuncPair("GetBaseV",M_GetBaseV),
+            new NameFuncPair("SetBaseV",M_SetBaseV),
+            new NameFuncPair("GetAddBFB",M_GetAddBFB),
+            new NameFuncPair("SetAddBFB",M_SetAddBFB),
+            new NameFuncPair("ToFloat",M_ToFloat)
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        { 
+             new NameFuncPair("new",S_new),  
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+
+
+    public static void _wrap(ILuaState lua, I_AAttr obj)
+    {
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,obj),
+        };
+
+        m_ClassRegHelper.InstanceLuaClass(lua, propertys);
+    }
+
+    public static I_AAttr Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<I_AAttr>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+
+    static int S_new(ILuaState lua)
+    {
+        //in
+        //out AAttr
+        _wrap(lua, new AAttrLight ());
+        return 1;
+    }
+
+    static int M_GetAddV(ILuaState lua)
+    {
+        //in self
+        //out number
+        var self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.AddV);
+        return 1;
+    }
+
+    static int M_SetAddV(ILuaState lua)
+    {
+        //in self,number
+        var self = Lua2Obj(lua, 1);
+        float v = (float)lua.L_CheckNumber(2);
+        self.SetAddV(v);
+        return 0;
+    }
+
+    
+    static int M_GetAddBFB(ILuaState lua)
+    {
+        //in self
+        //out number
+        var self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.addBFB);
+        return 1;
+    }
+
+    static int M_SetAddBFB(ILuaState lua)
+    {
+        //in self,number
+        var self = Lua2Obj(lua, 1);
+        float v = (float)lua.L_CheckNumber(2);
+        self.SetAddBFB(v);
+        return 0;
+    }
+
+
+    static int M_GetBaseV(ILuaState lua)
+    {
+        //in self
+        //out number
+        var self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.BaseV);
+        return 1;
+    }
+
+
+
+    static int M_SetBaseV(ILuaState lua)
+    {
+        //in self,int
+        var self = Lua2Obj(lua, 1);
+        float v = (float)lua.L_CheckNumber(2);
+        self.SetV((int)v);
+        return 0;
+    }
+     
+    static int  M_ToFloat(ILuaState lua)
+    {
+        //in self
+        //out number
+        var self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.ToFloat());
+        return 1;
+    }
+}

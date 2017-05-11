@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+
+
+message Header{
+    required int32 ID           =1;
+    required int32 msgId        =2;
+    required int32 userId       =3;
+    required string version     =4;
+    required int32 errno        =5;
+    required int32 ext          =6;
+    optional bytes body         =7;
+}
+
+

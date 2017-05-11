@@ -1,0 +1,266 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+
+class LuaCMUIFlyLibs
+{
+    class CMUIFlyInfo : ICoreComponentInfo
+    {
+        public Type type { get { return typeof(UIFly); } }
+        public string name { get { return LuaCMUIFlyLibs.LIB_NAME; } }
+        public void newLuaObj(ILuaState lua, Component cmp)
+        {
+            LuaCMUIFlyLibs._wrap(lua, cmp as UIFly);
+        }
+    }
+
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    //static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "CMUIFly";
+
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            new NameFuncPair("SetTarget",M_SetTarget),
+            new NameFuncPair("GetTarget",M_GetTarget),
+            new NameFuncPair("SetStrength",M_SetStrength),
+            new NameFuncPair("GetStrength",M_GetStrength),
+            new NameFuncPair("SetWorldSpace",M_SetWorldSpace),
+            new NameFuncPair("GetWorldSpace",M_GetWorldSpace),
+            new NameFuncPair("SetInFlyLayer",M_SetInFlyLayer),
+            new NameFuncPair("GetInFlyLayer",M_GetInFlyLayer),
+            new NameFuncPair("SetFlyFinishedAction",M_SetFlyFinishedAction),
+            new NameFuncPair("GetFlyFinishedAction",M_GetFlyFinishedAction),
+           // new NameFuncPair("SetFlyFinishedParam",M_SetFlyFinishedParam),
+           // new NameFuncPair("GetFlyFinishedEvent",M_GetFlyFinishedEvent),
+            new NameFuncPair("StartFly",M_StartFly),
+        };
+         
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+           new NameFuncPair("Go",S_Go),
+           
+        };
+        //注册静态属性
+        NameValuePair[] static_property = new NameValuePair[]
+        {
+            new NameValuePair("Name",LIB_NAME),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define, static_property);
+
+        LuaGameObjectLib.RegComponent(new CMUIFlyInfo());
+
+
+        //注册枚举
+        NameValuePair[] FlyFinishedAction_define = new NameValuePair[]
+        {
+            new NameValuePair("Nothing",0),
+            new NameValuePair("DestroyComponet",1),
+            new NameValuePair("DestroyGameobject",2), 
+        };
+        m_ClassRegHelper.RegEnum(lua, "FlyFinishedAction", FlyFinishedAction_define);
+
+        return 1;
+    }
+    
+     
+     
+    public static void _wrap(ILuaState lua, UIFly comp)
+    {
+        LuaOpenLibs._wrapComponent(lua, comp, LIB_NAME, m_ClassRegHelper);
+    }
+
+    public static UIFly Lua2Obj(ILuaState lua, int index)
+    {
+
+       LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<UIFly>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+
+    
+
+    static int S_Go(ILuaState lua)
+    {
+        //in go,pos,strength
+        //out CMUIFly
+        GameObject go = LuaGameObjectLib.Lua2Obj(lua, 1);
+        Vector3 pos; LuaVector3Lib.Lua2Obj(lua, 2, out pos);
+        float strength = (float)lua.L_CheckNumber(3);
+        UIFly uiFly = UIFly.Go(go, pos, strength);
+        _wrap(lua, uiFly);
+        return 1;
+    }
+
+    static int M_SetTarget(ILuaState lua)
+    {
+        //in self,pos
+        //out nil
+        UIFly self = Lua2Obj(lua, 1);
+        Vector3 pos ; LuaVector3Lib.Lua2Obj(lua,2,out pos);
+        self.target = pos;
+        return 0;
+    }
+
+    static int M_GetTarget(ILuaState lua)
+    {
+        //in self
+        //out Vector3
+
+        UIFly self = Lua2Obj(lua, 1);
+        LuaVector3Lib._wrap(lua,self.target);
+        return 1;
+    }
+
+
+
+    static int M_SetStrength(ILuaState lua)
+    {
+        //in self,strength
+        //out nil
+        UIFly self = Lua2Obj(lua, 1);
+        float strength = (float)lua.L_CheckNumber(2);
+        self.strength = strength;
+        return 0;
+    }
+
+    static int M_GetStrength(ILuaState lua)
+    {
+        //in self
+        //out strength
+
+        UIFly self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.strength);
+        return 1;
+    }
+
+    static int M_SetWorldSpace(ILuaState lua)
+    {
+        //in self,bool
+        //out nil
+        UIFly self = Lua2Obj(lua, 1);
+        bool worldSpace = lua.ToBoolean(2);
+        self.worldSpace = worldSpace;
+        return 0;
+    }
+
+    static int M_GetWorldSpace(ILuaState lua)
+    {
+        //in self
+        //out bool
+
+        UIFly self = Lua2Obj(lua, 1);
+        lua.PushBoolean(self.worldSpace);
+        return 1;
+    }
+
+
+    static int M_SetInFlyLayer(ILuaState lua)
+    {
+        //in self,bool
+        //out nil
+        UIFly self = Lua2Obj(lua, 1);
+        bool inFlyLayer = lua.ToBoolean(2);
+        self.InFlyLayer = inFlyLayer;
+        return 0;
+    }
+
+    static int M_GetInFlyLayer(ILuaState lua)
+    {
+        //in self
+        //out bool
+
+        UIFly self = Lua2Obj(lua, 1);
+        lua.PushBoolean(self.InFlyLayer);
+        return 1;
+    }
+
+
+    static int M_SetFlyFinishedAction(ILuaState lua)
+    {
+        //in self,FlyFinishedAction
+        //out nil
+        UIFly self = Lua2Obj(lua, 1);
+        int flyFinishedAction = lua.L_CheckInteger(2);
+        self.flyFinishedAction = (UIFly.FlyFinishedAction)flyFinishedAction;
+        return 0;
+    }
+
+    static int M_GetFlyFinishedAction(ILuaState lua)
+    {
+        //in self
+        //out FlyFinishedAction
+
+        UIFly self = Lua2Obj(lua, 1);
+        lua.PushInteger((int)self.flyFinishedAction);
+        return 1;
+    }
+
+    /*
+    static int M_SetFlyFinishedParam(ILuaState lua)
+    {
+        //in self,any
+        //out nil
+        UIFly self = Lua2Obj(lua, 1);
+        object anyV = LuaRoot.GetAnyValue(lua, 2);
+        self.evt_param = anyV;
+        return 0;
+    }
+
+    static int M_GetFlyFinishedEvent(ILuaState lua)
+    {
+        //in self
+        //out QKEvent
+        try
+        {
+            UIFly self = Lua2Obj(lua, 1);
+            if (self.evt_Finished == null) self.evt_Finished = new LuaEvent();
+
+            LuaEventLib._wrap(lua, self.evt_Finished);
+        }
+        catch (Exception ex)
+        {
+            lua.L_Error(ex.ToString());
+        }
+        return 1;
+    }*/
+
+    static int M_StartFly(ILuaState lua)
+    {
+        //in self,recallClass,recallFunc
+        //out nil
+        try
+        {
+            UIFly self = Lua2Obj(lua, 1);
+            using(LuaDelegateEx recallDelegate = LuaRoot.LDelegate<LuaDelegateEx>(lua,2,3))
+            {
+                self.StartFly(()=>recallDelegate.Call(null));
+            }
+        }
+        catch (Exception ex)
+        {
+            lua.L_Error(ex.ToString());
+        }
+        return 0;
+    } 
+}
+ 

@@ -1,0 +1,16 @@
+ManifestFileVersion: 0
+CRC: 3244460629
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 4a28113a974c64e17af1f3cdb9554fe0
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 1033bf7ddfd4c6d43e7a6382c0a0a61a
+HashAppended: 0
+ClassTypes:
+- Class: 49
+  Script: {instanceID: 0}
+Assets:
+- Assets/TmpLua/protol/person_pb.lua.bytes
+Dependencies: []

@@ -1,0 +1,243 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+using UniLua;
+using DG.Tweening;
+
+public class LuaTweenLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+    public const string LIB_NAME = "Tween";
+
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            new NameFuncPair("OnComplete",M_OnComplete),  
+            new NameFuncPair("OnKill",M_OnKill),  
+            new NameFuncPair("SetEase",M_SetEase),  
+            new NameFuncPair("Kill",M_Kill),  
+            
+            
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        { 
+           
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        //注册枚举 
+        NameValuePair[] enum_RotateMode = new NameValuePair[]
+        {
+            new NameValuePair("Unset",Ease.Unset),
+            new NameValuePair("Linear",Ease.Linear),
+            new NameValuePair("InSine",Ease.InSine),
+            new NameValuePair("OutSine",Ease.OutSine),
+            new NameValuePair("InOutSine",Ease.InOutSine),
+            new NameValuePair("InQuad",Ease.InQuad),
+            new NameValuePair("OutQuad",Ease.OutQuad),
+            new NameValuePair("InOutQuad",Ease.InOutQuad),
+            new NameValuePair("InCubic",Ease.InCubic),
+            new NameValuePair("OutCubic",Ease.OutCubic),
+            new NameValuePair("InOutCubic",Ease.InOutCubic),
+            new NameValuePair("InQuart",Ease.InQuart),
+            new NameValuePair("OutQuart",Ease.OutQuart),
+            new NameValuePair("InOutQuart",Ease.InOutQuart),
+            new NameValuePair("InQuint",Ease.InQuint),
+            new NameValuePair("OutQuint",Ease.OutQuint),
+            new NameValuePair("InOutQuint",Ease.InOutQuint),
+            new NameValuePair("InExpo",Ease.InExpo),
+            new NameValuePair("OutExpo",Ease.OutExpo),
+            new NameValuePair("InOutExpo",Ease.InOutExpo),
+            new NameValuePair("InCirc",Ease.InCirc),
+            new NameValuePair("OutCirc",Ease.OutCirc),
+            new NameValuePair("InOutCirc",Ease.InOutCirc),
+            new NameValuePair("InElastic",Ease.InElastic),
+            new NameValuePair("OutElastic",Ease.OutElastic),
+            new NameValuePair("InOutElastic",Ease.InOutElastic),
+            new NameValuePair("InBack",Ease.InBack),
+            new NameValuePair("OutBack",Ease.OutBack),
+            new NameValuePair("InOutBack",Ease.InOutBack),
+            new NameValuePair("InBounce",Ease.InBounce),
+            new NameValuePair("OutBounce",Ease.OutBounce),
+            new NameValuePair("InOutBounce",Ease.InOutBounce),
+            new NameValuePair("Flash",Ease.Flash),
+            new NameValuePair("InFlash",Ease.InFlash),
+            new NameValuePair("OutFlash",Ease.OutFlash),
+            new NameValuePair("InOutFlash",Ease.InOutFlash),
+            new NameValuePair("INTERNAL_Zero",Ease.INTERNAL_Zero),
+            new NameValuePair("INTERNAL_Custom",Ease.INTERNAL_Custom),
+        };
+        m_ClassRegHelper.RegEnum(lua, "DoTweenEase", enum_RotateMode);
+        return 1;
+    }
+
+    public static void _wrap(ILuaState lua, Tween obj)
+    {
+      
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,obj), 
+        };
+
+        m_ClassRegHelper.InstanceLuaClass(lua, propertys);
+    }
+
+    public static Tween Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+        return LuaMemberHelper.GetObject<Tween>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    public static int M_Kill(ILuaState lua)
+    {
+        //in self,complate
+        //out self
+        Tween self = Lua2Obj(lua, 1);
+        int n = lua.GetTop();
+        bool complate = n > 1 ? lua.ToBoolean(2) : false;
+
+        self.Kill(complate);
+        LuaTweenLib._wrap(lua, self);
+        return 1;
+    }
+
+    public static int M_OnKill(ILuaState lua)
+    {
+        //in self,recallClass,recallFunc
+        //out self
+        Tween self = Lua2Obj(lua, 1);
+
+        TweenEvts evts = TweenEvts.GetEvts(self);
+        if (evts == null) {LuaTweenLib._wrap(lua, self); return 1;}
+
+        QKEvent evt = LuaRoot.LDelegate2Event<LuaEventCallback>(lua, 2, 3);
+        if (evt == null) { LuaTweenLib._wrap(lua, self); return 1; }
+
+        evts.OnKill = evt;
+        LuaTweenLib._wrap(lua, self);
+        return 1;
+    }
+
+    public static int M_OnComplete(ILuaState lua)
+    {
+        //in self,recallClass,recallFunc
+        //out self
+        Tween self = Lua2Obj(lua, 1);
+
+        TweenEvts evts = TweenEvts.GetEvts(self);
+        if (evts == null) {LuaTweenLib._wrap(lua, self); return 1;}
+
+        QKEvent evt = LuaRoot.LDelegate2Event<LuaEventCallback>(lua, 2, 3);
+        if (evt == null) { LuaTweenLib._wrap(lua, self); return 1; }
+
+        evts.OnComplete = evt;
+
+        LuaTweenLib._wrap(lua, self);
+        return 1;
+    } 
+
+    static int M_SetEase(ILuaState lua)
+    {
+        //in self,DoTweenEase
+        //out self
+        Tween self = Lua2Obj(lua, 1);
+        Ease ease = (Ease)lua.L_CheckInteger(2);
+        self.SetEase(ease);
+        LuaTweenLib._wrap(lua, self);
+        return 1;
+    }
+     
+
+   
+     
+}
+
+
+class TweenEvts
+{
+    public TweenEvts(Tween tween)
+    {
+        _owner = tween;
+        _owner.OnKill(OnTweenKill);
+        _owner.OnComplete(OnTweenComplete);
+    }
+
+    public QKEvent OnKill
+    {
+        get { return _OnKill; }
+        set
+        {
+            if (_OnKill == value) return;
+            if (_OnKill != null) _OnKill.Dispose();
+            _OnKill = value;
+        }
+    }
+
+    public QKEvent OnComplete
+    {
+        get { return _OnComplete; }
+        set
+        {
+            if (_OnComplete == value) return;
+            if (_OnComplete != null) _OnComplete.Dispose();
+            _OnComplete = value;
+        }
+    }
+
+    public void OnTweenComplete()
+    {
+        if (_OnComplete != null) _OnComplete.Call(null);
+    }
+
+    public void OnTweenKill()
+    {
+        OnComplete = null;
+
+        foreach (QKEvent currEvt in _OtherEvts) currEvt.Dispose();//销毁所有绑定的事件
+        _OtherEvts.Clear();
+
+        m_TweenEvts.Remove(_owner);
+        _owner = null;
+
+        if (_OnKill != null) { _OnKill.Call(null); OnKill = null; }
+    }
+
+    public void AddOtherEvt(QKEvent evt)
+    {
+        _OtherEvts.Add(evt);
+    }
+
+    public static TweenEvts GetEvts(Tween tween)
+    {
+        if (!tween.IsActive()) return null;//已经被干掉的tween
+        if (m_TweenEvts.ContainsKey(tween)) return m_TweenEvts[tween];
+
+        TweenEvts re = new TweenEvts(tween);
+        m_TweenEvts.Add(tween, re);
+        return re;
+    }
+
+
+
+    Tween _owner;
+    QKEvent _OnKill = null;
+    QKEvent _OnComplete = null;
+    List<QKEvent> _OtherEvts = new List<QKEvent>();
+
+    static Dictionary<Tween, TweenEvts> m_TweenEvts = new Dictionary<Tween, TweenEvts>();
+}

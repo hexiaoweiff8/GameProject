@@ -1,0 +1,186 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+
+class LuaTimeSpanLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "TimeSpan";
+     
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            new NameFuncPair("TotalDays",M_TotalDays), 
+            new NameFuncPair("TotalHours",M_TotalHours), 
+            new NameFuncPair("TotalMilliseconds",M_TotalMilliseconds), 
+            new NameFuncPair("TotalMinutes",M_TotalMinutes), 
+            new NameFuncPair("TotalSeconds",M_TotalSeconds), 
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+             new NameFuncPair("__add",OP___add),//重载加法
+            new NameFuncPair("__sub",OP___sub),//重载减法
+            new NameFuncPair("__tostring",OP___tostring),
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        { 
+            new NameFuncPair("new",F_new),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+    private static int OP___add(ILuaState lua)
+    {
+        TimeSpan a = Lua2Obj(lua, 1);
+        TimeSpan b = Lua2Obj(lua, 1);
+        _wrap(
+            lua,
+            a + b
+            );
+        return 1;
+    }
+
+    private static int OP___sub(ILuaState lua)
+    {
+        TimeSpan a = Lua2Obj(lua, 1);
+        TimeSpan b = Lua2Obj(lua, 1);
+        _wrap(
+            lua,
+            a - b
+            );
+        return 1;
+    }
+
+    private static int OP___tostring(ILuaState lua)
+    {
+        TimeSpan self = Lua2Obj(lua, 1);
+        lua.PushString(self.ToString());
+        return 1;
+    }
+
+    public static void _wrap(ILuaState lua, TimeSpan obj)
+    {
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,obj),
+        };
+
+        m_ClassRegHelper.InstanceLuaClass(lua, propertys);
+    }
+
+    public static TimeSpan Lua2Obj(ILuaState lua, int index)
+    {
+       LuaMemberHelper.CheckClass(lua, index);
+
+        return m_MemberHelper.GetStruct<TimeSpan>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    static int F_new(ILuaState lua)
+    {
+        //in hours,minutes,seconds
+        //in days,hours,minutes,seconds
+        //in days,hours,minutes,seconds,milliseconds
+        //out TimeSpan
+
+        int n = lua.GetTop();
+
+        TimeSpan re;
+        switch (n)
+        {
+            case 3:
+                {
+                    int hours = lua.L_CheckInteger(1);
+                    int minutes= lua.L_CheckInteger(2);
+                    int seconds = lua.L_CheckInteger(3);
+                    re = new TimeSpan(hours, minutes, seconds);
+                }
+                break;
+            case 4:
+                {
+                    int days = lua.L_CheckInteger(1);
+                    int hours = lua.L_CheckInteger(2);
+                    int minutes= lua.L_CheckInteger(3);
+                    int seconds = lua.L_CheckInteger(4);
+                    re = new TimeSpan(days,hours, minutes, seconds);
+                }
+                break;
+            case 5:
+                {
+                    int days = lua.L_CheckInteger(1);
+                    int hours = lua.L_CheckInteger(2);
+                    int minutes = lua.L_CheckInteger(3);
+                    int seconds = lua.L_CheckInteger(4);
+                    int milliseconds = lua.L_CheckInteger(5);
+                    re = new TimeSpan(days, hours, minutes, seconds, milliseconds);
+                }
+                break;
+            default:
+                throw new Exception("TimeSpan.new parameter error");
+        };
+
+        _wrap(lua, re);
+        return 1;
+    }
+
+    static int M_TotalSeconds(ILuaState lua)
+    {
+        //in self
+        //out double
+        TimeSpan self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.TotalSeconds);
+        return 1;
+    }
+
+    static int M_TotalMinutes(ILuaState lua)
+    {
+        //in self
+        //out double
+        TimeSpan self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.TotalMinutes);
+        return 1;
+    }
+
+    static int M_TotalMilliseconds(ILuaState lua)
+    {
+        //in self
+        //out double
+        TimeSpan self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.TotalMilliseconds);
+        return 1;
+    }
+
+    static int M_TotalHours(ILuaState lua)
+    {
+        //in self
+        //out double
+        TimeSpan self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.TotalHours);
+        return 1;
+    }
+
+    static int M_TotalDays(ILuaState lua)
+    {
+        //in self
+        //out double
+        TimeSpan self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.TotalDays);
+        return 1;
+    }
+    
+}

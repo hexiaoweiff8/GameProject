@@ -1,0 +1,8 @@
+20170420173537
+SuitID I16
+SuitEffect2 I32
+Effect2Point F
+SuitEffect3 I32
+Effect3Point F
+SuitEffect5 I32
+Effect5Point F

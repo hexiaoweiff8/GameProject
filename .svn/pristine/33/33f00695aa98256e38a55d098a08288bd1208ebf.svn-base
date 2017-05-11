@@ -1,0 +1,462 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+class ETCJoystickEvents:MonoBehaviour
+{
+   // void Awake() {  }
+
+    void OnEnable()
+    {
+        //绑定各种事件
+        ETCJoystick joystick = GetComponent<ETCJoystick>();
+        if (joystick != null)
+        {
+            joystick.onMoveStart.AddListener(OnMoveStart);
+            joystick.onMove.AddListener(OnMove);
+            joystick.onMoveSpeed.AddListener(OnMoveSpeed);
+            joystick.onMoveEnd.AddListener(OnMoveEnd);
+            joystick.onTouchStart.AddListener(OnTouchStart);
+            joystick.onTouchUp.AddListener(OnTouchUp);
+            joystick.OnDownUp.AddListener(OnDownUp);
+            joystick.OnDownDown.AddListener(OnDownDown);
+            joystick.OnDownLeft.AddListener(OnDownLeft);
+            joystick.OnDownRight.AddListener(OnDownRight);
+            joystick.OnPressUp.AddListener(OnPressUp);
+            joystick.OnPressDown.AddListener(OnPressDown);
+            joystick.OnPressLeft.AddListener(OnPressLeft);
+            joystick.OnPressRight.AddListener(OnPressRight);
+        }
+    }
+    
+    void OnDisable()
+    {
+        ETCJoystick joystick = GetComponent<ETCJoystick>();
+        if (joystick != null)
+        {
+            joystick.onMoveStart.RemoveListener(OnMoveStart);
+            joystick.onMove.RemoveListener(OnMove);
+            joystick.onMoveSpeed.RemoveListener(OnMoveSpeed);
+            joystick.onMoveEnd.RemoveListener(OnMoveEnd);
+            joystick.onTouchStart.RemoveListener(OnTouchStart);
+            joystick.onTouchUp.RemoveListener(OnTouchUp);
+            joystick.OnDownUp.RemoveListener(OnDownUp);
+            joystick.OnDownDown.RemoveListener(OnDownDown);
+            joystick.OnDownLeft.RemoveListener(OnDownLeft);
+            joystick.OnDownRight.RemoveListener(OnDownRight);
+            joystick.OnPressUp.RemoveListener(OnPressUp);
+            joystick.OnPressDown.RemoveListener(OnPressDown);
+            joystick.OnPressLeft.RemoveListener(OnPressLeft);
+            joystick.OnPressRight.RemoveListener(OnPressRight);
+        }
+    }
+
+
+     void OnTouchStart()
+     {
+         evt_OnTouchStart.Call(null);
+     }
+     void OnTouchUp()
+     {
+         evt_OnTouchUp.Call(null);
+     }
+     void OnDownUp()
+     {
+         evt_OnDownUp.Call(null);
+     }
+     void OnDownDown()
+     {
+         evt_OnDownDown.Call(null);
+     }
+     void OnDownLeft()
+     {
+         evt_OnDownLeft.Call(null);
+     }
+     void OnDownRight()
+     {
+         evt_OnDownRight.Call(null);
+     }
+     void OnPressUp()
+     {
+         evt_OnPressUp.Call(null);
+     }
+     void OnPressDown()
+     {
+         evt_OnPressDown.Call(null);
+     }
+     void OnPressLeft()
+     {
+         evt_OnPressLeft.Call(null);
+     }
+     void OnPressRight()
+     {
+         evt_OnPressRight.Call(null);
+     }
+
+
+     void OnMoveStart()
+     {
+         
+         evt_OnMoveStart.Call(null);
+
+     }
+
+    void OnMoveEnd()
+     {
+         evt_OnMoveEnd.Call(null);
+     }
+
+     void OnMove(Vector2 point)
+     {
+         LuaVector2Lib._wrap(LuaRoot._Lua, point);
+         int refGesture = LuaRoot._Lua.L_Ref(LuaDef.LUA_REGISTRYINDEX); 
+         using (LuaValue_Any anyV = new LuaValue_Any(refGesture))
+         {
+             evt_OnMove.Call(anyV);
+         }
+     }
+
+     void OnMoveSpeed(Vector2 point)
+     {
+         LuaVector2Lib._wrap(LuaRoot._Lua, point);
+         int refGesture = LuaRoot._Lua.L_Ref(LuaDef.LUA_REGISTRYINDEX); 
+         using (LuaValue_Any anyV = new LuaValue_Any(refGesture))
+         {
+             evt_OnMoveSpeed.Call(anyV);
+         }
+     }
+
+     void OnDestroy()
+     {
+         evt_OnMoveStart.Dispose(); evt_OnMoveStart = null;
+         evt_OnMove.Dispose(); evt_OnMove = null;
+         evt_OnMoveSpeed.Dispose(); evt_OnMoveSpeed = null;
+         evt_OnMoveEnd.Dispose(); evt_OnMoveEnd = null;
+         evt_OnTouchStart.Dispose(); evt_OnTouchStart = null;
+         evt_OnTouchUp.Dispose(); evt_OnTouchUp = null;
+         evt_OnDownUp.Dispose(); evt_OnDownUp = null;
+         evt_OnDownDown.Dispose(); evt_OnDownDown = null;
+         evt_OnDownLeft.Dispose(); evt_OnDownLeft = null;
+         evt_OnDownRight.Dispose(); evt_OnDownRight = null;
+         evt_OnPressUp.Dispose(); evt_OnPressUp = null;
+         evt_OnPressDown.Dispose(); evt_OnPressDown = null;
+         evt_OnPressLeft.Dispose(); evt_OnPressLeft = null;
+         evt_OnPressRight.Dispose(); evt_OnPressRight = null;
+
+         
+     }
+
+     public QKEvent evt_OnMoveStart = new QKEvent();
+     public QKEvent evt_OnMove = new QKEvent();
+     public QKEvent evt_OnMoveSpeed = new QKEvent();
+     public QKEvent evt_OnMoveEnd = new QKEvent();
+     public QKEvent evt_OnTouchStart = new QKEvent();
+     public QKEvent evt_OnTouchUp = new QKEvent();
+     public QKEvent evt_OnDownUp = new QKEvent();
+     public QKEvent evt_OnDownDown = new QKEvent();
+     public QKEvent evt_OnDownLeft = new QKEvent();
+     public QKEvent evt_OnDownRight = new QKEvent();
+     public QKEvent evt_OnPressUp = new QKEvent();
+     public QKEvent evt_OnPressDown = new QKEvent();
+     public QKEvent evt_OnPressLeft = new QKEvent();
+     public QKEvent evt_OnPressRight = new QKEvent();
+}
+
+class LuaCMETCJoystickEventsLib
+{
+    class CMETCJoystickEventsInfo : ICoreComponentInfo
+    {
+        public Type type { get { return typeof(ETCJoystickEvents); } }
+        public string name { get { return LuaCMETCJoystickEventsLib.LIB_NAME; } }
+        public void newLuaObj(ILuaState lua, Component cmp)
+        {
+            LuaCMETCJoystickEventsLib._wrap(lua, cmp as ETCJoystickEvents);
+        }
+    }
+
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+    public const string LIB_NAME = "CMETCJoystickEvents";
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {  
+            new NameFuncPair("OnPressRight",M_OnPressRight),  
+            new NameFuncPair("OnPressLeft",M_OnPressLeft),  
+            new NameFuncPair("OnPressDown",M_OnPressDown),  
+            new NameFuncPair("OnPressUp",M_OnPressUp),  
+            new NameFuncPair("OnDownRight",M_OnDownRight),  
+            new NameFuncPair("OnDownLeft",M_OnDownLeft),  
+            new NameFuncPair("OnDownDown",M_OnDownDown),  
+            new NameFuncPair("OnDownUp",M_OnDownUp),  
+            new NameFuncPair("OnTouchUp",M_OnTouchUp),  
+            new NameFuncPair("OnTouchStart",M_OnTouchStart),  
+            new NameFuncPair("OnMoveEnd",M_OnMoveEnd),  
+            new NameFuncPair("OnMoveSpeed",M_OnMoveSpeed),  
+            new NameFuncPair("OnMove",M_OnMove),  
+            new NameFuncPair("OnMoveStart",M_OnMoveStart),                  
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            
+        };
+
+        //注册静态属性
+        NameValuePair[] static_property = new NameValuePair[]
+        {
+            new NameValuePair("Name",LIB_NAME),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define, static_property);
+
+        //注册组件
+        LuaGameObjectLib.RegComponent(new CMETCJoystickEventsInfo()); 
+
+        return 1;
+    }
+
+
+    public static void _wrap(ILuaState lua, ETCJoystickEvents comp)
+    {
+        LuaOpenLibs._wrapComponent(lua, comp, LIB_NAME, m_ClassRegHelper);
+    }
+
+    public static ETCJoystickEvents Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<ETCJoystickEvents>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    static int M_OnMoveStart(ILuaState lua)
+    {
+        //in self
+        //out QKEvent
+        ETCJoystickEvents self = Lua2Obj(lua, 1);
+        LuaEventLib._wrap(lua, self.evt_OnMoveStart);
+        return 1;
+    }
+
+    static int M_OnMove(ILuaState lua)
+    {
+        //in self
+        //out QKEvent
+        ETCJoystickEvents self = Lua2Obj(lua, 1);
+        LuaEventLib._wrap(lua, self.evt_OnMove);
+        return 1;
+    }
+
+    static int M_OnMoveSpeed(ILuaState lua)
+    {
+        //in self
+        //out QKEvent
+        ETCJoystickEvents self = Lua2Obj(lua, 1);
+        LuaEventLib._wrap(lua, self.evt_OnMoveSpeed);
+        return 1;
+    }
+
+    static int M_OnMoveEnd(ILuaState lua)
+    {
+        //in self
+        //out QKEvent
+        ETCJoystickEvents self = Lua2Obj(lua, 1);
+        LuaEventLib._wrap(lua, self.evt_OnMoveEnd);
+        return 1;
+    }
+
+    static int M_OnTouchStart(ILuaState lua)
+    {
+        //in self
+        //out QKEvent
+        ETCJoystickEvents self = Lua2Obj(lua, 1);
+        LuaEventLib._wrap(lua, self.evt_OnTouchStart);
+        return 1;
+    }
+
+    static int M_OnTouchUp(ILuaState lua)
+    {
+        //in self
+        //out QKEvent
+        ETCJoystickEvents self = Lua2Obj(lua, 1);
+        LuaEventLib._wrap(lua, self.evt_OnTouchUp);
+        return 1;
+    }
+
+    static int M_OnDownUp(ILuaState lua)
+    {
+        //in self
+        //out QKEvent
+        ETCJoystickEvents self = Lua2Obj(lua, 1);
+        LuaEventLib._wrap(lua, self.evt_OnDownUp);
+        return 1;
+    }
+
+    static int M_OnDownDown(ILuaState lua)
+    {
+        //in self
+        //out QKEvent
+        ETCJoystickEvents self = Lua2Obj(lua, 1);
+        LuaEventLib._wrap(lua, self.evt_OnDownDown);
+        return 1;
+    }
+
+    static int M_OnDownLeft(ILuaState lua)
+    {
+        //in self
+        //out QKEvent
+        ETCJoystickEvents self = Lua2Obj(lua, 1);
+        LuaEventLib._wrap(lua, self.evt_OnDownLeft);
+        return 1;
+    }
+
+    static int M_OnDownRight(ILuaState lua)
+    {
+        //in self
+        //out QKEvent
+        ETCJoystickEvents self = Lua2Obj(lua, 1);
+        LuaEventLib._wrap(lua, self.evt_OnDownRight);
+        return 1;
+    }
+
+    static int M_OnPressUp(ILuaState lua)
+    {
+        //in self
+        //out QKEvent
+        ETCJoystickEvents self = Lua2Obj(lua, 1);
+        LuaEventLib._wrap(lua, self.evt_OnPressUp);
+        return 1;
+    }
+
+    static int M_OnPressDown(ILuaState lua)
+    {
+        //in self
+        //out QKEvent
+        ETCJoystickEvents self = Lua2Obj(lua, 1);
+        LuaEventLib._wrap(lua, self.evt_OnPressDown);
+        return 1;
+    }
+
+    static int M_OnPressLeft(ILuaState lua)
+    {
+        //in self
+        //out QKEvent
+        ETCJoystickEvents self = Lua2Obj(lua, 1);
+        LuaEventLib._wrap(lua, self.evt_OnPressLeft);
+        return 1;
+    }
+
+    static int M_OnPressRight(ILuaState lua)
+    {
+        //in self
+        //out QKEvent
+        ETCJoystickEvents self = Lua2Obj(lua, 1);
+        LuaEventLib._wrap(lua, self.evt_OnPressRight);
+        return 1;
+    }
+
+}
+
+class LuaCMETCJoystickLib
+{
+    class CMETCJoystickInfo : ICoreComponentInfo
+    {
+        public Type type { get { return typeof(ETCJoystick); } }
+        public string name { get { return LuaCMETCJoystickLib.LIB_NAME; } }
+        public void newLuaObj(ILuaState lua, Component cmp)
+        {
+            LuaCMETCJoystickLib._wrap(lua, cmp as ETCJoystick); 
+        }
+    }
+
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+    public const string LIB_NAME = "CMETCJoystick";
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        { 
+           new NameFuncPair("Events",M_Events), 
+           new NameFuncPair("JoystickName",M_JoystickName), 
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            
+        };
+
+        //注册静态属性
+        NameValuePair[] static_property = new NameValuePair[]
+        {
+            new NameValuePair("Name",LIB_NAME),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define, static_property);
+
+        //注册组件
+        LuaGameObjectLib.RegComponent(new CMETCJoystickInfo());
+
+         
+        return 1;
+    }
+
+
+    public static void _wrap(ILuaState lua, ETCJoystick comp)
+    {
+        LuaOpenLibs._wrapComponent(lua, comp, LIB_NAME, m_ClassRegHelper);
+    }
+
+    public static ETCJoystick Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<ETCJoystick>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+
+    public static int M_Events(ILuaState lua)
+    {
+        //in self
+        //out CMETCJoystickEvents
+        ETCJoystick self = Lua2Obj(lua, 1);
+        ETCJoystickEvents evts = self.gameObject.GetComponent<ETCJoystickEvents>();
+        if(evts==null) evts = self.gameObject.AddComponent<ETCJoystickEvents>();
+
+        LuaCMETCJoystickEventsLib._wrap(lua, evts);
+        return 1;
+    }
+   
+    public static int M_JoystickName(ILuaState lua)
+    {
+        //in self
+        //out string
+        ETCJoystick self = Lua2Obj(lua, 1);
+        lua.PushString(self.gameObject.name);
+        return 1;
+    }
+
+
+} 

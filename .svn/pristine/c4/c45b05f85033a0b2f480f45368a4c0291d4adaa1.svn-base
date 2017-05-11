@@ -1,0 +1,121 @@
+ManifestFileVersion: 0
+CRC: 3413800943
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 6aa37f188f329a190d80f408fb58dac8
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 2e6ff121bfa6db4560be3741e1983a78
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 49
+  Script: {instanceID: 0}
+- Class: 65
+  Script: {instanceID: 0}
+- Class: 74
+  Script: {instanceID: 0}
+- Class: 90
+  Script: {instanceID: 0}
+- Class: 91
+  Script: {instanceID: 0}
+- Class: 95
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: ae942c9068183dc40a9d01f648273726, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 75e7459110b9666449485c40f25362a5, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 858a20c1b21a3f94bb5b2d3b901c9aaf, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 9e2747e3775af504da1a4d5a46c5a1ce, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e9d0b5f3bbe925a408bd595c79d0bf63, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 0b4eb3a400afab046abb8471a9d746d6, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 07c4de3b4b6fe9045b059ee627c100df, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4d0c51bb0b6e93049af5e88f93826e3b, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 128
+  Script: {instanceID: 0}
+- Class: 198
+  Script: {instanceID: 0}
+- Class: 199
+  Script: {instanceID: 0}
+Assets:
+- Assets/Resources/ui/@ui_fight/skillfxAtlas.prefab
+- Assets/Resources/ui/@ui_fight/binsiAtlas.png
+- Assets/Resources/ui/@ui_fight/ui_comboAtlas.mat
+- Assets/Resources/ui/@ui_fight/ui_fightAtlas.png
+- Assets/Resources/ui/@ui_fight/guangtiao/Tx_Models/pian/fangp_zl_001/fangp_zl_001.FBX
+- Assets/Resources/ui/@ui_fight/ui_comboAtlas.prefab
+- Assets/Resources/ui/@ui_fight/EagleEyeAtlas.prefab
+- Assets/Resources/ui/@ui_fight/binsiAtlas.prefab
+- Assets/Resources/ui/@ui_fight/yinchang_sb/Tx_Texhures/Tx_xingtai/@xingtai_zl_004/xingtai_zl_004.tga
+- Assets/Resources/ui/@ui_fight/yinchang_cg/Tx_Models/pian/@tixingpianz_zl_002/tixingpianz_zl_002.FBX
+- Assets/Resources/ui/@ui_fight/binsiAtlas.mat
+- Assets/Resources/ui/@ui_fight/yinchang_sb/Tx_Models/pian/@tixingpianz_zl_002/Materials/No
+  Name.mat
+- Assets/Resources/ui/@ui_fight/yinchang_cg/Tx_Materials/xulie_zl_004.mat
+- Assets/Resources/ui/@ui_fight/zhuiguang/Prefab/zhuiguang.prefab
+- Assets/Resources/ui/@ui_fight/yinchang_sb/Tx_Texhures/Tx_lizi/@lizi_zl_007/lizi_zl_007.png
+- Assets/Resources/ui/@ui_fight/EagleEyeAtlas.mat
+- Assets/Resources/ui/@ui_fight/yinchang_sb/Tx_Texhures/Tx_shandian/@shandian_zl_013/shandian_zl_013.tga
+- Assets/Resources/ui/@ui_fight/zhuiguang/Tx_Textures/Tx_light/@light_ll_003/light_ll_003.tga
+- Assets/Resources/ui/@ui_fight/yinchang_sb/Tx_Materials/xingtai_zl_004_02.mat
+- Assets/Resources/ui/@ui_fight/ui_fightAtlas.prefab
+- Assets/Resources/ui/@ui_fight/EagleEyeAtlas.png
+- Assets/Resources/ui/@ui_fight/zhuiguang/Tx_Materials/ani_ll_009_1.mat
+- Assets/Resources/ui/@ui_fight/guangtiao/Prefab/ui/guangtiao.prefab
+- Assets/Resources/ui/@ui_fight/combo.fnt
+- Assets/Resources/ui/@ui_fight/guangtiao/Tx_Texhures/Tx_zhezhao/zhezhao_zl_005/zhezhao_zl_005.mat
+- Assets/Resources/ui/@ui_fight/yinchang_sb/Tx_Materials/lizi_zl_007.mat
+- Assets/Resources/ui/@ui_fight/yinchang_sb/Prefab/ui/yinchang_sb.prefab
+- Assets/Resources/ui/@ui_fight/spfxAtlas.mat
+- Assets/Resources/ui/@ui_fight/skillfxAtlas.mat
+- Assets/Resources/ui/@ui_fight/spfxAtlas.png
+- Assets/Resources/ui/@ui_fight/yinchang_sb/Tx_Materials/shandian_zl_013_02.mat
+- Assets/Resources/ui/@ui_fight/zhuiguang/Tx_Textures/Tx_animation/@ani_ll_009/ani_ll_009.tga
+- Assets/Resources/ui/@ui_fight/show.anim
+- Assets/Resources/ui/@ui_fight/guangtiao/Tx_Models/pian/fangp_zl_001/Materials/No
+  Name.mat
+- Assets/Resources/ui/@ui_fight/ui_fightAtlas.mat
+- Assets/Resources/ui/@ui_fight/yinchang_cg/Prefab/ui/yinchang_cg.prefab
+- Assets/Resources/ui/@ui_fight/ui_fight.controller
+- Assets/Resources/ui/@ui_fight/comboFont.prefab
+- Assets/Resources/ui/@ui_fight/ui_comboAtlas.png
+- Assets/Resources/ui/@ui_fight/yinchang_sb/Tx_Models/pian/@tixingpianz_zl_002/tixingpianz_zl_002.FBX
+- Assets/Resources/ui/@ui_fight/yinchang_cg/Tx_Texhures/Tx_xulie/@xulie_zl_004/xulie_zl_004.png
+- Assets/Resources/ui/@ui_fight/ui_combo.prefab
+- Assets/Resources/ui/@ui_fight/ui_fight.prefab
+- Assets/Resources/ui/@ui_fight/combo_0.tga
+- Assets/Resources/ui/@ui_fight/yinchang_cg/Tx_Models/pian/@tixingpianz_zl_002/Materials/No
+  Name.mat
+- Assets/Resources/ui/@ui_fight/zhuiguang/Tx_Materials/light_ll_003_1.mat
+- Assets/Resources/ui/@ui_fight/guangtiao/Tx_Texhures/Tx_zhezhao/zhezhao_zl_005/zhezhao_zl_005.png
+- Assets/Resources/ui/@ui_fight/spfxAtlas.prefab
+- Assets/Resources/ui/@ui_fight/skillfxAtlas.png
+Dependencies:
+- F:/unityProject/tzbd2Now/Assets/StreamingAssets/win64/packets/hero
+- F:/unityProject/tzbd2Now/Assets/StreamingAssets/win64/packets/common

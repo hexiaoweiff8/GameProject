@@ -1,0 +1,238 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<Project Name="luadebug.luaprj" Cmd="" Arg="" Dir="" Toggle="false" >
+    <Filter Name="PersistentData" Directory=".\.." Toggle="false" >
+        <Filter Name=".vs" Directory=".\..\.vs" Toggle="false" >
+            <Filter Name="NewHero" Directory=".\..\.vs\NewHero" Toggle="true" >
+                <Filter Name="v14" Directory=".\..\.vs\NewHero\v14" Toggle="true" />
+            </Filter>
+        </Filter>
+        <Filter Name="luadebug" Toggle="true" />
+        <Filter Name="obj" Directory=".\..\obj" Toggle="true" >
+            <Filter Name="Debug" Directory=".\..\obj\Debug" Toggle="true" />
+        </Filter>
+        <Filter Name="pack_script" Directory=".\..\pack_script" Toggle="false" >
+            <Filter Name="pk_lualibs" Directory=".\..\pack_script\pk_lualibs" Toggle="false" >
+                <Filter Name="LuaLibs" Directory=".\..\pack_script\pk_lualibs\LuaLibs" Toggle="true" >
+                    <LuaFile RelativePath=".\..\pack_script\pk_lualibs\LuaLibs\_libmain.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_lualibs\LuaLibs\class.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_lualibs\LuaLibs\cm_coroutine.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_lualibs\LuaLibs\debug.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_lualibs\LuaLibs\delegate.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_lualibs\LuaLibs\event.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_lualibs\LuaLibs\exlua.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_lualibs\LuaLibs\exmath.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_lualibs\LuaLibs\exstring.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_lualibs\LuaLibs\extable.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_lualibs\LuaLibs\exVector2.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_lualibs\LuaLibs\exVector3.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_lualibs\LuaLibs\luacsv.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_lualibs\LuaLibs\progress_statistical.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_lualibs\LuaLibs\resultwait.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_lualibs\LuaLibs\sceneJump.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_lualibs\LuaLibs\wnd_base.lua" />
+                </Filter>
+            </Filter>
+            <Filter Name="pk_script" Directory=".\..\pack_script\pk_script" Toggle="false" >
+                <LuaFile RelativePath=".\..\pack_script\pk_script\EventHandles.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_script\GameCookies.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_script\jsonparse.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_script\main.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_script\memdebug.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_script\TestFight.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_script\tmp.lua" />
+                <Filter Name="component" Directory=".\..\pack_script\pk_script\component" Toggle="true" >
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\component\CMUICountDown.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\component\CMUIInScreen.lua" />
+                </Filter>
+                <Filter Name="dydata" Directory=".\..\pack_script\pk_script\dydata" Toggle="true" >
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\dydata\AHeroInfos.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\dydata\AvaHero.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\dydata\CommItems.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\dydata\Equip.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\dydata\EquipMaterials.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\dydata\formation.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\dydata\Frms.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\dydata\GKInfo.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\dydata\Hero.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\dydata\HHero.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\dydata\JLBag.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\dydata\OOSyncList.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\dydata\Player.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\dydata\playerdata.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\dydata\SJM.lua" />
+                </Filter>
+                <Filter Name="init" Directory=".\..\pack_script\pk_script\init" Toggle="false" >
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\init\_requirefiles.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\init\cm_gameinit.lua" />
+                </Filter>
+                <Filter Name="littleFunction" Directory=".\..\pack_script\pk_script\littleFunction" Toggle="true" >
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\littleFunction\DataConversion.lua" />
+                </Filter>
+                <Filter Name="login" Directory=".\..\pack_script\pk_script\login" Toggle="true" >
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\login\___cm_loginsys.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\login\cm_serverlist_update.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\login\cm_serverst_update.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\login\logincm_setup.lua" />
+                </Filter>
+                <Filter Name="network" Directory=".\..\pack_script\pk_script\network" Toggle="true" >
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\network\___cm_serverlink.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\network\__nm_login.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\network\cm_AutoReConn.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\network\GameConn.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\network\HttpLoaderEX.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\network\LoaderEX.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\network\nm_chat.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\network\nm_dispatcher.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\network\nm_uattr.lua" />
+                </Filter>
+                <Filter Name="scene" Directory=".\..\pack_script\pk_script\scene" Toggle="true" >
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\scene\__cm_armyai.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\scene\__cm_CameraCtrl.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\scene\__cm_GameScene.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\scene\__cm_lightai.lua" />
+                </Filter>
+                <Filter Name="sdata" Directory=".\..\pack_script\pk_script\sdata" Toggle="true" >
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\client_config.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_Buzhenxuanze.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_DialogueData.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_DiaoluoType.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_DramaData.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_EquipData.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_equiplist.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_FirstPay.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_HardMission.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_huodong.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_itemdata.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_JunlingbaoData.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_keyvalue.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_KeyValueMath.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_LeijiChongzhi.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_Mission.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_MonsterData.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_NormalHead.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_OfflicalRank.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_Pay.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_PKAward.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_suiji.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_SurrenderCost.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_uidefine.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_username_boy.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_username_girl.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_username_xing.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_username_xingming.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_VIP.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sdata\sdata_XilianshiData.lua" />
+                </Filter>
+                <Filter Name="sound" Directory=".\..\pack_script\pk_script\sound" Toggle="true" >
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\sound\cm_BackgroundMusic.lua" />
+                </Filter>
+                <Filter Name="wnd" Directory=".\..\pack_script\pk_script\wnd" Toggle="true" >
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\_wnddefine.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\CodingEasyer.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\DragDropCtrlBase.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\exui_AlphaTip.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\exui_CardCollection.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\exui_Formation.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\exui_HeroCard.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\item_popMenu.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\TestCode.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_achievements.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_background.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_beibao.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_buzheng.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_CardHouse.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_chat.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_chongzhi.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_ChouJiang.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_CreateRole.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_dailytasks.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_DanXuan.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_daohang.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_debug.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_enemy_info.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_fight_info.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_fightwin.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_gainmethod.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_gameinit.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_guanka.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_GuankaJuqing.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_healthadvice.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_heroinfo.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_HeroPerview.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_itemget.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_jingjichang.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_liezhuan.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_login.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_main.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_NetConnectWait.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_NewCard.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_paihangbang.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_PlayerCreate.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_playerinfo.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_qianzhuang.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_randomEvents.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_readyfight.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_ReadyToFight.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_recruitHero.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_replay.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_replayinfo.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_rewardbox.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_serverlist.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_ShuangXuan.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_Storybooks.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_success.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_TitlesVideo.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_tuiguan.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_tuiguanfail.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\wnd_xilian.lua" />
+                    <LuaFile RelativePath=".\..\pack_script\pk_script\wnd\WndJumpManage.lua" />
+                </Filter>
+            </Filter>
+            <Filter Name="pk_tabs" Directory=".\..\pack_script\pk_tabs" Toggle="true" >
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\Choujiang.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\ChoujiangItem.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\ChoujiangPreview.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\CJItem.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\DialogueData.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\DiaoluoType.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\DramaData.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\EquipData.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\equiplist.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\FirstPay.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\HardMission.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\HeadFrame.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\HeroHead.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\Huodong.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\Id2String.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\ItemData.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\JunlingbaoData.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\KeyValue.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\KeyValueMath.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\LessonData.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\LoadingTips.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\Mission.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\MissionCity.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\MissionMonster.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\MissionPart.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\MissionState.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\NormalHead.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\OfflicalRank.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\Pay.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\PKAward.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\SuijiBaoxiang.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\SuijiEvent.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\SuijiHero.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\SuijiMonster.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\SuijiShop.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\SurrenderCost.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\UiDefine.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\username_boy.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\username_girl.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\username_xing.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\VIP.lua" />
+                <LuaFile RelativePath=".\..\pack_script\pk_tabs\XilianshiData.lua" />
+            </Filter>
+        </Filter>
+    </Filter>
+</Project>

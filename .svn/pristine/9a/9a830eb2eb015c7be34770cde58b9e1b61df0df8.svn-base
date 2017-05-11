@@ -1,0 +1,235 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+class LuaWndManageLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    // static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "WndManage";
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair("Show",S_Show),
+            new NameFuncPair("Hide",S_Hide),
+            new NameFuncPair("RegWnd",S_RegWnd),
+            new NameFuncPair("GetDependPackets",S_GetDependPackets),
+            new NameFuncPair("PreLoadDepend",S_PreLoadDepend),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        //注册静态属性
+        lua.PushString("OnShowFinish");
+        LuaEventLib._wrap(lua, OnShowFinish);
+        lua.RawSet(-3);
+
+        lua.PushString("OnHideFinish");
+        LuaEventLib._wrap(lua, OnHideFinish);
+        lua.RawSet(-3);
+
+        
+
+        lua.PushString("OnLostInstance");
+        LuaEventLib._wrap(lua, OnLostInstance);
+        lua.RawSet(-3);
+
+
+        lua.PushString("OnPreLoadFinish");
+        LuaEventLib._wrap(lua, OnPreLoadFinish);
+        lua.RawSet(-3);
+        
+        //注册枚举
+        NameValuePair[] WndFadeMode_define = new NameValuePair[]
+        {
+            new NameValuePair("None",0),
+            new NameValuePair("ScaleAlpha",1),
+            new NameValuePair("Alpha",2),
+            new NameValuePair("Scale",3),
+        };
+        m_ClassRegHelper.RegEnum(lua, "FadeMode", WndFadeMode_define);
+
+        NameValuePair[] WndAnimationMode_define = new NameValuePair[]
+        {
+            new NameValuePair("situ",(int)WndAnimationMode.situ),
+            new NameValuePair("down",(int)WndAnimationMode.down),
+            new NameValuePair("up",(int)WndAnimationMode.up),
+            new NameValuePair("left",(int)WndAnimationMode.left),
+            new NameValuePair("right",(int)WndAnimationMode.right),
+        }; 
+        m_ClassRegHelper.RegEnum(lua, "WndAnimationMode", WndAnimationMode_define);
+
+
+        WndManage.Single.OnWndDestroy += OnWndDestroy;
+      //  evt_shapShowFinish.AddCallback(new SharpEventCallback(OnShapWndShowFinish));
+
+        return 1;
+    }
+
+    
+    static int S_RegWnd(ILuaState lua)
+    {
+        //in wndName,packetNames,sort,cacheTime,WndFadeMode,WndAnimationMode
+        //out void
+        try
+        {
+            string wndName = lua.L_CheckString(1);
+
+            string packetNames = lua.L_CheckString(2);
+
+            int sort = lua.L_CheckInteger(3);
+
+            int cacheTime = lua.L_CheckInteger(4);
+
+            int fade = lua.L_CheckInteger(5);
+
+            int wndAnimationMode = lua.L_CheckInteger(6);
+
+            WndManage.Single.RegWnd(wndName, packetNames, sort, cacheTime, (WndFadeMode)fade, (WndAnimationMode)wndAnimationMode);
+
+            
+        }catch(Exception ex)
+        {
+            lua.L_Error(ex.ToString());
+        }
+        return 0;
+    }
+
+    static int S_Show(ILuaState lua)
+    {
+        //in name[,duration]
+        //out void
+        int n = lua.GetTop();
+        string wndName = lua.L_CheckString(1);
+        float duration = n >= 2 ? (float)lua.L_CheckNumber(2) : Wnd.DefaultDuration;
+
+        //CoroutineManage.Single.StartCoroutine(  WndManage.Single.ShowWnd(wndName, duration, OnShapWndShowFinish)  );
+
+        WndManage.Single.ShowWnd(wndName, duration, OnSharpWndShowFinish);
+
+        return 0;
+    }
+
+
+    static int S_Hide(ILuaState lua)
+    {
+        //in name[,duration]
+        //out void
+        int n = lua.GetTop();
+        string wndName = lua.L_CheckString(1);
+        float duration = n >= 2 ? (float)lua.L_CheckNumber(2) : Wnd.DefaultDuration;
+
+        WndManage.Single.HideWnd(wndName, duration, OnSharpWndHideFinish);
+
+        return 0;
+    }
+     
+     
+    static int S_GetDependPackets(ILuaState lua)
+    {
+        //in wndName1[,wndName2,...]
+        //out table {packet1,packet2,...}
+        int n = lua.GetTop();
+        List<string> wndList = new List<string>();
+        for(int i=1;i<=n;i++)
+        {
+            string wndName = lua.L_CheckString(i);
+            wndList.Add(wndName);
+        }
+
+        //压入返回值
+        int index = 1;
+        HashSet<string> packets = WndManage.Single.GetDependPackets(wndList);
+        lua.CreateTable(0, 0);
+        foreach (string curr in packets)
+        {
+            //压入值 
+            LuaRoot.PushObject(lua, curr);
+
+            //建立keyValue
+            lua.RawSetI(-2, index++); 
+        }
+        return 1;
+    }
+
+    static void OnSharpWndShowFinish(Wnd wnd)
+    { 
+
+        LuaWndLib._wrap(LuaRoot._Lua, wnd);
+        int luaWndRef = LuaRoot._Lua.L_Ref(LuaDef.LUA_REGISTRYINDEX);
+        using (LuaValue_Any luaWnd = new LuaValue_Any(luaWndRef))
+        {
+            OnShowFinish.Call(luaWnd);//通知脚本窗体装载完成
+        }
+
+    }
+
+    static void OnSharpWndHideFinish(Wnd wnd)
+    {
+
+        LuaWndLib._wrap(LuaRoot._Lua, wnd);
+        int luaWndRef = LuaRoot._Lua.L_Ref(LuaDef.LUA_REGISTRYINDEX);
+        using (LuaValue_Any luaWnd = new LuaValue_Any(luaWndRef))
+        {
+            OnHideFinish.Call(luaWnd);//通知脚本窗体隐藏完成
+        }
+
+    }
+
+    static void OnSharpWndPreLoadFinish(Wnd wnd)
+    {
+        LuaWndLib._wrap(LuaRoot._Lua, wnd);
+        int luaWndRef = LuaRoot._Lua.L_Ref(LuaDef.LUA_REGISTRYINDEX);
+        using (LuaValue_Any luaWnd = new LuaValue_Any(luaWndRef))
+        {
+            OnPreLoadFinish.Call(luaWnd);//通知脚本窗体预加载完成
+        }
+
+    }
+    static void OnWndDestroy(Wnd wnd)
+    {
+        LuaWndLib._wrap(LuaRoot._Lua, wnd);
+        int luaWndRef = LuaRoot._Lua.L_Ref(LuaDef.LUA_REGISTRYINDEX);
+        using (LuaValue_Any luaWnd = new LuaValue_Any(luaWndRef))
+        {
+            OnLostInstance.Call(luaWnd);//通知脚本窗体即将被卸载
+        }
+    }
+
+    static int S_PreLoadDepend(ILuaState lua)
+    {
+
+        string wndName = lua.L_CheckString(1);
+        WndManage.Single.PreLoadDepend(wndName, OnSharpWndPreLoadFinish);
+        return 0;
+    }
+
+    //static QKEvent evt_shapShowFinish = new QKEvent();
+
+
+    static QKEvent OnLostInstance = new QKEvent();
+    static QKEvent OnShowFinish = new QKEvent();
+    static QKEvent OnHideFinish = new QKEvent();
+    static QKEvent OnPreLoadFinish = new QKEvent();
+}
+ 

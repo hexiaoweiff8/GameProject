@@ -1,0 +1,89 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+ 
+class LuaApplicationLibs
+{
+
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper(); 
+
+
+    public const string LIB_NAME = "Application";
+
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            
+            
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair("Quit",S_Quit),
+            new NameFuncPair("GetRomValue",S_GetRomValue), 
+         
+            new NameFuncPair("ShowFPS",S_ShowFPS),
+            new NameFuncPair("GetScreenSize",S_GetScreenSize),            
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+    static int S_Quit(ILuaState lua)
+    {
+        //in void
+        //out void
+        Application.Quit();
+        ULDebug.Log("游戏退出");
+        return 0;
+    }
+
+    //获取配置项的值
+    static int S_GetRomValue(ILuaState lua)
+    {
+        
+        //in key
+        //out string
+        string key = lua.L_CheckString(1);
+        string v = GameConfig.Single.GetValue(key);
+        if (v == null)
+            lua.PushNil();
+        else
+            lua.PushString(v);
+        return 1;
+    }
+
+    
+    static int S_ShowFPS(ILuaState lua)
+    {
+        //in bool
+        bool isshow = lua.ToBoolean(1);
+        UROMSystem.Single.RemoveComponent<CMShowFPS>();
+        if (isshow) UROMSystem.Single.AddComponent<CMShowFPS>();
+        return 0;
+    }
+    static int S_GetScreenSize(ILuaState lua)
+    {
+        //out width,height
+        lua.PushInteger(Screen.width);
+        lua.PushInteger(Screen.height);
+        return 2;
+    }
+}
+

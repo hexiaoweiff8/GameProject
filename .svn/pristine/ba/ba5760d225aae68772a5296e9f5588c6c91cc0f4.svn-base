@@ -1,0 +1,55 @@
+require("common/init")
+require("uiscripts/init")
+require("eventsystem/init")
+require("framework/init")
+
+string_table = require("globalization/zh/string_table")
+
+
+print("This is a script from a utf8 file")
+
+require "LuaLibs.class"
+require "LuaLibs.exmath"
+require "LuaLibs.exVector3"
+require "LuaLibs.exVector2"
+require "LuaLibs.exlua"
+require "LuaLibs.delegate"
+require "LuaLibs.event"
+require "LuaLibs.extable"
+require "LuaLibs.exstring"
+require "LuaLibs.luacsv"
+require "LuaLibs.debug"
+require "LuaLibs.progress_statistical"
+require "LuaLibs.resultwait"
+require "LuaLibs.wndtz_base"
+require "LuaLibs.sceneJump" 
+
+require "init._requirefiles"
+ require "wnd._wnddefine"
+ require "EventHandles"
+
+
+
+local function Start()
+--	WndManage.Showt("ui_login",TestDict)
+ require "init.cm_gameinit_pan"
+end
+  varTable = {1,2,3,4,5}
+  varTable.default = 1	
+
+   function TestDict(wndqq)  
+   print("********-----xxxxxxxxxxxxx------111111111111111111111111111111111111111111111111111111111111111111111")
+    -- print(wndqq:GetName());
+   end
+
+Start()
+
+
+
+
+GameObject = UnityEngine.GameObject
+Object = UnityEngine.Object
+
+UNetworkManager = LuaHelper.GetNetManager()
+
+Resources = UnityEngine.Resources

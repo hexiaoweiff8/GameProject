@@ -1,0 +1,16 @@
+﻿using UnityEngine;
+using System.Collections;
+using System;
+
+public class DaiJiTriTrigger : SoldierFSMTrigger {
+
+    public override bool CheckTrigger(SoldierFSMSystem fsm)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void Init()
+    {
+        throw new NotImplementedException();
+    }
+}

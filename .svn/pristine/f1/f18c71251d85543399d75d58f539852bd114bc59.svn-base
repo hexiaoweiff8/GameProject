@@ -1,0 +1,162 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+ 
+/// <summary>
+/// 统计英雄收集的能量
+/// </summary>
+public class AI_PowerStatistical
+{
+    public AI_PowerStatistical(AI_Battlefield ownerBattlefield)
+    {
+        m_OwnerBattlefield = ownerBattlefield;
+
+
+        ownerBattlefield.Event.OnHeroDie += OnHeroDie;
+        ownerBattlefield.Event.OnSoldiersDie += OnSoldiersDie;
+        ownerBattlefield.Event.OnBishaRelease += OnBishaRelease;
+        ownerBattlefield.Event.OnShoudongRelease += OnShoudongRelease;
+        ownerBattlefield.Event.OnTexingRelease += OnTexingRelease;
+        ownerBattlefield.Event.OnGeneralRelease += OnGeneralRelease;
+        ownerBattlefield.Event.OnHeroLostHP += OnHeroLostHP;
+    }
+
+    void OnHeroDie(AI_Hero hero, AI_FightUnit attacker)
+    {
+        var attacker_soldiers = attacker as AI_Soldiers;
+        if (attacker_soldiers != null) //武将自己带的士兵杀死敌方一个武将
+            attacker_soldiers.OwnerArmySquare.hero.PowerAttr.CurrPower += SData_FightKeyValue.Single.ArmyToHeroNengliang;
+        else
+        {
+            var attacker_hero = attacker as AI_Hero;
+            if (attacker_hero != null)//武将自己杀死敌方一个武将
+                attacker_hero.PowerAttr.CurrPower += SData_FightKeyValue.Single.HeroToHeroNengliang;
+        }
+    }
+
+    void OnSoldiersDie(AI_Soldiers sb, AI_FightUnit attacker)
+    {
+        var attacker_soldiers = attacker as AI_Soldiers;
+        if (attacker_soldiers != null)//武将自己带的士兵杀死敌方一个士兵
+            attacker_soldiers.OwnerArmySquare.hero.PowerAttr.CurrPower += SData_FightKeyValue.Single.ArmyToArmyNengliang;
+        else
+        {
+            var attacker_hero = attacker as AI_Hero;
+            if (attacker_hero != null)//武将自己杀死敌方一个士兵
+                attacker_hero.PowerAttr.CurrPower += SData_FightKeyValue.Single.HeroToArmyNengliang;
+        }
+    }
+    void OnBishaRelease(AI_Hero hero,Skill skill)//必杀释放成功
+    {
+        hero.PowerAttr.CurrPower += skill.Nengliangzhi;
+    }
+
+    void OnShoudongRelease(AI_Hero hero, Skill skill)
+    {
+        hero.PowerAttr.CurrPower += skill.Nengliangzhi;
+    }
+
+
+    void OnTexingRelease(AI_Hero hero, Skill skill)//特性释放成功
+    {
+        hero.PowerAttr.CurrPower += skill.Nengliangzhi;
+    }
+
+    void OnGeneralRelease(AI_Hero hero, Skill skill)
+    {
+        hero.PowerAttr.CurrPower += skill.Nengliangzhi;
+    }
+
+    void OnHeroLostHP(AI_Hero hero, int num)
+    {
+        //武将每损失千分之一的HP
+        hero.PowerAttr.NotUsedLostHP += num;
+
+        var qfhp = hero.FinalMaxHP / 1000f;
+        if (hero.PowerAttr.NotUsedLostHP > qfhp)
+        {
+            hero.PowerAttr.CurrPower += (int)((float)hero.PowerAttr.NotUsedLostHP / qfhp * SData_FightKeyValue.Single.HpLostNengliang);
+            hero.PowerAttr.NotUsedLostHP = 0;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="unit">进攻方</param>
+    void OnLianzhan(AI_FightUnit unit, int lianzhanID, int num)
+    {
+        var campPowerAttr = unit.OwnerBattlefield.BattlefieldPowerAttr.GetCampPowerAttr(unit.Flag);
+        if (num < 1)//连斩失效 
+            campPowerAttr.LastLianzhan = 0;
+        else
+        {
+            int newcs = (int)((campPowerAttr.LastLianzhan + num) / SData_FightKeyValue.Single.LianzhanNumNengliang);
+            int oldcs = (int)(campPowerAttr.LastLianzhan / SData_FightKeyValue.Single.LianzhanNumNengliang);
+            if (newcs > oldcs)
+            {
+                var it = m_OwnerBattlefield.ArmySquareListEnumerator;
+                while (it.MoveNext())
+                {
+                    var s = it.Current;
+                    if (s.flag == unit.Flag)
+                        s.hero.PowerAttr.CurrPower += (newcs - oldcs) * SData_FightKeyValue.Single.LianzhanNengliang;
+                }
+            }
+            campPowerAttr.LastLianzhan += num;
+        }
+    }
+
+    AI_Battlefield m_OwnerBattlefield;
+}
+
+public class AI_BattlefieldPowerAttr
+{
+    public AI_CampPowerAttr GetCampPowerAttr(ArmyFlag flag)
+    {
+        return flag == ArmyFlag.Attacker ? m_Left : m_Right;
+    }
+
+    AI_CampPowerAttr m_Left = new AI_CampPowerAttr();
+    AI_CampPowerAttr m_Right = new AI_CampPowerAttr();
+}
+
+public class AI_CampPowerAttr
+{
+    public int LastLianzhan = 0;
+}
+
+
+
+public class AI_HeroPowerAttr
+{
+    public AI_HeroPowerAttr(AI_Hero owner)
+    {
+        OwnerHero = owner;
+        m_CurrPower = owner.Data.StartNengliang;
+    }
+
+    //当前能量
+    public int CurrPower
+    {
+        get { return m_CurrPower; }
+        set {
+            if (OwnerHero.IsDie) return;
+
+            m_CurrPower = value;
+
+            if(m_CurrPower>=SData_FightKeyValue.Single.NengliangMax)
+            {
+                m_CurrPower -= SData_FightKeyValue.Single.NengliangMax;
+
+                //抛出能量满事件
+                OwnerHero.OwnerBattlefield.Event.PostPowerFull(OwnerHero);
+            }
+
+        }
+    }
+    public int NotUsedLostHP = 0;//受到的伤害， 未转化为能量的部分
+    AI_Hero OwnerHero = null;
+    int m_CurrPower = 0;
+}

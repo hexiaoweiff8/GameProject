@@ -1,0 +1,31 @@
+﻿using UnityEngine;
+using System.Collections;
+/// <summary>
+/// 创建模型参数集
+/// </summary>
+public class CreateActorParam
+{
+    public AvatarCM CmType;
+    //ModleMaskColor maskColor,
+    public bool ColorMat;
+    public int FlagColorIdx;
+    public string MeshPackName;
+    public string TexturePackName;
+    public bool IsHero;
+
+    public CreateActorParam(AvatarCM cmType,
+        //ModleMaskColor maskColor,
+        bool colorMat,
+        int flagColorIdx,
+        string meshPackName,
+        string texturePackName,
+        bool isHero)
+    {
+        this.CmType = cmType;
+        this.ColorMat = colorMat;
+        this.FlagColorIdx = flagColorIdx;
+        this.MeshPackName = meshPackName;
+        this.TexturePackName = texturePackName;
+        this.IsHero = isHero;
+    }
+}

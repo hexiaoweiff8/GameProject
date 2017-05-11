@@ -1,0 +1,7 @@
+local data ={
+	info={key="SkillID",keytype=keytype.int},
+	head={"SkillID","Name","Des","SkillIcon"},
+	body={
+	}
+}
+return data

@@ -1,0 +1,431 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+public enum UIEventType
+{
+    None = 0,
+    Submit = 1,
+    Click =2,
+    DoubleClick=3,
+    Hover =4,
+    Press =5,
+    Select=6,
+    Scroll =7,
+    DragStart=8,
+    Drag=9,
+    DragOver=10,
+    DragOut=11,
+    DragEnd=12,
+    Drop=13,
+    Key=14,
+    Tooltip=15,
+    LinkClick = 16,
+    PixelClick = 17,
+    PixelPress = 18,
+    SelectionChange = 19,//下拉列表选项改变
+    LongPress = 20,//长按
+}
+ 
+//lua ui事件接口
+public class CMUIEvent : MonoBehaviour
+{ 
+
+    void OnDestroy()
+    {
+        UnListener(); 
+    }
+
+    public void ReBindFunc(ILuaState lua)
+    {
+        ReBindFunc(lua, m_callbackLuaFuncName);
+    }
+
+    public void ReBindFunc(ILuaState lua,string newFunc)
+    {
+        m_callbackLuaClass.Push(lua);
+        {
+            int callbackLuaFunc = LuaRoot.StoreMethod(lua, newFunc);
+            if (callbackLuaFunc <= 0) throw new Exception(string.Format("UIEvent.Listener {0}不是函数", newFunc));
+            m_callbackLuaFunc.SetRef(callbackLuaFunc);
+        }
+        lua.Pop(1);
+
+        m_callbackLuaFuncName = newFunc;
+    }
+
+    //监听事件
+    public void Listener(ILuaState lua,int gameObjectRefI, UIEventType tp, int callbackLuaClass, string callbackLuaFuncName,object param)
+    {
+        //int callbackLuaFunc
+        UnListener();
+
+        m_Param = param;
+        m_callbackLuaFuncName = callbackLuaFuncName;
+        m_callbackLuaClass.SetRef( callbackLuaClass);
+
+        ReBindFunc(lua);
+
+        LuaRoot._Lua.RawGetI(LuaDef.LUA_REGISTRYINDEX, gameObjectRefI);
+        GameObject go = LuaGameObjectLib.Lua2Obj(LuaRoot._Lua, -1);
+        LuaRoot._Lua.Pop(1);
+
+        QKUIEventListener listener = QKUIEventListener.Get(go);
+        switch (tp)
+        {
+            case UIEventType.Submit:
+                listener.onSubmit += VoidDelegate;
+                break;
+            case UIEventType.Click:
+                listener.onClick += VoidDelegate;
+                break;
+            case UIEventType.PixelClick:
+                listener.onPixelClick += VoidDelegate;
+                break;
+            case UIEventType.LinkClick:
+                listener.onLinkClick += LinkClickDelegate;
+                break;
+            case UIEventType.DoubleClick:
+                listener.onDoubleClick += VoidDelegate;
+                break;
+            case UIEventType.Hover:
+                listener.onHover += BoolDelegate;
+                break;
+            case UIEventType.Press:
+                listener.onPress += BoolDelegate;
+                break;
+            case UIEventType.LongPress:
+                listener.onLongPress += VoidDelegate;
+                break;
+            case UIEventType.PixelPress:
+                listener.onPixelPress += BoolDelegate;
+                break;
+            case UIEventType.SelectionChange:
+                listener.onSelectionChange += StringDelegate;
+                break;
+            case UIEventType.Select:
+                listener.onSelect += BoolDelegate;
+                break;
+            case UIEventType.Scroll:
+                listener.onScroll += FloatDelegate;
+                break;
+            case UIEventType.DragStart:
+                listener.onDragStart += VoidDelegate;
+                break;
+            case UIEventType.Drag:
+                listener.onDrag += VectorDelegate;
+                break;
+            case UIEventType.DragOver:
+                listener.onDragOver += VoidDelegate;
+                break;
+            case UIEventType.DragOut:
+                listener.onDragOut += VoidDelegate;
+                break;
+            case UIEventType.DragEnd:
+                listener.onDragEnd += VoidDelegate;
+                break;
+            case UIEventType.Drop:
+                listener.onDrop += ObjectDelegate;
+                break;
+            case UIEventType.Key:
+                listener.onKey += KeyCodeDelegate;
+                break;
+            case UIEventType.Tooltip:
+                listener.onTooltip += BoolDelegate;
+                break;
+        }
+
+        m_GameObjectRef.SetRef(gameObjectRefI);
+        m_tp = tp;
+    }
+
+    public static CMUIEvent Go(GameObject gameObj,UIEventType eType)
+    {
+        var events = gameObj.GetComponents<CMUIEvent>();
+        if(events==null||events.Length<1) 
+            return gameObj.AddComponent<CMUIEvent>();//没有绑定事件组件，则绑定
+
+        //选择一个类型匹配的组件
+        foreach(var evt in events)
+        {
+            if (evt.CurrEventType == eType) 
+                return evt;
+        }
+
+        //选择类型是空的组件
+        foreach (var evt in events)
+        {
+            if (evt.CurrEventType ==  UIEventType.None)
+                return evt;
+        }
+
+        return gameObj.AddComponent<CMUIEvent>();//没有设合适的组件可复用，则绑定新的
+    }
+
+    void UnListener()
+    {
+
+        if (m_GameObjectRef.RefI == LuaObjRef.EmptyObj)
+        {
+            UnrefLuaHandel();
+            return;
+        }
+
+        m_GameObjectRef.Push(LuaRoot._Lua);
+        GameObject go = LuaGameObjectLib.Lua2Obj(LuaRoot._Lua, -1);
+        LuaRoot._Lua.Pop(1);
+
+        if(go!=null)
+        {
+            QKUIEventListener listener = QKUIEventListener.Get(go);
+            switch (m_tp)
+            {
+                case UIEventType.Submit:
+                    //if (listener.onSubmit == VoidDelegate) 
+                        listener.onSubmit-= VoidDelegate;
+                    break;
+                case UIEventType.Click:
+                    //if (listener.onClick == VoidDelegate) 
+                        listener.onClick -= VoidDelegate;
+                    break;
+                case UIEventType.PixelClick:
+                    listener.onPixelClick -= VoidDelegate;
+                    break;
+                case UIEventType.LinkClick:
+                    listener.onLinkClick -= LinkClickDelegate;
+                    break;
+                case UIEventType.DoubleClick:
+                    //if (listener.onDoubleClick == VoidDelegate) 
+                        listener.onDoubleClick  -= VoidDelegate;
+                    break;
+                case UIEventType.Hover:
+                    //if (listener.onHover == BoolDelegate) 
+                        listener.onHover  -= BoolDelegate;
+                    break;
+                case UIEventType.Press:
+                    //if (listener.onPress == BoolDelegate) 
+                        listener.onPress  -= BoolDelegate;
+                    break;
+                case UIEventType.LongPress:
+                    listener.onLongPress -= VoidDelegate;
+                    break;
+                case UIEventType.PixelPress:
+                    listener.onPixelPress -= BoolDelegate;
+                    break;
+                case UIEventType.SelectionChange:
+                    listener.onSelectionChange -= StringDelegate;
+                    break;
+                case UIEventType.Select:
+                    //if (listener.onSelect == BoolDelegate) 
+                        listener.onSelect -= BoolDelegate;
+                    break;
+                case UIEventType.Scroll:
+                    //if (listener.onScroll == FloatDelegate) 
+                        listener.onScroll  -= FloatDelegate;
+                    break;
+                case UIEventType.DragStart:
+                    //if (listener.onDragStart == VoidDelegate) 
+                        listener.onDragStart  -= VoidDelegate;
+                    break;
+                case UIEventType.Drag:
+                    //if (listener.onDrag == VectorDelegate) 
+                        listener.onDrag  -= VectorDelegate;
+                    break;
+                case UIEventType.DragOver:
+                    //if (listener.onDragOver == VoidDelegate) 
+                        listener.onDragOver  -= VoidDelegate;
+                    break;
+                case UIEventType.DragOut:
+                    //if (listener.onDragOut == VoidDelegate) 
+                        listener.onDragOut  -= VoidDelegate;
+                    break;
+                case UIEventType.DragEnd:
+                    //if (listener.onDragEnd == VoidDelegate) 
+                        listener.onDragEnd -= VoidDelegate;
+                    break;
+                case UIEventType.Drop:
+                    //if (listener.onDrop == ObjectDelegate) 
+                        listener.onDrop  -= ObjectDelegate;
+                    break;
+                case UIEventType.Key:
+                    //if (listener.onKey == KeyCodeDelegate) 
+                        listener.onKey  -= KeyCodeDelegate;
+                    break;
+                case UIEventType.Tooltip:
+                    //if (listener.onTooltip == BoolDelegate) 
+                        listener.onTooltip -= BoolDelegate;
+                    break;
+            }
+            m_tp = UIEventType.None;
+        }
+        UnrefLuaHandel();
+    }
+
+    void VoidDelegate(GameObject go)
+    {
+        try
+        {
+            LuaCall.CallMemberG(m_callbackLuaFunc.RefI, m_callbackLuaClass.RefI, m_GameObjectRef.RefI, m_Param);
+        }catch(Exception ex)
+        {
+            ULDebug.LogError(string.Format( "游戏物体{0} 的回掉接口中存在错误", go.name));
+            ULDebug.LogError(ex.ToString());
+        }
+    }
+
+    /*
+    void StringDelegate(GameObject go, string strv)
+    {
+        try
+        {
+            LuaCall.CallMemberG(m_callbackLuaFunc.RefI, m_callbackLuaClass.RefI, m_GameObjectRef.RefI, (object)strv, m_Param);
+        }
+        catch (Exception ex)
+        {
+            ULDebug.LogError(string.Format("游戏物体{0} 的回掉接口中存在错误", go.name));
+            ULDebug.LogError(ex.ToString());
+        }
+    }*/
+
+    void BoolDelegate(GameObject go, bool state)
+    {
+        try
+        {
+            LuaCall.CallMemberG(m_callbackLuaFunc.RefI, m_callbackLuaClass.RefI, m_GameObjectRef.RefI, state, m_Param);
+        }
+        catch (Exception ex)
+        {
+            ULDebug.LogError(string.Format("游戏物体{0} 的回掉接口中存在错误", go.name));
+            ULDebug.LogError(ex.ToString());
+        }
+    }
+
+    void StringDelegate(GameObject go, string p1)
+    {
+        try
+        {
+            LuaCall.CallMemberG(m_callbackLuaFunc.RefI, m_callbackLuaClass.RefI, m_GameObjectRef.RefI,p1, m_Param);
+        }
+        catch (Exception ex)
+        {
+            ULDebug.LogError(string.Format("游戏物体{0} 的回掉接口中存在错误", go.name));
+            ULDebug.LogError(ex.ToString());
+        }
+    }
+
+    void LinkClickDelegate(GameObject go)
+    {
+        try
+        {
+            //string linkstr = null;
+            //var nguiLinkText = go.GetComponent<NGUILinkText>();
+            //if (nguiLinkText != null) linkstr = nguiLinkText.linkText;
+            LuaGameObjectLib._wrap(LuaRoot._Lua,go);
+
+            using (LuaObjRef refGo = new LuaObjRef(LuaRoot._Lua.L_Ref(LuaDef.LUA_REGISTRYINDEX)))
+            {
+
+                LuaCall.CallMemberG(m_callbackLuaFunc.RefI, m_callbackLuaClass.RefI, refGo.RefI, m_Param);
+            }
+        }
+        catch (Exception ex)
+        {
+            ULDebug.LogError(string.Format("游戏物体{0} 的回掉接口中存在错误", go.name));
+            ULDebug.LogError(ex.ToString());
+        }
+    }
+
+    void FloatDelegate(GameObject go, float delta)
+    {
+         try
+        {
+            LuaCall.CallMemberG(m_callbackLuaFunc.RefI, m_callbackLuaClass.RefI, m_GameObjectRef.RefI, delta, m_Param);
+        }  catch (Exception ex)
+          {
+              ULDebug.LogError(string.Format("游戏物体{0} 的回掉接口中存在错误", go.name));
+              ULDebug.LogError(ex.ToString());
+          }
+    }
+
+    void VectorDelegate(GameObject go, Vector2 delta)
+    {
+        try
+        {
+            LuaVector2Lib._wrap(LuaRoot._Lua, delta);
+            using (LuaValue_Any luaDelta = new LuaValue_Any(LuaRoot._Lua.L_Ref(LuaDef.LUA_REGISTRYINDEX)))
+            {
+                LuaCall.CallMemberG(m_callbackLuaFunc.RefI, m_callbackLuaClass.RefI, m_GameObjectRef.RefI, luaDelta, m_Param);
+            }
+        }
+        catch (Exception ex)
+        {
+            ULDebug.LogError(string.Format("游戏物体{0} 的回掉接口中存在错误", go.name));
+            ULDebug.LogError(ex.ToString());
+        }
+    }
+
+    void ObjectDelegate(GameObject go, GameObject obj)
+    {
+        try
+        {
+            LuaCall.CallMemberG(m_callbackLuaFunc.RefI, m_callbackLuaClass.RefI, m_GameObjectRef.RefI, obj, m_Param);
+        }
+        catch (Exception ex)
+        {
+            ULDebug.LogError(string.Format("游戏物体{0} 的回掉接口中存在错误", go.name));
+            ULDebug.LogError(ex.ToString());
+        }
+    }
+
+    void KeyCodeDelegate(GameObject go, KeyCode key)
+    {
+         try
+        {
+        //看看鼠标有没有需求，如果没有就不导出了
+        }
+         catch (Exception ex)
+         {
+             ULDebug.LogError(string.Format("游戏物体{0} 的回掉接口中存在错误", go.name));
+             ULDebug.LogError(ex.ToString());
+         }
+    }
+
+    void UnrefLuaHandel()
+    {
+        m_GameObjectRef.Dispose();
+        m_callbackLuaClass.Dispose();
+        m_callbackLuaFunc.Dispose();
+
+        {
+            IDisposable paramDisposable = m_Param as IDisposable;
+            if (paramDisposable != null) { paramDisposable.Dispose(); paramDisposable = null; }
+        }
+    }
+
+
+    public UIEventType CurrEventType {
+        get { return m_tp; }
+    }
+
+    [System.NonSerialized] 
+    UIEventType m_tp = UIEventType.None;
+
+    [System.NonSerialized]
+    LuaObjRef m_GameObjectRef = new LuaObjRef(LuaObjRef.EmptyObj);
+
+    [System.NonSerialized] 
+    LuaObjRef m_callbackLuaClass = new LuaObjRef(LuaObjRef.EmptyObj);
+
+    [System.NonSerialized] 
+    LuaObjRef m_callbackLuaFunc = new LuaObjRef(LuaObjRef.EmptyObj);
+
+    [System.NonSerialized] 
+    string m_callbackLuaFuncName = "";
+
+    [System.NonSerialized] 
+    object m_Param = null;
+}
+ 

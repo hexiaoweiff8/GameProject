@@ -1,0 +1,60 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+
+class LuaEncodingLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+  //  static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+
+    public const string LIB_NAME = "Encoding";
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+         };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair("MD5",S_MD5),
+            new NameFuncPair("BuildCKey",S_BuildCKey),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+     
+     static int S_MD5(ILuaState lua)
+    {
+        //in string
+        //out md5string
+        string v = lua.L_CheckString(1);
+        lua.PushString(QKEncoding.MD5(v));
+        return 1;
+    }
+
+     static int S_BuildCKey(ILuaState lua)
+     {
+         //in string
+         //out string
+         string v = lua.L_CheckString(1);
+         lua.PushString(QKEncoding.BuildCKey(v));
+         return 1;
+     }
+}

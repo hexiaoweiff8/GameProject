@@ -1,0 +1,536 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+/*
+public class QKEvent : IQKEvent
+{
+    public void AddCallback(IEventCallback callBack)
+    {
+        m_Callbacks.Add(callBack);
+    }
+
+    public void RemoveCallback(IEventCallback callBack)
+    {
+        callBack.Dispose();
+
+        if (m_Callbacks.Contains(callBack))
+            m_Callbacks.Remove(callBack);
+    }
+
+    public void Call(object param)
+    {
+        HashSet<IEventCallback> clondCallbacks = new HashSet<IEventCallback>();
+        foreach (IEventCallback curr in m_Callbacks) clondCallbacks.Add(curr);
+
+        foreach (IEventCallback curr in clondCallbacks)
+        {
+            curr.Call(param);
+        }
+    }
+
+    public void Dispose()
+    {
+        foreach (IEventCallback curr in m_Callbacks)
+        {
+            curr.Dispose();
+        }
+        m_Callbacks.Clear();
+    }
+
+    HashSet<IEventCallback> m_Callbacks = new HashSet<IEventCallback>();
+}
+
+
+*/
+class LuaCMDragDropSurfaceLib
+{
+
+    class DragDropEventCallback : LuaEventCallback
+    {
+        protected override void _Call(object param)
+        {
+            QKDragDropItem item = param as QKDragDropItem;
+            LuaCMDragDropItemLib._wrap(LuaRoot._Lua, item);
+            using (LuaValue_Any luaDragDropItem = new LuaValue_Any(LuaRoot._Lua.L_Ref(LuaDef.LUA_REGISTRYINDEX)))
+            {
+                LuaRoot.CallMember(m_FuncRef, m_ClassRef, luaDragDropItem);
+            }
+        }
+
+    }
+
+
+
+    class LuaDelegate_DragDropItem : LuaDelegate
+    {
+        protected override object _Call(object param)
+        {
+            QKDragDropItem item = param as QKDragDropItem;
+            LuaCMDragDropItemLib._wrap(LuaRoot._Lua, item);
+            using (LuaValue_Any luaDragDropItem = new LuaValue_Any(LuaRoot._Lua.L_Ref(LuaDef.LUA_REGISTRYINDEX)))
+            {
+                return LuaRoot.R_CallMember(m_FuncRef, m_ClassRef, luaDragDropItem);
+            }
+        }
+    }
+
+
+    class CMDragDropSurfaceInfo : ICoreComponentInfo
+    {
+        public Type type { get { return typeof(QKDragDropSurface); } }
+        public string name { get { return LuaCMDragDropSurfaceLib.LIB_NAME; } }
+        public void newLuaObj(ILuaState lua, Component cmp)
+        {
+            LuaCMDragDropSurfaceLib._wrap(lua, cmp as QKDragDropSurface);
+        }
+    }
+
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "CMDragDropSurface";
+
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {             
+            new NameFuncPair("SetWidgetContainer",M_SetWidgetContainer),
+            new NameFuncPair("GetWidgetContainer",M_GetWidgetContainer),
+            new NameFuncPair("GetItemTags",M_GetItemTags),
+            new NameFuncPair("SetItemTags",M_SetItemTags),
+            new NameFuncPair("SetFlyStrength",M_SetFlyStrength),
+            new NameFuncPair("GetFlyStrength",M_GetFlyStrength),
+            new NameFuncPair("SetFlyOnCancel",M_SetFlyOnCancel),
+            new NameFuncPair("GetFlyOnCancel",M_GetFlyOnCancel), 
+
+            new NameFuncPair("RemoveDragDropCancelEvent", M_RemoveDragDropCancelEvent),
+            new NameFuncPair("AddDragDropCancelEvent",M_AddDragDropCancelEvent),
+            new NameFuncPair("RemoveDragDropStartEvent",M_RemoveDragDropStartEvent),
+            new NameFuncPair("AddDragDropStartEvent",M_AddDragDropStartEvent),
+            new NameFuncPair("RemoveDragDropJoinItemEvent",M_RemoveDragDropJoinItemEvent),
+            new NameFuncPair("AddDragDropJoinItemEvent",M_AddDragDropJoinItemEvent),
+            new NameFuncPair("RemoveDragDropLeaveEvent",M_RemoveDragDropLeaveEvent),
+            new NameFuncPair("AddDragDropLeaveEvent",M_AddDragDropLeaveEvent),
+            new NameFuncPair("RemoveDragDropMoveingEvent",M_RemoveDragDropMoveingEvent),
+            new NameFuncPair("AddDragDropMoveingEvent",M_AddDragDropMoveingEvent),
+            new NameFuncPair("RemoveDragDropEndEvent",M_RemoveDragDropEndEvent),
+            new NameFuncPair("AddDragDropEndEvent",M_AddDragDropEndEvent),
+
+            new NameFuncPair("AddDragDropCancellingEvent",M_AddDragDropCancellingEvent),
+            new NameFuncPair("RemoveDragDropCancellingEvent",M_RemoveDragDropCancellingEvent),
+
+            new NameFuncPair("SetDockCheckFunc",M_SetDockCheckFunc),
+            new NameFuncPair("IsHovered",M_IsHovered),
+
+            
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+           
+            
+        };
+        //注册静态属性
+        NameValuePair[] static_property = new NameValuePair[]
+        {
+            new NameValuePair("Name",LIB_NAME),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define, static_property);
+
+        LuaGameObjectLib.RegComponent(new CMDragDropSurfaceInfo());
+
+        return 1;
+    }
+
+    public static void _wrap(ILuaState lua, QKDragDropSurface comp)
+    {
+        LuaOpenLibs._wrapComponent(lua, comp, LIB_NAME, m_ClassRegHelper);
+    }
+
+    public static QKDragDropSurface Lua2Obj(ILuaState lua, int index)
+    {
+       LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<QKDragDropSurface>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+
+
+    static int M_SetWidgetContainer(ILuaState lua)
+    {
+        //in self,GameObject
+        //out nil
+        QKDragDropSurface self = Lua2Obj(lua, 1);
+        GameObject gameObj = LuaGameObjectLib.Lua2Obj(lua, 2);
+        self.WidgetContainer = gameObj;
+
+        return 0;
+    }
+
+    static int M_GetWidgetContainer(ILuaState lua)
+    {
+        //in self
+        //out GameObject
+        QKDragDropSurface self = Lua2Obj(lua, 1);
+        LuaGameObjectLib._wrap(lua, self.WidgetContainer);
+
+        return 1;
+    }
+
+    static int M_GetItemTags(ILuaState lua)
+    {
+        //in self
+        //out {tag1,tag2,...}
+        QKDragDropSurface self = Lua2Obj(lua, 1);
+
+        lua.CreateTable(0, 0);
+        if (self.ItemTags != null)
+        {   
+            int index = 1;
+            foreach (string curr in self.ItemTags)
+            {
+                lua.PushString(curr);
+                lua.RawSetI(-2, index++);
+            }
+        }
+        return 1;
+    }
+
+    static int M_SetItemTags(ILuaState lua)
+    {
+        
+        //in self,{tag1,tag2,...}
+        //out nil
+        try
+        {
+            QKDragDropSurface self = Lua2Obj(lua, 1);
+            List<string> tags = m_MemberHelper.GetStringList(lua, 2);
+            self.ItemTags = tags.ToArray();
+        }
+        catch (Exception ex)
+        {
+            lua.L_Error(ex.ToString());
+        }
+        return 0;
+    }
+
+    static int M_SetFlyStrength(ILuaState lua)
+    {
+        //in self,strength
+        //out nil
+        try
+        {
+            QKDragDropSurface self = Lua2Obj(lua, 1);
+            float strength = (float)lua.L_CheckNumber(2);
+            self.FlyStrength = strength;
+        }
+        catch (Exception ex)
+        {
+            lua.L_Error(ex.ToString());
+        }
+        return 0;
+    }
+
+    static int M_GetFlyStrength(ILuaState lua)
+    {
+        //in self
+        //out strength
+        try
+        {
+            QKDragDropSurface self = Lua2Obj(lua, 1);
+            
+            lua.PushNumber( self.FlyStrength );
+        }
+        catch (Exception ex)
+        {
+            lua.L_Error(ex.ToString());
+        }
+        return 1;
+    }
+
+
+
+
+    static int M_SetFlyOnCancel(ILuaState lua)
+    {
+        //in self,bool
+        //out nil
+        try
+        {
+            QKDragDropSurface self = Lua2Obj(lua, 1);
+            bool flyOnCancel = lua.ToBoolean(2);
+            self.FlyOnCancel = flyOnCancel;
+        }
+        catch (Exception ex)
+        {
+            lua.L_Error(ex.ToString());
+        }
+        return 0;
+    }
+
+
+
+    static int M_GetFlyOnCancel(ILuaState lua)
+    {
+        //in self
+        //out bool
+        try
+        {
+            QKDragDropSurface self = Lua2Obj(lua, 1);
+            lua.PushBoolean(self.FlyOnCancel);
+        }
+        catch (Exception ex)
+        {
+            lua.L_Error(ex.ToString());
+        }
+        return 1;
+    }
+     
+
+
+
+
+    static int M_AddDragDropEndEvent(ILuaState lua)
+    {
+        //in self,class,func
+        //out evtCallBackHandel 
+        QKDragDropSurface self = Lua2Obj(lua, 1);
+        if (self.evt_DragDropEnd == null) self.evt_DragDropEnd = new QKEvent();
+
+        var cbk = LuaRoot.LDelegate2Event<DragDropEventCallback>(self.evt_DragDropEnd, lua, 2, 3);
+
+        lua.PushLightUserData(cbk);
+        return 1;
+    }
+
+    static int M_RemoveDragDropEndEvent(ILuaState lua)
+    {
+        //in self evtCallBackHandel
+        //out void
+        QKDragDropSurface self = Lua2Obj(lua, 1);
+        DragDropEventCallback callBack = (DragDropEventCallback)lua.ToUserData(2);
+
+        self.evt_DragDropEnd.RemoveCallback(callBack);
+        return 0;
+    }
+
+
+
+
+
+
+
+    static int M_AddDragDropMoveingEvent(ILuaState lua)
+    {
+        //in self,class,func
+        //out evtCallBackHandel 
+        QKDragDropSurface self = Lua2Obj(lua, 1);
+        if (self.evt_DragDropMoveing == null) self.evt_DragDropMoveing = new QKEvent();
+
+        var cbk = LuaRoot.LDelegate2Event<DragDropEventCallback>(self.evt_DragDropMoveing, lua, 2, 3);
+
+        lua.PushLightUserData(cbk);
+        return 1;
+    }
+
+    static int M_RemoveDragDropMoveingEvent(ILuaState lua)
+    {
+        //in self evtCallBackHandel
+        //out void
+        QKDragDropSurface self = Lua2Obj(lua, 1);
+        DragDropEventCallback callBack = (DragDropEventCallback)lua.ToUserData(2);
+
+        self.evt_DragDropMoveing.RemoveCallback(callBack);
+        return 0;
+    }
+
+
+
+
+
+
+     
+
+     static int M_AddDragDropLeaveEvent(ILuaState lua)
+     {
+         //in self,class,func
+         //out evtCallBackHandel 
+         QKDragDropSurface self = Lua2Obj(lua, 1);
+         if (self.evt_DragDropLeaveItem == null) self.evt_DragDropLeaveItem = new QKEvent();
+
+         var cbk = LuaRoot.LDelegate2Event<DragDropEventCallback>(self.evt_DragDropLeaveItem, lua, 2, 3);
+
+         lua.PushLightUserData(cbk);
+         return 1;
+     }
+
+     static int M_RemoveDragDropLeaveEvent(ILuaState lua)
+     {
+         //in self evtCallBackHandel
+         //out void
+         QKDragDropSurface self = Lua2Obj(lua, 1);
+         DragDropEventCallback callBack = (DragDropEventCallback)lua.ToUserData(2);
+
+         self.evt_DragDropLeaveItem.RemoveCallback(callBack);
+         return 0;
+     }
+
+
+
+
+
+     
+    /// <summary>
+    /// 设置道具加入表面时的检查函数
+    /// </summary>
+    /// <param name="lua"></param>
+    /// <returns></returns>
+    static int M_SetDockCheckFunc(ILuaState lua)
+    { 
+        //in self,recallClass,recallFunc
+        //out nil
+
+        int n = lua.GetTop();
+
+        QKDragDropSurface self = Lua2Obj(lua, 1);
+        LuaDelegate_DragDropItem luaDelegate = LuaRoot.LDelegate<LuaDelegate_DragDropItem>(lua, 2, 3);
+        lua.L_ArgCheck(luaDelegate!=null, 2, "回调类或函数有误"); 
+        self.delegate_DockCheck = luaDelegate;
+        return 0;
+    }
+
+
+    /// <summary>
+    /// 判定指针是否停在该表面上
+    /// </summary>
+    static int M_IsHovered(ILuaState lua)
+    {
+        //in self
+        //out bool
+        QKDragDropSurface self = Lua2Obj(lua, 1);
+        lua.PushBoolean(self.IsHovered);
+        return 1;
+    }
+     
+
+    static int M_AddDragDropJoinItemEvent(ILuaState lua)
+    {
+        //in self,class,func
+        //out evtCallBackHandel 
+        QKDragDropSurface self = Lua2Obj(lua, 1);
+        if (self.evt_DragDropJoinItem == null) self.evt_DragDropJoinItem = new QKEvent();
+
+        var cbk = LuaRoot.LDelegate2Event<DragDropEventCallback>(self.evt_DragDropJoinItem, lua, 2, 3);
+
+        lua.PushLightUserData(cbk);
+        return 1;
+    }
+
+    static int M_RemoveDragDropJoinItemEvent(ILuaState lua)
+    {
+        //in self evtCallBackHandel
+        //out void
+        QKDragDropSurface self = Lua2Obj(lua, 1);
+        DragDropEventCallback callBack = (DragDropEventCallback)lua.ToUserData(2);
+
+        self.evt_DragDropJoinItem.RemoveCallback(callBack);
+        return 0;
+    }
+
+
+
+
+
+    static int M_AddDragDropStartEvent(ILuaState lua)
+    {
+        //in self,class,func
+        //out evtCallBackHandel 
+        QKDragDropSurface self = Lua2Obj(lua, 1);
+        if (self.evt_DragDropStart == null) self.evt_DragDropStart = new QKEvent();
+
+        var cbk = LuaRoot.LDelegate2Event<DragDropEventCallback>(self.evt_DragDropStart, lua, 2, 3);
+
+        lua.PushLightUserData(cbk);
+        return 1;
+    }
+
+    static int M_RemoveDragDropStartEvent(ILuaState lua)
+    {
+        //in self evtCallBackHandel
+        //out void
+        QKDragDropSurface self = Lua2Obj(lua, 1);
+        DragDropEventCallback callBack = (DragDropEventCallback)lua.ToUserData(2);
+
+        self.evt_DragDropStart.RemoveCallback(callBack);
+        return 0;
+    }
+
+
+
+
+    static int M_AddDragDropCancelEvent(ILuaState lua)
+    {
+        //in self,class,func
+        //out evtCallBackHandel 
+        QKDragDropSurface self = Lua2Obj(lua, 1);
+        if (self.evt_DragDropCancel == null) self.evt_DragDropCancel = new QKEvent();
+
+        var cbk = LuaRoot.LDelegate2Event<DragDropEventCallback>(self.evt_DragDropCancel, lua, 2, 3);
+        
+        lua.PushLightUserData(cbk);
+        return 1; 
+    }
+
+   
+   
+    static int M_RemoveDragDropCancelEvent(ILuaState lua)
+    {
+        //in self evtCallBackHandel
+        //out void
+        QKDragDropSurface self = Lua2Obj(lua, 1);
+        DragDropEventCallback callBack = (DragDropEventCallback)lua.ToUserData(2);
+
+        self.evt_DragDropCancel.RemoveCallback(callBack);
+        return 0;
+    }
+
+    static int M_AddDragDropCancellingEvent(ILuaState lua)
+    {
+        //in self,class,func
+        //out evtCallBackHandel 
+        QKDragDropSurface self = Lua2Obj(lua, 1);
+        if (self.evt_DragDropCancelling == null) self.evt_DragDropCancelling = new QKEvent();
+
+        var cbk = LuaRoot.LDelegate2Event<DragDropEventCallback>(self.evt_DragDropCancelling, lua, 2, 3);
+
+        lua.PushLightUserData(cbk);
+        return 1;
+    }
+
+    static int M_RemoveDragDropCancellingEvent(ILuaState lua)
+    {
+        //in self evtCallBackHandel
+        //out void
+        QKDragDropSurface self = Lua2Obj(lua, 1);
+        DragDropEventCallback callBack = (DragDropEventCallback)lua.ToUserData(2);
+
+        self.evt_DragDropCancelling.RemoveCallback(callBack);
+        return 0;
+    }
+
+} 

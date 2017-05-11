@@ -1,0 +1,54 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "LUA51",
+            "type": "lua",
+            "request": "launch",
+            "runtimeType": "Lua51",
+            "localRoot": "${workspaceRoot}",
+            "mainFile": "${file}",
+            "host": "localhost",
+            "port": 7003
+        },
+        {
+            "name": "Cocos2-launch",
+            "type": "lua",
+            "request": "launch",
+            "runtimeType": "Cocos2",
+            "localRoot": "${workspaceRoot}",
+            "mainFile": "scripts/main.lua",
+            "port": 7003,
+            "scripts": [
+                "scripts"
+            ],
+            "exePath": ""
+        },
+        {
+            "name": "COCOS(remote debugging)",
+            "type": "lua",
+            "request": "attach",
+            "runtimeType": "Cocos2",
+            "port": 7003,
+            "scripts": [
+                "${workspaceRoot}",
+                "${workspaceRoot}/assets",
+                "${workspaceRoot}/assets/scripts"
+            ],
+            "printType": 1
+        },
+        {
+            "name": "Unity-ulua",
+            "type": "lua",
+            "request": "attach",
+            "runtimeType": "Unity",
+            "port": 7003,
+            "scripts": [
+                "${workspaceRoot}",
+                "${workspaceRoot}/lua"
+            ],
+            "printType": 1
+        }
+    ]
+}

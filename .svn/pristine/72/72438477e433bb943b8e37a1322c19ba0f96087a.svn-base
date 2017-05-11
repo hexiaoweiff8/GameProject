@@ -1,0 +1,126 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+/// <summary>
+/// 状态机主类 管理各状态切换
+/// </summary>
+public class SoldierFSMSystem : MonoBehaviour {
+    private List<SoldierFSMState> states;
+
+    private SoldierStateID _currentStateId;
+    //不要直接修改这个变量，之所以让他公有是因为得让其他脚本调用这个变量。
+    public SoldierStateID CurrentStateID { get { return _currentStateId; } }
+    //记录当前状态
+    private SoldierFSMState _currentState;
+    public SoldierFSMState CurrentState { get { return _currentState; } }
+
+    public SoldierFSMSystem()
+    {
+        states = new List<SoldierFSMState>();
+    }
+    /// <summary>
+    /// 增加状态转换对 第一次添加的状态是默认状态
+    /// </summary>
+    /// <param name="s"></param>
+    public void AddState(SoldierFSMState s)
+    {
+        //_currentState = states.Find((e) => e.StateID == s.StateID);
+        if (s == null)
+        {
+            Debug.LogError("SoldierFSM ERROR: Null reference is not allowed");
+        }
+
+        if (states.Count == 0)
+        {
+            states.Add(s);
+            _currentState = s;
+            _currentStateId = s.StateID;
+            return;
+        }
+        //排除相同的状态
+        foreach (SoldierFSMState state in states)
+        {
+            if (state.StateID == s.StateID)
+            {
+                Debug.LogError("SoldierFSM ERROR: Impossible to add state " + s.StateID.ToString() +
+                               " because state has already been added");
+                return;
+            }
+        }
+        states.Add(s);
+    }
+
+    /// <summary>
+    /// 跟据ID来从容器states中定向移除FSMState实例
+    /// </summary>
+    /// <param name="id"></param>
+    public void DeleteState(SoldierStateID id)
+    {
+
+        if (id == SoldierStateID.NullState)
+
+        {
+            Debug.LogError("FSM ERROR: NullStateID is not allowed for a real state");
+            return;
+        }
+
+
+        foreach (SoldierFSMState state in states)
+
+        {
+            if (state.StateID == id)
+            {
+                states.Remove(state);
+                return;
+            }
+        }
+        Debug.LogError("FSM ERROR: Impossible to delete state " + id.ToString() +
+                       ". It was not on the list of states");
+    }
+    /// <summary>
+    /// 查找并切换对应id的状态 
+    /// </summary>
+    /// <param name="stateId"></param>
+    public void ChangeState(SoldierStateID stateId)
+    {
+        _currentState = states.Find((e) => e.StateID == stateId);
+    }
+
+    /// <summary>
+    /// 执行状态转换
+    /// </summary>
+    /// <param name="trigger"></param>
+    public void PerformTransition(SoldierTriggerID trigger)
+    {
+
+        if (trigger == SoldierTriggerID.NullTri)
+
+        {
+            Debug.LogError("FSM ERROR: NullTransition is not allowed for a real transition");
+
+        }
+
+        SoldierStateID id = _currentState.GetStateByTrans(trigger);
+        if (id == SoldierStateID.NullState)
+        {
+            Debug.LogError("FSM ERROR: State " + _currentStateId.ToString() + " does not have a target state " +
+                           " for transition " + trigger.ToString());
+            return;
+        }
+
+        _currentStateId = id;
+        foreach (SoldierFSMState state in states)//遍历此状态容器
+        {
+            if (state.StateID == _currentStateId)
+            {
+                _currentState.DoBeforeLeaving();
+                //只允许在这里切换状态
+                _currentState = state;
+                _currentState.DoBeforeEntering();
+
+                break;
+            }
+        }
+
+    }
+}

@@ -1,0 +1,44 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class SoldierFSMControl : MonoBehaviour {
+    private SoldierFSMSystem fsm;//内置一个fsm
+
+    public void SetTransition(SoldierTriggerID t) //转换状态
+    {
+        fsm.PerformTransition(t);
+    }
+
+    public void Start()
+    {
+        //初始化状态机 
+        MakeFSM();
+        ConfigureState();
+    }
+    /// <summary>
+    /// 配置状态
+    /// </summary>
+    private void ConfigureState()
+    {
+        Soldier_Daiji_State daiji = new Soldier_Daiji_State();
+        daiji.AddTrigger(SoldierTriggerID.DaiJiTri, SoldierStateID.DaiJi);
+        fsm.AddState(daiji);
+
+        Soldier_Xingjin_State xingjin = new Soldier_Xingjin_State();
+        xingjin.AddTrigger(SoldierTriggerID.XingjinTri, SoldierStateID.Xingjin);
+        fsm.AddState(xingjin);
+
+    }
+
+    public void FixedUpdate()//作为驱动源
+    {
+        fsm.CurrentState.Reason(fsm);
+        fsm.CurrentState.Act(fsm);
+    }
+
+    private void MakeFSM()
+    {
+        //实例化fsm 
+        fsm = new SoldierFSMSystem();
+    }
+}

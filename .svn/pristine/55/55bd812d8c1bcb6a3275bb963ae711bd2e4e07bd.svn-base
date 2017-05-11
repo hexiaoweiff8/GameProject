@@ -1,0 +1,54 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+class LuaPoptipLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();  
+
+    public const string LIB_NAME = "Poptip";
+    
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            
+            
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair("PopMsg",S_PopMsg),
+            
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+    static int S_PopMsg(ILuaState lua)
+    {
+        //in msg,color
+        //out void
+        string msg = lua.L_CheckString(1);
+        Color color; LuaColorLib.Lua2Obj(lua,2,out color);
+        wnd_poptip.Single.PopMsg(msg, color);
+        return 0;
+    }
+     
+}
+ 

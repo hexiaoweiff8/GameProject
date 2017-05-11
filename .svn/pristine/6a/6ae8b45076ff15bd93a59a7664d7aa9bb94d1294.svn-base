@@ -1,0 +1,90 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+ 
+class LuaCMUIPanelLib
+{
+    class CMUIPanelInfo : ICoreComponentInfo
+    {
+        public Type type { get { return typeof(UIPanel); } }
+        public string name { get { return LuaCMUIPanelLib.LIB_NAME; } }
+        public void newLuaObj(ILuaState lua, Component cmp)
+        {
+            LuaCMUIPanelLib._wrap(lua, cmp as UIPanel);
+        }
+    }
+
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+   // static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "CMUIPanel";
+
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        { 
+            new NameFuncPair("SetClipOffset",M_SetClipOffset),
+            new NameFuncPair("GetClipOffset",M_GetClipOffset),
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+           
+            
+        };
+        //注册静态属性
+        NameValuePair[] static_property = new NameValuePair[]
+        {
+            new NameValuePair("Name",LIB_NAME),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define, static_property);
+
+        LuaGameObjectLib.RegComponent(new CMUIPanelInfo());
+
+        return 1;
+    }
+
+    public static void _wrap(ILuaState lua, UIPanel comp)
+    { 
+        LuaOpenLibs._wrapComponent(lua, comp, LIB_NAME, m_ClassRegHelper);
+    }
+
+    public static UIPanel Lua2Obj(ILuaState lua, int index)
+    {
+       LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<UIPanel>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    static int M_SetClipOffset(ILuaState lua)
+    {
+        //in self,Vector2
+        var self = Lua2Obj(lua, 1);
+        Vector2 offset; LuaVector2Lib.Lua2Obj(lua, 2, out offset);
+        self.clipOffset = offset;
+        return 0;
+    }
+
+    static int M_GetClipOffset(ILuaState lua)
+    {
+        //in self
+        //out Vector2
+        var self = Lua2Obj(lua, 1);
+        LuaVector2Lib._wrap(lua, self.clipOffset); 
+        return 1;
+    }
+}

@@ -1,0 +1,160 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+using UniLua;
+ 
+class LuaPacketLoaderLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "PacketLoader";
+     
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            new NameFuncPair("Start",M_Start),            
+            new NameFuncPair("GetProgress",M_GetProgress),        
+            new NameFuncPair("IsDone",M_IsDone),        
+            new NameFuncPair("HasError",M_HasError),        
+            
+
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair("new",F_new),
+            
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+    static int F_new(ILuaState lua)
+    {
+        _wrap(lua);
+        return 1;
+    }
+
+    static void _wrap(ILuaState lua)
+    {
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,null),
+        };
+
+        m_ClassRegHelper.InstanceLuaClass(lua, propertys);
+    }
+
+    public static PacketLoader Lua2Obj(ILuaState lua, int index)
+    {
+       LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<PacketLoader>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    static int M_GetProgress(ILuaState lua)
+    {
+        //in self
+        //out float
+        PacketLoader packetLoader = Lua2Obj(lua, 1);
+        if (packetLoader == null)
+        {
+            lua.PushNumber(0);//任务尚未启动
+        }
+        else
+        {
+            lua.PushNumber(packetLoader.Progress);
+        }
+        return 1;
+    }
+
+    static int M_IsDone(ILuaState lua)
+    {
+        //in self
+        //out boolean
+        PacketLoader packetLoader = Lua2Obj(lua, 1);
+        if (packetLoader == null)
+        {
+            lua.PushBoolean(false);//任务尚未启动
+        }
+        else
+        {
+            lua.PushBoolean(packetLoader.Result == PacketLoader.ResultEnum.Done);
+        }
+        return 1;
+    }
+
+    static int M_HasError(ILuaState lua)
+    {
+        //in self
+        //out boolean
+        PacketLoader packetLoader = Lua2Obj(lua, 1);
+        if (packetLoader == null)
+        {
+            lua.PushBoolean(false);//任务尚未启动
+        }
+        else
+        {
+            lua.PushBoolean(packetLoader.Result == PacketLoader.ResultEnum.Error);
+        }
+        return 1;
+    }
+
+    //开始装载
+    //void Start(
+    //  self
+    //  {包名,...},
+    //  callbackClass,
+    //  callbackFunc
+    //);
+    static int M_Start(ILuaState lua)
+    {
+        int n = lua.GetTop();
+         
+       LuaMemberHelper.CheckClass(lua, 2);
+
+
+        PacketLoader packetLoader =  Lua2Obj(lua,1);
+        if (packetLoader != null)  return 0;//任务已经启动过
+
+        packetLoader = new PacketLoader( );
+
+        QKEvent DoneEvent = null;
+        //绑定事件
+        if (n>=4 && !lua.IsNil(3) && !lua.IsNil(4) && lua.IsFunction(4)) 
+            DoneEvent = LuaRoot.LDelegate2Event<LuaEventCallback>(lua, 3, 4); 
+        
+        //将对象设置到类属性中
+        m_MemberHelper.SetObject(lua, 1, LuaOpenLibs.OBJ_HANDELNAME, packetLoader);
+
+        
+        //启动任务
+        packetLoader.Start(
+              PackType.Res,
+              m_MemberHelper.GetStringList(lua, 2),
+              (isOK)=>{
+                  if (DoneEvent != null) using (DoneEvent) { DoneEvent.Call(isOK); }
+              }
+              );
+
+        return 0;
+    }
+    
+}
+ 

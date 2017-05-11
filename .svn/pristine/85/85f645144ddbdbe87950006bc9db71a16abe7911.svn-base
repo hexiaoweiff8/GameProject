@@ -1,0 +1,103 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+
+class LuaOOSyncClientLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+    public const string LIB_NAME = "OOSyncClient";
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+         };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair("Clean",S_Clean), 
+            new NameFuncPair("GetObject",S_GetObject), 
+            new NameFuncPair("DoDispatcher",S_DoDispatcher), 
+
+            new NameFuncPair("RemoveValueChangedEvent",S_RemoveValueChangedEvent), 
+            new NameFuncPair("BindValueChangedEvent",S_BindValueChangedEvent),   
+            
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+    static int S_Clean(ILuaState lua)
+    {
+        //in
+        //out
+        OOSync.OOSyncClient.Single.Clean();
+        return 0;
+    }
+    
+    static int S_DoDispatcher(ILuaState lua)
+    {
+        var msg = LuaQKJsonLib.Lua2Obj(lua,1) as QK_JsonValue_Map;
+        lua.L_ArgCheck(msg != null,1,"消息不是jsonmap");
+        lua.PushBoolean( OOSync.OOSyncClient.Single.DoDispatcher(msg) );
+        return 1;
+    }
+    
+    static int S_GetObject(ILuaState lua)
+    {
+        //in sid,objPath[,autoCreate]
+        //out SyncObj
+        uint sid = lua.L_CheckUnsigned(1);
+        var objName = lua.L_CheckString(2);
+        bool autoCreate = (lua.GetTop()==3)?lua.ToBoolean(3):false;
+
+        LuaSyncObjLib._wrap(lua, OOSync.OOSyncClient.Single.GetObject(sid, objName, autoCreate));
+        return 1;
+    }
+
+    static int S_BindValueChangedEvent(ILuaState lua)
+    {
+        //in sid,objpath,attrName,callbackClass,callbackFunc 
+        //out EventCallback
+        var sid = lua.L_CheckUnsigned(1);
+        string objPath = lua.L_CheckString(2);
+        string attrName;
+        LuaEventCallback callBack; 
+            attrName = lua.L_CheckString(3);
+            callBack = LuaRoot.LDelegate2EventCallback<LuaEventCallback>(lua, 4, 5);
+        
+
+        OOSync.OOSyncClient.Single.BindValueChangedEvent(sid, objPath, attrName, callBack);
+        lua.PushLightUserData(callBack);
+        return 1;
+    }
+     
+
+    static int S_RemoveValueChangedEvent(ILuaState lua)
+    {
+        //in sid,objid,attrName,EventCallback
+        //out
+        var sid =  lua.L_CheckUnsigned(1);
+        string objPath = lua.L_CheckString(2);
+        string attrName = lua.L_CheckString(3);
+        var callBack = lua.ToUserData(4) as LuaEventCallback;
+        lua.L_ArgCheck(callBack != null, 4, "无效的EventCallback");
+        OOSync.OOSyncClient.Single.RemoveValueChangedEvent(sid, objPath, attrName, callBack);
+        return 0;
+    }
+     
+}

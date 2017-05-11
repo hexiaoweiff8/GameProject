@@ -1,0 +1,74 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using DG.Tweening;
+
+public class myTest : MonoBehaviour
+{
+    private Transform blood;
+    private Camera nowWorldCamera;
+    private bool isRun = false;
+    private Transform Head;
+    public bool isEnemy = false;
+    public bool isSetShader = false;
+    public int groupIndex;
+    //private float Fomat;
+    void Start()
+    {
+        nowWorldCamera = GameObject.Find("/PTZCamera/SceneryCamera").GetComponent<Camera>();
+        Head = transform.Find("head");
+        //Fomat = Vector3.Distance(Head.position, nowWorldCamera.transform.position);
+        blood =
+            GameObjectExtension.InstantiateFromPacket("ui_fightU", "blood.prefab", GameObject.Find("ui_fightU")).transform;
+        blood.localScale = Vector3.zero;
+        StartCoroutine(startToRun());
+
+
+    }
+
+    private IEnumerator startToRun()
+    {
+        yield return new WaitForSeconds(1);
+        isRun = true;
+
+        blood.localScale = Vector3.one;
+        GetComponent<MFAModelRender>().speedScale = 1;
+
+
+        GetComponent<Renderer>().material.shader = PacketManage.Single.GetPacket("core").Load("Avatar_N.shader") as Shader;
+        GetComponent<MFAModelRender>().SetClip("run".GetHashCode());
+        AstarFight at = GameObject.Find("/AstarFight").GetComponent<AstarFight>();
+        at.schoolItem = gameObject;
+        at.toXunLu(isEnemy, groupIndex);
+
+        Vector3 pt = nowWorldCamera.WorldToScreenPoint(Head.position);
+        Vector3 ff = UICamera.currentCamera.ScreenToWorldPoint(pt);
+        blood.position = ff;
+
+    }
+
+    private void OnWillRenderObject()
+    {
+        if (!isSetShader && isRun)
+        {
+            isSetShader = true;
+            GetComponent<Renderer>().material.shader = PacketManage.Single.GetPacket("core").Load("Avatar_N.shader") as Shader;
+        }
+    }
+    void Update()
+    {
+        if (!isRun)
+        {
+            return;
+        }
+        //transform.Translate(0, 0, 10 * Time.deltaTime);
+
+        ////float newFomat = Fomat / Vector3.Distance(Head.position, nowWorldCamera.transform.position);
+        Vector3 pt = nowWorldCamera.WorldToScreenPoint(Head.position);
+        Vector3 ff = UICamera.currentCamera.ScreenToWorldPoint(pt);
+        //ff.z = 0;
+        blood.position = ff;
+        //blood.localScale = Vector3.one * newFomat;
+    }
+}

@@ -1,0 +1,174 @@
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UniLua;
+
+class LuaCookiesLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    //static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "Cookies";
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair("HasKey",S_HasKey),
+            new NameFuncPair("SetInt",S_SetInt),
+            new NameFuncPair("SetFloat",S_SetFloat),
+            new NameFuncPair("SetString",S_SetString),
+            new NameFuncPair("GetFloat",S_GetFloat),
+            new NameFuncPair("GetInt",S_GetInt),
+            new NameFuncPair("GetString",S_GetString),
+            new NameFuncPair("Delete",S_Delete),
+            new NameFuncPair("Save",S_Save),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+    static int S_HasKey(ILuaState lua)
+    {
+        //in key
+        //out bool
+        string key = lua.L_CheckString(1);
+        lua.PushBoolean(Cookies.HasKey(key));
+        return 1;
+    }
+     
+    static int S_SetInt(ILuaState lua)
+    {
+        //in key,v
+        //out void
+        
+
+        string key = lua.L_CheckString(1);
+
+        if (lua.IsNil(2))
+        {
+            Cookies.Delete(key);
+            return 0;
+        }
+
+        int v = lua.L_CheckInteger(2);
+        Cookies.SetInt(key, v);
+        return 0;
+    }
+
+
+    static int S_SetFloat(ILuaState lua)
+    {
+        //in key,v
+        //out void
+
+        string key = lua.L_CheckString(1);
+
+        if (lua.IsNil(2))
+        {
+            Cookies.Delete(key);
+            return 0;
+        }
+
+        float v = (float)lua.L_CheckNumber(2);
+        Cookies.SetFloat(key, v);
+        return 0;
+    }
+
+    static int S_SetString(ILuaState lua)
+    {
+        //in key,v
+        //out void
+
+        string key = lua.L_CheckString(1);
+
+        if (lua.IsNil(2))
+        {
+            Cookies.Delete(key);
+            return 0;
+        }
+
+
+        string v = lua.L_CheckString(2);
+        Cookies.SetString(key, v);
+        return 0;
+    }
+
+    static int S_GetFloat(ILuaState lua)
+    {
+        //in key
+        //out v
+        string key = lua.L_CheckString(1);
+
+        if(!Cookies.HasKey(key))
+        {
+            lua.PushNil();
+            return 1;
+        }
+
+        lua.PushNumber(Cookies.GetFloat(key));
+        return 1;
+    }
+
+    static int S_GetInt(ILuaState lua)
+    {
+        //in key
+        //out v
+        string key = lua.L_CheckString(1);
+        if (!Cookies.HasKey(key))
+        {
+            lua.PushNil();
+            return 1;
+        }
+        lua.PushInteger(Cookies.GetInt(key));
+        return 1;
+    }
+
+    static int S_GetString(ILuaState lua)
+    {
+        //in key
+        //out v
+        string key = lua.L_CheckString(1);
+        if (!Cookies.HasKey(key))
+        {
+            lua.PushNil();
+            return 1;
+        }
+        lua.PushString(Cookies.GetString(key));
+        return 1;
+    }
+
+    static int S_Delete(ILuaState lua)
+    {
+        //in key
+        //out void
+        string key = lua.L_CheckString(1);
+        Cookies.Delete(key);
+        return 0;
+    }
+
+    static int S_Save(ILuaState lua)
+    {
+        //in void
+        //out void 
+        Cookies.Save();
+        return 0;
+    }
+}
+ 

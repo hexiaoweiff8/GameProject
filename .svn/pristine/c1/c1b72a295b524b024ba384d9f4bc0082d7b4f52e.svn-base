@@ -1,0 +1,423 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+using System.Runtime.Serialization.Formatters.Binary;
+using MonoEX;
+using System.IO;
+
+class LuaDebuggerClientInfo
+{
+    public bool updateToExternal;
+    public bool updateToMemery;
+    public UpdateMode updateMode;
+    public PackType packType;
+    public bool hasError=false;
+
+    public ulong uid;
+    //缓存的buff
+    public List<byte[]> cacheBuffs = new List<byte[]>();
+
+    public int cacheBuffSize = 0;
+    /*
+    {
+        get
+        {
+            int re = 0;
+            foreach (byte[] curr in cacheBuffs)
+            {
+                re += curr.Length;
+            }
+            return re;
+        }
+    }*/
+}
+
+
+//lua调试器组件
+public class CMLuaDebugger : MonoBehaviour, ILuaDebugger
+{ 
+    void Start()
+    {
+
+        LuaDebugger.Single = this;
+
+        //绑定网络事件
+        m_Server.Event_Close = OnClose;
+        m_Server.Event_Conn = OnConn;
+        m_Server.Event_Recv = OnRecv;
+
+        //启动服务
+        m_Server.Start(LuaDebuggerCfg.divecePort);
+
+        NMHelper.SetCallBack(LDNM_ACTION.DOString, NM_Dostring);
+        NMHelper.SetCallBack(LDNM_ACTION.BeginUpdate, NM_BeginUpdate);
+        NMHelper.SetCallBack(LDNM_ACTION.UpdateFile, NM_UpdateFile);
+        NMHelper.SetCallBack(LDNM_ACTION.EndUpdate, NM_EndUpdate);
+        NMHelper.SetCallBack(LDNM_ACTION.EXMList, NM_EXMList);
+        NMHelper.SetCallBack(LDNM_ACTION.EXMDel, NM_EXMDel); 
+    }
+
+    /*
+    void OnEnable() { CoroutineManage.Single.RegComponentUpdate(IUpdate); }
+
+    void OnDisable()
+    {
+        CoroutineManage.Single.UnRegComponentUpdate(IUpdate);
+    }
+    */
+    void NM_EXMList(ILDNM _nm)
+    {
+        C_LDNM_EXMList nm = (C_LDNM_EXMList)_nm;
+        string expath = FileSystem.persistentDataPath;
+        if (nm.path != "/") expath += nm.path;
+
+        DirectoryInfo dirInfo = new DirectoryInfo(expath);
+        FileInfo[] files = null;
+        DirectoryInfo[] dirs = null;
+        if (dirInfo.Exists)
+        {
+            files = dirInfo.GetFiles();
+            dirs = dirInfo.GetDirectories();
+
+            //返回目录
+            {
+                S_LDNM_EXMREList renm = new S_LDNM_EXMREList();
+                renm.path = nm.path;
+                renm.dirs = new List<string>();
+                renm.files = new List<string>();
+                foreach (DirectoryInfo curr in dirs)
+                    renm.dirs.Add(curr.Name);
+
+                renm.isEnd = files.Length == 0;
+                m_Server.Send(m_CurrUID, NMHelper.Serialize(renm));
+            } 
+            //返回文件
+            if (files.Length>0)
+            {
+                
+                const int maxfilecount = 100;//单次返回的文件数上限
+
+                for (int i = 0; i < files.Length; i += maxfilecount)
+                { 
+                    int delcount = Math.Min(files.Length - i, maxfilecount);
+
+                    S_LDNM_EXMREList renm = new S_LDNM_EXMREList();
+                    renm.path = nm.path;
+                    renm.dirs = new List<string>();
+                    renm.files = new List<string>();
+                    renm.isEnd = ((i + delcount) == files.Length);
+                    for (int j = i; j < i + delcount; j++)
+                        renm.files.Add(files[j].Name); 
+                    m_Server.Send(m_CurrUID, NMHelper.Serialize(renm));
+                } 
+            }
+        } else
+        {
+            S_LDNM_EXMREList renm = new S_LDNM_EXMREList();
+            renm.path = nm.path;
+            renm.dirs = new List<string>();
+            renm.files = new List<string>();
+            renm.isEnd = true;
+            m_Server.Send(m_CurrUID,NMHelper.Serialize(renm));
+        } 
+    }
+
+    void NM_EXMDel(ILDNM _nm)
+    { 
+        LuaDebuggerClientInfo cInfo = m_UIDs[m_CurrUID];
+
+        C_LDNM_EXMDelete nm = _nm as C_LDNM_EXMDelete;
+         
+
+        string expath = FileSystem.persistentDataPath;
+        if (nm.path != "/") expath += nm.path;
+
+        if(nm.dirs.Count>0)
+        {
+            if (!IsEditor)
+            {
+                foreach (string dir in nm.dirs)
+                {
+                    try
+                    {
+                        DirectoryInfo dirInfo = new DirectoryInfo(expath + "/" + dir);
+
+
+                        if (dirInfo.Exists)
+                            dirInfo.Delete(true);
+                        else
+                            cInfo.hasError = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        ULDebug.LogError(ex.ToString());
+                        cInfo.hasError = true;
+                    }
+                }
+            }
+            else
+            {
+                ULDebug.LogWarning("编辑器模式忽略删除外存目录");
+            }
+        }
+
+        foreach (string file in nm.files)
+        {
+            try
+            {
+                if (IsEditor && expath.IndexOf("pack_script") >= 0)
+                {
+                    ULDebug.LogWarning("编辑器模式忽略删除外存脚本操作");
+                } else
+                {
+                    FileInfo fileInfo = new FileInfo(expath + "/" + file);
+                    if (fileInfo.Exists)
+                    {
+                        fileInfo.Delete();
+                    }
+                    else
+                    {
+
+                        cInfo.hasError = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ULDebug.LogError(ex.ToString());
+                cInfo.hasError = true;
+            }
+        } 
+
+
+        if (nm.isEnd)
+        {
+            S_LDNM_EXMDeleteEnd renm = new S_LDNM_EXMDeleteEnd();
+            renm.isOK = !cInfo.hasError;
+            cInfo.hasError = false;
+            m_Server.Send(m_CurrUID, NMHelper.Serialize(renm));
+        } 
+    }
+
+    void NM_Dostring(ILDNM _nm)
+    { 
+        C_LDNM_DoString nm = _nm as C_LDNM_DoString;
+        UniLua.ThreadStatus st = LuaRoot._Lua.L_DoString(nm.code);
+        if (st != UniLua.ThreadStatus.LUA_OK)
+        {
+            ULDebug.LogError("执行远程代码遇到错误");
+            ULDebug.LogError(LuaRoot._Lua.ToString(-1));
+        } else
+        {
+            ULDebug.Log("已成功执行远程代码");
+        }
+        LuaRoot._Lua.SetTop(0);
+    }
+
+    void NM_BeginUpdate(ILDNM _nm)
+    {
+        LuaDebuggerClientInfo cInfo = m_UIDs[m_CurrUID];
+        C_LDNM_BeginUpdate nm = (C_LDNM_BeginUpdate)_nm;
+        cInfo.updateToExternal = nm.external;
+        cInfo.updateToMemery = nm.mem;
+        cInfo.updateMode = nm.mode;
+        cInfo.packType = (PackType)(int)nm.packType;
+        cInfo.hasError = false;
+    }
+
+    //当前是否处于编辑器模式
+    bool IsEditor
+    {
+        get
+        {
+            return (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.OSXEditor);
+        }
+    }
+    void NM_UpdateFile(ILDNM _nm)
+    { 
+
+        LuaDebuggerClientInfo cInfo = m_UIDs[m_CurrUID];
+        C_LDNM_UpdateFile nm = (C_LDNM_UpdateFile)_nm;
+
+        cInfo.cacheBuffs.Add(nm.bytes);
+        cInfo.cacheBuffSize += nm.bytes.Length;
+        
+
+        if (cInfo.cacheBuffSize >= nm.countsize)//文件已经传递完成
+        {
+            try
+            {
+                string fulloutpath;
+                string packipath="";
+
+                if (cInfo.packType == PackType.Script)
+                {
+                    string ph = nm.path.Substring(3, nm.path.Length - 3);
+                    int fgpos = ph.IndexOf('/');
+                    string packname = ph.Substring(0, fgpos);
+                    packipath = ph.Substring(fgpos + 1, ph.Length - (fgpos + 1));
+
+                    FileSystem.RES_LOCATION out_srctype;
+                    string devPackPath;
+                    FileSystem.RrelativePath2Absolute_Packet(  "pack_script"  , packname, true, out out_srctype, out devPackPath);
+
+                    fulloutpath = devPackPath + "/" + packipath;
+                }
+                else
+                {
+                    fulloutpath = FileSystem.MakeExternalPackPath("pack_res", nm.path);
+                }
+
+                if ( cInfo.updateToExternal )//需要更新外存
+                {
+                    if (
+                        IsEditor &&//编辑器模式 
+                        cInfo.packType == PackType.Script//更新脚本
+                        )
+                        ULDebug.LogWarning("选择了更新外存脚本，编辑器模式忽略该操作");
+                    else
+                    {
+                        
+                       // FileSystem.CreateFileParentDirectory(fulloutpath);
+
+                        Directory.CreateDirectory(Path.GetDirectoryName(fulloutpath));
+
+                        FileInfo fInfo = new FileInfo(fulloutpath);
+                        using (FileStream fs = fInfo.OpenWrite())
+                        {
+                            foreach (byte[] cbuff in cInfo.cacheBuffs)
+                            {
+                                fs.Write(cbuff, 0, cbuff.Length);
+                            }
+                            fs.Close();
+                        }
+                    }
+                }
+
+                //更新内存
+                if (cInfo.updateToMemery)
+                {
+                    if(cInfo.packType == PackType.Script)//热更脚本
+                    {
+                       string codeName = LuaCodeCache.Single.HotUpdate(
+                                                         fulloutpath,//完整路径
+                                                         cInfo.cacheBuffs//缓存的buffs
+                                                         );
+
+                        switch (cInfo.updateMode)
+                        {
+                            case UpdateMode.UM_Component://组件模式
+                                {
+                                    //去掉扩展名
+                                    int pos = packipath.LastIndexOf('.');
+                                    string cmName = (pos < 0) ? packipath : packipath.Substring(0, pos); 
+                                    cmName = cmName.Replace('/', '.');
+                                    //更新组件系统
+                                    LuaRoot.UpdateCMFactory(LuaRoot._Lua, cmName);
+                                }
+                                break;
+                            default://文件模式
+                                {
+                                    //执行刚热更的文件
+                                    UniLua.ThreadStatus st = LuaRoot._Lua.L_DoString(LuaCodeCache.Single.GetCodeContent(codeName));
+                                    if (st != UniLua.ThreadStatus.LUA_OK)
+                                    {
+                                        ULDebug.LogError("执行远程文件遇到错误");
+                                        ULDebug.LogError(LuaRoot._Lua.ToString(-1));
+                                    }
+                                    else
+                                    {
+                                        ULDebug.Log("已成功执行执行远程文件");
+                                    }
+                                    LuaRoot._Lua.SetTop(0);
+                                }
+                                break;
+                        }
+                    }
+                    else //热更资源
+                    {
+                        string extension = Path.GetExtension(Path.GetDirectoryName(fulloutpath));
+                        if (extension == ".bkmft")
+                        {
+                            var packname = Path.GetFileNameWithoutExtension(fulloutpath);
+                            packname = packname.Substring(0, packname.Length - 1);//去掉末尾的_
+                            PacketManage.Single.UnLoadPacket(packname);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                cInfo.hasError = true;
+                ULDebug.LogError(ex.ToString());
+            }
+
+            //清缓存
+            cInfo.cacheBuffSize = 0;
+            cInfo.cacheBuffs.Clear();
+        }
+    }
+
+    void NM_EndUpdate(ILDNM _nm)
+    {
+        LuaDebuggerClientInfo cInfo = m_UIDs[m_CurrUID];
+        CS_LDNM_EndUpdate snm = new CS_LDNM_EndUpdate();
+        snm.isOK = !cInfo.hasError;
+        m_Server.Send(cInfo.uid, NMHelper.Serialize(snm));
+    }
+
+    void Update()
+    {
+        m_Server.Update();
+    }
+
+    void OnClose(ulong uid)
+    {
+        m_UIDs.Remove(uid);
+    }
+
+    void OnConn(ulong uid)
+    {
+       LuaDebuggerClientInfo info = new LuaDebuggerClientInfo();
+       info.uid = uid;
+       m_UIDs.Add(uid, info);
+    }
+
+    void OnRecv(ulong uid, byte[] buff, object[] pm)
+    {
+        if (!m_UIDs.ContainsKey(uid)) return;
+
+        m_CurrUID = uid;
+        
+        NMHelper.Unserialize(buff); 
+    }
+
+    public void _Log(LOG_TYPE lt, string log)
+    {
+        byte[] nm;
+        {
+            S_LDNM_Log lognm = new S_LDNM_Log();
+            lognm.lt = lt;
+            lognm.log = log;
+            lognm.time = DateTime.Now;
+            nm = NMHelper.Serialize(lognm);
+        }
+
+        foreach (KeyValuePair<ulong, LuaDebuggerClientInfo> kv in m_UIDs)
+        {
+            ulong uid = kv.Key;
+            m_Server.Send(uid, nm);
+        }
+    }
+    public static void Log(LOG_TYPE lt, string log)
+    {
+        if (LuaDebugger.Single == null) return;
+        LuaDebugger.Single._Log(lt, log);
+    }
+
+    ulong m_CurrUID = 0;
+    Dictionary<ulong, LuaDebuggerClientInfo> m_UIDs = new Dictionary<ulong, LuaDebuggerClientInfo>();
+    TcpIPServer m_Server = new TcpIPServer(new NMCoder_Common());
+}

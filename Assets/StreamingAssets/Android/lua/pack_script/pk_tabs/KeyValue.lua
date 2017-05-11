@@ -1,0 +1,8 @@
+local data ={
+	info={key="ID",keytype=keytype.int},
+	head={"ID","1xingSuipian","2xingSuipian","3xingSuipian","4xingSuipian","5xingSuipian","6xingSuipian","7xingSuipian","1xingCost","2xingCost","3xingCost","4xingCost","5xingCost","6xingCost","1xingArmyCost","2xingArmyCost","3xingArmyCost","4xingArmyCost","5xingArmyCost","6xingArmyCost","SaodangCost","HeroSXLV2","HeroSXLV3","HeroSXLV4","HeroSXLV5","HeroSXLV6","HeroSXLV7","ArmySXLV2","ArmySXLV3","ArmySXLV4","ArmySXLV5","ArmySXLV6","ArmySXLV7","Minyuan","CopperPrice","Copper10LianPrice","Copper10LianDiscount1","Copper10LianDiscount2","Copper10LianDiscount3","Copper10LianDiscount4","Copper10LianDiscount5","Copper10LianDiscountKeep","CopperFree","CopperFreeTimes","CopperFreeReplay","GoldDiscount1","GoldDiscount2","GoldDiscount3","GoldDiscount4","GoldDiscount5","Gold10LianDiscount1","Gold10LianDiscount2","Gold10LianDiscount3","Gold10LianDiscount4","Gold10LianDiscount5","GoldDiscountKeep","Gold10LianDiscountKeep","GoldFree","GoldPrice","Gold10LianPrice","GoldControllableTimes","Gold10LianControllableTimes","GoldGetHero","ZhaoxiangTime","HeroStarLimit","1xingFanhuan","2xingFanhuan","3xingFanhuan","4xingFanhuan","YanzhengmaTime","LingShangxian","LingXiaohao","LingBuchong","BuyLingNum","ResetTime1","ShouciFapai","MeiciFapai","SuijiShijian"},
+	body={
+		[1]={1,10,30,60,100,170,290,490,20,30,40,70,120,200,20,30,40,70,120,200,1,10,15,25,30,40,50,1,5,15,20,30,40,100,10000,90000,0.95,0.9,0.85,0.8,0.75,1800,600,5,"5:00:00",0.95,0.9,0.85,0.8,0.75,0.9,0.85,0.8,0.75,0.7,1200,600,172800,280,2520,20,20,"2_3_5_10",1800,8,5,15,30,50,120,100,5,720,100,"5:00:00",3,1,40},
+	}
+}
+return data

@@ -1,0 +1,76 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+class LuaTextureLib
+{
+
+    
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    //static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+
+    public const string LIB_NAME = "Texture";
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            new NameFuncPair("GetSize",M_GetSize),
+            
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            //new NameFuncPair("new",F_new),//绝对不能提供new 给脚本，不安全 
+            
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+    //每次获取对象时，重新产生包装类
+    public static void _wrap(ILuaState lua, Texture obj)
+    {
+        if (obj == null) {lua.PushNil(); return;}
+
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,obj),
+        };
+
+        m_ClassRegHelper.InstanceLuaClass(lua, propertys);
+    }
+
+    public static Texture Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+        return LuaMemberHelper.GetObject<Texture>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    static int M_GetSize(ILuaState lua)
+    {
+        //in self
+        //out width,height
+        Texture self = Lua2Obj(lua, 1);
+
+        lua.PushInteger(self.width);
+        lua.PushInteger(self.height);
+        return 2;
+    }
+}
+ 

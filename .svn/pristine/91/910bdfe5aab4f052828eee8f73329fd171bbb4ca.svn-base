@@ -1,0 +1,44 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
+{
+    private Dictionary<int, GameObject> _mySoldiersDict;
+    public DisplayerManager()
+    {
+        _mySoldiersDict = new Dictionary<int, GameObject>();
+    }
+
+    public void AddElement(ObjectID objId, GameObject gameObj)
+    {
+        gameObj.GetComponent<MFAModelRender>().ObjId = objId;
+
+        switch (objId.ObjType)
+        {
+            case ObjectID.ObjectType.MySoldier:
+                _mySoldiersDict.Add(objId.ID, gameObj);
+                break;
+        }
+    }
+
+    public GameObject GetElementById(ObjectID objId)
+    {
+        switch (objId.ObjType)
+        {
+            case ObjectID.ObjectType.MySoldier:
+                if (_mySoldiersDict.ContainsKey(objId.ID))
+                {
+                    return _mySoldiersDict[objId.ID];
+                }
+                break;
+        }
+        return null;
+    }
+    
+
+    public Dictionary<int, GameObject> MySoldiersDict
+    {
+        get { return _mySoldiersDict; }
+    }
+}

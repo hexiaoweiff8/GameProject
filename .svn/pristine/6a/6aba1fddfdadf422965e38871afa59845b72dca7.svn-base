@@ -1,0 +1,45 @@
+-- region *.lua
+-- Date
+-- 此文件由[BabeLua]插件自动生成
+local class = require("common/middleclass")
+
+local network_manager = require "manager/network_manager"
+local ui_manager = require "uiscripts/ui_manager"
+local fw_command = require "framework/fw_command"
+local equipment = require "uiscripts/equipment"
+local inventory2 = require "uiscripts/inventory2"
+local ui_shopScene = require "uiscripts/ui_shopScene"
+local ui_login = require "uiscripts/ui_login"
+local ui_fight = require "uiscripts/ui_fight"
+local shortcut = require "uiscripts/shortcut"
+local skill_UI = require "uiscripts/skill_UI"
+local store = require "uiscripts/store"
+local Temp = require "uiscripts/Temp"
+local Tooltip = require "uiscripts/Tooltip"
+
+local fw_startcommand = class("fw_startcommand", fw_command)
+function fw_startcommand:initialize()
+end
+
+function fw_startcommand:execute(msg)
+    print("fw_startcommand")
+    fw_facade:instance():add_mgr(mgr_name.NET_MGR, network_manager:instance())
+    UNetworkManager:SetLuaTable(network_manager())
+    m_ui_manager = fw_facade:instance():add_mgr(mgr_name.UI_MGR, ui_manager:instance())
+    --        equipment.show_me()
+
+    --    ui_shopScene.show_me()
+    --    inventory2.show_me()
+
+    --    shortcut.show_me()
+    --    skill_UI.show_me()
+    --    store.show_me()
+    --    Temp.show_me()
+    --    Tooltip.show_me()
+
+
+    --        ui_login.show_me()
+    ui_fight.show_me()
+end
+
+return fw_startcommand

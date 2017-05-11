@@ -1,0 +1,355 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine; 
+class LuaQKJsonLib
+{
+
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+   // static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "QKJsonDoc";
+
+    const string DOC_NAME = "_DocName";
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            new NameFuncPair("Add",M_Add), 
+            new NameFuncPair("GetValue",M_GetValue),
+            new NameFuncPair("Foreach",M_Foreach),
+            new NameFuncPair("Parse",M_Parse),
+            new NameFuncPair("Clone",M_Clone),
+            new NameFuncPair("ToString",M_ToString),
+            new NameFuncPair("ToBytes",M_ToBytes),
+            new NameFuncPair("Clear",M_Clear),
+            new NameFuncPair("RemoveAt",M_RemoveAt),
+            new NameFuncPair("Remove",M_Remove),
+        };
+         
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        { 
+            new NameFuncPair("NewMap",S_NewMap),
+            new NameFuncPair("NewArray",S_NewArray), 
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+    public static void _wrap(ILuaState lua,  QK_JsonMultipleValue obj)
+    {
+        if(obj==null)
+        {
+            ULDebug.LogWarning("QKJsonLib._wrap 空值");
+        } 
+
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,obj),
+            //new NameValuePair(DOC_NAME,name),
+        };
+
+        m_ClassRegHelper.InstanceLuaClass(lua, propertys);
+    }
+
+    public static QK_JsonMultipleValue Lua2Obj(ILuaState lua, int index)
+    {
+       LuaMemberHelper.CheckClass(lua, index);
+
+        /*
+        {
+            lua.PushValue(index);
+            lua.GetField(-1, DOC_NAME);
+            name = lua.ToString(-1);
+            lua.Pop(2);
+        }*/
+
+        return LuaMemberHelper.GetObject<QK_JsonMultipleValue>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    static int S_NewMap(ILuaState lua)
+    {
+        //in nil
+        //out QKJsonDoc 
+        QK_JsonMultipleValue re = new QK_JsonValue_Map();
+        _wrap(lua,  re);
+        return 1;
+    }
+
+
+    static int S_NewArray(ILuaState lua)
+    {
+        //in nil
+        //out QKJsonDoc
+       
+        QK_JsonMultipleValue re = new QK_JsonValue_Array(); 
+        _wrap(lua,  re);
+        return 1;
+    }
+
+
+    static int M_Parse(ILuaState lua)
+    {
+        //in self,jsonCode/ByteArray
+        //out bool 
+        QK_JsonMultipleValue value = Lua2Obj(lua, 1);
+        if (lua.IsTable(2))
+        {
+            MonoEX.ByteArray byteArray = LuaByteArrayLib.Lua2Obj(lua, 2);
+            lua.PushBoolean(value.Parse(Encoding.UTF8.GetString(byteArray.ToBytes())));
+        }
+        else
+        {
+            string jsonCode = lua.L_CheckString(2);
+            lua.PushBoolean(value.Parse(jsonCode));
+        }
+        return 1;
+    }
+     
+	static int M_Remove(ILuaState lua)
+	{
+		//in self,key
+        //out bool
+        QK_JsonMultipleValue self = Lua2Obj(lua, 1);
+        if (self == null)
+        {
+            lua.PushBoolean(false);
+            return 1;
+        }
+
+        var key = lua.L_CheckString(2);
+        var array = self as QK_JsonValue_Array;
+        if(array!=null)
+        {
+            int i = 0;
+            foreach(KeyValuePair<string, QK_JsonValue> kv in array)
+            {
+                if(kv.Key==key)
+                {
+                    array.RemoveAt(i);
+                    lua.PushBoolean(true);
+                    return 1;
+                }
+                i++;
+            }
+        }else
+        {
+            var map = self as QK_JsonValue_Map;
+            if(map[key]!=null)
+            {
+                map.removeValue(key);
+                lua.PushBoolean(true);
+                return 1;
+            }
+        }
+
+        lua.PushBoolean(false);
+        return 1;
+	}
+ 
+    static int M_RemoveAt(ILuaState lua)
+    {
+        //in self,index
+        //out bool
+        QK_JsonMultipleValue self = Lua2Obj(lua, 1);
+        if (self == null)
+        {
+            lua.PushBoolean(false);
+            return 1;
+        }
+
+        var array = self as QK_JsonValue_Array;
+        if(array==null)
+        {
+            lua.PushBoolean(false);
+            return 1;
+        }
+
+        var idx = lua.L_CheckInteger(2);
+        if(idx<1 || idx>array.Count)
+        {
+            lua.PushBoolean(false);
+            return 1;
+        }
+        array.RemoveAt(idx - 1);
+        lua.PushBoolean(true);
+        return 1;
+    }
+
+    static int M_Clear(ILuaState lua)
+    {
+        //in self  
+        QK_JsonMultipleValue self = Lua2Obj(lua, 1);
+        self.Clear();
+        return 0;
+    }
+
+
+    static int M_Add(ILuaState lua)
+    {
+        //in self,key,value
+        //out QKJsonDoc 
+        QK_JsonMultipleValue value = Lua2Obj(lua, 1 );
+
+        if(value == null)
+        {
+            lua.PushNil();
+            return 1;
+        }
+
+        string key = lua.L_CheckString(2);
+        if (lua.IsTable(3))
+        { 
+            QK_JsonMultipleValue subDoc = Lua2Obj(lua, 3 );
+            QK_JsonMultipleValue re = subDoc.Clone() as QK_JsonMultipleValue;
+            value.addValue(key, re);
+            _wrap(lua, re);
+        }
+        else
+        {
+            string strv = lua.L_CheckString(3);
+            value.addStrValue(key, strv);
+            lua.PushString(strv);
+        }
+        return 1;
+    }
+
+    static int M_ToString(ILuaState lua)
+    { 
+        //in self
+        //out string 
+        QK_JsonMultipleValue value = Lua2Obj(lua, 1 );
+
+        lua.PushString(value.ToString());
+        return 1;
+    }
+
+
+    static int M_ToBytes(ILuaState lua)
+    {
+        //in self
+        //out ByteArray 
+        QK_JsonMultipleValue value = Lua2Obj(lua, 1);
+
+        MonoEX.ByteArray bytes = new MonoEX.ByteArray(Encoding.UTF8.GetBytes(value.ToString())); 
+        LuaByteArrayLib._wrap(lua, bytes);
+        return 1;
+    }
+
+    static int M_GetValue(ILuaState lua)
+    {
+        //in self,key
+        //out value 
+        QK_JsonMultipleValue value = Lua2Obj(lua, 1 );
+
+        string key = lua.L_CheckString(2);
+
+        QK_JsonValue_Map mapValue = value as QK_JsonValue_Map;
+        if (mapValue == null)
+        {
+            lua.PushNil();
+        }
+        else
+        {
+            QK_JsonValue jsonObj = mapValue[key];
+            if (jsonObj==null)
+            {
+                lua.PushNil();
+            } else
+                PushJsonValue(lua, jsonObj);
+        }
+        return 1;
+    }
+
+    static void PushJsonValue(ILuaState lua, QK_JsonValue jsonObj)
+    {
+        QK_JsonValue_Str strObj = jsonObj as QK_JsonValue_Str;
+        if (strObj != null)
+        { 
+            lua.PushString(strObj.ToString());
+        }
+        else
+        { 
+            _wrap(lua,  jsonObj as QK_JsonMultipleValue);
+        }
+    }
+
+    static int M_Clone(ILuaState lua)
+    {
+        //in self 
+        QK_JsonMultipleValue value = Lua2Obj(lua, 1 );
+       
+        QK_JsonMultipleValue re = value.Clone() as QK_JsonMultipleValue;
+        
+        _wrap(lua,  re);
+        return 1;
+    }
+
+    static int M_Foreach(ILuaState lua)
+    {
+        //in self,function
+        //out void 
+        QK_JsonMultipleValue value = Lua2Obj(lua, 1);
+        lua.L_ArgCheck(lua.IsFunction(2), 2, "must be a function");
+       
+        try
+        {   
+            foreach(KeyValuePair<string, QK_JsonValue> kv in value)
+            {
+                // push `traceback' function  
+                var b = lua.GetTop() + 1;
+                lua.PushCSharpFunction(LuaRoot.Traceback);
+
+                //压入回掉函数
+                lua.PushValue(2);
+                 
+                //压入参数
+                lua.PushString(kv.Key);
+                
+                PushJsonValue(lua, kv.Value);
+                 
+                //调用函数
+                var status = lua.PCall(2, 0, b); 
+                if (status != ThreadStatus.LUA_OK)
+                { 
+                    lua.Remove(b);
+                    ULDebug.LogError(lua.ToString(-1));
+                }
+                 
+                // remove `traceback' function  
+                lua.Remove(b);
+                
+            }
+        }
+        catch (Exception ex)
+        {
+            lua.L_Error(ex.ToString());
+        }
+        finally
+        {
+           // LuaRoot._Lua.L_Unref(LuaDef.LUA_REGISTRYINDEX, funcRef);
+        }
+         
+
+        return 0;
+    } 
+     
+
+
+     
+    //static ulong m_DocIDSeed = 1;//文档种子id
+}

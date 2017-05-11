@@ -1,0 +1,71 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+using UniLua;
+
+/*
+class LuaLoaderManageLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    //static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "LoaderManage";
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new     NameFuncPair("Reset",S_Reset) ,
+            new     NameFuncPair("SetEnable",S_SetEnable) ,
+            new     NameFuncPair("Add",S_Add) ,
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+    
+    static int S_Reset(ILuaState lua)
+    {
+        //in nil
+        //out nil
+        UROMSystem.ScriptLoaderManage.Reset();
+        return 0;
+    }
+
+    static int S_Add(ILuaState lua)
+    {
+        //in Loader
+        //out nil
+        Loader loader = LuaLoaderLib.Lua2Obj(lua, 1);
+        UROMSystem.ScriptLoaderManage.Add(loader);
+        return 0;
+    }
+
+    static int S_SetEnable(ILuaState lua)
+    {
+        //in enable
+        //out nil
+        bool enable = lua.ToBoolean(1);
+        UROMSystem.ScriptLoaderManage.SetEnable(enable);
+        return 0;
+    } 
+    
+}
+ */

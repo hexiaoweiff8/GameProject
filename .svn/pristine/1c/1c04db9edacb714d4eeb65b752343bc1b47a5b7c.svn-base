@@ -1,0 +1,310 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+
+
+class LuaSkillEffectLibs
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+
+    public const string LIB_NAME = "SkillEffect";
+
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            new NameFuncPair("GetHitPercent",M_GetHitPercent),   
+            new NameFuncPair("GetSkillHit",M_GetSkillHit),  
+            new NameFuncPair("GetEditAttrV",M_GetEditAttrV),  
+            new NameFuncPair("Float3rdTriggerEnd_Lv",M_Float3rdTriggerEnd_Lv),  
+             new NameFuncPair("TriggerEndLv",M_TriggerEndLv), 
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        { 
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+
+
+    public static void _wrap(ILuaState lua, SkillEffect obj)
+    {
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,obj),
+        };
+
+        m_ClassRegHelper.InstanceLuaClass(lua, propertys);
+    }
+
+    public static SkillEffect Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<SkillEffect>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+     
+    static int M_GetHitPercent(ILuaState lua)
+    {
+        //in self,skillLevel
+        //out number
+        var self = Lua2Obj(lua, 1);
+        var skillLevel = lua.L_CheckInteger(2);
+
+        if (self == null) { lua.PushNumber(0); return 1; }
+        lua.PushNumber(self.GetHitPercent(skillLevel));
+        return 1;
+    } 
+
+    static int M_GetSkillHit(ILuaState lua)
+    {
+        //in self,skillLevel
+        //out number
+        var self = Lua2Obj(lua, 1);
+        var skillLevel = lua.L_CheckInteger(2);
+        if (self == null) { lua.PushNumber(0); return 1; }
+        lua.PushNumber(self.GetSkillHit(skillLevel));
+        return 1;
+    }
+    static int M_GetEditAttrV(ILuaState lua)
+    {
+        //in self,skillLevel
+        //out number
+        var self = Lua2Obj(lua, 1);
+        var skillLevel = lua.L_CheckInteger(2);
+        if (self == null) { lua.PushNumber(0); return 1; }
+        lua.PushNumber(self.GetEditAttrV(skillLevel));
+        return 1;
+    }
+
+    static int M_Float3rdTriggerEnd_Lv(ILuaState lua)
+    {
+        //in self,skillLevel
+        //out number
+        var self = Lua2Obj(lua, 1);
+        var skillLevel = lua.L_CheckInteger(2);
+        if (self == null || self.EndSkillTriggerObj==null) { lua.PushNumber(0); return 1; }
+        lua.PushNumber(self.EndSkillTriggerObj.Float3rdTriggerEnd_Lv(skillLevel));
+        return 1;
+    }
+
+    static int M_TriggerEndLv(ILuaState lua)
+    {
+        //in self
+        //out int
+        var self = Lua2Obj(lua, 1);
+        lua.PushInteger(self.EndSkillTriggerObj.TriggerEndLv);
+        return 1;
+    }
+}
+
+class LuaSkillInfoLibs
+{
+    
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+
+    public const string LIB_NAME = "SkillInfo";
+
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        { 
+            new NameFuncPair("GetTakeEffect",M_GetTakeEffect),
+            new NameFuncPair("GetTakeEffectsCount",M_GetTakeEffectsCount),  
+            new NameFuncPair("SkillNote",M_SkillNote), 
+            new NameFuncPair("SkillNoteMin",M_SkillNoteMin), 
+            
+            new NameFuncPair("Name",M_Name),   
+            new NameFuncPair("Zhandouli",M_Zhandouli),
+            new NameFuncPair("Icon",M_Icon),
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        { 
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+ 
+
+
+        return 1;
+    }
+
+
+
+    public static void _wrap(ILuaState lua, Skill obj)
+    {
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,obj),
+        };
+
+        m_ClassRegHelper.InstanceLuaClass(lua, propertys);
+    }
+
+    public static Skill Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<Skill>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    static int M_Zhandouli(ILuaState lua)
+    {
+        //in self
+        //out int
+        var self = Lua2Obj(lua, 1);
+        lua.PushInteger(self.Zhandouli);
+        return 1;
+    }
+     
+    static int M_Icon (ILuaState lua)
+    {
+        //in self
+        //out string
+        var self = Lua2Obj(lua, 1);
+        lua.PushString(self.Icon);
+        return 1;
+    }
+
+    static int M_SkillNoteMin(ILuaState lua)
+    {
+        //in self
+        //out string
+        var self = Lua2Obj(lua, 1);
+        lua.PushString(self.SkillNoteMin);
+        return 1;
+    }
+
+    static int M_SkillNote(ILuaState lua)
+    {
+        //in self
+        //out string
+        var self = Lua2Obj(lua, 1);
+        lua.PushString(self.SkillNote);
+        return 1;
+    }
+
+    static int M_Name(ILuaState lua)
+    {
+        //in self
+        //out string
+        var self = Lua2Obj(lua, 1);
+        lua.PushString(self.Name);
+        return 1;
+    }
+    
+    
+    static int M_GetTakeEffectsCount(ILuaState lua)
+    {
+        //in self
+        //out int
+        Skill self = Lua2Obj(lua, 1);
+        lua.PushInteger(self.TakeEffects.Length);
+        return 1;
+    }
+
+    static int M_GetTakeEffect(ILuaState lua)
+    {
+        //in self,index
+        //out SkillEffect
+        Skill self = Lua2Obj(lua, 1);
+        int index = lua.L_CheckInteger(2);
+        LuaSkillEffectLibs._wrap(lua, self.TakeEffects[index - 1]);
+        return 1;
+    }
+     
+    
+}
+
+
+
+class LuaSData_SkillLibs
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+
+    public const string LIB_NAME = "SData_Skill";
+
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            
+            
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair("GetSkill",S_GetSkill),    
+            new NameFuncPair("GetSkillEffect",S_GetSkillEffect),  
+            
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+     
+    static int S_GetSkill(ILuaState lua)
+    {
+        //in id
+        //out SkillInfo
+        int id = lua.L_CheckInteger(1);
+
+        Skill info = SData_Skill.Single.Get(id);
+        LuaSkillInfoLibs._wrap(lua, info);
+        return 1;
+    }
+
+
+    static int S_GetSkillEffect(ILuaState lua)
+    {
+        //in id
+        //out SkillEffect
+        int id = lua.L_CheckInteger(1);
+
+        SkillEffect info = SData_Skill.Single.GetEffect(id);
+        LuaSkillEffectLibs._wrap(lua, info);
+        return 1;
+    }
+}

@@ -1,0 +1,13 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class Soldier_PutongGongji_State : SoldierFSMState {
+    public override void Init()
+    {
+        StateID = SoldierStateID.PutongGongji;
+    }
+
+    public override void Action(SoldierFSMSystem fsm)
+    {
+    }
+}

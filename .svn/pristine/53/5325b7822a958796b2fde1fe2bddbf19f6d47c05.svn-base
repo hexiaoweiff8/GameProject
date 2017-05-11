@@ -1,0 +1,26 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class SoldierFSMFactory
+{
+    public static void GetTrigger(SoldierTriggerID stateName, List<SoldierFSMTrigger> _fsmTrriggerList)
+    {
+        switch(stateName){
+            case SoldierTriggerID.RuChang:
+                var xingjin = new XingjinTrigger();
+                _fsmTrriggerList.Add(xingjin);
+                break;
+        }
+    }
+
+    public static SoldierStateID GetStateIDByTrigger(SoldierTriggerID id)
+    {
+        switch (id)
+        {
+            case SoldierTriggerID.Xingjin:
+                return SoldierStateID.Xingjin;
+        }
+        return SoldierStateID.NullState;
+    }
+}

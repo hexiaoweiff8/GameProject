@@ -1,0 +1,523 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using CLinkPool;
+using MonoEX;
+using UnityEngine;
+using YQ2Common.CSecurity;
+namespace CHttp
+{
+
+    /// <summary>
+    /// Http的请求完成的回调对象
+    /// </summary>
+    public delegate void COnHttpFinished(CHttpRequest reqeust);
+    /// <summary>
+    /// Http的错误类型
+    /// </summary>
+    public enum CHttpErrorCode
+    {
+        Success = 0,
+        Expired = 1,        // 通信过期 该请求者过期了，一般是顶号了。
+        Busying = 2,        // 服务器繁忙    结果尚在执行中，稍后再试
+        ContextLost = 3,    // 丢失上下文    上下文丢失，通讯过程中数据丢失了
+        ErrorFromat = 4,    // 错误的请求格式 请求时的通信格式出错
+        NetError = 5,       // 通讯失败
+        Unkonw = 99         // 未知错误 
+    }
+
+    /// <summary>
+    /// 请求的模式
+    /// </summary>
+    public enum CHttpRequestMode
+    {
+        Normal = 0,
+        Delay = 1,
+    }
+
+    /// <summary>
+    /// Http响应对象
+    /// </summary>
+    public class CHttpResonse : IDisposable
+    {
+        public CHttpResonse(bool hasError, byte[] result)
+        {
+            if (hasError)
+            {
+                mErrorCode = CHttpErrorCode.NetError;
+                mContent = "网络错误";
+                mExtContet = string.Empty;
+            }
+            else
+            {
+                string tempContent = CSafeData.SecDecode(result);
+                QK_JsonValue_Map jsonMap = new QK_JsonValue_Map();
+                if (!jsonMap.Parse(tempContent))
+                {
+                    mErrorCode = CHttpErrorCode.Unkonw;
+                    mContent = tempContent;
+                    mExtContet = string.Empty;
+                }
+                else
+                {
+                    mErrorCode = (CHttpErrorCode)int.Parse(jsonMap.StrValue("ErrorCode"));
+                    mContent = jsonMap.StrValue("Content");
+                    mExtContet = jsonMap.StrValue("Ext");
+                }
+            }
+        }
+        public CHttpResonse(CHttpErrorCode errorType, string content)
+        {
+            mErrorCode = errorType;
+            mContent = content;
+            mExtContet = string.Empty;
+        }
+
+        /// <summary>
+        /// 错误码
+        /// </summary>
+        public CHttpErrorCode ErrorCode
+        {
+            get { return mErrorCode; }
+        }
+
+        /// <summary>
+        /// 响应的内容
+        /// </summary>
+        public string Content
+        {
+            get { return mContent; }
+        }
+        /// <summary>
+        /// 扩展内容
+        /// </summary>
+        public string ExtContent
+        {
+            get { return mExtContet; }
+        }
+
+        public void Dispose()
+        {
+            
+        }
+
+        /// <summary>
+        /// 错误码
+        /// </summary>
+        CHttpErrorCode mErrorCode;
+        /// <summary>
+        /// 响应内容
+        /// </summary>
+        string mContent;
+        /// <summary>
+        /// 护展内容
+        /// </summary>
+        string mExtContet;
+    }
+
+    /// <summary>
+    /// http请求对象
+    /// </summary>
+    public class CHttpRequest : IDisposable
+    {
+
+        #region 事件类型定义
+        interface IRequestFinishedCallBack
+        {
+            void Call(CHttpRequest request);
+        }
+
+        class RequestFinishedDelegateCallBack : IRequestFinishedCallBack
+        {
+            public RequestFinishedDelegateCallBack(COnHttpFinished callBack)
+            {
+                mCallBack = callBack;
+            }
+
+            public void Call(CHttpRequest request)
+            {
+                if (null != mCallBack)
+                {
+                    mCallBack(request);
+                }
+            }
+
+            COnHttpFinished mCallBack;
+        }
+
+        class RequestFinishedEventCallBack : IRequestFinishedCallBack
+        {
+            public RequestFinishedEventCallBack(IEventCallback callBack)
+            {
+                mCallBack = callBack;
+            }
+
+            public void Call(CHttpRequest request)
+            {
+                if (null != mCallBack)
+                {
+                    mCallBack.Call(request);
+                }
+            }
+
+            IEventCallback mCallBack;
+        }
+
+        #endregion 
+
+
+        /// <summary>
+        /// 请求对象
+        /// </summary>
+        public CHttpRequest(string url, QK_JsonValue_Map content, bool delaySupport)
+        {
+            mUrl = url;
+            mContent = content;
+            mDelaySupport = delaySupport;
+            Reset();
+        }
+
+        public void Send()
+        {
+            mSending = true;
+            OnceSend();
+        }
+
+        public void Dispose()
+        {
+            if (null != mResponse)
+            {
+                mResponse.Dispose();
+            }
+            mFinishListener.Clear();
+        }
+
+        public void Reset()
+        {
+            mErrorTimes = 0;
+            mFinished = false;
+            mSending = false;
+        }
+
+        /// <summary>
+        /// 添加监听
+        /// </summary>
+        public void AddListener(COnHttpFinished onFinished)
+        {
+            mFinishListener.Add(new RequestFinishedDelegateCallBack(onFinished));
+        }
+        /// <summary>
+        /// 设置请求模式
+        /// </summary>
+        public void SetMode(CHttpRequestMode mode)
+        {
+            mMode = mode;
+        }
+        /// <summary>
+        /// 添加监听
+        /// </summary>
+        public void AddListener(IEventCallback callBack)
+        {
+            mFinishListener.Add(new RequestFinishedEventCallBack(callBack));
+        }
+        /// <summary>
+        /// 通知完成
+        /// </summary>
+        public void NotifyFinished(CHttpErrorCode errorType, string content)
+        {
+            NotifyFinished(new CHttpResonse(errorType, content));
+        }
+
+        /// <summary>
+        /// 通知完成
+        /// </summary>
+        void NotifyFinished(CHttpResonse response)
+        {
+            mResponse = response;
+            mSending = false;
+            mFinished = true;
+            mFinishedTimes++;
+
+            NotifyListener(this);
+        }
+
+        /// <summary>
+        /// Url
+        /// </summary>
+        public string Url
+        {
+            get { return mUrl; }
+        }
+        /// <summary>
+        /// 请求的内容
+        /// </summary>
+        public string Content
+        {
+            get 
+            {
+                mContent.addStrValue("mode", ((int)mMode).ToString());
+                return mContent.ToString(); 
+            }
+        }
+        /// <summary>
+        /// 响应
+        /// </summary>
+        public CHttpResonse Response
+        {
+            get { return mResponse; }
+        }
+
+        /// <summary>
+        /// 延迟支持
+        /// </summary>
+        public bool DelaySupport
+        {
+            get { return mDelaySupport; }
+        }
+
+        /// <summary>
+        /// 工作状态
+        /// </summary>
+        public bool Sending
+        {
+            get { return mSending; }
+        }
+        /// <summary>
+        /// 完成状态
+        /// </summary>
+        public bool Finished
+        {
+            get { return mFinished; }
+        }
+
+        /// <summary>
+        /// 首次完成
+        /// </summary>
+        public bool FirstFinished
+        {
+            get { return 1 == mFinishedTimes; }
+        }
+
+        /// <summary>
+        /// 发送一次
+        /// </summary>
+        void OnceSend()
+        {
+            string ip;
+            int port;
+            ParseUrl(mUrl, out ip, out port);
+            byte[] postData = CSafeData.SecEncode(Content);
+            CHttpRequestHelper.Single.Send(ip, port, postData, OnSendReutrn);
+        }
+
+        /// <summary>
+        /// 发送的返回
+        /// </summary>
+        void OnSendReutrn(bool hasError,byte[] result)
+        {
+            CHttpResonse response = new CHttpResonse(hasError,result);
+            switch (response.ErrorCode)
+            {
+                case CHttpErrorCode.Busying:// 服务器繁忙    结果尚在执行中，稍后再试
+                    {
+                        OnceSend();
+                    }
+                    break;
+                case CHttpErrorCode.ContextLost:// 丢失上下文    上下文丢失，通讯过程中数据丢失了
+                case CHttpErrorCode.ErrorFromat:// 错误的请求格式 请求时的通信格式出错
+                case CHttpErrorCode.Unkonw:// 未知错误
+                case CHttpErrorCode.NetError:// 通讯失败
+                    {
+                        if (mErrorTimes++ >= 0)
+                        {
+                            NotifyFinished(response);
+                        }
+                        else
+                        {
+                            OnceSend();
+                        }
+                    }
+                    break;
+                default: // Success = 0, Expired = 1,  
+                    {
+                        NotifyFinished(response);
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 解析URL
+        /// </summary>
+        void ParseUrl(string url,out string ip,out int port)
+        {
+            if(url.Contains(":"))
+            {
+                string[] args = url.Split(':');
+                ip = args[0];
+                port = int.Parse(args[1]);
+            }
+            else
+            {
+                ip = url;
+                port = 80;
+            }
+        }
+
+        /// <summary>
+        /// 通知所有监听者
+        /// </summary>
+        void NotifyListener(CHttpRequest request)
+        {
+            if (!FirstFinished && CHttpErrorCode.Success != request.Response.ErrorCode) return;
+
+            for(int i = 0 ; i < mFinishListener.Count ; ++i)
+            {
+                mFinishListener[i].Call(request);
+            }
+        }
+        /// <summary>
+        /// 模式 0-正常 1-延迟发送模式
+        /// </summary>
+        CHttpRequestMode mMode = CHttpRequestMode.Normal;
+        /// <summary>
+        /// 发送中
+        /// </summary>
+        bool mSending = false;
+        /// <summary>
+        /// 是否完成
+        /// </summary>
+        bool mFinished = false;
+        /// <summary>
+        /// 延迟支持
+        /// </summary>
+        bool mDelaySupport = false;
+        /// <summary>
+        /// 发生错误的次数
+        /// </summary>
+        uint mErrorTimes = 0;
+        /// <summary>
+        /// 是否是首次通知
+        /// </summary>
+        int mFinishedTimes = 0;
+        /// <summary>
+        /// 请求的地址
+        /// </summary>
+        string mUrl = string.Empty;
+        /// <summary>
+        /// 请求内容
+        /// </summary>
+        QK_JsonValue_Map mContent = null;
+        /// <summary>
+        /// 响应对象
+        /// </summary>
+        CHttpResonse mResponse = null;
+        /// <summary>
+        /// 回调对象
+        /// </summary>
+        List<IRequestFinishedCallBack> mFinishListener = new List<IRequestFinishedCallBack>();
+    }
+
+    public class CHttpRequestHelper
+    {
+
+        #region 类型定义
+
+        public delegate void OnTaskFinished(bool hasError, byte[] result);
+
+        class CHttpTask
+        {
+            public CHttpTask(string ip, int port, byte[] data, OnTaskFinished onFinished)
+            {
+                // 回调
+                mOnFinished = onFinished;
+                // 创建链接
+                mHandle = LinkPool.Single.GetLink(ip, port);
+                // 创建Loader
+                mLoader = mHandle.CreateLoader(data, 0, data.Length, 0);
+                // 完成
+                mFinished = false;
+            }
+
+            public void Run()
+            {
+                // 发送
+                CoroutineManage.Single.StartCoroutine(coSend());
+            }
+
+            IEnumerator coSend()
+            {
+                while(mHandle.TrackLoader(mLoader))
+                {
+                    yield return null;
+                }
+
+                // 从任务列表删除
+                CHttpRequestHelper.Single.RemoveTask(this);
+                LinkPool.Single.FreeLink(mHandle);
+
+                if(null != mOnFinished)
+                {
+                    mOnFinished(mLoader.HasError(), mLoader.Result);
+                }
+            }
+
+
+            bool mFinished = false;
+            Loader mLoader = null;
+            QKNodeLink mHandle = null;
+            OnTaskFinished mOnFinished = null;
+        }
+
+        #endregion
+
+        public static CHttpRequestHelper Single
+        {
+            get
+            {
+                if(null == mSingle)
+                {
+                    mSingle = new CHttpRequestHelper();
+                }
+                return mSingle;
+            }
+        }
+
+        public void Send(string ip, int port, byte[] data, OnTaskFinished onFinished)
+        {
+            if (NetworkReachability.NotReachable == Application.internetReachability)
+            {
+                onFinished(true, null);
+            }
+            else
+            {
+                CHttpTask temp = new CHttpTask(ip, port, data, onFinished);
+                AddTask(temp);
+                temp.Run();
+            }
+        }
+
+        void AddTask(CHttpTask task)
+        {
+            mTaskList.Add(task);
+        }
+
+        void RemoveTask(CHttpTask task)
+        {
+            mTaskList.Remove(task);
+        }
+
+        CHttpRequestHelper()
+        {
+
+        }
+        /// <summary>
+        /// 任务列表
+        /// </summary>
+        List<CHttpTask> mTaskList = new List<CHttpTask>();
+        /// <summary>
+        /// 单例对象
+        /// </summary>
+        static CHttpRequestHelper mSingle = null;
+    }
+}

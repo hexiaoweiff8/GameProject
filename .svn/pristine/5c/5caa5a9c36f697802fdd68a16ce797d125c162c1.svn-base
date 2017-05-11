@@ -1,0 +1,29 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using System.Collections;
+public class Module_OOSyncClientLua : IModule
+{
+    public IEnumerator Init()
+    {
+        NameFuncPair[] define = new NameFuncPair[]
+		{    
+            new NameFuncPair( LuaOOSyncClientLib.LIB_NAME,LuaOOSyncClientLib.OpenLib),
+            new NameFuncPair( LuaSyncObjLib.LIB_NAME,LuaSyncObjLib.OpenLib),
+            //new NameFuncPair( LuaMemData.LIB_NAME,LuaMemData.OpenLib),
+		};
+
+        ILuaState lua = LuaRoot._Lua;
+
+        for (var i = 0; i < define.Length; ++i)
+        {
+            lua.L_RequireF(define[i].Name, define[i].Func, true);
+            lua.Pop(1);
+        }
+
+        LuaMemData.OpenLib(lua);
+        yield break;
+    }
+}

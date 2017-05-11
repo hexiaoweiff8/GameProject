@@ -1,0 +1,53 @@
+using System;
+using System.Collections.Generic;
+using LuaInterface;
+
+public class SData_ArmyCardStar_C : MonoEX.Singleton<SData_ArmyCardStar_C>
+{
+    public void setData(LuaTable table1, LuaTable table2)
+    {
+        var head = new string[table1.Length];
+        SDataUtils.dealTable(table1, (Object o1, Object o2) =>
+        {
+            head[(int)(double)o1 - 1] = (string)o2;
+        });
+        SDataUtils.dealTable(table2, (Object o1, Object o2) =>
+        {
+            ArmyCardStar_CInfo dif = new ArmyCardStar_CInfo();
+            SDataUtils.dealTable((LuaTable)o2, (Object o11, Object o22) =>
+            {
+                switch (head[(int)(double)o11 - 1])
+				{
+					case "UniqueID": dif.UniqueID = (int)(double)o22; break;
+					case "ArmyCardID": dif.ArmyCardID = (int)(double)o22; break;
+					case "ArmyStarLevel": dif.ArmyStarLevel = (short)(double)o22; break;
+					case "CardStarAttack": dif.CardStarAttack = (float)(double)o22; break;
+					case "CardStarHP": dif.CardStarHP = (float)(double)o22; break;
+					case "CardStarDefense": dif.CardStarDefense = (float)(double)o22; break;
+                }
+            });
+            if (Data.ContainsKey(dif.UniqueID))
+                MonoEX.Debug.Logout(MonoEX.LOG_TYPE.LT_ERROR, "重复的ID：" + dif.UniqueID.ToString());
+            Data.Add(dif.UniqueID, dif);
+        });
+    }
+
+    public ArmyCardStar_CInfo GetDataOfID(int Id)
+    {
+        if (!Data.ContainsKey(Id)) throw new Exception(String.Format("ArmyCardStar_CInfo::GetDataOfID() not found data  Id:{0}", Id));
+        return Data[Id];
+    }
+
+    internal Dictionary<int, ArmyCardStar_CInfo> Data = new Dictionary<int, ArmyCardStar_CInfo>();
+}
+
+
+public struct ArmyCardStar_CInfo
+{
+	public int UniqueID;
+	public int ArmyCardID;
+	public short ArmyStarLevel;
+	public float CardStarAttack;
+	public float CardStarHP;
+	public float CardStarDefense;
+}

@@ -1,0 +1,108 @@
+﻿using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Threading;
+using UnityEngine;
+using System.Collections;
+
+namespace UniLua
+{
+	public delegate string PathHook(string filename);
+	public class LuaFile
+	{ 
+		private static PathHook pathhook = (s) => Path.Combine(Path.Combine(Application.streamingAssetsPath, "LuaRoot"), s);
+		public static void SetPathHook(PathHook hook) {
+			pathhook = hook;
+		}
+ 
+		public static FileLoadInfo OpenFile( string filename)
+		{
+            var path = pathhook(filename);
+            string code = LuaCodeCache.Single.GetCodeContent(path);
+            if (code == null)
+                ULDebug.LogError(string.Format("脚本内容异常 {0}", path));
+
+            return new FileLoadInfo(code);
+		}
+
+		public static bool Readable( string filename )
+		{
+			var path = pathhook(filename);
+            
+            bool re = LuaCodeCache.Single.GetCodeContent(path) != null;
+            if (!re)
+            {
+                ULDebug.LogError(string.Format("LuaFile.Readable {0} path:{1}", filename, path));
+            }
+
+            return re;
+		}
+	}
+
+	public class FileLoadInfo : ILoadInfo, IDisposable
+	{
+		public FileLoadInfo(string data)
+		{
+            m_data = data;
+            m_readpos = 0;            
+		}
+
+       
+		public int ReadByte()
+		{
+            if (m_readpos >= m_data.Length) return -1;
+            return m_data[m_readpos++];
+		}
+
+		public int PeekByte()
+		{
+            if (m_readpos >= m_data.Length) return -1;
+            return m_data[m_readpos];
+		}
+
+		public void Dispose()
+		{
+            //Reader.Dispose();
+			//Stream.Dispose();
+		}
+
+		private const string UTF8_BOM = "\u00EF\u00BB\u00BF";
+
+#if false
+		private int SkipBOM()
+		{
+			for( var i=0; i<UTF8_BOM.Length; ++i )
+			{
+				var c = Stream.ReadByte();
+				if(c == -1 || c != (byte)UTF8_BOM[i])
+					return c;
+				Save( (char)c );
+			}
+			// perfix matched; discard it
+			Clear();
+			return Stream.ReadByte();
+		}
+#endif
+
+		public void SkipComment()
+		{
+            var c = PeekByte();
+            if(c==-1) return;
+
+            if (c == '#')
+            {
+                do
+                {
+                    c = ReadByte();
+                } while (c != -1 && c != '\n');
+                //Save((char)'\n'); // fix line number
+                if (c == '\n') m_readpos--;
+            }
+		}
+
+       string m_data;
+       int m_readpos;
+	}
+
+}
+

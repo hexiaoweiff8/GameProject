@@ -1,0 +1,81 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class UIFingerZoom : MonoBehaviour {
+    public GameObject target;  
+    public float distance = 10.0f;
+    public float xSpeed = 250.0f;
+    public float ySpeed = 120.0f;
+    public float yMinLimit = -20;
+    public float yMaxLimit = 80;
+    public float x = 0.0f;
+    public float y = 0.0f;
+    Vector3 tmp;
+    private Vector2 oldPosition1;  
+    private Vector2 oldPosition2;
+
+    public UIEventListener.FloatDelegate onRotate;
+    public UIEventListener.BoolDelegate onZoom;
+
+    void Start () {
+        //EasyTouch.On_PinchIn += OnPinchIn;
+        //EasyTouch.On_PinchOut += OnPinchOut;
+        ////真机测试发现应该反过来
+        EasyTouch.On_PinchOut += OnPinchIn;
+        EasyTouch.On_PinchIn += OnPinchOut;
+    }
+
+    void OnDisable()
+    {
+        //EasyTouch.On_PinchIn -= OnPinchIn;
+        //EasyTouch.On_PinchOut -= OnPinchOut;
+
+        EasyTouch.On_PinchIn -= OnPinchOut;
+        EasyTouch.On_PinchOut -= OnPinchIn;
+
+    }
+
+    //二指拉近
+    void OnPinchIn(Gesture gesture)
+    {
+        isEnable(false);
+
+        if (target == null) return;
+        if (onZoom != null)
+            onZoom(target, false);
+        
+    }
+
+
+    //二指拉远
+    void OnPinchOut(Gesture gesture)
+    {
+        isEnable(false);
+        if (target == null) return;
+        if (onZoom != null)
+            onZoom(target, true);
+        
+    }
+
+    public void LateUpdate ()
+    {
+    }
+    public void isEnable(bool _value)
+    {
+        UIDragScrollView temp = gameObject.GetComponent<UIDragScrollView>();
+        temp.enabled = _value;
+    }
+    public void Update()
+    {
+        isEnable(true);
+    }
+
+    static float ClampAngle(float angle, float min, float max)
+    {
+        if (angle < -360)
+            angle += 360;
+        if (angle > 360)
+            angle -= 360;
+        return Mathf.Clamp(angle, min, max);  
+    }
+}

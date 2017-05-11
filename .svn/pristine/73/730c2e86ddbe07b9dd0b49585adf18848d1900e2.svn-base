@@ -1,0 +1,162 @@
+﻿using System;
+using System.Collections.Generic;
+using MonoEX;
+
+namespace CLinkPool
+{
+    public class QKNodeLink
+    {
+        public QKNodeLink(string ip,int port)
+        {
+            mIP = ip;
+            mPort = port;
+        }
+
+        public Loader CreateLoader(byte[] nm, int startIndex, int len, byte flag)
+        {
+            Loader res = null;
+            try
+            {
+                if (!mClient.IsConnValid) //当处于断开状态时，自动连接
+                {
+                    int count = 0;
+                    mClient.Conn(mIP, mPort, true);
+                    while (!mClient.IsConnValid)
+                    {
+                        System.Threading.Thread.Sleep(300);
+                        mClient.Update();
+                        if (count++ > 20) break;
+                    }
+                }
+                res = mClient.CreateLoader(nm, startIndex, len, flag);
+                res.Send();
+            }
+            catch (Exception)
+            {
+                mHasException = true;
+            }
+            return res;
+        }
+
+        public bool TrackLoader(Loader loader)
+        {
+            try
+            {
+                mClient.Update();
+            }
+            catch (Exception)
+            {
+                mHasException = true;
+            }
+            return loader.IsLoading && !loader.HasError();
+        }
+
+        public bool HasException
+        {
+            get { return mHasException; }
+        }
+
+        public string IP
+        {
+            get { return mIP; }
+        }
+
+        public int Port
+        {
+            get { return mPort; }
+        }
+
+        /// <summary>
+        /// 连接的IP
+        /// </summary>
+        string mIP;
+        /// <summary>
+        /// 连接的端口
+        /// </summary>
+        int mPort;
+        /// <summary>
+        /// 是否发生了异常
+        /// </summary>
+        bool mHasException = false;
+        /// <summary>
+        /// QKNode的Client对象
+        /// </summary>
+        QKNodeClient mClient = new QKNodeClient();
+    }
+    /// <summary>
+    /// 连接池
+    /// </summary>
+    public class LinkPool
+    {
+
+        public static LinkPool Single
+        {
+            get 
+            {
+                if(null == mSingle)
+                {
+                    mSingle = new LinkPool();
+                }
+                return mSingle;
+            }
+        }
+
+        public QKNodeLink GetLink(string ip,int port)
+        {
+            lock (mFreeLinks)
+            {
+                string tag = GetTag(ip, port);
+                
+                if(!mFreeLinks.ContainsKey(tag))
+                {
+                    mFreeLinks.Add(tag, new Queue<QKNodeLink>());
+                }
+
+                if (mFreeLinks[tag].Count > 0) //池中没有缓存的连接
+                {
+                    return mFreeLinks[tag].Dequeue();
+
+                }
+                else
+                {
+                    return new QKNodeLink(ip,port);
+                }
+            }
+        }
+        /// <summary>
+        /// 释放链接
+        /// </summary>
+        public void FreeLink(QKNodeLink link)
+        {
+            if (!link.HasException)
+            {
+                lock (mFreeLinks)
+                {
+                    string tag = GetTag(link.IP, link.Port);
+
+                    if (!mFreeLinks.ContainsKey(tag))
+                    {
+                        mFreeLinks.Add(tag, new Queue<QKNodeLink>());
+                    }
+
+                    mFreeLinks[tag].Enqueue(link);
+                }
+            }
+        }
+
+        string GetTag(string ip,int port)
+        {
+            return string.Format("{0}:{1}", ip, port);
+        }
+
+        /// <summary>
+        /// 单例对象
+        /// </summary>
+        static LinkPool mSingle = null;
+        /// <summary>
+        /// 空闲的链接
+        /// </summary>
+        Dictionary<string, Queue<QKNodeLink>> mFreeLinks = new Dictionary<string, Queue<QKNodeLink>>();
+    }
+
+}

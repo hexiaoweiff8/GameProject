@@ -1,0 +1,430 @@
+﻿using System;
+using System.Collections.Generic;
+using UniLua;
+using UnityEngine;
+using System.Collections;
+
+
+public class LuaValue_Any : ILuaValue
+{
+    public LuaValue_Any(int refI)
+    {
+        m_refI = refI;
+    }
+
+    public void Push(ILuaState lua)
+    {
+        lua.RawGetI(LuaDef.LUA_REGISTRYINDEX, m_refI);
+    }
+
+    public void Dispose()
+    {
+        if (m_refI > 0) { LuaRoot._Lua.L_Unref(LuaDef.LUA_REGISTRYINDEX, m_refI); m_refI = 0; }
+    }
+
+    public ILuaValue clone(ILuaState lua)
+    {
+        Push(lua);
+        return new LuaValue_Any(lua.L_Ref(LuaDef.LUA_REGISTRYINDEX));
+    }
+
+    public string GetStringValue(ILuaState lua)
+    {
+        Push(lua);
+        string re = lua.L_ToString(-1);
+        lua.Pop(1);
+        return re;
+    }
+
+    int m_refI;
+}
+
+public class LuaRoot
+{
+    public static ILuaState _Lua = null;
+
+    public static void DoFile(string filePath)
+    {
+        var status = _Lua.L_DoFile(filePath);
+        if (status != ThreadStatus.LUA_OK)
+        {
+            throw new Exception(_Lua.ToString(-1));
+        }
+    }
+     
+
+    //将脚本委托转换为事件句柄，转换失败返回null
+    public static QKEvent LDelegate2Event<T>(ILuaState lua, int classIndex, int funcIndex)
+        where T : LuaEventCallback, new()
+    {
+        var evt = new QKEvent();
+        LDelegate2Event<T>(evt, lua, classIndex, funcIndex);
+        return evt;
+    }
+
+
+
+
+    public static T LDelegate2Event<T>(IQKEvent evt,ILuaState lua, int classIndex, int funcIndex)
+        where T : LuaEventCallback, new()
+    {   
+        var cbk = LDelegate2EventCallback<T>(lua, classIndex, funcIndex);
+        if (cbk!=null) evt.AddCallback(cbk);
+        return cbk;
+    }
+
+
+    public static T LDelegate2EventCallback<T>( ILuaState lua, int classIndex, int funcIndex)
+        where T : LuaEventCallback, new()
+    {
+        if (!lua.IsTable(classIndex) || !lua.IsFunction(funcIndex)) return null;
+
+        lua.PushValue(classIndex);
+        int classref = lua.L_Ref(LuaDef.LUA_REGISTRYINDEX);
+
+        lua.PushValue(funcIndex);
+        int funcref = lua.L_Ref(LuaDef.LUA_REGISTRYINDEX);
+
+        T cbk = new T();
+        cbk.Init(classref, funcref); 
+        return cbk;
+    }
+
+
+
+    public static T LDelegate<T>(ILuaState lua, int classIndex, int funcIndex) where T : LuaDelegate, new( )
+    {
+        if (!lua.IsTable(classIndex) || !lua.IsFunction(funcIndex)) return null;
+
+        lua.PushValue(classIndex);
+        int classref = lua.L_Ref(LuaDef.LUA_REGISTRYINDEX);
+
+        lua.PushValue(funcIndex);
+        int funcref = lua.L_Ref(LuaDef.LUA_REGISTRYINDEX);
+
+        T cbk = new T();
+        cbk.Init(classref, funcref); 
+        return cbk; 
+    }
+
+    
+
+    //从堆中取出一个未知类型的数据
+    public static object GetAnyValue(ILuaState lua,int index)
+    {
+        {
+            bool isnumber; int numberParam = lua.ToIntegerX(index, out isnumber);
+            if (isnumber) return numberParam;
+        }
+
+
+        {
+            bool isnumber; double numberParam = lua.ToNumberX(index, out isnumber);
+            if (isnumber) return numberParam;
+        }
+
+        
+        {
+            bool isnumber; uint numberParam = lua.ToUnsignedX(index, out isnumber);
+            if (isnumber) return numberParam;
+        }
+
+        {
+            bool isnumber; UInt64 numberParam = lua.ToUInt64X(index, out isnumber);
+            if (isnumber) return numberParam;
+        }
+
+        if (lua.IsTable(index) || lua.IsFunction(index))
+        {
+            lua.PushValue(index);
+            return new LuaValue_Any(lua.L_Ref(LuaDef.LUA_REGISTRYINDEX));
+        }
+        else if (lua.IsString(index))
+        {
+            return lua.L_CheckString(index);
+        }
+        else if(lua.Type( index ) == LuaType.LUA_TBOOLEAN)
+        {
+            return lua.ToBoolean(index);
+        }
+        else if (lua.IsNoneOrNil(index))
+        {
+            return null;
+        }
+        else
+        {
+            return lua.ToUserData(index);
+        }
+    }
+
+    
+
+    public static void PushObject(ILuaState lua,object v)
+    {
+        if (v == null)
+        {
+            lua.PushNil();
+            return;
+        }
+
+        ILuaValue luaV = v as ILuaValue;
+        if (luaV != null) { luaV.Push(lua); return; }
+
+        switch (Type.GetTypeCode(v.GetType()))
+        {
+            case TypeCode.Int16:
+                lua.PushInteger((Int16)v);
+                break;
+            case TypeCode.UInt16:
+                lua.PushInteger((UInt16)v);
+                break;
+            case TypeCode.Int32:
+                lua.PushInteger((Int32)v);
+                break;
+            case TypeCode.UInt32:
+                lua.PushUnsigned((UInt32)v);
+                break;
+            case TypeCode.UInt64:
+                lua.PushUInt64((ulong)v);
+                break; 
+            case TypeCode.Boolean:
+                lua.PushBoolean((bool)v);
+                break;
+            case TypeCode.Double:
+                lua.PushNumber((double)v);
+                break;
+            case TypeCode.Single:
+                lua.PushNumber((float)v);
+                break;
+            case TypeCode.String:
+                lua.PushString((string)v);
+                break;
+            default:
+                lua.PushLightUserData(v);
+                break;
+        } 
+    }
+
+    public static int Traceback(ILuaState lua)
+    {
+        var msg = lua.ToString(1);
+        if (msg != null)
+        {
+            lua.L_Traceback(lua, msg, 1);
+        }
+        // is there an error object?  
+        else if (!lua.IsNoneOrNil(1))
+        {
+            // try its `tostring' metamethod  
+            if (!lua.L_CallMeta(1, "__tostring"))
+            {
+                lua.PushString("(no error message)");
+            }
+        }
+        return 1;
+    }
+
+    public static void CallMember(int funcRef, int classRef)
+    {
+        _Lua.RawGetI(LuaDef.LUA_REGISTRYINDEX, funcRef);
+
+        // insert `traceback' function  
+        var b = _Lua.GetTop();
+        _Lua.PushCSharpFunction(Traceback);
+        _Lua.Insert(b);
+
+        //传递self参数
+        _Lua.RawGetI(LuaDef.LUA_REGISTRYINDEX, classRef);
+
+        //调用函数
+        var status = _Lua.PCall(1, 0, b);
+        if (status != ThreadStatus.LUA_OK)
+        {
+            ULDebug.LogError(_Lua.ToString(-1));
+        }
+
+        // remove `traceback' function  
+        _Lua.Remove(b);
+    }
+
+
+
+    public static object R_CallMember(int funcRef, int classRef)
+    {
+        _Lua.RawGetI(LuaDef.LUA_REGISTRYINDEX, funcRef);
+
+        // insert `traceback' function  
+        var b = _Lua.GetTop();
+        _Lua.PushCSharpFunction(Traceback);
+        _Lua.Insert(b);
+
+        //传递self参数
+        _Lua.RawGetI(LuaDef.LUA_REGISTRYINDEX, classRef); 
+
+        //调用函数
+        var status = _Lua.PCall(1, 1, b);
+        if (status != ThreadStatus.LUA_OK)
+        {
+            // remove `traceback' function  
+            ULDebug.LogError(_Lua.ToString(-1));
+            _Lua.Remove(b);
+            return null;
+        }
+
+        object re = LuaRoot.GetAnyValue(_Lua, -1);
+
+        // remove `traceback' function  
+        _Lua.Remove(b);
+
+        return re;
+    }
+
+
+    public static void CallMember(int funcRef, int classRef,object param)
+    { 
+        _Lua.RawGetI(LuaDef.LUA_REGISTRYINDEX, funcRef);
+
+        // insert `traceback' function  
+        var b = _Lua.GetTop();
+        _Lua.PushCSharpFunction(Traceback);
+        _Lua.Insert(b);
+
+        //传递self参数
+        _Lua.RawGetI(LuaDef.LUA_REGISTRYINDEX, classRef);
+
+        //传递param
+        PushObject(_Lua, param);
+
+        //调用函数
+        var status = _Lua.PCall(2, 0, b);
+        if (status != ThreadStatus.LUA_OK)
+        {
+            // remove `traceback' function  
+            ULDebug.LogError(_Lua.ToString(-1)); 
+        }
+
+        // remove `traceback' function  
+        _Lua.Remove(b); 
+    }
+
+    public static object R_CallMember(int funcRef, int classRef, object param, object param2)
+    {
+        _Lua.RawGetI(LuaDef.LUA_REGISTRYINDEX, funcRef);
+
+        // insert `traceback' function  
+        var b = _Lua.GetTop();
+        _Lua.PushCSharpFunction(Traceback);
+        _Lua.Insert(b);
+
+        //传递self参数
+        _Lua.RawGetI(LuaDef.LUA_REGISTRYINDEX, classRef);
+
+        //传递param
+        PushObject(_Lua, param);
+
+        PushObject(_Lua, param2);
+
+        //调用函数
+        var status = _Lua.PCall(3, 1, b);
+        if (status != ThreadStatus.LUA_OK)
+        {
+            // remove `traceback' function  
+            ULDebug.LogError(_Lua.ToString(-1));
+            _Lua.Remove(b);
+            return null;
+        }
+         
+        object re = LuaRoot.GetAnyValue(_Lua, -1);
+
+        // remove `traceback' function  
+        _Lua.Remove(b);
+
+        return re;
+    }
+
+
+    public static object R_CallMember(int funcRef, int classRef, object param)
+    {
+        _Lua.RawGetI(LuaDef.LUA_REGISTRYINDEX, funcRef);
+
+        // insert `traceback' function  
+        var b = _Lua.GetTop();
+        _Lua.PushCSharpFunction(Traceback);
+        _Lua.Insert(b);
+
+        //传递self参数
+        _Lua.RawGetI(LuaDef.LUA_REGISTRYINDEX, classRef);
+
+        //传递param
+        PushObject(_Lua, param); 
+
+        //调用函数
+        var status = _Lua.PCall(2, 1, b);
+        if (status != ThreadStatus.LUA_OK)
+        {
+            // remove `traceback' function  
+            ULDebug.LogError(_Lua.ToString(-1));
+            _Lua.Remove(b);
+            return null;
+        }
+
+        object re = LuaRoot.GetAnyValue(_Lua, -1);
+
+        // remove `traceback' function  
+        _Lua.Remove(b);
+
+        return re;
+    }
+
+
+    public static int StoreMethod(ILuaState lua,string name)
+    {
+        lua.GetField(-1, name);
+        if (!lua.IsFunction(-1))
+        {
+            lua.Pop(1);//弹出获取的值 
+            return 0;
+        }
+
+        //获得引用，同时弹出 
+        return lua.L_Ref(LuaDef.LUA_REGISTRYINDEX);
+    }
+
+
+    
+
+    static public string PathHook(string filename)
+    {
+        return string.Format(filename);
+    }
+
+
+
+    public static CMLuaFuns CreateCMFuncs(ILuaState lua ,string scriptFile)
+    {
+        if (!m_LuaCMFactorys.ContainsKey(scriptFile))
+        {
+            LuaCMFactory cmf = new LuaCMFactory(lua,scriptFile);
+            m_LuaCMFactorys.Add(scriptFile, cmf);
+        }
+
+        return m_LuaCMFactorys[scriptFile].NewCM(lua);
+    }
+
+    public static void UpdateCMFactory(ILuaState lua, string scriptFile)
+    {
+     
+        if (!m_LuaCMFactorys.ContainsKey(scriptFile))
+        {
+            ULDebug.Log(string.Format("未更新组件 {0}，组件不在缓存中",scriptFile));
+            return;
+        }
+
+        
+        LuaCMFactory cmfactory = m_LuaCMFactorys[scriptFile];
+        cmfactory.Dispose();
+        m_LuaCMFactorys.Remove(scriptFile);
+    }
+
+    static Dictionary<string, LuaCMFactory> m_LuaCMFactorys = new Dictionary<string, LuaCMFactory>();
+}

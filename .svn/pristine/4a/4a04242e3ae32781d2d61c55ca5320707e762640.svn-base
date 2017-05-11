@@ -1,0 +1,241 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+class LuaCMScrollContainerLib
+{
+    class CMScrollContainerInfo : ICoreComponentInfo
+    {
+        public Type type { get { return typeof(ScrollContainer); } }
+        public string name { get { return LuaCMScrollContainerLib.LIB_NAME; } }
+        public void newLuaObj(ILuaState lua, Component cmp)
+        {
+            LuaCMScrollContainerLib._wrap(lua, cmp as ScrollContainer);
+        }
+    }
+
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+   // static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "CMScrollContainer";
+
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {             
+            new NameFuncPair("SetMomentum",M_SetMomentum),  
+            new NameFuncPair("GetMomentum",M_GetMomentum),  
+            new NameFuncPair("SetSpringSpeed",M_SetSpringSpeed),  
+            new NameFuncPair("GetSpringSpeed",M_GetSpringSpeed),  
+            new NameFuncPair("GetSpringRange",M_GetSpringRange),  
+            new NameFuncPair("SetSpringRange",M_SetSpringRange),  
+            new NameFuncPair("GetMargin",M_GetMargin),  
+            new NameFuncPair("SetMargin",M_SetMargin),  
+            new NameFuncPair("SetScrollScale",M_SetScrollScale),  
+            new NameFuncPair("GetScrollScale",M_GetScrollScale), 
+            new NameFuncPair("SetContainerSize",M_SetContainerSize),  
+            new NameFuncPair("GetContainerSize",M_GetContainerSize), 
+            new NameFuncPair("Reposition",M_Reposition),
+            new NameFuncPair("GetDragFlip",M_GetDragFlip), 
+            new NameFuncPair("SetDragFlip",M_SetDragFlip),
+            
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+           
+            
+        };
+        //注册静态属性
+        NameValuePair[] static_property = new NameValuePair[]
+        {
+            new NameValuePair("Name",LIB_NAME),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define, static_property);
+
+        LuaGameObjectLib.RegComponent(new CMScrollContainerInfo());
+
+        return 1;
+    }
+
+    public static void _wrap(ILuaState lua, ScrollContainer comp)
+    {
+        LuaOpenLibs._wrapComponent(lua, comp, LIB_NAME, m_ClassRegHelper);
+    }
+
+    public static ScrollContainer Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<ScrollContainer>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    static int M_SetMomentum(ILuaState lua)
+    {
+        //in self,Vector2
+        ScrollContainer self = Lua2Obj(lua, 1);
+        LuaVector2Lib.Lua2Obj(lua, 2, out self.Momentum);
+        return 0;
+    }
+
+    static int M_GetMomentum(ILuaState lua)
+    {
+        //in self
+        //out Vector2
+        ScrollContainer self = Lua2Obj(lua, 1);
+        LuaVector2Lib._wrap(lua, self.Momentum);
+        return 1;
+    }
+
+    static int M_SetSpringSpeed(ILuaState lua)
+    {
+        //in self,Vector2
+        ScrollContainer self = Lua2Obj(lua, 1);
+        LuaVector2Lib.Lua2Obj(lua, 2, out self.SpringSpeed);
+        return 0;
+    }
+
+    static int M_GetSpringSpeed(ILuaState lua)
+    {
+        //in self
+        //out Vector2
+        ScrollContainer self = Lua2Obj(lua, 1);
+        LuaVector2Lib._wrap(lua, self.SpringSpeed);
+        return 1;
+    }
+
+     static int M_GetSpringRange(ILuaState lua)
+    {
+         //in self
+         //out left,top,right,bottom
+        ScrollContainer self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.SpringRange_Left);
+        lua.PushNumber(self.SpringRange_Top);
+        lua.PushNumber(self.SpringRange_Right);
+        lua.PushNumber(self.SpringRange_Bottom);
+        return 4;
+    }
+
+     static int M_SetSpringRange(ILuaState lua)
+     {
+         //in self,left,top,right,bottom
+         //out nil
+         ScrollContainer self = Lua2Obj(lua, 1);
+         float left = (float)lua.L_CheckNumber(2);
+         float top = (float)lua.L_CheckNumber(3);
+         float right = (float)lua.L_CheckNumber(4);
+         float bottom = (float)lua.L_CheckNumber(5);
+         self.SpringRange_Left = left;
+         self.SpringRange_Top = top;
+         self.SpringRange_Right = right;
+         self.SpringRange_Bottom = bottom;
+         return 0;
+     }
+
+     static int M_GetMargin(ILuaState lua)
+     {
+         //in self
+         //out left,top,right,bottom
+         ScrollContainer self = Lua2Obj(lua, 1);
+         lua.PushNumber(self.Margin_Left);
+         lua.PushNumber(self.Margin_Top);
+         lua.PushNumber(self.Margin_Right);
+         lua.PushNumber(self.Margin_Bottom);
+         return 4;
+     }
+
+     static int M_SetMargin(ILuaState lua)
+     {
+         //in self,left,top,right,bottom
+         //out nil
+         ScrollContainer self = Lua2Obj(lua, 1);
+         float left = (float)lua.L_CheckNumber(2);
+         float top = (float)lua.L_CheckNumber(3);
+         float right = (float)lua.L_CheckNumber(4);
+         float bottom = (float)lua.L_CheckNumber(5);
+         self.Margin_Left = left;
+         self.Margin_Top = top;
+         self.Margin_Right = right;
+         self.Margin_Bottom = bottom;
+         return 0;
+     }
+
+
+
+     static int M_SetScrollScale(ILuaState lua)
+     {
+         //in self,Vector2
+         ScrollContainer self = Lua2Obj(lua, 1);
+         LuaVector2Lib.Lua2Obj(lua, 2, out self.ScrollScale);
+         return 0;
+     }
+
+     static int M_GetScrollScale(ILuaState lua)
+     {
+         //in self
+         //out Vector2
+         ScrollContainer self = Lua2Obj(lua, 1);
+         LuaVector2Lib._wrap(lua, self.ScrollScale);
+         return 1;
+     }
+
+
+     static int M_SetContainerSize(ILuaState lua)
+     {
+         //in self,Vector2
+         ScrollContainer self = Lua2Obj(lua, 1);
+         LuaVector2Lib.Lua2Obj(lua, 2, out self.ContainerSize);
+         return 0;
+     }
+
+     static int M_GetContainerSize(ILuaState lua)
+     {
+         //in self
+         //out Vector2
+         ScrollContainer self = Lua2Obj(lua, 1);
+         LuaVector2Lib._wrap(lua, self.ContainerSize);
+         return 1;
+     } 
+
+    static int M_Reposition(ILuaState lua)
+     {
+        //in self
+         ScrollContainer self = Lua2Obj(lua, 1);
+         self.Reposition();
+         return 0;
+     }
+
+    static int M_GetDragFlip(ILuaState lua)
+    {
+        //in self
+        //out SpriteFlip
+        ScrollContainer self = Lua2Obj(lua, 1);
+        lua.PushInteger((int)self.DragFlip);
+        return 1;
+    }
+
+    static int M_SetDragFlip(ILuaState lua)
+    {
+        //in self,SpriteFlip
+        //out nil
+        ScrollContainer self = Lua2Obj(lua, 1);
+        int flip = lua.L_CheckInteger(2);
+        self.DragFlip = (Flip)flip;
+        return 0;
+    } 
+}
+ 

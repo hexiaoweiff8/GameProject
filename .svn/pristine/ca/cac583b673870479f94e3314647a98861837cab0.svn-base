@@ -1,0 +1,433 @@
+--region *.lua
+--Date 20150804
+--登陆界面
+--作者 wenchuan
+local class = require("common/middleclass")
+local class_wnd_login = class("class_wnd_login", wnd_base)
+
+function class_wnd_login:OnShowDone()
+    local btn_go = self.transform:Find("mainpanel/btn_go").gameObject
+    -- SendPB_10001()
+    UIEventListener.Get(btn_go).onPress = function(btn_go, args)
+        if args then
+            -- LuaHelper.myd2()
+            -- System.GC.Collect()
+            -- collectgarbage("collect")
+            -- ui_manager:ShowWB(WNDTYPE.ui_equip)
+            ui_manager:ShowWB(WNDTYPE.Prefight)
+        -- ui_manager:ShowWB(WNDTYPE.ui_kejitree)
+        --TODODO
+        --
+        -- SendPB_10004(equipP.allEqList[1][1].EquipUniID)
+        -- SendPB_10005(equipP.allEqList[1][1].EquipUniID, 1 - equipP.allEqList[1][1].IsLock)
+        -- SendPB_10006(equipP.allEqList[1][1].EquipUniID)
+        -- SendPB_10007(equipP.allEqList[1][1].EquipUniID, 5)
+        -- SendPB_10008(equipP.allEqList[1][1].EquipUniID, 5, 3)
+        end
+    end
+end
+
+require "proto/role_pb_pb"
+require "proto/gwc_pb"
+require "proto/cgw_pb"
+require "proto/header_pb2_pb"
+-- 测试发送PBLUA--
+function SendPB_10001()
+    local cgw = cgw_pb.LoginGame()
+    cgw.token = 'token'
+    local msg1 = cgw:SerializeToString()
+    createSendPBHeader(10001, msg1)
+end
+function MSGID_10001(body)
+    SendPB_10002()
+end
+
+
+
+function SendPB_10002()
+    createSendPBHeader(10002)
+end
+
+
+function MSGID_10002(body)
+    local gwc = gwc_pb.SelectRole()
+    gwc:ParseFromString(body);
+    lgyPrint('uId==>' .. gwc.user.uId);
+    lgyPrint('hostId==>' .. gwc.user.hostId);
+    lgyPrint('rId==>' .. gwc.user.rId);
+    lgyPrint('userName==>' .. gwc.user.userName);
+    lgyPrint('exp==>' .. gwc.user.exp);
+    lgyPrint('vipexp==>' .. gwc.user.vipexp);
+    lgyPrint('gwc.user.currency.gold==>' .. gwc.user.currency.gold);
+    for k, v in ipairs(gwc.user.card) do
+        lgyPrint('gwc.user.card.id==>' .. v.id);
+    end
+    for k, v in ipairs(gwc.user.item) do
+        lgyPrint('gwc.user.item.id==>' .. v.id);
+    end
+    local type
+    --装备数据
+    for k, v in ipairs(gwc.user.equip) do
+        lgyPrint('gwc.user.equip.id==>' .. v.id);
+        lgyPrint('gwc.user.equip.eid==>' .. v.eid);
+        lgyPrint('gwc.user.equip.lv==>' .. v.lv);
+        lgyPrint('gwc.user.equip.rarity==>' .. v.rarity);
+        lgyPrint('gwc.user.equip.fst_attr==>' .. v.fst_attr);
+        
+        local tempTB1 = {}
+        for k, v in ipairs(v.sndAttr) do
+            lgyPrint('gwc.user.equip.sndAttr.id==>' .. v.id);
+            lgyPrint('gwc.user.equip.sndAttr.val==>' .. v.val);
+            lgyPrint('gwc.user.equip.sndAttr.isRemake==>' .. v.isRemake);
+            
+            local tempTB2 = {}
+            for k, v in ipairs(v.remake) do
+                lgyPrint('gwc.user.equip.sndAttr.remake.id==>' .. v.id);
+                lgyPrint('gwc.user.equip.sndAttr.remake.val==>' .. v.val);
+                tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
+            end
+            
+            tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
+        end
+        lgyPrint('gwc.user.equip.isLock==>' .. v.isLock);
+        lgyPrint('gwc.user.equip.isBad==>' .. v.isBad);
+        
+        type = sdata_Equip_data:GetV(sdata_Equip_data.I_EquipType, v.eid)
+        --TODODO v.rarity + 1
+        equipP.allEqList[temp][#equipP.allEqList[temp] + 1] = equipM(v.id, v.eid, v.lv, v.rarity + 1, v.isBad, v.isLock, v.fst_attr, tempTB1)
+    
+    end
+end
+
+
+function SendPB_10003()
+    local cgw = cgw_pb.RegisterRole()
+    cgw.userName = 'lgy'
+    local msg1 = cgw:SerializeToString()
+    createSendPBHeader(10003, msg1)
+end
+
+function MSGID_10003(body)
+end
+
+-- 测试发送PBLUA--
+function SendPB_10004(id)
+    -- local gwc = gwc_pb.EquipLvlup()
+    -- gwc.equip.id = v.EquipUniID
+    -- gwc.equip.eid = v.EquipID
+    -- gwc.equip.lv = v.QiangHuaLevel
+    -- gwc.equip.rarity = v.EquipQuality
+    -- gwc.equip.fst_attr = v.MainEffectID
+    -- gwc.equip.isLock = v.IsLock
+    -- gwc.equip.isBad = v.IsBad
+    -- if v.ViceEffect then
+    --     for k, v in ipairs(v.ViceEffect) do
+    --         local sndAttr = gwc.equip.sndAttr:add()
+    --         sndAttr.id = v.ShuXingID
+    --         sndAttr.val = v.ShuXingNum
+    --         sndAttr.isRemake = v.IsChongZhu
+    --         if v.Remake then
+    --             for k, v in ipairs(v.Remake) do
+    --                 local remake = sndAttr.remake:add()
+    --                 remake.id = v.RemakeShuXingID
+    --                 remake.val = v.RemakeShuXingNum
+    --             end
+    --         end
+    --     end
+    -- end
+    -- local msg1 = gwc:SerializeToString()
+    local cgw = cgw_pb.EquipLvlup()
+    cgw.equipId = id
+    local msg1 = cgw:SerializeToString()
+    ----------------------------------------------------------------
+    -- local gwc = gwc_pb.EquipLvlup()
+    -- gwc:ParseFromString(msg1);
+    -- --装备数据
+    -- local v = gwc.equip
+    -- lgyPrint('gwc.equip.id==>' .. v.id);
+    -- lgyPrint('gwc.equip.eid==>' .. v.eid);
+    -- lgyPrint('gwc.equip.lv==>' .. v.lv);
+    -- lgyPrint('gwc.equip.rarity==>' .. v.rarity);
+    -- lgyPrint('gwc.equip.fst_attr==>' .. v.fst_attr);
+    -- local tempTB1 = {}
+    -- for k, v in ipairs(v.sndAttr) do
+    --     lgyPrint('gwc.equip.sndAttr.id==>' .. v.id);
+    --     lgyPrint('gwc.equip.sndAttr.val==>' .. v.val);
+    --     lgyPrint('gwc.equip.sndAttr.isRemake==>' .. v.isRemake);
+    --     local tempTB2 = {}
+    --     for k, v in ipairs(v.remake) do
+    --         lgyPrint('gwc.equip.sndAttr.remake.id==>' .. v.id);
+    --         lgyPrint('gwc.equip.sndAttr.remake.val==>' .. v.val);
+    --         tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
+    --     end
+    --     tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
+    -- end
+    -- lgyPrint('gwc.equip.isLock==>' .. v.isLock);
+    -- lgyPrint('gwc.equip.isBad==>' .. v.isBad);
+    ----------------------------------------------------------------
+    createSendPBHeader(10004, msg1)
+end
+
+function MSGID_10004(body)
+    local gwc = gwc_pb.EquipLvlup()
+    gwc:ParseFromString(body);
+    --装备数据
+    local v = gwc.equip
+    lgyPrint('gwc.equip.id==>' .. v.id);
+    lgyPrint('gwc.equip.eid==>' .. v.eid);
+    lgyPrint('gwc.equip.lv==>' .. v.lv);
+    lgyPrint('gwc.equip.rarity==>' .. v.rarity);
+    lgyPrint('gwc.equip.fst_attr==>' .. v.fst_attr);
+    local tempTB1 = {}
+    for k, v in ipairs(v.sndAttr) do
+        lgyPrint('gwc.equip.sndAttr.id==>' .. v.id);
+        lgyPrint('gwc.equip.sndAttr.val==>' .. v.val);
+        lgyPrint('gwc.equip.sndAttr.isRemake==>' .. v.isRemake);
+        local tempTB2 = {}
+        for k, v in ipairs(v.remake) do
+            lgyPrint('gwc.equip.sndAttr.remake.id==>' .. v.id);
+            lgyPrint('gwc.equip.sndAttr.remake.val==>' .. v.val);
+            tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
+        end
+        tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
+    end
+    lgyPrint('gwc.equip.isLock==>' .. v.isLock);
+    lgyPrint('gwc.equip.isBad==>' .. v.isBad);
+    
+    local value = equipM(v.id, v.eid, v.lv, v.rarity + 1, v.isBad, v.isLock, v.fst_attr, tempTB1)
+    local index, index2 = equipP.getIndexByID(v.id)
+    if index2 then
+        equipP.change_allEqList(index, index2, value)
+    else
+        equipP.change_nowEqList(index, value)
+    end
+end
+
+-- 测试发送PBLUA--
+function SendPB_10005(id, isLock)
+    lgyPrint('isLock==>' .. isLock);
+    local cgw = cgw_pb.EquipLock()
+    cgw.equipId = id
+    cgw.isLock = isLock
+    local msg1 = cgw:SerializeToString()
+    createSendPBHeader(10005, msg1)
+end
+
+
+function MSGID_10005(body)
+    local gwc = gwc_pb.EquipLock()
+    gwc:ParseFromString(body);
+    --装备数据
+    local v = gwc.equip
+    lgyPrint('gwc.equip.id==>' .. v.id);
+    lgyPrint('gwc.equip.eid==>' .. v.eid);
+    lgyPrint('gwc.equip.lv==>' .. v.lv);
+    lgyPrint('gwc.equip.rarity==>' .. v.rarity);
+    lgyPrint('gwc.equip.fst_attr==>' .. v.fst_attr);
+    local tempTB1 = {}
+    for k, v in ipairs(v.sndAttr) do
+        lgyPrint('gwc.equip.sndAttr.id==>' .. v.id);
+        lgyPrint('gwc.equip.sndAttr.val==>' .. v.val);
+        lgyPrint('gwc.equip.sndAttr.isRemake==>' .. v.isRemake);
+        local tempTB2 = {}
+        for k, v in ipairs(v.remake) do
+            lgyPrint('gwc.equip.sndAttr.remake.id==>' .. v.id);
+            lgyPrint('gwc.equip.sndAttr.remake.val==>' .. v.val);
+            tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
+        end
+        tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
+    end
+    lgyPrint('gwc.equip.isLock==>' .. v.isLock);
+    lgyPrint('gwc.equip.isBad==>' .. v.isBad);
+    
+    local value = equipM(v.id, v.eid, v.lv, v.rarity + 1, v.isBad, v.isLock, v.fst_attr, tempTB1)
+    local index, index2 = equipP.getIndexByID(v.id)
+    if index2 then
+        equipP.change_allEqList(index, index2, value)
+    else
+        equipP.change_nowEqList(index, value)
+    end
+end
+
+
+-- 测试发送PBLUA--
+function SendPB_10006(id)
+    local cgw = cgw_pb.EquipRepair()
+    cgw.equipId = id
+    local msg1 = cgw:SerializeToString()
+    createSendPBHeader(10006, msg1)
+end
+function MSGID_10006(body)
+    local gwc = gwc_pb.EquipRepair()
+    gwc:ParseFromString(body);
+    --装备数据
+    local v = gwc.equip
+    lgyPrint('gwc.equip.id==>' .. v.id);
+    lgyPrint('gwc.equip.eid==>' .. v.eid);
+    lgyPrint('gwc.equip.lv==>' .. v.lv);
+    lgyPrint('gwc.equip.rarity==>' .. v.rarity);
+    lgyPrint('gwc.equip.fst_attr==>' .. v.fst_attr);
+    local tempTB1 = {}
+    for k, v in ipairs(v.sndAttr) do
+        lgyPrint('gwc.equip.sndAttr.id==>' .. v.id);
+        lgyPrint('gwc.equip.sndAttr.val==>' .. v.val);
+        lgyPrint('gwc.equip.sndAttr.isRemake==>' .. v.isRemake);
+        local tempTB2 = {}
+        for k, v in ipairs(v.remake) do
+            lgyPrint('gwc.equip.sndAttr.remake.id==>' .. v.id);
+            lgyPrint('gwc.equip.sndAttr.remake.val==>' .. v.val);
+            tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
+        end
+        tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
+    end
+    lgyPrint('gwc.equip.isLock==>' .. v.isLock);
+    lgyPrint('gwc.equip.isBad==>' .. v.isBad);
+    
+    local value = equipM(v.id, v.eid, v.lv, v.rarity + 1, v.isBad, v.isLock, v.fst_attr, tempTB1)
+    local index, index2 = equipP.getIndexByID(v.id)
+    if index2 then
+        equipP.change_allEqList(index, index2, value)
+    else
+        equipP.change_nowEqList(index, value)
+    end
+end
+
+-- 测试发送PBLUA--
+function SendPB_10007(id, viceId)
+    local cgw = cgw_pb.EquipRemake()
+    cgw.equipId = id
+    cgw.viceId = viceId
+    local msg1 = cgw:SerializeToString()
+    createSendPBHeader(10007, msg1)
+end
+function MSGID_10007(body)
+    lgyPrint('MSGID_10007');
+    local gwc = gwc_pb.EquipRemake()
+    gwc:ParseFromString(body);
+    --装备数据
+    local v = gwc.equip
+    lgyPrint('gwc.equip.id==>' .. v.id);
+    lgyPrint('gwc.equip.eid==>' .. v.eid);
+    lgyPrint('gwc.equip.lv==>' .. v.lv);
+    lgyPrint('gwc.equip.rarity==>' .. v.rarity);
+    lgyPrint('gwc.equip.fst_attr==>' .. v.fst_attr);
+    local tempTB1 = {}
+    for k, v in ipairs(v.sndAttr) do
+        lgyPrint('gwc.equip.sndAttr.id==>' .. v.id);
+        lgyPrint('gwc.equip.sndAttr.val==>' .. v.val);
+        lgyPrint('gwc.equip.sndAttr.isRemake==>' .. v.isRemake);
+        local tempTB2 = {}
+        for k, v in ipairs(v.remake) do
+            lgyPrint('gwc.equip.sndAttr.remake.id==>' .. v.id);
+            lgyPrint('gwc.equip.sndAttr.remake.val==>' .. v.val);
+            tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
+        end
+        tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
+    end
+    lgyPrint('gwc.equip.isLock==>' .. v.isLock);
+    lgyPrint('gwc.equip.isBad==>' .. v.isBad);
+    
+    local value = equipM(v.id, v.eid, v.lv, v.rarity + 1, v.isBad, v.isLock, v.fst_attr, tempTB1)
+    local index, index2 = equipP.getIndexByID(v.id)
+    if index2 then
+        equipP.change_allEqList(index, index2, value)
+    else
+        equipP.change_nowEqList(index, value)
+    end
+end
+
+-- 测试发送PBLUA--
+function SendPB_10008(id, viceId, indexId)
+    local cgw = cgw_pb.EquipConfirmRemake()
+    cgw.equipId = id
+    cgw.viceId = viceId
+    cgw.indexId = indexId
+    local msg1 = cgw:SerializeToString()
+    createSendPBHeader(10008, msg1)
+end
+
+function MSGID_10008(body)
+    local gwc = gwc_pb.EquipConfirmRemake()
+    gwc:ParseFromString(body);
+    --装备数据
+    local v = gwc.equip
+    lgyPrint('gwc.equip.id==>' .. v.id);
+    lgyPrint('gwc.equip.eid==>' .. v.eid);
+    lgyPrint('gwc.equip.lv==>' .. v.lv);
+    lgyPrint('gwc.equip.rarity==>' .. v.rarity);
+    lgyPrint('gwc.equip.fst_attr==>' .. v.fst_attr);
+    local tempTB1 = {}
+    for k, v in ipairs(v.sndAttr) do
+        lgyPrint('gwc.equip.sndAttr.id==>' .. v.id);
+        lgyPrint('gwc.equip.sndAttr.val==>' .. v.val);
+        lgyPrint('gwc.equip.sndAttr.isRemake==>' .. v.isRemake);
+        local tempTB2 = {}
+        for k, v in ipairs(v.remake) do
+            lgyPrint('gwc.equip.sndAttr.remake.id==>' .. v.id);
+            lgyPrint('gwc.equip.sndAttr.remake.val==>' .. v.val);
+            tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
+        end
+        tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
+    end
+    lgyPrint('gwc.equip.isLock==>' .. v.isLock);
+    lgyPrint('gwc.equip.isBad==>' .. v.isBad);
+    
+    local value = equipM(v.id, v.eid, v.lv, v.rarity + 1, v.isBad, v.isLock, v.fst_attr, tempTB1)
+    local index, index2 = equipP.getIndexByID(v.id)
+    if index2 then
+        equipP.change_allEqList(index, index2, value)
+    else
+        equipP.change_nowEqList(index, value)
+    end
+end
+
+
+
+
+
+-- 测试发送PBLUA--
+function createSendPBHeader(msgId, body)
+    local header = header_pb2_pb.Header()
+    header.ID = 1
+    header.msgId = msgId
+    header.userId = 8001
+    header.version = '1.0.0'
+    header.errno = 0
+    header.ext = 0
+    if body then
+        header.body = body
+    end
+    local msg2 = header:SerializeToString()
+    local buffer = ByteBuffer()
+    buffer:WriteBuffer(msg2)
+    networkMgr:SendMessage(buffer)
+end
+
+function ERRNO_10001(body)
+
+end
+
+function class_wnd_login:OnAddHandler()
+    Event.AddListener("10001", MSGID_10001)
+    Event.AddListener("10002", MSGID_10002)
+    Event.AddListener("10003", MSGID_10003)
+    Event.AddListener("10004", MSGID_10004)
+    Event.AddListener("10005", MSGID_10005)
+    Event.AddListener("10006", MSGID_10006)
+    Event.AddListener("10007", MSGID_10007)
+    Event.AddListener("10008", MSGID_10008)
+    Event.AddListener("errno10001", ERRNO_10001)
+end
+function class_wnd_login:OnRemoveHandler()
+    Event.RemoveListener("10001", MSGID_10001)
+    Event.RemoveListener("10002", MSGID_10002)
+    Event.RemoveListener("10003", MSGID_10003)
+    Event.RemoveListener("10004", MSGID_10004)
+    Event.RemoveListener("10005", MSGID_10005)
+    Event.RemoveListener("10006", MSGID_10006)
+    Event.RemoveListener("10007", MSGID_10007)
+    Event.RemoveListener("10008", MSGID_10008)
+    Event.RemoveListener("errno10001", ERRNO_10001)
+end
+
+return class_wnd_login

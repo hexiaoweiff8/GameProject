@@ -1,0 +1,54 @@
+syntax = "proto2";
+import "role_pb.proto";
+
+
+message SelectRole {
+    required  Role  user          =1;
+}
+
+
+message EquipLvlup {
+    required  Equip  equip          =1;
+}
+
+message EquipLock {
+    required  Equip  equip          =1;
+}
+
+message EquipRepair {
+    required  Equip  equip          =1;
+}
+
+message EquipRemake {
+    required  Equip  equip          =1;
+}
+
+message EquipConfirmRemake {
+    required  Equip  equip          =1;
+}
+
+message CardFeed {
+    required  Card  card            =1;
+}
+
+message CardStarup {
+    required  Card  card            =1;
+}
+
+message CardCarryup {
+    required  Card  card            =1;
+}
+
+message CardRankup {
+    required  Card  card            =1;
+}
+
+message CardTakeMedal {
+    required  Card  card            =1;
+}
+
+message SkillLevelup {
+    required  Card  card            =1;
+}
+
+

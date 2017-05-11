@@ -1,0 +1,204 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+using System.Collections;
+using System.IO;
+ 
+
+class SData_LuaDirList
+{     
+    //装载全部lua脚本
+    public IEnumerator _LoadFiles()
+    { 
+        List<string> packs = new List<string>();
+        packs.Add("pack_script");
+        packs.Add("script");
+        packs.Add("lualibs");
+        packs.Add("tabs");
+        PacketLoader loader = new PacketLoader();
+        loader.Start(PackType.Script, packs,null);
+        while (loader.Result != PacketLoader.ResultEnum.Done && loader.Result != PacketLoader.ResultEnum.Error)
+        {
+            yield return null;
+        }
+
+        m_packScript = PacketManage.Single.GetPacket("pack_script"); 
+        m_libsPack = PacketManage.Single.GetPacket("lualibs"); 
+        m_scriptPack = PacketManage.Single.GetPacket("script");
+        m_tabsPack = PacketManage.Single.GetPacket("tabs"); 
+        _IsDone = true;
+        ULDebug.Log("Lua装载完成");
+    }
+
+  
+    //是否已装载完成
+    public bool IsDone
+    {
+        get
+        { 
+            return _IsDone;
+        }
+    }
+ 
+
+
+    public string GetCode(string _path)
+    {
+        int ii = _path.LastIndexOf('/');
+        string path ;
+        if (ii > 0)
+        {
+            path = _path.Substring(ii + 1);
+        }
+        else
+        {
+            ii = _path.LastIndexOf('.');
+            if (ii > 0)   
+                path = _path.Substring(ii + 1);
+            else
+                path = _path;
+        }
+
+        if(m_hotCodes.ContainsKey(path))
+            return m_hotCodes[path];//使用热代码
+
+        if (m_scriptPack != null)
+        {
+            string re = m_scriptPack.LoadString(path);
+            if (re == null)
+                re = m_tabsPack.LoadString(path);
+
+            if (re == null)
+                re = m_libsPack.LoadString(path);
+
+            if (re == null)
+            {
+                ULDebug.LogError("Lua 装载失败 " + path);
+            }
+            return re;
+        }else
+        {
+            ULDebug.LogError("Lua 装载失败 " + path);
+            return null;
+        } 
+    }
+
+
+    /// <summary>
+    /// 卸载全部的脚本包
+    /// </summary>
+    public void UnloadScriptPacks()
+    {
+        if (m_scriptPack != null) return;
+        m_scriptPack.UnLoad();
+        m_tabsPack.UnLoad();
+        m_libsPack.UnLoad();
+        m_packScript.UnLoad();
+
+        m_scriptPack = null;
+        m_tabsPack = null;
+        m_libsPack = null;
+        m_packScript = null;
+    }
+
+   
+
+    public void Clear()
+    { 
+        m_hotCodes.Clear();
+    }
+
+    public string HotUpdate(
+                        string fullPath,//完整路径
+                        List<byte[]> cacheBuffs//缓存的buffs
+                        )
+    {
+        int buflen = 0;
+        foreach (byte[] curr in cacheBuffs)
+        {
+            buflen += curr.Length;
+        }
+
+        byte[] buf = new byte[buflen];
+        int startIndex = 0;
+        foreach (byte[] curr in cacheBuffs)
+        {
+            Array.Copy(curr, 0, buf, startIndex, curr.Length);
+            startIndex += curr.Length;
+        }
+        string code = FileSystem.byte2string(buf);
+        string name = Path.GetFileNameWithoutExtension(fullPath);
+        if (m_hotCodes.ContainsKey(name))
+            m_hotCodes[name] = code;
+        else
+            m_hotCodes.Add(name, code);
+
+        return name;
+    }
+
+    Dictionary<string, string> m_hotCodes = new Dictionary<string, string>();//热代码
+    PacketRouting m_scriptPack = null;
+    PacketRouting m_tabsPack = null;
+    PacketRouting m_libsPack = null;
+    PacketRouting m_packScript = null;
+    bool _IsDone = false; 
+    
+}
+
+
+
+public class CMLuaCodeCache : MonoBehaviour, ILuaCodeCache
+{
+    void Start()
+    {
+        LuaCodeCache.Single = this;
+        StartCoroutine(mDirList._LoadFiles());
+    }
+
+    //是否已装载完成
+    public bool IsDone { get { return mDirList.IsDone; } }
+
+
+    //获取lua代码内容
+    public string GetCodeContent(string path)
+    {
+        return mDirList.GetCode(path);
+    }
+
+    public string HotUpdate(
+                        string fullPath,//完整路径
+                        List<byte[]> cacheBuffs//缓存的buffs
+                        )
+    {
+        return mDirList.HotUpdate(fullPath, cacheBuffs);
+    }
+
+    public void Clear()
+    {
+        mDirList.Clear();
+    }
+
+    public void UnloadScriptPacks()
+    {
+        mDirList.UnloadScriptPacks();
+    }
+
+
+    void OnEnable() { CoroutineManage.Single.RegComponentUpdate(IUpdate); }
+
+    void OnDisable()
+    {
+        CoroutineManage.Single.UnRegComponentUpdate(IUpdate);
+    }
+
+    void IUpdate()
+    {
+        //清lua栈
+        if (LuaRoot._Lua != null) LuaRoot._Lua.SetTop(0);
+    }
+    SData_LuaDirList mDirList = new SData_LuaDirList();
+
+}
+

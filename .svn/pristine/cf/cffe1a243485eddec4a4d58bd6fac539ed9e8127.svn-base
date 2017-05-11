@@ -1,0 +1,138 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+using UniLua;
+using System.Xml;
+using System.IO;
+class LuaXMLLib
+{ 
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    
+    public const string LIB_NAME = "XML";
+
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            new NameFuncPair("SelectSingleNode",M_SelectSingleNode),
+            new NameFuncPair("SelectNodes",M_SelectNodes),
+            new NameFuncPair("GetAttribute",M_GetAttribute),
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair("Parse",S_Parse),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+    public static void _wrap(ILuaState lua, XmlNode obj)
+    {
+        LuaOpenLibs._wrap(m_ClassRegHelper, lua, obj);
+    }
+
+    public static XmlNode Lua2Obj(ILuaState lua, int index)
+    {
+        return LuaOpenLibs.Lua2Obj<XmlNode>( lua, index);
+    }
+
+    static int S_Parse(ILuaState lua)
+    {
+        //in xmlcode
+        //out xmlnode
+        string xmlCode = lua.L_CheckString(1);
+   
+        XmlDocument doc = new XmlDocument();
+        
+        try
+        {   
+            //doc.Load( new StringReader(xmlCode) );
+            doc.LoadXml( xmlCode );
+        }
+        catch(Exception ex)
+        {
+            ULDebug.LogWarning(ex.ToString());
+            ULDebug.LogWarning(xmlCode);
+            
+            doc = null;
+        }
+
+        
+        _wrap(lua,doc);
+        return 1;
+    }
+
+    static int M_SelectSingleNode(ILuaState lua)
+    {
+        //in self,nodePath
+        //out xmlnode
+
+        XmlNode self = Lua2Obj(lua, 1);
+        string nodePath = lua.L_CheckString(2);
+        _wrap(lua,self.SelectSingleNode(nodePath));
+        return 1;
+    }
+
+    static int M_SelectNodes(ILuaState lua)
+    {
+        //in self,nodePath
+        //out {xmlnode,xmlnode,...}
+         
+        XmlNode self = Lua2Obj(lua, 1);
+        
+        string nodePath = lua.L_CheckString(2);
+        
+        XmlNodeList nodes = self.SelectNodes(nodePath);
+         
+        lua.CreateTable(0, 0);
+        int index = 1;
+        int count = nodes.Count;
+        for(int i=0;i<count;i++)
+        { 
+            _wrap(lua, nodes.Item(i));
+            lua.RawSetI(-2, index++);
+        }
+            
+      
+        
+        return 1;
+    }
+
+    static int M_GetAttribute(ILuaState lua)
+    {
+        //in self,attrName
+        //out string
+        XmlNode self = Lua2Obj(lua, 1);
+        string attrName = lua.L_CheckString(2);
+        XmlElement el = self as XmlElement;
+        if (el == null)
+            lua.PushNil();
+        else
+        {
+            string v = el.GetAttribute(attrName);
+            if (v == null)
+                lua.PushNil();
+            else
+                lua.PushString(v);
+        }
+
+        return 1;
+    }
+
+}
+

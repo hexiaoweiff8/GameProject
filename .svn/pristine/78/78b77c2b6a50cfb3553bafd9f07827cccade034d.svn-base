@@ -1,0 +1,69 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+
+public class LuaLogicInitLibs
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+
+    public const string LIB_NAME = "LogicInit";
+
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            
+            
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair("Go",S_Go),           
+            new NameFuncPair("GetInitProgress",S_GetInitProgress),            
+           // new NameFuncPair("FightTest",S_FightTest),      
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+
+    /// <summary>
+    /// 初始化c sharp 层的逻辑
+    /// </summary>
+    /// <param name="lua"></param>
+    /// <returns></returns>
+    static int S_Go(ILuaState lua)
+    {
+        CoroutineManage.Single.StartCoroutine(LogicInit.InitLogic());
+        return 0;
+    }
+
+    /// <summary>
+    /// 获取初始化进度
+    /// </summary>
+    /// <param name="lua"></param>
+    /// <returns></returns>
+    static int S_GetInitProgress(ILuaState lua)
+    {
+        lua.PushNumber(LogicInit.LogicInitProgress);
+        return 1;
+    } 
+}
+

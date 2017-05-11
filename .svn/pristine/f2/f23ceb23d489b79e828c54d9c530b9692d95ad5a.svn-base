@@ -1,0 +1,34 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
+using System.Text;
+ using UnityEngine;
+
+[AddComponentMenu("QK/YQ2/UI/UIAudioFx")]
+public class UIAudioFx:MonoBehaviour
+{
+    public int AudioFxID = 0;//效果ID
+     
+    void OnEnable()
+    {
+        if(m_FXObj==null)
+        {
+            m_FXObj = new GameObject();
+            m_FXObj.transform.parent = this.transform;
+            m_FXObj.transform.localScale = Vector3.one;
+            m_FXObj.transform.localPosition = Vector3.zero;
+            m_FXObj.transform.rotation = Quaternion.identity;
+
+        }
+    }
+
+      
+
+    public void ReStart()
+    {
+        YQ2AudioFx.Go(m_FXObj, AudioFxID).ReStart();
+    }
+     
+    GameObject m_FXObj = null;
+} 

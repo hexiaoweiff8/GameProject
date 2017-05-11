@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+
+interface ILuaDebugger
+{
+    void _Log(LOG_TYPE lt, string log);
+}
+
+class LuaDebugger
+{
+    public static ILuaDebugger Single = null;
+}

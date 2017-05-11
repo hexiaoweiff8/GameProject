@@ -1,0 +1,121 @@
+using System;
+using System.Collections.Generic;
+using LuaInterface;
+
+public class SData_ArmyBase_C : MonoEX.Singleton<SData_ArmyBase_C>
+{
+    public void setData(LuaTable table1, LuaTable table2)
+    {
+        var head = new string[table1.Length];
+        SDataUtils.dealTable(table1, (Object o1, Object o2) =>
+        {
+            head[(int)(double)o1 - 1] = (string)o2;
+        });
+        SDataUtils.dealTable(table2, (Object o1, Object o2) =>
+        {
+            ArmyBase_CInfo dif = new ArmyBase_CInfo();
+            SDataUtils.dealTable((LuaTable)o2, (Object o11, Object o22) =>
+            {
+                switch (head[(int)(double)o11 - 1])
+				{
+					case "UniqueID": dif.UniqueID = (int)(double)o22; break;
+					case "ArmyID": dif.ArmyID = (int)(double)o22; break;
+					case "ArmyLevel": dif.ArmyLevel = (short)(double)o22; break;
+					case "ModelID": dif.ModelID = (string)o22; break;
+					case "Name": dif.Name = (string)o22; break;
+					case "AimGeneralType": dif.AimGeneralType = (short)(double)o22; break;
+					case "DeployTime": dif.DeployTime = (float)(double)o22; break;
+					case "GeneralType": dif.GeneralType = (short)(double)o22; break;
+					case "ArmyType": dif.ArmyType = (short)(double)o22; break;
+					case "Attack1": dif.Attack1 = (float)(double)o22; break;
+					case "Clipsize1": dif.Clipsize1 = (short)(double)o22; break;
+					case "AttackRate1": dif.AttackRate1 = (float)(double)o22; break;
+					case "ReloadTime1": dif.ReloadTime1 = (float)(double)o22; break;
+					case "Accuracy": dif.Accuracy = (float)(double)o22; break;
+					case "SpaceSet": dif.SpaceSet = (short)(double)o22; break;
+					case "SpreadRange": dif.SpreadRange = (float)(double)o22; break;
+					case "Defence": dif.Defence = (float)(double)o22; break;
+					case "HP": dif.HP = (float)(double)o22; break;
+					case "MoveSpeed": dif.MoveSpeed = (float)(double)o22; break;
+					case "Dodge": dif.Dodge = (float)(double)o22; break;
+					case "Hit": dif.Hit = (float)(double)o22; break;
+					case "AntiArmor": dif.AntiArmor = (float)(double)o22; break;
+					case "Armor": dif.Armor = (float)(double)o22; break;
+					case "AntiCrit": dif.AntiCrit = (float)(double)o22; break;
+					case "Crit": dif.Crit = (float)(double)o22; break;
+					case "CritDamage": dif.CritDamage = (float)(double)o22; break;
+					case "BulletType": dif.BulletType = (short)(double)o22; break;
+					case "BulletSpeed": dif.BulletSpeed = (float)(double)o22; break;
+					case "AttackType": dif.AttackType = (short)(double)o22; break;
+					case "MultiAimMax": dif.MultiAimMax = (short)(double)o22; break;
+					case "AttackRange": dif.AttackRange = (float)(double)o22; break;
+					case "SightRange": dif.SightRange = (float)(double)o22; break;
+					case "IsHide": dif.IsHide = (short)(double)o22; break;
+					case "IsAntiHide": dif.IsAntiHide = (short)(double)o22; break;
+					case "LifeTime": dif.LifeTime = (float)(double)o22; break;
+					case "Skill1": dif.Skill1 = (int)(double)o22; break;
+					case "Skill2": dif.Skill2 = (int)(double)o22; break;
+					case "Skill3": dif.Skill3 = (int)(double)o22; break;
+					case "Skill4": dif.Skill4 = (int)(double)o22; break;
+					case "Skill5": dif.Skill5 = (int)(double)o22; break;
+                }
+            });
+            if (Data.ContainsKey(dif.UniqueID))
+                MonoEX.Debug.Logout(MonoEX.LOG_TYPE.LT_ERROR, "重复的ID：" + dif.UniqueID.ToString());
+            Data.Add(dif.UniqueID, dif);
+        });
+    }
+
+    public ArmyBase_CInfo GetDataOfID(int Id)
+    {
+        if (!Data.ContainsKey(Id)) throw new Exception(String.Format("ArmyBase_CInfo::GetDataOfID() not found data  Id:{0}", Id));
+        return Data[Id];
+    }
+
+    internal Dictionary<int, ArmyBase_CInfo> Data = new Dictionary<int, ArmyBase_CInfo>();
+}
+
+
+public struct ArmyBase_CInfo
+{
+	public int UniqueID;
+	public int ArmyID;
+	public short ArmyLevel;
+	public string ModelID;
+	public string Name;
+	public short AimGeneralType;
+	public float DeployTime;
+	public short GeneralType;
+	public short ArmyType;
+	public float Attack1;
+	public short Clipsize1;
+	public float AttackRate1;
+	public float ReloadTime1;
+	public float Accuracy;
+	public short SpaceSet;
+	public float SpreadRange;
+	public float Defence;
+	public float HP;
+	public float MoveSpeed;
+	public float Dodge;
+	public float Hit;
+	public float AntiArmor;
+	public float Armor;
+	public float AntiCrit;
+	public float Crit;
+	public float CritDamage;
+	public short BulletType;
+	public float BulletSpeed;
+	public short AttackType;
+	public short MultiAimMax;
+	public float AttackRange;
+	public float SightRange;
+	public short IsHide;
+	public short IsAntiHide;
+	public float LifeTime;
+	public int Skill1;
+	public int Skill2;
+	public int Skill3;
+	public int Skill4;
+	public int Skill5;
+}

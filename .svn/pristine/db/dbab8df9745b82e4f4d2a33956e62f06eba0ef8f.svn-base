@@ -1,0 +1,22 @@
+ManifestFileVersion: 0
+CRC: 1064838014
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: c87411158fc8f9989ff706ff62a813c5
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: e6a9e4149af2e9e0805fc21f5a860a6c
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 128
+  Script: {instanceID: 0}
+Assets:
+- Assets/Resources/ui/@commonU/hkhtW9_P.TTF
+Dependencies: []

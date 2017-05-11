@@ -1,0 +1,21 @@
+ManifestFileVersion: 0
+CRC: 1058061078
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: scene_share
+      Dependencies: {}
+    Info_1:
+      Name: scene_01
+      Dependencies: {}
+    Info_2:
+      Name: commonu
+      Dependencies: {}
+    Info_3:
+      Name: herou
+      Dependencies: {}
+    Info_4:
+      Name: ui_fightu
+      Dependencies:
+        Dependency_0: commonu
+        Dependency_1: herou

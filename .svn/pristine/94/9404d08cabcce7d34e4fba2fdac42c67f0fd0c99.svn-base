@@ -1,0 +1,15 @@
+local item = require "uiscripts/item"
+local ItemDatebase = { }
+local i = 1
+ItemDatebase[i] = item:new("redPotion01", 1, "血药", "增加100生命值", 99, ItemType["Potion"], 1000) i = i + 1
+ItemDatebase[i] = item:new("bluePotion01", 2, "蓝药", "增加100魔法值", 99, ItemType["Potion"], 1000) i = i + 1
+ItemDatebase[i] = item:new("boot01", 3, "鞋子", "增加50移动速度", 1, ItemType["Shoes"], 1000) i = i + 1
+ItemDatebase[i] = item:new("cloth01", 4, "衣服", "增加50防御力", 1, ItemType["Clothing"], 1000) i = i + 1
+ItemDatebase[i] = item:new("hat01", 5, "头盔", "增加50力量", 1, ItemType["Casque"], 1000) i = i + 1
+ItemDatebase[i] = item:new("trousers01", 6, "裤子", "增加50敏捷", 1, ItemType["ItemType"], 1000) i = i + 1
+ItemDatebase[i] = item:new("weapon01", 7, "武器", "增加100攻击力", 1, ItemType["ItemType"], 1000) i = i + 1
+ItemDatebase[i] = item:new("boot02", 8, "鞋子2", "增加100移动速度", 1, ItemType["ItemType"], 1000) i = i + 1
+ItemDatebase[i] = item:new("weapon02", 9, "武器2", "增加200攻击力", 1, ItemType["ItemType"], 9000) i = i + 1
+
+return ItemDatebase
+

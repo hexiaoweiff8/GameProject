@@ -1,0 +1,31 @@
+ManifestFileVersion: 0
+CRC: 3355357582
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 7104b6a1ee1723fd50ed33fd207b2e51
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 1033bf7ddfd4c6d43e7a6382c0a0a61a
+HashAppended: 0
+ClassTypes:
+- Class: 49
+  Script: {instanceID: 0}
+Assets:
+- Assets/TmpLua/uiscripts/ui_session.lua.bytes
+- Assets/TmpLua/uiscripts/ui_login.lua.bytes
+- Assets/TmpLua/uiscripts/ui_fight.lua.bytes
+- Assets/TmpLua/uiscripts/skill_UI.lua.bytes
+- Assets/TmpLua/uiscripts/inventory2.lua.bytes
+- Assets/TmpLua/uiscripts/item.lua.bytes
+- Assets/TmpLua/uiscripts/store.lua.bytes
+- Assets/TmpLua/uiscripts/ItemDatebase.lua.bytes
+- Assets/TmpLua/uiscripts/equipment.lua.bytes
+- Assets/TmpLua/uiscripts/ui_session_id.lua.bytes
+- Assets/TmpLua/uiscripts/Temp.lua.bytes
+- Assets/TmpLua/uiscripts/Tooltip.lua.bytes
+- Assets/TmpLua/uiscripts/ui_shopScene.lua.bytes
+- Assets/TmpLua/uiscripts/init.lua.bytes
+- Assets/TmpLua/uiscripts/ui_manager.lua.bytes
+- Assets/TmpLua/uiscripts/shortcut.lua.bytes
+Dependencies: []

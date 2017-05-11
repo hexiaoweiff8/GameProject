@@ -1,0 +1,125 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+
+class LuaWndLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    //static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "Wnd";
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+             new NameFuncPair("FindWidget",M_FindWidget), 
+             new NameFuncPair("Hide",M_Hide),
+             new NameFuncPair("GetGameObject",M_GetGameObject),
+             new NameFuncPair("IsNewInstance",M_IsNewInstance),
+             new NameFuncPair("GetName",M_GetName),
+             
+             
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+           
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+
+    
+        return 1;
+    }
+
+
+
+
+    public static void _wrap(ILuaState lua, Wnd obj)
+    {
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,obj),
+        };
+
+        m_ClassRegHelper.InstanceLuaClass(lua, propertys);
+    }
+
+    public static Wnd Lua2Obj(ILuaState lua, int index)
+    {
+       LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<Wnd>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    static int M_GetGameObject(ILuaState lua)
+    {
+        //in self
+        //out gameObject
+        Wnd self = Lua2Obj(lua, 1);
+        LuaGameObjectLib._wrap(lua, self.GetGameObject());
+        return 1;
+    }
+
+    static int M_GetName(ILuaState lua)
+    {
+        //in self
+        //out string
+        Wnd self = Lua2Obj(lua, 1);
+        lua.PushString(self.Name);
+        return 1;
+    }
+    static int M_IsNewInstance(ILuaState lua)
+    {
+        //in self
+        //out bool
+        Wnd self = Lua2Obj(lua, 1);
+        lua.PushBoolean(self.IsNewInstance);
+        return 1;
+    }
+    
+    static int M_Hide(ILuaState lua)
+    {
+        //in self[,duration]
+        //out void
+        int n = lua.GetTop();
+
+        Wnd self = Lua2Obj(lua, 1);
+        //bool isShow = lua.ToBoolean(2);
+        if (n >= 3)
+        {
+            float duration = (float)lua.L_CheckNumber(3);
+            self.Hide(duration);
+        }
+        else
+            self.Hide(Wnd.DefaultDuration);
+        return 0;
+    }
+
+    static int M_FindWidget(ILuaState lua)
+    {
+        //in self,objName
+        //out GameObject
+        Wnd self = Lua2Obj(lua, 1);
+        string objName = lua.L_CheckString(2);
+        LuaGameObjectLib._wrap(lua,self.FindWidget(objName));
+        return 1;
+    }
+
+}
+ 

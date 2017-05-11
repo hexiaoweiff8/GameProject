@@ -1,0 +1,25 @@
+require("common/init")
+require("framework/init")
+require("gameEventType")
+
+
+-- string_table = require("globalization/zh/string_table")
+-- lgyPrint = LGYLOG.Log
+GameObject = UnityEngine.GameObject
+Object = UnityEngine.Object
+Input = UnityEngine.Input
+networkMgr = LuaHelper.GetNetManager()
+
+function lgyPrint(log)
+    if true then --控制输出log开关
+        LGYLOG.Log(log .. "")
+    end
+end
+local network_manager = require "manager/network_manager"
+networkMgr:SetLuaTable(network_manager())
+networkMgr:SendConnect()
+
+Resources = UnityEngine.Resources
+
+require("uiscripts/wnd_base")
+require "uiscripts/cm_gameinit_pan"

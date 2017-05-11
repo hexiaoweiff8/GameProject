@@ -1,0 +1,272 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+class LuaGestureLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    //static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "Gesture";
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            new NameFuncPair("GetCurrentPickedObject",M_GetCurrentPickedObject), 
+            new NameFuncPair("GetCurrentFirstPickedUIElement",M_GetCurrentFirstPickedUIElement),  
+            new NameFuncPair("IsOverUIElement",M_IsOverUIElement),  
+            new NameFuncPair("NormalizedPosition",M_NormalizedPosition),  
+            new NameFuncPair("GetSwipeOrDragAngle",M_GetSwipeOrDragAngle),   
+            new NameFuncPair("GetTouchToWorldPoint",M_GetTouchToWorldPoint),  
+            new NameFuncPair("get_twoFingerDistance",M_get_twoFingerDistance),  
+            new NameFuncPair("get_twistAngle",M_get_twistAngle),  
+            new NameFuncPair("get_deltaPinch",M_get_deltaPinch),  
+            new NameFuncPair("get_swipeVector",M_get_swipeVector),  
+            new NameFuncPair("get_swipeLength",M_get_swipeLength),  
+            new NameFuncPair("get_swipe",M_get_swipe),  
+
+            new NameFuncPair("set_twoFingerDistance",M_set_twoFingerDistance),  
+            new NameFuncPair("set_twistAngle",M_set_twistAngle),  
+            new NameFuncPair("set_deltaPinch",M_set_deltaPinch),  
+            new NameFuncPair("set_swipeVector",M_set_swipeVector),  
+            new NameFuncPair("set_swipeLength",M_set_swipeLength),  
+            new NameFuncPair("set_swipe",M_set_swipe),  
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+           
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        //导出枚举
+        NameValuePair[] enum_SwipeDirection = new NameValuePair[]
+        {
+            new NameValuePair("None",EasyTouch.SwipeDirection.None),
+            new NameValuePair("Left",EasyTouch.SwipeDirection.Left),
+            new NameValuePair("Right",EasyTouch.SwipeDirection.Right),
+            new NameValuePair("Up",EasyTouch.SwipeDirection.Up),
+            new NameValuePair("Down",EasyTouch.SwipeDirection.Down),
+            new NameValuePair("UpLeft",EasyTouch.SwipeDirection.UpLeft),
+            new NameValuePair("UpRight",EasyTouch.SwipeDirection.UpRight),
+            new NameValuePair("DownLeft",EasyTouch.SwipeDirection.DownLeft),
+            new NameValuePair("DownRight",EasyTouch.SwipeDirection.DownRight),
+            new NameValuePair("Other",EasyTouch.SwipeDirection.Other), 
+        };
+        m_ClassRegHelper.RegEnum(lua,"SwipeDirection",enum_SwipeDirection); 
+
+
+
+        return 1;
+    }
+
+
+
+
+    public static void _wrap(ILuaState lua, Gesture obj)
+    {
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,obj),
+        };
+
+        m_ClassRegHelper.InstanceLuaClass(lua, propertys);
+    }
+
+    public static Gesture Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<Gesture>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    static int M_get_swipe(ILuaState lua)
+    {
+        //in self
+        //out SwipeDirection
+        Gesture self = Lua2Obj(lua, 1);
+        lua.PushInteger( (int)self.swipe);
+        return 1;
+    }
+     
+    static int M_get_swipeLength(ILuaState lua)
+    {
+        //in self
+        //out float
+        Gesture self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.swipeLength);
+        return 1;
+    }
+
+    static int M_get_swipeVector(ILuaState lua)
+    {
+        //in self
+        //out Vector2
+        Gesture self = Lua2Obj(lua, 1);
+        LuaVector2Lib._wrap(lua,self.swipeVector);
+        return 1;
+    }
+
+
+    static int M_get_deltaPinch(ILuaState lua)
+    {
+        //in self
+        //out float
+        Gesture self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.deltaPinch);
+        return 1;
+    }
+
+    static int M_get_twistAngle(ILuaState lua)
+    {
+        //in self
+        //out float
+        Gesture self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.twistAngle);
+        return 1;
+    }
+
+    static int M_get_twoFingerDistance(ILuaState lua)
+    {
+        //in self
+        //out float
+        Gesture self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.twoFingerDistance);
+        return 1;
+    } 
+
+    static int M_set_swipe(ILuaState lua)
+    {
+        //in self,SwipeDirection
+        //out 
+        Gesture self = Lua2Obj(lua, 1);
+        EasyTouch.SwipeDirection sd = (EasyTouch.SwipeDirection)lua.L_CheckInteger(2);
+        self.swipe = sd;
+        return 0;
+    }
+
+    static int M_set_swipeLength(ILuaState lua)
+    {
+        //in self,v
+        //out 
+        Gesture self = Lua2Obj(lua, 1);
+        float v = (float)lua.L_CheckNumber(2);
+        self.swipeLength = v;
+        return 0;
+    }
+
+    static int M_set_swipeVector(ILuaState lua)
+    {
+        //in self,
+        //out 
+        Gesture self = Lua2Obj(lua, 1);
+        Vector2 v; LuaVector2Lib.Lua2Obj(lua, 2, out v);
+        self.swipeVector = v;
+        return 0;
+    }
+
+
+    static int M_set_deltaPinch(ILuaState lua)
+    {
+        //in self,float
+        //out 
+        Gesture self = Lua2Obj(lua, 1);
+        float v = (float)lua.L_CheckNumber(2);
+        self.deltaPinch = v;
+        return 0;
+    }
+
+    static int M_set_twistAngle(ILuaState lua)
+    {
+        //in self,float
+        //out 
+        Gesture self = Lua2Obj(lua, 1);
+        float v = (float)lua.L_CheckNumber(2);
+        self.twistAngle = v;
+        return 0;
+    }
+
+    static int M_set_twoFingerDistance(ILuaState lua)
+    {
+        //in self,float
+        //out 
+        Gesture self = Lua2Obj(lua, 1);
+        float v = (float)lua.L_CheckNumber(2);
+        self.twoFingerDistance = v;
+        return 0;
+    }
+     
+    static int M_GetTouchToWorldPoint(ILuaState lua)
+     {
+         //in self,position3D
+         //out Vector3
+         Gesture self = Lua2Obj(lua, 1);
+         if (lua.IsTable(2))
+         {
+             Vector3 position3D; LuaVector3Lib.Lua2Obj(lua, 2, out position3D);
+             LuaVector3Lib._wrap(lua, self.GetTouchToWorldPoint(position3D));
+         }else
+         {
+             float z = (float)lua.L_CheckNumber(2);
+             LuaVector3Lib._wrap(lua, self.GetTouchToWorldPoint(z));
+         }
+         return 1;
+     }
+
+    static int M_GetSwipeOrDragAngle(ILuaState lua)
+    {
+        //in self
+        //out float
+        Gesture self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.GetSwipeOrDragAngle());
+        return 1;
+    }
+
+    static int M_NormalizedPosition(ILuaState lua)
+    {
+        //in self
+        //out Vector2
+        Gesture self = Lua2Obj(lua, 1);
+        LuaVector2Lib._wrap(lua, self.NormalizedPosition());
+        return 1;
+    }
+
+    static int M_IsOverUIElement(ILuaState lua)
+    {
+        //in self
+        //out bool
+        Gesture self = Lua2Obj(lua, 1);
+        lua.PushBoolean(self.IsOverUIElement());
+        return 1;
+    }
+    static int M_GetCurrentFirstPickedUIElement(ILuaState lua)
+    {
+        //in self
+        //out GameObject
+        Gesture self = Lua2Obj(lua, 1);
+        LuaGameObjectLib._wrap(lua, self.GetCurrentFirstPickedUIElement());
+        return 1;
+    }
+    static int M_GetCurrentPickedObject(ILuaState lua)
+    {
+        //in self
+        //out GameObject
+        Gesture self = Lua2Obj(lua, 1);
+        LuaGameObjectLib._wrap(lua, self.GetCurrentPickedObject());
+        return 1;
+    }
+    
+} 

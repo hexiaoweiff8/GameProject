@@ -1,0 +1,131 @@
+﻿FileRequire = {}
+
+--- <summary>
+--- 装入系统必备的lua
+--- </summary>
+function FileRequire.RequireBase()
+    --if debug.IsDev() then--研发版使用没有优化过的class，方便调试
+	    
+	
+    require "wnd._wnddefine"
+    require "EventHandles"
+    --require "memdebug"
+end
+
+--- <summary>
+--- 装入静态数据表
+--- </summary>
+function FileRequire.RequireSData(initPogressManage)
+
+	require "sdata.sdata_NormalHead"
+	initPogressManage:SetMissionPogress(0.1)--设置装载进度
+
+	
+
+	require "sdata.sdata_Mission"
+	initPogressManage:SetMissionPogress(0.1)--设置装载进度
+	require "sdata.sdata_DiaoluoType"
+	initPogressManage:SetMissionPogress(0.2)--设置装载进度
+
+
+	require "sdata.sdata_keyvalue"
+	initPogressManage:SetMissionPogress(0.2)--设置装载进度
+	require "sdata.sdata_OfflicalRank"
+	initPogressManage:SetMissionPogress(0.4)--设置装载进度
+	require "sdata.sdata_FirstPay"
+	initPogressManage:SetMissionPogress(0.5)--设置装载进度
+	require "sdata.sdata_SurrenderCost"
+	initPogressManage:SetMissionPogress(0.6)--设置装载进度
+
+    require "sdata.sdata_itemdata"
+	initPogressManage:SetMissionPogress(0.65)--设置装载进度
+	
+	require "sdata.sdata_VIP"
+	initPogressManage:SetMissionPogress(0.7)--设置装载进度
+	require "sdata.sdata_suiji"
+	initPogressManage:SetMissionPogress(0.71)--设置装载进度
+	require "sdata.sdata_Pay"
+	initPogressManage:SetMissionPogress(0.8)--设置装载进度
+	require "sdata.sdata_KeyValueMath"
+	initPogressManage:SetMissionPogress(0.85)--设置装载进度
+	require "sdata.sdata_DramaData"
+	initPogressManage:SetMissionPogress(0.87)--设置装载进度
+	require "sdata.sdata_DialogueData"
+	initPogressManage:SetMissionPogress(0.9)--设置装载进度
+	require "sdata.sdata_EquipData"
+    initPogressManage:SetMissionPogress(0.9)--设置装载进度
+	require "sdata.sdata_XilianshiData"
+    initPogressManage:SetMissionPogress(0.91)--设置装载进度
+	require "sdata.sdata_JunlingbaoData"
+end 
+
+---<summary>
+--- 装入登录逻辑代码
+--- </summary>
+function FileRequire.RequireLoginCode(initPogressManage)
+	require "network.LoaderEX"
+    require "network.HttpLoaderEX"
+    
+	 require "jsonparse"
+    --require "sc_main"
+	require "network.nm_dispatcher"
+    require "login.logincm_setup"
+	
+	--require "network.nm_login"
+    initPogressManage:SetMissionPogress(0.3)--设置装载进度
+
+	
+    require "sdata.client_config"
+    
+    require "GameCookies" 
+end
+
+--- <summary>
+--- 装入逻辑代码
+--- </summary>
+function FileRequire.RequireLogicCode(initPogressManage)
+   
+
+
+    initPogressManage:SetMissionPogress(0.6)--设置装载进度
+
+    require "dydata.OOSyncList"
+    require "dydata.formation"
+    require "dydata.playerdata"
+
+    print("FileRequire.RequireLogicCode#0")
+
+    --扩展界面处理类
+    require "wnd.DragDropCtrlBase"
+    require "wnd.exui_HeroCard"
+
+	print("FileRequire.RequireLogicCode!1")
+    require "wnd.WndJumpManage"
+     initPogressManage:SetMissionPogress(0.7)--设置装载进度
+	print("FileRequire.RequireLogicCode!2")
+	require "wnd.exui_Formation"
+    require "littleFunction.DataConversion"
+
+    initPogressManage:SetMissionPogress(0.8)--设置装载进度
+	print("FileRequire.RequireLogicCode!3")
+    require "network.GameConn"
+    GameConn:Init()
+	print("FileRequire.RequireLogicCode!4")
+    --界面简单化
+    require "wnd.CodingEasyer"
+	--角色对象
+	require "dydata.Hero"
+	require "dydata.Player"
+	require "dydata.Equip"
+	require "dydata.HHero"
+	require "dydata.AvaHero"
+    require "dydata.GKInfo"
+	require "dydata.AHeroInfos"
+	require "dydata.Frms"
+	require "dydata.EquipMaterials"
+    require "dydata.JLBag"
+	require "dydata.SJM"
+	require "dydata.CommItems"
+    
+	print("FileRequire.RequireLogicCode!5")
+end 

@@ -1,0 +1,267 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+/// <summary>
+/// A*寻路
+/// </summary>
+public class AStarPathFinding
+{
+    /// <summary>
+    /// 障碍物
+    /// </summary>
+    public const int Obstacle = 1;
+
+    /// <summary>
+    /// 无障碍
+    /// </summary>
+    public const int Accessibility = 0;
+
+    /// <summary>
+    /// 结束节点
+    /// 是否存在路径
+    /// </summary>
+    private static AStarNode endNode = null;
+
+    /// <summary>
+    /// 寻找路径
+    /// 如果搜索次数大于(w+h) * 2 则停止搜索(100*100地图搜寻400次0.01m)
+    /// </summary>
+    /// <param name="map">地图数组</param>
+    /// <param name="startX">起始点X</param>
+    /// <param name="startY">起始点Y</param>
+    /// <param name="endX">目标点X</param>
+    /// <param name="endY">目标点Y</param>
+    /// <param name="diameter">物体半径</param>
+    /// <param name="isJumpPoint">TODO 是否为跳跃式点, 如果为true 则路径只会给出拐点处的关键点</param>
+    /// <param name="completeCallback">寻路结束回调, 不赋值不回调</param>
+    static IList<AStarNode> SearchRoad(int[][] map, int startX, int startY, int endX, int endY, int diameter, bool isJumpPoint = false, Action completeCallback = null)
+    {
+        Queue<AStarNode> openList = new Queue<AStarNode>();
+        IList<AStarNode> closeList = new List<AStarNode>();
+        // 初始化开始节点
+        openList.Enqueue(new AStarNode(startX, startY, 0));
+
+        endNode = null;
+
+        // 计算结束偏移
+        endX = endX - diameter;
+        endY = endY - diameter;
+        var counter = 0;
+        do
+        {
+            counter++;
+            // 获取当前所在节点
+            var currentPoint = openList.Dequeue();
+            // 将当前节点放入关闭列表
+            closeList.Add(currentPoint);
+            // 获取当前节点周围的节点
+            var surroundPointArray = SurroundPoint(currentPoint);
+            foreach (var tmpPoint in surroundPointArray)
+            {
+                // 是否可以通过
+                // 判断位置
+                // 判断是否障碍
+                // 斜向是否可移动
+                // 判断周围节点合理性
+                if (IsPassable(map, tmpPoint, currentPoint, diameter) && ExistInList(tmpPoint, closeList) == null)
+                {
+                    // 计算G值 上下左右为10, 四角为14
+                    var g = currentPoint.G + ((currentPoint.X - tmpPoint.X) * (currentPoint.Y - tmpPoint.Y)) == 0
+                        ? 10
+                        : 14;
+                    // 该点是否在开启列表中
+                    if (ExistInList(tmpPoint, openList.ToArray()) == null)
+                    {
+                        // 计算H值, 通过水平和垂直距离确定
+                        tmpPoint.H = Math.Abs(endX - tmpPoint.X) * 10 + Math.Abs(endY - tmpPoint.Y) * 10;
+                        tmpPoint.G = g;
+                        tmpPoint.F = tmpPoint.H + tmpPoint.G;
+                        tmpPoint.Parent = currentPoint;
+                        openList.Enqueue(tmpPoint);
+                    }
+                    else // 存在于开启列表, 比较当前的G值与之前的G值大小
+                    {
+                        var node = ExistInList(tmpPoint, openList.ToArray());
+                        if (g < node.G)
+                        {
+                            node.Parent = currentPoint;
+                            node.G = g;
+                            node.F = g + node.H;
+                        }
+                    }
+                }
+            }
+
+
+            // 如果开放列表为空, 则没有通路
+            if (openList.Count == 0)
+            {
+                break;
+            }
+
+            // 重新排列, 将F值最小的放在最先取出的位置
+            var tmpList = openList.ToArray();
+            Array.Sort(tmpList, (a, b) => a.F - b.F);
+            openList = new Queue<AStarNode>(tmpList);
+
+            // 如果搜索次数大于(w+h) * 2 则停止搜索(100*100地图搜寻400次0.01m)
+            if (counter > (map.Length + map[0].Length) * 2)
+            {
+                openList.Clear();
+                break;
+            }
+            // 如果没有到达目标点则继续循环
+        } while ((endNode = ExistInList(new AStarNode(endX, endY), openList.ToArray())) == null);
+
+        // 搜寻路径结果列表
+        IList<AStarNode> path = new List<AStarNode>();
+        // 如果有可行路径
+        if (endNode != null)
+        {
+            // 将路径回退并放入列表
+            var currentNode = endNode;
+            do
+            {
+                path.Add(currentNode);
+                currentNode = currentNode.Parent;
+            } while (currentNode.X != startX || currentNode.Y != startY);
+        }
+
+        if (completeCallback != null)
+        {
+            completeCallback();
+        }
+
+        // 返回路径, 如果路径数量为0 则没有可行路径
+        return path;
+    }
+
+    /// <summary>
+    /// 当前位置是否可以通过
+    /// </summary>
+    /// <param name="computeMap">地图</param>
+    /// <param name="nowNode">当前位置</param>
+    /// <param name="prvNode">父节点</param>
+    /// <param name="diameter">移动物体直径</param>
+    /// <returns></returns>
+    private static bool IsPassable(int[][] computeMap, AStarNode nowNode, AStarNode prvNode, int diameter)
+    {
+        // 定义 物体位置为左上角(主要指直径大于1的)
+        // 验证参数是否合法
+        if (diameter <= 0 || computeMap == null || nowNode == null || prvNode == null)
+        {
+            return false;
+        }
+        // TODO 优化方案 差值判断不同区域, 重复区域忽略
+        // 遍历直径内的点
+        for (var i = 0; i < diameter; i++)
+        {
+            for (var j = 0; j < diameter; j++)
+            {
+                var tmpNode = new AStarNode(nowNode.X + i, nowNode.Y + j);
+
+                // 判断点的位置是否合法
+                if (tmpNode.X < 0 ||
+                    tmpNode.Y < 0 ||
+                    tmpNode.X >= computeMap.Length ||
+                    tmpNode.Y >= computeMap[0].Length ||
+                    computeMap[tmpNode.Y][tmpNode.X] == Obstacle)
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 获取当前点周围的点
+    /// </summary>
+    /// <param name="curPoint">当前点</param>
+    /// <returns>周围节点的数组</returns>
+    private static AStarNode[] SurroundPoint(AStarNode curPoint)
+    {
+        var x = curPoint.X;
+        var y = curPoint.Y;
+        return new[]
+        {
+            new AStarNode(x - 1, y - 1),
+            new AStarNode(x, y - 1),
+            new AStarNode(x + 1, y - 1),
+            new AStarNode(x + 1, y),
+            new AStarNode(x + 1, y + 1),
+            new AStarNode(x, y + 1),
+            new AStarNode(x - 1, y + 1),
+            new AStarNode(x - 1, y)
+        };
+    }
+
+
+    /// <summary>
+    /// 在列表中查找节点
+    /// 如果列表中存在该节点返回true 否则返回false
+    /// </summary>
+    /// <param name="node">被查找节点</param>
+    /// <param name="nodeList">查找列表</param>
+    /// <returns></returns>
+    private static AStarNode ExistInList(AStarNode node, IList<AStarNode> nodeList)
+    {
+        foreach (var tmpNode in nodeList)
+        {
+            if (node.X == tmpNode.X && node.Y == tmpNode.Y)
+            {
+                return tmpNode;
+            }
+        }
+        return null;
+    }
+}
+
+
+/// <summary>
+/// 地图节点
+/// </summary>
+public class AStarNode
+{
+    public AStarNode(int x, int y, int g = 0, int h = 0)
+    {
+        X = x;
+        Y = y;
+        G = g;
+        H = h;
+    }
+
+    /// <summary>
+    /// 位置点x值
+    /// </summary>
+    public int X { get; set; }
+
+    /// <summary>
+    /// 位置点y值
+    /// </summary>
+    public int Y { get; set; }
+
+    /// <summary>
+    /// 预期花费
+    /// </summary>
+    public int G { get; set; }
+
+    /// <summary>
+    /// 实际花费
+    /// </summary>
+    public int H { get; set; }
+
+    /// <summary>
+    /// G+H
+    /// </summary>
+    public int F { get; set; }
+
+    /// <summary>
+    /// 上级节点
+    /// </summary>
+    public AStarNode Parent { get; set; }
+
+}

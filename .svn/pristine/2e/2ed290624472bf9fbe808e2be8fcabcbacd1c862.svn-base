@@ -1,0 +1,1460 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Collections;
+ 
+//方向
+public enum AIDirection
+{
+    None=-1,//什么也不是
+    Up = 0,
+    Right = 1,//右
+    UpRight = 2,
+    LeftUp = 3,
+    Left = 4,//左
+    DownLeft = 5,
+    RightDown = 6,
+    Down = 7,
+    All = 99,//所有方向
+}
+
+public enum ArmyFlag
+{
+    None,//什么也不是
+    Attacker,//进攻者
+    Defender,//防御者
+    All,//所有
+}
+
+public class AI_Battlefield //: MonoEX.Singleton<AI_Battlefield>
+{
+
+
+    const float delayEndTime = 5;//延迟结束战斗时间
+    public void AddToFindEnemyCache(AI_FightUnit unit)
+    {
+        if (unit.IsInFindEnemyQueue) return;
+        FindEnemyCache.Add(unit);
+        unit.IsInFindEnemyQueue = true;
+    }
+     
+
+    int mDPID_Seed = 0;
+    public int NewDPID { get { return mDPID_Seed++; } }
+
+
+    public const float OneFrameTime = 0.2f;
+
+    public void IterationNext()
+    { 
+        m_totalLostTime += OneFrameTime;//时间逝去
+
+        
+        if (FightST < FightST.FightEnd)//战斗尚未结束
+        {
+            AddTime(OneFrameTime);//AI对象获得可行动时间
+            DoAI();//迭代AI
+        }
+
+
+        SkillBoxManage.AddTime(OneFrameTime);
+        SkillBoxManage.Update();
+
+        EffectTrackManage.Update(OneFrameTime
+           // , FightST >= FightST.FightEnd
+            );//迭代技能特效 
+
+        DoFindEnemyCache();//执行寻敌缓存
+        DoDieUnitCache();//执行单位死亡缓存
+
+        if(m_UnitLeaveGridCache.Count>0)
+        {
+            m_NeedRemoveUnitLeave.Clear();
+
+            foreach(var curr in m_UnitLeaveGridCache)
+            {
+                curr.t--;
+                if (curr.t <= 0)
+                { 
+                    m_NeedRemoveUnitLeave.Add(curr);
+                    curr.unit.SetGridObj(null,true);//.ownerGrid.Obj = null; 
+                }
+            }
+
+            if(m_NeedRemoveUnitLeave.Count>0)
+            {
+                foreach (var curr in m_NeedRemoveUnitLeave)
+                    m_UnitLeaveGridCache.Remove(curr);
+            }
+        }
+
+        //同步士兵总数
+        foreach (var square in m_ArmySquareList)
+        {
+            var currSoldiersCount = square.SoldiersCount;
+            if (square.LastSyncSoldiersCount != currSoldiersCount)
+            {
+                square.LastSyncSoldiersCount = currSoldiersCount;
+                //增加兵数量变化关键帧
+                if (square.OverheadPanel != null) square.OverheadPanel.AddKey_SoldiersCountChange(TotalLostTime, currSoldiersCount);
+            }
+        }
+
+        //动态设置最后排位置
+        /*
+        m_LeftBehindX = 255;
+        m_RightBehindX = 0;
+        foreach (var square in m_ArmySquareList)
+        {
+           if(square.flag == ArmyFlag.Attacker)
+            {
+                if (!square.hero.IsDie && square.hero.ownerGrid.GredX < m_LeftBehindX)
+                    m_LeftBehindX = square.hero.ownerGrid.GredX;
+
+                foreach (var curr in square.soldiers)
+                {
+                    if (!curr.IsDie&& curr.ownerGrid.GredX < m_LeftBehindX)
+                        m_LeftBehindX = curr.ownerGrid.GredX;
+                }
+
+            }else
+            {
+                if (!square.hero.IsDie && square.hero.ownerGrid.GredX > m_RightBehindX)
+                    m_RightBehindX = square.hero.ownerGrid.GredX;
+
+                foreach (var curr in square.soldiers)
+                {
+                    if (!curr.IsDie && curr.ownerGrid.GredX > m_RightBehindX)
+                        m_RightBehindX = curr.ownerGrid.GredX;
+                }
+
+            }
+        }
+         
+        */
+
+        //判定战斗结果
+        CheckFightResult(OneFrameTime);
+    }
+
+    //已经开战的时间,从冲锋开始算
+    public float FightLostTime {  get { return m_totalLostTime - m_FightStartTime; }  }
+
+    void CheckFightResult(float lostTime)
+    {
+        //战斗结束定时器获得行动时间
+        FightEndTimer.AddTime(OneFrameTime);
+        FightEndTimer.Update();
+
+        if (
+            FightST < FightST.Charge ||//战斗尚未进入冲锋阶段
+            FightST > FightST.FightEnd//战斗结果已经出来了
+            ) return;//不进行结果检查
+         
+        float eTime = SData_FightKeyValue.Single.BattleTime - FightLostTime;//距离战斗结束还剩多久
+         
+        switch(m_CountdownST)
+        {
+            case CountdownST.Hide: 
+                m_CountdownST = CountdownST.Show;
+                WorldActor.AddKey_ShowFightCountDown(m_totalLostTime, eTime, false);//创建战斗倒计时关键帧 
+                break;
+            case CountdownST.Show:
+                if (eTime <= SData_FightKeyValue.Single.BattleTimeXianshi)//开始显示倒计时
+                {
+                    m_CountdownST = CountdownST.ShowRed;
+                    WorldActor.AddKey_ShowFightCountDown(m_totalLostTime, eTime, true);//创建战斗倒计时关键帧
+                }
+                break;
+        }
+        
+      
+
+        if(eTime<=0)//战斗时间已过
+        {
+            CheckFightResultSetFightST (FightST.FightLost);
+            return;
+        }
+
+
+        byte attackerCount = 0;//存活的进攻者
+        byte defender = 0;//存活的防御者
+        foreach(var square in m_ArmySquareList)
+        {
+            if (square.hero.IsDie) continue;
+            if (square.flag == ArmyFlag.Attacker)
+                attackerCount++; 
+            else 
+                defender++;
+        }
+
+        //判断攻击方军队是否全灭
+        if(attackerCount<=0)
+        {
+            CheckFightResultSetFightST(FightST.FightLost);
+            return;
+        }
+
+        if(defender<=0)
+        {
+
+            CheckFightResultSetFightST(FightST.FightWin);
+            return;
+        }
+    }
+
+    void CheckFightResultSetFightST(FightST st)
+    {
+        m_FightST = st;//判攻击方胜利
+          WaitDie = true;
+        //delayEndTime
+        FightEndTimer.Start(0.5f);//定时结束战斗
+        WorldActor.AddKey_FightAIEnd(TotalLostTime);
+       
+        
+    }
+
+    void FightEnd()
+    { 
+        var time = TotalLostTime;
+
+        //剪裁所有武将关键帧
+        foreach (var currSquare in m_ArmySquareList)
+        {
+
+            if (!currSquare.hero.IsDie)
+                currSquare.hero.Shape.RH.CutKyes(time);
+
+            if (!currSquare.IsDie)
+                currSquare.OverheadPanel.CutKyes(time); 
+        }
+
+        //清除出生点在当前时间点之后的所有演员
+        DPTimeLine.Cut(time);
+
+        var ZhanhouAudioFxObj = SData_FightKeyValue.Single.ZhanhouAudioFxObj;
+        if (m_FightST == FightST.FightWin)
+        {
+            foreach (var currSquare in m_ArmySquareList)
+            {
+                if (currSquare.flag == ArmyFlag.Attacker)
+                {
+                    //进攻方全军播放欢呼
+                    if (!currSquare.hero.IsDie)
+                    {
+                        currSquare.hero.Shape.RH.AddKey_PlayAct(time, "wait", false, 0, 0, -1);
+
+                        AI_CreateFX.CreateFX(time, ZhanhouAudioFxObj, currSquare.hero, 1, 0);
+                    }
+
+                    int i = 0;
+                    foreach (var currSoldiers in currSquare.soldiers) 
+                    {
+                        if (!currSoldiers.IsDie)
+                        {
+                            currSoldiers.Shape.RH.AddKey_PlayAct(time, "wait", true, 0, 0, -1);
+
+                            if(i++%50==0) AI_CreateFX.CreateFX(time, ZhanhouAudioFxObj, currSoldiers, 1, 0);
+                        }
+                    }
+
+                }
+                else
+                {
+                    //防御方全军逃跑
+                    if (!currSquare.hero.IsDie)
+                        currSquare.hero.DoEscape(null, time);
+
+                    foreach (var currSoldiers in currSquare.soldiers)
+                    {
+                        if (!currSoldiers.IsDie)
+                            currSoldiers.DoEscape(null, time); 
+                    }
+
+                }
+            }
+        }
+        else
+        {
+            foreach (var currSquare in m_ArmySquareList)
+            {
+                if (currSquare.flag == ArmyFlag.Attacker)
+                {
+                    //进攻方全军逃跑
+                    if (!currSquare.hero.IsDie)
+                        currSquare.hero.DoEscape(null, time);
+
+
+                    foreach (var currSoldiers in currSquare.soldiers)
+                    {
+                        if (!currSoldiers.IsDie)
+                            currSoldiers.DoEscape(null, time); 
+                    }
+                }
+                else
+                {
+                    //防御方全军播放欢呼 
+                    if (!currSquare.hero.IsDie)
+                    {
+                        currSquare.hero.Shape.RH.AddKey_PlayAct(time, "wait", false, 0, 0, -1);
+                        AI_CreateFX.CreateFX(time, ZhanhouAudioFxObj, currSquare.hero, 1, 0);
+                    }
+
+                    int i = 0;
+                    foreach (var currSoldiers in currSquare.soldiers)  
+                    {
+                        if (!currSoldiers.IsDie)
+                        {
+                            currSoldiers.Shape.RH.AddKey_PlayAct(time, "wait", true, 0, 0, -1);
+                            if (i++ % 50 == 0) AI_CreateFX.CreateFX(time, ZhanhouAudioFxObj, currSoldiers, 1, 0);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    FightResult CreateFightResult( )
+    {
+        FightResult re = new FightResult();
+        re.IsWin = (m_FightST == FightST.FightWin);
+        re.FightTime = Math.Min(SData_FightKeyValue.Single.BattleTime,FightLostTime );
+
+        ArmyFlag winFlag = re.IsWin?ArmyFlag.Attacker:ArmyFlag.Defender;
+
+        foreach(var  square in m_ArmySquareList)
+        {
+            HeroFightResult reHeroInfo = new HeroFightResult();
+            reHeroInfo.fid = square.BaseAttr.fid;
+            reHeroInfo.staticDataID = square.BaseAttr.staticHeroID;
+            reHeroInfo.HitCount = square.hero.HitCount;
+            reHeroInfo.NursedCount = square.hero.NursedCount;
+            reHeroInfo.KillSoldiersCount = square.hero.KillSoldiersCount;
+            reHeroInfo.currHP = Math.Max(square.hero.CurrHP, 0);
+
+            reHeroInfo.heroLevel = square.BaseAttr.heroLevel;//英雄等级
+            reHeroInfo.heroXJ = square.BaseAttr.hxj;//英雄星级
+            reHeroInfo.MaxHP = square.hero.FinalMaxHP;//最大血量
+            reHeroInfo.AliveSoldiers = winFlag == square.flag ? square.soldiers.Count : 0;
+
+
+            if (square.flag == ArmyFlag.Attacker)
+                re.LeftHeros.Add(reHeroInfo);
+            else
+                re.RightHeros.Add(reHeroInfo);
+        }
+        return re;
+    }  
+
+    void DoFindEnemyCache()
+    { 
+         if (FindEnemyCache.Count>0)
+        {
+            int count = Math.Min(FindEnemyCache.Count,10);
+            for(int i=0;i<count;i++)
+            {
+                var unit = FindEnemyCache[0];
+                unit.Enemy = unit.FindEnemy(true);
+                FindEnemyCache.RemoveAt(0);
+                unit.IsInFindEnemyQueue = false;
+            }
+        }
+    }
+
+
+    class UnitLeaveGridT
+    {
+        public AI_FightUnit unit;
+        public int t = 10;
+    }
+
+    void DoDieUnitCache()
+    {
+        if (DieUnitCache.Count > 0)
+        {
+            foreach (var unit in DieUnitCache)
+            {
+                 AI_Hero hero = unit as AI_Hero;
+                 if (hero != null)//是英雄死亡
+                 {
+                     /*
+                     foreach (var curr in m_ArmySquareList)
+                     {
+                         if (curr.hero == hero) { curr.hero = null; break; }
+                     } */
+                 }
+                 else //士兵
+                 { 
+                     AI_Soldiers soldiers = unit as AI_Soldiers;
+                     var ownerSquare = soldiers.OwnerArmySquare; 
+                     ownerSquare.soldiers.Remove(soldiers);
+                     
+                 }
+
+                 unit.OwnerArmySquare.ChargeKeyUnits.Remove(unit);
+                 unit.OwnerArmySquare.FindEnemyKeyUnits.Remove(unit);
+
+                 m_UnitLeaveGridCache.Add(new UnitLeaveGridT() { unit = unit });
+            }
+            DieUnitCache.Clear();
+        }
+    }
+
+    List<UnitLeaveGridT> m_NeedRemoveUnitLeave = new List<UnitLeaveGridT>();
+    HashSet<UnitLeaveGridT> m_UnitLeaveGridCache = new  HashSet<UnitLeaveGridT>();
+
+    public void OnUnityDie(AI_FightUnit unit)
+    { 
+        DieUnitCache.Add(unit);  
+        
+    }
+
+    
+    /// <summary>
+    /// 获取战斗参数
+    /// </summary>
+    public FightParameter GetFightParameter() { return this.m_FightParameter; }
+
+    public void Reset()
+    {
+
+        _Event = new AI_FightEvent();
+         TexingTrigger = new AI_TexingSkillTrigger(this);
+
+         if (SkillBoxManage == null)
+             SkillBoxManage = new AI_SkillBoxManage(this);
+         else
+             SkillBoxManage.Reset();
+
+         m_QixiEntered = false;
+        m_FightStartTime = 0 ;
+        m_CountdownST = CountdownST.Hide;
+       // lastDoTestGongTime = 0;
+        const int randomSeed = 1;
+        m_LeftPreList.Clear();
+        m_RightPreList.Clear();
+        m_ArmySquareList.Clear();
+        m_totalLostTime = 0;
+        BattlefieldPowerAttr = new AI_BattlefieldPowerAttr();
+        AudioFXCache.Reset(this);
+
+        QixiSquare = null;
+         
+
+        LeftLianzhan = new Lianzhan(this,ArmyFlag.Attacker) ;
+        RightLianzhan = new Lianzhan(this,ArmyFlag.Defender);
+
+        PowerStatistical = new AI_PowerStatistical(this);
+
+        m_BehindInfo.Reset();
+     
+
+        FindEnemyCache.Clear();
+        DieUnitCache.Clear();
+        m_NeedRemoveUnitLeave.Clear();
+        m_UnitLeaveGridCache.Clear();
+        mDPID_Seed = 0;
+        DPTimeLine.Reset();
+        m_LastCmd.Clear();
+        FightEndTimer = new AI_Timer();
+        FightEndTimer.OnComplete += OnFightEnd;
+        m_FightParameter = null;
+         m_FightST = FightST.None; 
+        m_Random = new QKRandom(randomSeed);
+
+        EffectTrackManage = new AI_EffectTrackManage(this);
+
+        if (GridMap == null)
+        {
+            GridMap = new DiamondGridMap();
+            GridMap.Resize((byte)(SData_MapData.Single.MapMaxColumn + DiamondGridMap.SideSize * 2), (byte)(SData_MapData.Single.MapMaxRow + DiamondGridMap.SideSize * 2));
+         } else
+            GridMap.ClearItems();//清空格子地图中的对象
+        /*
+        if (QuadTreeMap == null)
+        {
+            float minX, minZ, maxX, maxZ;
+            GridMap.Grid2World(1, 1, out minX, out minZ);
+            GridMap.Grid2World(
+                SData_MapData.Single.MapMaxColumn,
+                SData_MapData.Single.MapMaxRow,
+                out maxX,
+                out maxZ
+                );
+            QuadTreeMap = new YQ2QuadTree<AI_Object>(
+                new YQ2AABBBox2D(minX, minZ, maxX, maxZ),
+                7
+                );
+        }
+        else
+            QuadTreeMap.ClearItems();//清空4叉树中的对象
+        */
+        EffectTrackManage.Reset();
+
+
+    }
+
+    public Lianzhan GetLianzhan(ArmyFlag flag)
+    {
+       return flag== ArmyFlag.Attacker?LeftLianzhan:RightLianzhan;
+    } 
+
+    public void PushAICmd(AICmd cmd)
+    {
+        if (FightST > FightST.FightEnd) return;//战斗已经结束了，不能再执行命令
+
+        switch(cmd.CmdType)
+        {
+            case AICmdType.SDSkill:
+                {
+                   var sdskill = cmd as AICmd_SDSkill;
+
+                   var fid=sdskill.fid;
+                   foreach (var currSquare in m_ArmySquareList)
+                    {
+                       if(!currSquare.hero.IsDie&&currSquare.BaseAttr.fid==fid)
+                       {
+                           //释放技能
+                           currSquare.hero.UserReleaseShoudong = true;//ReleaseShouDong(TotalLostTime); 
+
+                           //留下命令记录
+                           sdskill.CurrTime = TotalLostTime;
+                           m_LastCmd.Add(sdskill);
+
+                           break;
+                       }
+                    }
+
+                  
+                }
+                break;
+            case AICmdType.Charge:
+                {
+                    var hcmd = cmd as AICmd_Charge;
+                    Charge();
+
+                    //留下命令记录
+                    hcmd.CurrTime = TotalLostTime;
+                    m_LastCmd.Add(hcmd);
+                }
+                break;
+            case AICmdType.SetResult:
+                {
+                    if (m_FightST>=FightST.Charge && m_FightST < FightST.FightEnd)//只有战斗尚未分出胜负的时候允许执行
+                    {
+                        var hcmd = cmd as AICmd_SetResult;
+                         
+                        CheckFightResultSetFightST(hcmd.IsWin ? FightST.FightWin : FightST.FightLost);
+
+                        //留下命令记录
+                        hcmd.CurrTime = TotalLostTime;
+                        m_LastCmd.Add(hcmd);
+                    }
+                }
+                break;
+            
+        }
+    }
+
+
+
+   
+
+    public int RandomInt(int min, int max)
+    {
+        return m_Random.RangeI(min, max);
+    }
+
+    /*
+    static int SortLeftFightObj(AI_FightUnit a, AI_FightUnit b)
+    {
+        int re;
+        if(a.ownerGrid.GredX>b.ownerGrid.GredX)
+            re = -1;
+        else if(a.ownerGrid.GredX<b.ownerGrid.GredX)
+            re = 1;
+        else
+            re = 0;
+
+        return re;
+    }
+
+    static int SortRightFightObj(AI_FightUnit a, AI_FightUnit b)
+    {
+        int re;
+        if (a.ownerGrid.GredX > b.ownerGrid.GredX)
+            re = 1;
+        else if (a.ownerGrid.GredX < b.ownerGrid.GredX)
+            re = -1;
+        else
+            re = 0;
+
+        return re;
+    }*/
+
+    //一切数据都准备就绪后，调用该接口，启动战斗
+    public void StartFight()
+    {
+        //排序战斗单位
+        //m_RightFightUnit.Sort(SortRightFightObj);
+        //m_LeftFightUnit.Sort(SortLeftFightObj);
+
+        
+
+        //演员全部出场
+        ActorEnter(m_LeftPreList);
+        ActorEnter(m_RightPreList);
+
+
+        //为每个战士确定攻击目标 
+        foreach(var armySquare in m_ArmySquareList)
+        {
+            //为所有士兵寻敌
+            foreach (var curr in armySquare.soldiers) curr.FindEnemyK();//关键寻敌
+
+            //为所有武将寻敌
+            armySquare.hero.FindEnemyK();//关键寻敌
+        } 
+
+         
+        foreach (var currSquare in m_ArmySquareList)
+            currSquare.st = ArmySquareST.Standby;//进入待命状态
+
+        if (QixiSquare != null) QixiSquare.st = ArmySquareST.Standby;
+
+        //统计每个阵的解散时间
+        foreach (var armySquare in m_ArmySquareList) armySquare.CalculateToIndependentAITime();
+
+        m_FightST = FightST.StartDone;
+    }
+
+    //全军冲锋，战斗正式打响
+    public void  Charge()
+    {
+        foreach (var currSquare in m_ArmySquareList)
+        {
+            currSquare.st = ArmySquareST.Charge;//进入冲锋状态
+
+            currSquare.hero.OnJoin(this,TotalLostTime); 
+        }
+
+        m_FightStartTime = TotalLostTime;
+        m_FightST = FightST.Charge;
+
+        //抛出战斗开始事件
+        _Event.PostBattlefieldStart();
+    }
+
+    
+
+    //演员出场
+    void ActorEnter(List<AI_ArmySquare> squares)
+    {
+        foreach (var currSquare in squares)  m_ArmySquareList.Add(currSquare); 
+        squares.Clear();
+    }
+
+
+    public FightST FightST { get { return m_FightST; } }
+
+
+
+    //预备区加入一支军队
+    void AddPre(ArmySquareInfo info)
+    {
+
+        if (info.flag == ArmyFlag.Attacker)
+        {
+            MonoEX.Debug.Logout(MonoEX.LOG_TYPE.LT_DEBUG, "创建左军 fid:" + info.fid);
+            m_LeftPreList.Add(CreateArmySquare(0, info,false));
+        }
+        else
+            m_RightPreList.Add(CreateArmySquare(0, info, false));
+    }
+
+
+    /// <summary>
+    /// 设置战斗参数
+    /// </summary>
+    public void SetFightParameter(FightParameter param)
+    {
+        m_FightParameter = param;
+
+        m_LeftZhenfa = SData_Zhenfa.Single.Get(m_FightParameter.LeftZhenfaID);
+        m_RightZhenfa = SData_Zhenfa.Single.Get(m_FightParameter.RightZhenfaID);
+
+        m_LeftTacticalDeployment = SData_TacticalDeployment.Single.Get(
+            m_LeftZhenfa.ZhenfaBuzhi
+        );
+        
+
+        m_RightTacticalDeployment = SData_TacticalDeployment.Single.Get(m_RightZhenfa.ZhenfaBuzhi);
+
+        
+
+        //创建世界演员
+        WorldActor = AI_CreateDP.CreateDP(this, TotalLostTime);
+        WorldActor.AddKey_Active(TotalLostTime);
+
+
+        HashSet<int> AttackerFids = new HashSet<int>();
+        HashSet<int> DefenderFids = new HashSet<int>();
+        //检查fid是否重复
+        foreach (var curr in m_FightParameter.Squares)
+        {
+            var hashTab = curr.flag == ArmyFlag.Attacker?AttackerFids:DefenderFids;
+             
+            if(hashTab.Contains(curr.fid))
+            {
+                throw new Exception(string.Format("{0} 存在重复的 fid:{1}", curr.flag == ArmyFlag.Attacker ? "进攻方" : "防御方", curr.fid));
+            }
+
+            hashTab.Add(curr.fid); 
+        }
+
+        m_FightParameter.Squares.Sort((a, b) =>
+        {
+            return a.fid - b.fid;//从小到大
+        }
+        );
+
+        foreach (var curr in m_FightParameter.Squares)
+            AddPre(curr);
+
+        if (m_FightParameter.QixiSquare != null)
+        {
+            QixiSquare = CreateArmySquare(0, m_FightParameter.QixiSquare, true); 
+        }
+
+        
+        //清理无所属格的士兵
+        ClearNoOwnerSoldiers(m_LeftPreList);
+        ClearNoOwnerSoldiers(m_RightPreList);
+
+        //创建演示层角色
+        CreateDP(m_LeftPreList);
+        CreateDP(m_RightPreList);
+    }
+
+    void ClearNoOwnerSoldiers(List<AI_ArmySquare> square)
+    {
+        foreach (var curr in square)
+        {
+            HashSet<AI_Soldiers> newList = new HashSet<AI_Soldiers>();
+            foreach (var curr1 in curr.soldiers)
+            {
+                if (curr1.ownerGrid == null)
+                {
+                    curr.ChargeKeyUnits.Remove(curr1);
+                    curr.FindEnemyKeyUnits.Remove(curr1);
+                }
+                else
+                    newList.Add(curr1);
+            }
+            curr.soldiers = newList;
+        }
+    }
+
+    void CreateDP(List<AI_ArmySquare> square)
+    {
+        float time = 0;
+        foreach (var armySquare in square)
+        {
+            bool IsQixi = armySquare.IsQixi;
+
+            //创建出演示层英雄对象
+            armySquare.hero.CreateDPActors(time);
+            armySquare.hero.DoReadyEnter(time, armySquare.hero.Shape, IsQixi);
+
+            //创建出演示层士兵对象
+            foreach (var curr in armySquare.soldiers)
+            {
+                curr.CreateDPActors(time);
+                curr.DoReadyEnter(time, curr.Shape, IsQixi);
+            }
+
+            if (!IsQixi)
+                armySquare.OnJoin(this, time);
+        }
+    }
+
+    AI_ArmySquare QixiSquare;
+    ZhenfaInfo m_LeftZhenfa;
+    ZhenfaInfo m_RightZhenfa;
+    bool m_QixiEntered = false;
+
+    /// <summary>
+    /// 生成本次战斗所需的动态资源包队列
+    /// </summary>
+    public List<string> GeneratePackList()
+    {
+        HashSet<string> packList = new HashSet<string>();
+
+        _GeneratePack_SquareList(m_LeftPreList, packList);
+        _GeneratePack_SquareList(m_RightPreList, packList);
+
+
+        //战斗手动聚光灯依赖纹理
+        packList.Add("ani_ll_003");
+        packList.Add("light_ll_005");
+        packList.Add("light_ll_018");
+
+        //战斗特效材质
+        packList.Add("tx_materials");
+
+        packList.Add("spotlight");//聚光灯预置
+
+        //分尸资源包
+        packList.Add("fenshi");
+
+        //脚下烟尘
+        packList.Add("yanwu_zl_006");
+        packList.Add("yanwu_tuowei");
+
+        //头顶旗子
+        packList.Add("qizi");
+
+
+        _GeneratePack_Fx(SData_FightKeyValue.Single.LianzhanAudioFxObj, packList);
+        _GeneratePack_Fx(SData_FightKeyValue.Single.ShadiAudioFxObj, packList);
+        _GeneratePack_Fx(SData_FightKeyValue.Single.ZhanhouAudioFxObj, packList);
+        _GeneratePack_Fx(SData_FightKeyValue.Single.ZhanqianAllAudioFxObj, packList);
+        _GeneratePack_Fx(SData_FightKeyValue.Single.ZhanqianRoleAudioFxObj, packList);
+        //_GeneratePack_Fx(SData_FightKeyValue.Single.HeroSelfAudioFxObj, packList);
+        //_GeneratePack_Fx(SData_FightKeyValue.Single.HeroOtherAudioFxObj, packList);
+
+        return packList.ToList();
+    }
+
+    void _GeneratePack_SquareList(List<AI_ArmySquare> squareList, HashSet<string> outPackList)
+    {
+        HashSet<AudioFxInfo> fxList = new HashSet<AudioFxInfo>();
+        foreach (var square in squareList)
+        { 
+            var heroInfo = square.hero.Data;
+            outPackList.Add(heroInfo.ZiyuanBaoming);//武将模型资源包
+
+
+            
+
+            //武将
+            {
+                //坐骑模型资源包
+                if (!string.IsNullOrEmpty(heroInfo.ZiyuanBaomingZuoqi))
+                    outPackList.Add(heroInfo.ZiyuanBaomingZuoqi);
+
+                //吟唱特效
+                _GeneratePack_Fx(heroInfo.YinchangAudioFxObj, outPackList);
+
+                //英雄的技能
+                foreach (var skill in heroInfo.SkillObjs) _GeneratePack_Skill(skill, outPackList);
+
+                //死亡效果
+                _GeneratePack_Fx(heroInfo.HeroDeadAudioFxObj, outPackList);
+            }
+
+
+            {
+                var armyInfo = square.ArmyData;
+                outPackList.Add(armyInfo.ZiyuanBaoming);//士兵模型资源包
+
+                //士兵坐骑模型资源包
+                if (!string.IsNullOrEmpty(armyInfo.ZiyuanBaomingZuoqi))
+                    outPackList.Add(armyInfo.ZiyuanBaomingZuoqi);
+
+                //士兵的技能
+                foreach (var skill in armyInfo.SkillObjs) _GeneratePack_Skill(skill, outPackList);
+
+                //死亡效果
+                _GeneratePack_Fx(armyInfo.DeadAudioFxObj, outPackList);
+
+                //近身技
+                _GeneratePack_Skill(armyInfo.JinshenSkillObj, outPackList);
+
+                //弓兵技
+                //_GeneratePack_Skill(armyInfo.GongbingSkillObj, outPackList);
+            } 
+        }
+    }
+
+    void _GeneratePack_Skill(Skill skill, HashSet<string> outPackList)
+    {
+        if (skill == null) return;
+
+        _GeneratePack_Fx(skill.ShifaAudioFxObj, outPackList);
+        _GeneratePack_Fx(skill.ChufaAudioFxObj, outPackList);
+
+        foreach (var ef in skill.AddTakeEffects) _GeneratePack_SkillEffect(ef, outPackList);
+        foreach (var ef in skill.TakeEffects) _GeneratePack_SkillEffect(ef, outPackList);
+        foreach (var box in skill.TakeBoxObjs) _GeneratePack_SkillBox(box, outPackList);
+    }
+
+    void _GeneratePack_SkillEffect(SkillEffect skillEffect, HashSet<string> outPackList)
+    {
+        if (skillEffect == null) return;
+        _GeneratePack_Fx(skillEffect.ShengcunAudioFxObj, outPackList);
+
+        if (skillEffect.SkillArriveObj!=null)
+            _GeneratePack_Fx(skillEffect.SkillArriveObj.FeixingwuAudioFxObj, outPackList);
+
+        _GeneratePack_Fx(skillEffect.BeijiAudioFxObj, outPackList);
+    }
+
+    void _GeneratePack_SkillBox(SkillBoxInfo skillBox, HashSet<string> outPackList)
+    {
+        if (skillBox == null) return;
+        _GeneratePack_Fx(skillBox.ShengcunAudioFxObj, outPackList);
+        _GeneratePack_Fx(skillBox.DiaoyongAudioFxObj, outPackList);
+        _GeneratePack_Fx(skillBox.SiwangAudioFxObj, outPackList);
+
+        if (skillBox.SkillArriveObj != null)
+            _GeneratePack_Fx(skillBox.SkillArriveObj.FeixingwuAudioFxObj, outPackList); 
+    }
+
+    void _GeneratePack_Fx(AudioFxInfo[] fxArray, HashSet<string> outPackList)
+    {
+        int len = fxArray.Length;
+        for (int i = 0; i < len; i++) _GeneratePack_Fx(fxArray[i], outPackList);
+    }
+
+    void _GeneratePack_Fx(AudioFxInfo fx, HashSet<string> outPackList)
+    {
+        if (fx == null) return;
+
+        foreach(var ad in fx.Audios) 
+        {
+            if(ad._2Dor3D==2) continue;//2D音效常驻内存，无需加载
+            outPackList.Add(ad.Sound);
+        }
+
+        foreach(var tx in fx.Texiaos)
+        {
+            if (tx.ZiyuanType == ZiyuanTypeEnum.Jianyu) 
+                outPackList.Add("gongjian");
+            else if (tx.ZiyuanType == ZiyuanTypeEnum.Lizi)
+            {
+                var len = tx.TexiaoName.Length;
+                for (int i = 0; i < len;i++ )
+                    outPackList.Add(tx.TexiaoName[i]);
+            }
+        }
+    }
+
+
+    /*
+    public void SetLeftFormation(
+            int firstMid,
+            int secondUp,
+            int secondMid,
+            int secondDown,
+            int thirdUp,
+            int thirdMid,
+            int thirdDown,
+            int zf
+        )
+    {
+        m_LeftFormation.firstMid = firstMid;
+        m_LeftFormation.secondUp = secondUp;
+        m_LeftFormation.secondMid = secondMid;
+        m_LeftFormation.secondDown = secondDown;
+        m_LeftFormation.thirdUp = thirdUp;
+        m_LeftFormation.thirdMid = thirdMid;
+        m_LeftFormation.thirdDown = thirdDown;
+        m_LeftFormation.zf = zf;
+
+        m_LeftTacticalDeployment = SData_TacticalDeployment.Single.Get(LeftZhenfaBuzhi);//
+        //m_LeftTacticalDeployment = SData_TacticalDeployment.Single.Get("ZhenfaBuzhi_09");
+    }
+     
+
+    public void SetRightFormation(
+           int firstMid,
+           int secondUp,
+           int secondMid,
+           int secondDown,
+           int thirdUp,
+           int thirdMid,
+           int thirdDown,
+           int zf
+       )
+    {
+        m_RightFormation.firstMid = firstMid;
+        m_RightFormation.secondUp = secondUp;
+        m_RightFormation.secondMid = secondMid;
+        m_RightFormation.secondDown = secondDown;
+        m_RightFormation.thirdUp = thirdUp;
+        m_RightFormation.thirdMid = thirdMid;
+        m_RightFormation.thirdDown = thirdDown;
+        m_RightFormation.zf = zf;
+
+        m_RightTacticalDeployment = SData_TacticalDeployment.Single.Get(RightZhenfaBuzhi);
+        //m_RightTacticalDeployment = SData_TacticalDeployment.Single.Get("ZhenfaBuzhi_09");
+    }
+    */
+
+    void DoAI()
+    {
+        if (!m_QixiEntered && FightLostTime >= SData_FightKeyValue.Single.QixiTime && FightST >= FightST.Charge)
+        {
+            m_QixiEntered = true;
+            DoQixiEnter();//奇袭部队入场
+        }
+
+        foreach (var currSquare in m_ArmySquareList)
+        { 
+            currSquare.DoCharge1();//冲锋武将AI和一些影响解体的逻辑
+        }
+
+        foreach (var currSquare in m_ArmySquareList)
+        { 
+            currSquare.DoAI();
+        }
+         
+    }
+
+    void DoQixiEnter()
+    {
+        if (QixiSquare == null) return;//没有设置骑袭部队
+
+        m_ArmySquareList.Add(QixiSquare);
+
+        //为每个战士确定攻击目标  
+        {
+            //为所有士兵寻敌
+            foreach (var curr in QixiSquare.soldiers) curr.FindEnemyK();//关键寻敌
+
+            //为所有武将寻敌
+            QixiSquare.hero.FindEnemyK();//关键寻敌
+        }
+
+        QixiSquare.OnJoin(this, TotalLostTime);
+        QixiSquare.st = ArmySquareST.Charge;//进入冲锋状态 
+        QixiSquare.hero.OnJoin(this, TotalLostTime); 
+    }
+
+    public void _CheckArmys(string dbgtxt)
+    {
+        Dictionary<DiamondGrid, AI_FightUnit> gd = new Dictionary<DiamondGrid, AI_FightUnit>();
+
+        //检查有没有两个单位使用了同个格子
+
+        foreach (var currSquare in m_ArmySquareList)
+        {
+            currSquare._CheckArmy();
+
+            if (!currSquare.hero.IsDie) gd.Add(currSquare.hero.ownerGrid, currSquare.hero);
+            foreach (var sb in currSquare.soldiers)
+            {
+                if (sb.IsDie) continue;
+
+                if (gd.ContainsKey(sb.ownerGrid)) 
+                    MonoEX.Debug.Logout(MonoEX.LOG_TYPE.LT_DEBUG, string.Format("{2} ID1:{0} ID2:{1}", gd[sb.ownerGrid].ID, sb.ID, dbgtxt));
+
+                gd.Add(sb.ownerGrid, sb);
+            }
+        }
+    }
+
+    void AddTime(float lostTime)
+    {
+        foreach (var currSquare in m_ArmySquareList)
+            currSquare.AddTime(lostTime);
+    }
+
+
+    void CreateSoldiers(AI_ArmySquare armySquare, FightFormation fightFormation, int soldiersCount, bool IsQixi, bool isYuanjun)
+    {
+        ArmyFlag flag = armySquare.flag;
+
+        float dirx;
+        float dirz;
+        if (IsQixi)
+        {
+            if(isYuanjun)
+                if (flag == ArmyFlag.Attacker) dirx = 1; else dirx = -1;
+            else
+                if (flag == ArmyFlag.Attacker) dirx = -1; else dirx = 1;
+        }else
+            if (flag == ArmyFlag.Attacker) dirx = 1; else dirx = -1;
+
+        dirz = 0;
+        dirz = 0; 
+  
+        { 
+            var units =  fightFormation.units;
+            int unitLen =units.Length;
+            for (int i = 1; i < unitLen; i++)
+            {
+                UnitsInfo uinfo = units[i];
+
+                AI_Soldiers soldiers = new AI_Soldiers(armySquare, dirx, dirz, uinfo.indent);
+                DiamondGrid ownerGrid;
+
+                if (IsQixi)
+                    ownerGrid = GridMap.GetGrid(
+                        AI_Math.CalculateMassifX(uinfo.x, uinfo.z, isYuanjun?flag:AI_Math.ReverseFlag(flag), uinfo.indent),
+                    uinfo.z + DiamondGridMap.SideSize
+                    );
+                else
+                ownerGrid = GridMap.GetGrid(
+                    AI_Math.CalculateMassifX(uinfo.x, uinfo.z, flag, uinfo.indent) + DiamondGridMap.SideSize,
+                    uinfo.z + DiamondGridMap.SideSize
+                    );
+                if (
+                    ownerGrid == null||//所属格非法
+                    ownerGrid.Obj != null//所属格已经有人站了
+                )
+                {
+                    soldiers.ownerGrid = null;
+                } else
+                {
+                    soldiers.ownerGrid = ownerGrid;
+                    if (soldiers.SetGridObj(soldiers, false))
+                    {
+                        armySquare.soldiers.Add(soldiers);
+
+                        if (i == fightFormation.QiZhiSBIndex)
+                            armySquare.QizhiOwner = soldiers;
+
+                        if (uinfo.isk) armySquare.FindEnemyKeyUnits.Add(soldiers);//关键单位列表
+                    }else
+                        soldiers.ownerGrid = null;
+                }
+                /*
+                soldiers.ownerGrid = ownerGrid;
+                //if (ownerGrid.Obj != null)                    throw new Exception();
+                if (ownerGrid == null)
+                    throw new Exception(string.Format("超出格子范围 x:{0} z:{1}", AI_Math.CalculateMassifX(uinfo.x, uinfo.z, flag, uinfo.indent) + DiamondGridMap.SideSize, uinfo.z + DiamondGridMap.SideSize));
+
+             
+                if (ownerGrid.Obj!=null)
+                    throw new Exception(string.Format("格子对象重叠 x:{0} z:{1}", ownerGrid.GredX,ownerGrid.GredZ) );
+
+                ownerGrid.Obj = soldiers; 
+                 */
+            
+                if (--soldiersCount <= 0) { break; }
+            }
+
+            if (armySquare.QizhiOwner == null) //由于兵力不足，抗旗帜的兵没有出场
+            {
+                //计算抗旗兵的理论世界位置
+                UnitsInfo uinfo = units[fightFormation.QiZhiSBIndex];
+                DiamondGrid grid = GridMap.GetGrid(AI_Math.CalculateMassifX(uinfo.x, uinfo.z, flag, uinfo.indent) + DiamondGridMap.SideSize, uinfo.z + DiamondGridMap.SideSize);
+
+                //在本阵中找一个距离最近的担任抗旗大任
+                armySquare.FindQizhiOwner(grid.WorldX, grid.WorldZ);
+            } 
+
+            //英雄是关键单位
+            if (units[0].isk) armySquare.FindEnemyKeyUnits.Add(armySquare.hero);
+        }
+
+        
+    }
+
+   
+    AI_ArmySquare CreateArmySquare(float time, ArmySquareInfo info,bool IsQixi)
+    {
+        //取得阵型
+        FightFormation fightFormation;
+
+        if (IsQixi)
+            fightFormation = SData_Zhenfa.Single.QixiZhenBuzhi.formations[1];
+        else
+           fightFormation = info.flag == ArmyFlag.Attacker ? m_LeftTacticalDeployment.formations[info.fid] : m_RightTacticalDeployment.formations[info.fid];
+      
+
+        UnitsInfo heroUnitsInfo = fightFormation.units[0];//英雄信息
+
+
+        AI_Hero hero = new AI_Hero(info.fid, info.staticHeroID, heroUnitsInfo.indent);
+
+        if (info.flag == ArmyFlag.Attacker)
+        { 
+            hero.dirx = 1; 
+            hero.dirz = 0;
+        }
+        else
+        {
+            hero.dirx = -1;
+            hero.dirz = 0;
+        }  
+
+        AI_ArmySquare armySquare = new AI_ArmySquare(this);
+        armySquare.BaseAttr = info;
+        armySquare.flag = info.flag; 
+        armySquare.hero = hero;
+        armySquare.ArmyData = hero.Data.Army;
+        armySquare.IsQixi = IsQixi;
+         
+
+        armySquare.InitAtrr();
+        DiamondGrid ownerGrid;
+        
+        bool isYuanjun = false;
+
+        
+        if (IsQixi)
+        {
+            isYuanjun = !(SData_Hero.Get(info.staticHeroID) as HeroDataInfo).IsQixi;
+            ownerGrid = GridMap.GetGrid(
+                AI_Math.CalculateMassifX(heroUnitsInfo.x, heroUnitsInfo.z, isYuanjun ? info.flag : AI_Math.ReverseFlag(info.flag), heroUnitsInfo.indent),
+                heroUnitsInfo.z +  DiamondGridMap.SideSize
+                );
+        }else
+            ownerGrid = GridMap.GetGrid(
+                AI_Math.CalculateMassifX(heroUnitsInfo.x, heroUnitsInfo.z, info.flag, heroUnitsInfo.indent) +   DiamondGridMap.SideSize,
+                heroUnitsInfo.z +  DiamondGridMap.SideSize
+                );
+
+        armySquare.hero.ownerGrid = ownerGrid;
+        if (ownerGrid==null)
+            throw new Exception(string.Format("格子超出战斗区域 {0},{1}", AI_Math.CalculateMassifX(heroUnitsInfo.x, heroUnitsInfo.z, info.flag, heroUnitsInfo.indent) + DiamondGridMap.SideSize, heroUnitsInfo.z + DiamondGridMap.SideSize));
+        
+       
+        //for(int i=0;i<info.sklv.Length;i++) info.sklv[i]=1;
+        hero.InitAttrs(armySquare,info.hp);
+        armySquare.hero.SetGridObj(armySquare.hero, true);
+
+        //初始化士兵
+        int soldiersCount = info.soldiersCount;
+        CreateSoldiers(armySquare, fightFormation, soldiersCount, IsQixi, isYuanjun);
+        armySquare.SoldiersCount = armySquare.soldiers.Count;//填充初始的士兵总数  
+        armySquare.BuildChargeKeyUnits();
+
+        if (!IsQixi)
+        {
+            byte LeftBehindX = 255;
+            if (info.flag == ArmyFlag.Attacker)
+            {
+
+                if (hero.ownerGrid.GredX < LeftBehindX )
+                {
+                    LeftBehindX = hero.ownerGrid.GredX;
+                    m_BehindInfo.LeftBehindX = hero;
+                    m_BehindInfo.LeftBehind= armySquare;
+                }
+
+                foreach (var curr in armySquare.soldiers)
+                {
+                    if (curr.ownerGrid.GredX < LeftBehindX)
+                    {
+                        LeftBehindX = curr.ownerGrid.GredX;
+                        m_BehindInfo.LeftBehindX = curr ;
+                        m_BehindInfo.LeftBehind= armySquare;
+                    }
+                }
+            }
+            else
+            {
+                byte RightBehindX = 0;
+                if (hero.ownerGrid.GredX > RightBehindX)
+                {
+                    RightBehindX = hero.ownerGrid.GredX; 
+                    m_BehindInfo.RightBehindX = hero;
+                    m_BehindInfo.RightBehind = armySquare;
+                }
+                foreach (var curr in armySquare.soldiers)
+                {
+                    if (curr.ownerGrid.GredX > RightBehindX)
+                    {
+                        RightBehindX = curr.ownerGrid.GredX;
+                        m_BehindInfo.RightBehindX = curr;
+                        m_BehindInfo.RightBehind = armySquare;
+                    }
+                }
+            }
+        }
+    
+
+     
+        
+        
+
+        return armySquare;
+    }
+
+    
+    //战斗结束
+    void OnFightEnd()
+    {
+        if (WaitDie)
+        {
+            WaitDie = false; 
+            FightEndTimer.Start(delayEndTime);//定时结束战斗
+            FightEnd();
+        }else
+            WorldActor.AddKey_FightEnd(m_totalLostTime, CreateFightResult());//战斗结果关键帧
+    }
+
+
+    Lianzhan LeftLianzhan;
+    Lianzhan RightLianzhan;
+
+    public DPActor_World WorldActor = null;//世界演员，一个虚拟演员，用于承载一些世界公共的关键帧
+    public DiamondGridMap GridMap = null;
+   // public YQ2QuadTree<AI_Object> QuadTreeMap = null;
+    public List<AI_ArmySquare>.Enumerator ArmySquareListEnumerator { get { return m_ArmySquareList.GetEnumerator(); } }
+
+    public float TotalLostTime { get { return m_totalLostTime; } }
+    public List<AI_ArmySquare> m_LeftPreList = new List<AI_ArmySquare>();//左军预备队伍，按动态英雄ID索引
+    public List<AI_ArmySquare> m_RightPreList = new List<AI_ArmySquare>();//右军预备队伍，按动态英雄ID索引
+
+    public List<AICmd> m_LastCmd = new List<AICmd>();
+    public TacticalDeployment m_LeftTacticalDeployment;//左军阵法
+    public TacticalDeployment m_RightTacticalDeployment;//右军阵法
+
+    public class BehindInfo
+    {
+        public AI_FightUnit LeftBehindX;//左军最后面一排位置
+        public AI_ArmySquare LeftBehind;//左军最后面阵
+
+        public AI_FightUnit RightBehindX;//右军最后面一排位置
+        public AI_ArmySquare RightBehind;//右军最后面阵
+
+        public void Reset()
+        {
+            LeftBehindX = RightBehindX = null;
+            LeftBehind = RightBehind = null;
+        }
+    }
+    public BehindInfo m_BehindInfo = new BehindInfo();
+    
+    public AI_FightEvent Event { get { return _Event; } }
+    public AI_EffectTrackManage EffectTrackManage ;
+    public AI_SkillBoxManage SkillBoxManage = null;
+    public readonly DP_TimeLine DPTimeLine = new DP_TimeLine();
+
+    AI_FightEvent _Event = new AI_FightEvent();
+    AI_TexingSkillTrigger TexingTrigger;
+
+    float m_totalLostTime = 0;//离战斗开始逝去的时间 
+    List<AI_FightUnit> FindEnemyCache = new List<AI_FightUnit>();
+    List<AI_FightUnit> DieUnitCache = new List<AI_FightUnit>();
+
+    AI_Timer FightEndTimer = new AI_Timer();
+    FightParameter m_FightParameter;
+    FightST m_FightST = FightST.None;//战斗状态
+    //Formation m_LeftFormation = new Formation();
+    QKRandom m_Random;
+    //Formation m_RightFormation = new Formation();
+    List<AI_ArmySquare> m_ArmySquareList = new List<AI_ArmySquare>();//活动的军队方阵
+    public AI_AudioFXCache AudioFXCache = new AI_AudioFXCache();
+    float m_FightStartTime;//记录战斗开始的时间
+
+    enum CountdownST
+    {
+        Hide,//隐藏中
+        Show,//普通显示
+        ShowRed,//红色显示
+    }
+    CountdownST m_CountdownST;//倒计时当前是否处于显示状态
+    bool WaitDie = false;
+
+    public AI_BattlefieldPowerAttr BattlefieldPowerAttr;
+    
+    AI_PowerStatistical PowerStatistical;
+    //delayEndTime
+}
+
+public class Lianzhan
+{
+    public Lianzhan(AI_Battlefield battlefield,ArmyFlag flag)
+    {
+        OwnerBattlefield = battlefield;
+        this.Flag = flag;
+    }
+
+
+
+    public int KillHeroCount { get { return m_KillHeroCount; } }
+    int m_KillHeroCount = 0;//杀死英雄总数
+
+    public void AddShadi(AI_Hero unit, float time)
+    {
+        m_KillHeroCount++;
+
+        if (Flag == ArmyFlag.Attacker)
+        {
+            var idx = m_KillHeroCount - 1;
+            if (idx < SData_FightKeyValue.Single.ShadiAudioFx.Length)
+            {
+                //播放音效
+                AI_CreateFX.CreateFX(time, SData_FightKeyValue.Single.ShadiAudioFxObj[idx], OwnerBattlefield, 0, 0, 0, 1, 0);
+            }
+        }
+    }
+
+    public void AddLianzhan(AI_FightUnit unit, float time, short num)
+    {
+
+      
+
+        if (m_LianzhanID < 1)
+        {
+            m_LianzhanID = OwnerBattlefield.NewDPID;//新分配一个连斩ID
+            m_LianzhanNum = num;//设置连斩数量
+
+            m_LianzhanAudioFXIdx = 0;
+        }
+        else
+        {
+            if (time - m_LastLianzhanTime > SData_FightKeyValue.Single.LianzhanTime)//已经过了累计时间
+            {
+                OwnerBattlefield.Event.PostLianzhan(unit, m_LianzhanID, -1);//旧的连斩ID失效
+                m_LianzhanID = OwnerBattlefield.NewDPID;//新分配一个连斩ID
+                m_LianzhanNum = num;//重新开始记连斩数量
+
+                m_LianzhanAudioFXIdx = 0;
+            }
+            else
+                m_LianzhanNum += num;
+        }
+
+        if (unit.Flag == ArmyFlag.Attacker)
+            OwnerBattlefield.WorldActor.AddKey_LianzhanChange(time, m_LianzhanNum);
+
+        m_LastLianzhanTime = time;
+        OwnerBattlefield.Event.PostLianzhan(unit, m_LianzhanID, m_LianzhanNum); //连斩次数发生变化
+
+        //连斩激励音效逻辑
+        if (
+            m_LianzhanAudioFXIdx>=0&&//需要连斩激励
+            m_LianzhanNum >= SData_FightKeyValue.Single.LianzhanNO[m_LianzhanAudioFXIdx]
+            )
+        {
+            //播放激励音效 
+            AI_CreateFX.CreateFX(time, SData_FightKeyValue.Single.LianzhanAudioFxObj[m_LianzhanAudioFXIdx], OwnerBattlefield, 0, 0, 0, 1, 0);
+
+            //切换到下一个激励音效
+            m_LianzhanAudioFXIdx++;
+            if (m_LianzhanAudioFXIdx >= SData_FightKeyValue.Single.LianzhanNO.Length) m_LianzhanAudioFXIdx = -1;//已经超限
+        }
+    }
+
+
+    int m_LianzhanAudioFXIdx = 0;//连斩激励的音效索引
+
+    int m_LianzhanID = -1;
+    int m_LianzhanNum = 0;//当前连斩数
+    float m_LastLianzhanTime = 0;//上次连斩时间
+
+
+    AI_Battlefield OwnerBattlefield;
+    ArmyFlag Flag;
+   
+};
+
+public enum FightST
+{
+    None = 0,
+    StartDone = 1,
+    Charge = 2,
+    FightEnd = 10,//战斗结束,数字大于它的都是结束后的状态   
+    FightWin = 12,//战斗胜利
+    FightLost = 13,//战斗失败
+
+}

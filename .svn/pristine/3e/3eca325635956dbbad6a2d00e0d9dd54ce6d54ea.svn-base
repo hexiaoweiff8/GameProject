@@ -1,0 +1,75 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+using UnityEngine;
+using UniLua;
+
+class LuaUserDatasLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    //static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "UserDatas";
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair("SetUserData",S_SetUserData),
+            new NameFuncPair("GetUserData",S_GetUserDate),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+    //本地账户信息存储 
+    static int S_SetUserData(ILuaState lua)
+    {
+        //in key,v
+        //out void
+
+        string key = lua.L_CheckString(1);
+
+        //if (lua.IsNil(2))
+        //{
+        //    return 0;
+        //}
+        string v = lua.L_CheckString(2);
+        UserDatas.SetUserData(key, v);
+        return 0;
+    }
+
+    //获取本地存储的角色信息
+    static int S_GetUserDate(ILuaState lua)
+    {
+        //in key
+        //out v
+        string key = lua.L_CheckString(1);
+        if (UserDatas.GetUserData(key) == null)
+        {
+            lua.PushNil();
+            return 1;
+        }
+        lua.PushString(UserDatas.GetUserData(key));
+        return 1;
+    }
+
+}

@@ -1,0 +1,80 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+using UniLua;
+class LuaPacketManageLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    //static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "PacketManage";
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            //new NameFuncPair("RemoveCallback",F_RemoveCallback),
+            
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+           new NameFuncPair("GetPacket",S_GetPacket),
+           new NameFuncPair("UnloadScriptPacks",S_UnloadScriptPacks),
+           new NameFuncPair("DumpPacketsInfo",S_DumpPacketsInfo),
+          // new NameFuncPair("UnLoadUnusedPack",S_UnLoadUnusedPack),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+    static int S_UnloadScriptPacks(ILuaState lua)
+    {
+        LuaCodeCache.Single.UnloadScriptPacks();
+        return 0;
+    }
+
+    static int S_DumpPacketsInfo(ILuaState lua)
+    {
+        ResourceRefManage.Single.DumpInfo();
+        return 0;
+    }
+         
+    
+    static int S_GetPacket(ILuaState lua)
+    {
+        //in packName
+        //out Packet
+        string packName = lua.L_CheckString(1);
+
+        LuaPacketLib._wrap(
+            lua,
+            PacketManage.Single.GetPacket(packName)
+            );
+        return 1;
+    }
+
+    /*高危接口，不应该暴露给lua
+    static int S_UnLoadUnusedPack(ILuaState lua)
+    {
+        //in packName
+        //out nil
+        string packName = lua.L_CheckString(1);
+        ResourceRefManage.Single.UnLoadUnusedPack(packName);
+
+        return 0;
+    }*/
+} 

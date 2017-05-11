@@ -1,0 +1,96 @@
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UniLua;
+
+public class CMLuaFuns
+{
+    public int UpdateRef = 0;
+    public int ClassRef = 0;
+    public string cmName = "";
+    public void Destroy(ILuaState lua)
+    {
+
+        if (UpdateRef > 0) { lua.L_Unref(LuaDef.LUA_REGISTRYINDEX, UpdateRef); UpdateRef = 0; }
+        if (ClassRef > 0) { lua.L_Unref(LuaDef.LUA_REGISTRYINDEX, ClassRef); ClassRef = 0; }
+    }
+}
+
+
+//组件工厂
+class LuaCMFactory:IDisposable
+{
+    //scriptFile 例： "framework/main"
+    public LuaCMFactory(ILuaState lua,string scriptFile)
+    {
+        m_ScriptFile = scriptFile;
+        var status = lua.L_DoFile(scriptFile);
+        if (status != ThreadStatus.LUA_OK)
+        {
+            throw new Exception(lua.ToString(-1));
+        }
+
+        if (!lua.IsFunction(-1))
+        {
+            lua.Pop(1);
+            throw new Exception(
+                String.Format("\"{0}\" return value is not a function", scriptFile)
+                );
+        }
+
+        //获得组件创建接口引用，同时pop
+        m_CMNew_Ref.SetRef(lua.L_Ref(LuaDef.LUA_REGISTRYINDEX));
+    }
+ 
+
+    //创建组件
+    public CMLuaFuns NewCM(ILuaState lua)
+    {
+         
+        if (m_CMNew_Ref.RefI == LuaObjRef.EmptyObj) return null;
+
+        m_CMNew_Ref.Push(lua);
+
+        // insert `traceback' function  
+        var b = lua.GetTop();
+        lua.PushCSharpFunction(LuaRoot.Traceback);
+        lua.Insert(b);
+
+        var status = lua.PCall(0, 1, b);
+        if (status != ThreadStatus.LUA_OK)
+        {
+            ULDebug.LogError(lua.ToString(-1));
+        }
+
+   
+        //取返回值
+        if (!lua.IsTable(-1))
+        {
+            lua.Pop(1);
+            throw new Exception(
+                String.Format("\"{0}\" return value is not a table", m_ScriptFile)
+                );
+        }
+        lua.Remove(b);
+
+        CMLuaFuns re = new CMLuaFuns();
+        
+        re.UpdateRef = LuaRoot.StoreMethod(lua, "Update");
+        re.ClassRef = lua.L_Ref(LuaDef.LUA_REGISTRYINDEX);
+
+      
+
+        re.cmName = m_ScriptFile; 
+
+        return re;
+    }
+
+    public void Dispose()
+    {
+        m_CMNew_Ref.Dispose();
+    }
+
+    LuaObjRef m_CMNew_Ref = new LuaObjRef(LuaObjRef.EmptyObj);
+    string m_ScriptFile;
+}
+

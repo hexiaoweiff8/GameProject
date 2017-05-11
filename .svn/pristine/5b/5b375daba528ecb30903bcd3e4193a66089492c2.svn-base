@@ -1,0 +1,56 @@
+using System;
+using System.Collections.Generic;
+using LuaInterface;
+
+public class SData_ArmyCardUnionCost_C : MonoEX.Singleton<SData_ArmyCardUnionCost_C>
+{
+    public void setData(LuaTable table1, LuaTable table2)
+    {
+        var head = new string[table1.Length];
+        SDataUtils.dealTable(table1, (Object o1, Object o2) =>
+        {
+            head[(int)(double)o1 - 1] = (string)o2;
+        });
+        SDataUtils.dealTable(table2, (Object o1, Object o2) =>
+        {
+            ArmyCardUnionCost_CInfo dif = new ArmyCardUnionCost_CInfo();
+            SDataUtils.dealTable((LuaTable)o2, (Object o11, Object o22) =>
+            {
+                switch (head[(int)(double)o11 - 1])
+				{
+					case "UnionLevel": dif.UnionLevel = (short)(double)o22; break;
+					case "Gold": dif.Gold = (int)(double)o22; break;
+					case "Coin": dif.Coin = (int)(double)o22; break;
+                }
+            });
+            if (Data.ContainsKey(dif.UnionLevel))
+                MonoEX.Debug.Logout(MonoEX.LOG_TYPE.LT_ERROR, "重复的ID：" + dif.UnionLevel.ToString());
+            Data.Add(dif.UnionLevel, dif);
+        });
+    }
+
+    public ArmyCardUnionCost_CInfo GetDataOfID(int Id)
+    {
+        if (!Data.ContainsKey(Id)) throw new Exception(String.Format("ArmyCardUnionCost_CInfo::GetDataOfID() not found data  Id:{0}", Id));
+        return Data[Id];
+    }
+
+    internal Dictionary<int, ArmyCardUnionCost_CInfo> Data = new Dictionary<int, ArmyCardUnionCost_CInfo>();
+}
+
+
+public struct ArmyCardUnionCost_CInfo
+{
+	 /// <summary>
+	 ///1
+	 /// </summary>
+	public short UnionLevel;
+	 /// <summary>
+	 ///1000
+	 /// </summary>
+	public int Gold;
+	 /// <summary>
+	 ///10
+	 /// </summary>
+	public int Coin;
+}

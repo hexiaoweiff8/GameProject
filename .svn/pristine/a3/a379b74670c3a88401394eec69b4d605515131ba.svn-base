@@ -1,0 +1,66 @@
+using System;
+using System.Collections.Generic;
+using LuaInterface;
+
+public class SData_ArmyCardQualityShow_C : MonoEX.Singleton<SData_ArmyCardQualityShow_C>
+{
+    public void setData(LuaTable table1, LuaTable table2)
+    {
+        var head = new string[table1.Length];
+        SDataUtils.dealTable(table1, (Object o1, Object o2) =>
+        {
+            head[(int)(double)o1 - 1] = (string)o2;
+        });
+        SDataUtils.dealTable(table2, (Object o1, Object o2) =>
+        {
+            ArmyCardQualityShow_CInfo dif = new ArmyCardQualityShow_CInfo();
+            SDataUtils.dealTable((LuaTable)o2, (Object o11, Object o22) =>
+            {
+                switch (head[(int)(double)o11 - 1])
+				{
+					case "QualityLevel": dif.QualityLevel = (short)(double)o22; break;
+					case "CardLevel": dif.CardLevel = (short)(double)o22; break;
+					case "QualityIcon": dif.QualityIcon = (string)o22; break;
+					case "QualityColor": dif.QualityColor = (short)(double)o22; break;
+					case "PlusNum": dif.PlusNum = (short)(double)o22; break;
+                }
+            });
+            if (Data.ContainsKey(dif.QualityLevel))
+                MonoEX.Debug.Logout(MonoEX.LOG_TYPE.LT_ERROR, "重复的ID：" + dif.QualityLevel.ToString());
+            Data.Add(dif.QualityLevel, dif);
+        });
+    }
+
+    public ArmyCardQualityShow_CInfo GetDataOfID(int Id)
+    {
+        if (!Data.ContainsKey(Id)) throw new Exception(String.Format("ArmyCardQualityShow_CInfo::GetDataOfID() not found data  Id:{0}", Id));
+        return Data[Id];
+    }
+
+    internal Dictionary<int, ArmyCardQualityShow_CInfo> Data = new Dictionary<int, ArmyCardQualityShow_CInfo>();
+}
+
+
+public struct ArmyCardQualityShow_CInfo
+{
+	 /// <summary>
+	 ///1
+	 /// </summary>
+	public short QualityLevel;
+	 /// <summary>
+	 ///1
+	 /// </summary>
+	public short CardLevel;
+	 /// <summary>
+	 ///face_10
+	 /// </summary>
+	public string QualityIcon;
+	 /// <summary>
+	 ///1
+	 /// </summary>
+	public short QualityColor;
+	 /// <summary>
+	 ///0
+	 /// </summary>
+	public short PlusNum;
+}

@@ -1,0 +1,168 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+public class LuaQKUIQuadLibs
+{
+    class QKUIQuadInfo : ICoreComponentInfo
+    {
+        public Type type { get { return typeof(QKUIQuad); } }
+        public string name { get { return LuaQKUIQuadLibs.LIB_NAME; } }
+        public void newLuaObj(ILuaState lua, Component cmp)
+        {
+            LuaQKUIQuadLibs._wrap(lua, cmp as QKUIQuad);
+        }
+    }
+
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+    public const string LIB_NAME = "QKUIQuad";
+
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        { 
+            new NameFuncPair("SetWidgetSize",M_SetWidgetSize),
+            new NameFuncPair("SetColliderEnable",M_SetColliderEnable),
+            new NameFuncPair("SetShowColor",M_SetShowColor),
+            new NameFuncPair("SetOutLine",M_SetOutLine),
+            new NameFuncPair("SetColorID",M_SetColorID),
+            new NameFuncPair("PlayAction",M_PlayAction),
+            new NameFuncPair("ID",M_ID), 
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        { 
+            new NameFuncPair("OnClick",S_OnClick),
+            new NameFuncPair("GetProVinceID",S_GetProVinceID),
+            new NameFuncPair("SetProID",S_SetProVinceID),
+        };
+        //注册静态属性
+        NameValuePair[] static_property = new NameValuePair[]
+        {
+            new NameValuePair("Name",LIB_NAME),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define, static_property);
+
+        LuaGameObjectLib.RegComponent(new QKUIQuadInfo());
+        //绑定界面点击事件
+        QuadEvent.OnQuadClick += OnQuadClick;
+
+        return 1;
+    }
+    static QKEvent evt_QuadClick = new QKEvent();
+
+    //这个函数是给QuadEvent用的，用来接收QuadEvent的事件，并且调用lua里注册的回调函数
+    static void OnQuadClick(QKUIQuad result)
+    {
+        LuaQKUIQuadLibs._wrap(LuaRoot._Lua, result);
+        using (LuaValue_Any luaQuad = new LuaValue_Any(LuaRoot._Lua.L_Ref(LuaDef.LUA_REGISTRYINDEX)))
+        {
+            evt_QuadClick.Call(luaQuad);
+        }
+    }
+    //这个函数是给lua用的，用来添加click的回调函数
+    static int S_OnClick(ILuaState lua)
+    {
+        //in
+        //out QKEvent
+        LuaEventLib._wrap(lua, evt_QuadClick);
+        return 1;
+    }
+    static int S_GetProVinceID(ILuaState lua)
+    {
+        float x = (float)lua.ToNumber(1);
+        float y = (float)lua.ToNumber(2);
+        int id =  QKUIClickColor.Single.GetProVinceID(x, y);
+        lua.PushInteger(id);
+        return 1;
+    }
+    static int S_SetProVinceID(ILuaState lua)
+    {
+        int id = lua.L_CheckInteger(1);
+        QKUIClickColor.Single.SetProVinceID(id);
+        return 0;
+    }
+    public static void _wrap(ILuaState lua, QKUIQuad comp)
+    {
+        LuaOpenLibs._wrapComponent(lua, comp, LIB_NAME, m_ClassRegHelper);
+    }
+
+    public static QKUIQuad Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<QKUIQuad>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    static int M_SetWidgetSize(ILuaState lua)
+    {
+        //in self
+
+        var self = Lua2Obj(lua, 1);
+        int w = lua.L_CheckInteger(2);
+        int h = lua.L_CheckInteger(3);
+        self.SetSize(w,h);
+        return 0;
+    }
+    static int M_SetColliderEnable(ILuaState lua)
+    {
+        //in self
+        var self = Lua2Obj(lua, 1);
+        bool isEnable = lua.ToBoolean(2);
+        self.SetColliderEnable(isEnable);
+        return 0;
+    }
+    static int M_SetShowColor(ILuaState lua)
+    {
+        //in self
+        var self = Lua2Obj(lua, 1);
+        bool isEnable = lua.ToBoolean(2);
+        self.colorShow = isEnable ? 1 : 0;
+        return 0;
+    }
+    static int M_SetOutLine(ILuaState lua)
+    {
+        //in self
+        var self = Lua2Obj(lua, 1);
+        bool isEnable = lua.ToBoolean(2);
+        self.isShowLine = isEnable;
+        return 0;
+    }
+    static int M_SetColorID(ILuaState lua)
+    {
+        //in self
+        var self = Lua2Obj(lua, 1);
+        int ID = lua.L_CheckInteger(2);
+        self.SetColorID(ID);
+        return 0;
+    }
+    static int M_ID(ILuaState lua)
+    {
+        //in self
+        var self = Lua2Obj(lua, 1);
+        lua.PushInteger(self.m_ID);
+        return 1;
+    }
+    static int M_PlayAction(ILuaState lua)
+    {
+        var self = Lua2Obj(lua, 1);
+        self.PlayAction();
+        return 0;
+    }
+}
+

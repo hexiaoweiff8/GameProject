@@ -1,0 +1,170 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+class LuaCMUIAttributePageLib
+{
+    class CMUIAttributePageInfo : ICoreComponentInfo
+    {
+        public Type type { get { return typeof(UIAttributePage); } }
+        public string name { get { return LuaCMUIAttributePageLib.LIB_NAME; } }
+        public void newLuaObj(ILuaState lua, Component cmp)
+        {
+            LuaCMUIAttributePageLib._wrap(lua, cmp as UIAttributePage);
+        }
+    }
+
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    // static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "CMUIAttributePage";
+
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {             
+            new NameFuncPair("SetActivity",M_SetActivity),
+            new NameFuncPair("SetHide",M_SetHide),
+            new NameFuncPair("SetActivityButton",M_SetActivityButton),
+            new NameFuncPair("GetActivityButton",M_GetActivityButton),
+            new NameFuncPair("SetInactiveButton",M_SetInactiveButton),
+            new NameFuncPair("GetInactiveButton",M_GetInactiveButton),
+            new NameFuncPair("SetPage",M_SetPage),
+            new NameFuncPair("GetPage",M_GetPage),
+            new NameFuncPair("SetTabGrop",M_SetTabGrop),
+            new NameFuncPair("GetTabGrop",M_GetTabGrop),
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+           
+            
+        };
+        //注册静态属性
+        NameValuePair[] static_property = new NameValuePair[]
+        {
+            new NameValuePair("Name",LIB_NAME),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define, static_property);
+
+        LuaGameObjectLib.RegComponent(new CMUIAttributePageInfo());
+
+        return 1;
+    }
+
+    public static void _wrap(ILuaState lua, UIAttributePage comp)
+    {
+        LuaOpenLibs._wrapComponent(lua, comp, LIB_NAME, m_ClassRegHelper);
+    }
+
+    public static UIAttributePage Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<UIAttributePage>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    static int M_GetActivityButton(ILuaState lua)
+    {
+        //in self
+        //out GameObject
+        var self = Lua2Obj(lua, 1);
+        LuaGameObjectLib._wrap(lua, self.ActivityButton);
+        return 1;
+    }
+
+    static int M_SetActivityButton(ILuaState lua)
+    {
+        //in self,GameObject
+        //out nil
+        var self = Lua2Obj(lua, 1);
+        var gameObj = LuaGameObjectLib.Lua2Obj(lua, 2);
+        self.ActivityButton = gameObj;
+        return 0;
+    }
+
+    static int M_GetInactiveButton(ILuaState lua)
+    {
+        //in self
+        //out GameObject
+        var self = Lua2Obj(lua, 1);
+        LuaGameObjectLib._wrap(lua, self.InactiveButton);
+        return 1;
+    }
+    static int M_SetInactiveButton(ILuaState lua)
+    {
+        //in self,GameObject
+        //out nil
+        var self = Lua2Obj(lua, 1);
+        var gameObj = LuaGameObjectLib.Lua2Obj(lua, 2);
+        self.InactiveButton = gameObj;
+        return 0;
+    }
+    static int M_GetPage(ILuaState lua)
+    {
+        //in self
+        //out GameObject
+        var self = Lua2Obj(lua, 1);
+        LuaGameObjectLib._wrap(lua, self.Page);
+        return 1;
+    }
+    static int M_SetPage(ILuaState lua)
+    {
+        //in self,GameObject
+        //out nil
+        var self = Lua2Obj(lua, 1);
+        var gameObj = LuaGameObjectLib.Lua2Obj(lua, 2);
+        self.Page = gameObj;
+        return 0;
+    }
+    static int M_GetTabGrop(ILuaState lua)
+    {
+        //in self
+        //out int
+        var self = Lua2Obj(lua, 1);
+        lua.PushInteger(self.TabGrop);
+        return 1;
+    }
+    static int M_SetTabGrop(ILuaState lua)
+    {
+        //in self,int
+        //out nil
+        var self = Lua2Obj(lua, 1);
+        self.TabGrop = lua.L_CheckInteger(2);
+        return 0;
+    }
+
+    static int M_SetActivity(ILuaState lua)
+    {
+        //in self
+        //out nil
+        UIAttributePage self = Lua2Obj(lua, 1);
+        self.SetActivity();
+
+        return 0;
+    }
+
+    static int M_SetHide(ILuaState lua)
+    {
+        //in self,isHide
+        UIAttributePage self = Lua2Obj(lua, 1);
+        bool isHide = lua.ToBoolean(2);
+        self.SetHide(isHide);
+        return 0;
+    }
+}
+ 

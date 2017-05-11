@@ -1,0 +1,109 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+
+class LuaI32BoolValueLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+    public const string LIB_NAME = "I32BoolValue";
+
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            new NameFuncPair("SetI32Value",M_SetI32Value),
+            new NameFuncPair("GetI32Value",M_GetI32Value),
+            new NameFuncPair("GetBool",M_GetBool),
+            new NameFuncPair("SetBool",M_SetBool),
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair("new",S_new),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+    public static void _wrap(ILuaState lua, I32BoolValue obj)
+    {
+        LuaOpenLibs._wrap(m_ClassRegHelper, lua, obj);
+    }
+
+    public static I32BoolValue Lua2Obj(ILuaState lua, int index)
+    {
+        return LuaOpenLibs.Lua2Obj<I32BoolValue>(lua, index);
+    }
+
+    
+
+    static int S_new(ILuaState lua)
+    {
+        //in value
+        //out I32BoolValue
+
+        uint v = lua.GetTop() >= 1 ? lua.L_CheckUnsigned(1) : 0;
+        _wrap(lua, new I32BoolValue(v));
+        return 1;
+    }
+
+    static int M_SetBool(ILuaState lua)
+    {
+        //in self,pos,v
+        //out
+
+        I32BoolValue self = Lua2Obj(lua, 1);
+        short pos = (short)lua.L_CheckInteger(2);
+        bool v = lua.ToBoolean(3);
+
+        self.SetBool(pos, v);
+        return 0;
+    }
+
+    static int M_GetBool(ILuaState lua)
+    {
+        //in self,pos
+        //out v
+
+        I32BoolValue self = Lua2Obj(lua, 1);
+        short pos = (short)lua.L_CheckInteger(2);
+        lua.PushBoolean(self.GetBool(pos));
+        return 1;
+    }
+
+    static int M_GetI32Value(ILuaState lua)
+    {
+        //in self
+        //out v
+
+        I32BoolValue self = Lua2Obj(lua, 1);
+        lua.PushUnsigned(self.I32Value);
+        return 1;
+    }
+
+    static int M_SetI32Value(ILuaState lua)
+    {
+        //in self,v
+        //out
+
+        I32BoolValue self = Lua2Obj(lua, 1);
+        uint v =  lua.L_CheckUnsigned(2);
+        self.I32Value = v;
+        return 0;
+    } 
+} 

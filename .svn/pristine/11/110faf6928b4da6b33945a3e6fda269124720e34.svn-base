@@ -1,0 +1,243 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+ 
+class LuaSystemInfoLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper(); 
+
+
+    public const string LIB_NAME = "SystemInfo";
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+         };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair("deviceUniqueIdentifier",S_deviceUniqueIdentifier), 
+            new NameFuncPair("systemMemorySize",S_systemMemorySize),
+            new NameFuncPair("supportsVibration",S_supportsVibration ),
+            new NameFuncPair("supportsStencil",S_supportsStencil ),
+            new NameFuncPair("supportsSparseTextures",S_supportsSparseTextures ),
+            new NameFuncPair("supportsShadows",S_supportsShadows ),
+            new NameFuncPair("supportsRenderToCubemap",S_supportsRenderToCubemap ),
+            new NameFuncPair("supportsRenderTextures",S_supportsRenderTextures ),
+            new NameFuncPair("supportsRawShadowDepthSampling",S_supportsRawShadowDepthSampling ),
+            new NameFuncPair("supportsLocationService",S_supportsLocationService ),
+            new NameFuncPair("supportsInstancing",S_supportsInstancing ),
+            new NameFuncPair("supportsImageEffects",S_supportsImageEffects ),
+            new NameFuncPair("supportsGyroscope",S_supportsGyroscope ),
+            new NameFuncPair("supportsComputeShaders",S_supportsComputeShaders  ),
+            new NameFuncPair("supportsAccelerometer",S_supportsAccelerometer ),
+            new NameFuncPair("supports3DTextures",S_supports3DTextures ),
+            new NameFuncPair("supportedRenderTargetCount",S_supportedRenderTargetCount ),
+            new NameFuncPair("processorType",S_processorType ),
+            new NameFuncPair("processorFrequency",S_processorFrequency ),
+            new NameFuncPair("processorCount",S_processorCount ),
+            new NameFuncPair("operatingSystem",S_operatingSystem ),
+            new NameFuncPair("maxTextureSize",S_maxTextureSize ),
+            new NameFuncPair("graphicsShaderLevel",S_graphicsShaderLevel ),
+            new NameFuncPair("graphicsMultiThreaded",S_graphicsMultiThreaded ),
+            new NameFuncPair("graphicsMemorySize",S_graphicsMemorySize ),
+            new NameFuncPair("graphicsDeviceVersion",S_graphicsDeviceVersion ),
+            new NameFuncPair("graphicsDeviceVendorID",S_graphicsDeviceVendorID ),
+            new NameFuncPair("graphicsDeviceVendor",S_graphicsDeviceVendor ),
+            new NameFuncPair("graphicsDeviceName",S_graphicsDeviceName ),
+            new NameFuncPair("graphicsDeviceID",S_graphicsDeviceID ),
+            new NameFuncPair("deviceName",S_deviceName ),
+            new NameFuncPair("deviceModel",S_deviceModel ), 
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+    static int S_deviceUniqueIdentifier(ILuaState lua)
+    {
+        //in 
+        //out string 
+        lua.PushString(SystemInfo.deviceUniqueIdentifier);
+        
+        return 1;
+    }
+
+
+
+    static int S_deviceModel(ILuaState lua) {
+           //out string
+          lua.PushString( SystemInfo.deviceModel);
+          return 1;
+    } 
+    static int S_deviceName(ILuaState lua) {
+           //out string
+          lua.PushString( SystemInfo.deviceName);
+          return 1;
+    } 
+   // static int S_deviceType(ILuaState lua) { }DeviceType  { get; }
+
+    static int S_graphicsDeviceID(ILuaState lua) {
+           //out int
+          lua.PushInteger( SystemInfo.graphicsDeviceID);
+          return 1;
+    } 
+    static int S_graphicsDeviceName(ILuaState lua) {
+           //out string
+          lua.PushString( SystemInfo.graphicsDeviceName);
+          return 1;
+    } 
+ //   static int S_graphicsDeviceType(ILuaState lua) { }GraphicsDeviceType  { get; }
+    static int S_graphicsDeviceVendor(ILuaState lua) {
+           //out string
+          lua.PushString( SystemInfo.graphicsDeviceVendor);
+          return 1;
+    } 
+    static int S_graphicsDeviceVendorID(ILuaState lua) {
+           //out int
+          lua.PushInteger( SystemInfo.graphicsDeviceVendorID);
+          return 1;
+    } 
+    static int S_graphicsDeviceVersion(ILuaState lua) {
+           //out string
+          lua.PushString( SystemInfo.graphicsDeviceVersion);
+          return 1;
+    } 
+    static int S_graphicsMemorySize(ILuaState lua) {
+           //out int
+          lua.PushInteger( SystemInfo.graphicsMemorySize);
+          return 1;
+    }
+    static int S_graphicsMultiThreaded(ILuaState lua)
+    {
+        //out bool
+        lua.PushBoolean(SystemInfo.graphicsMultiThreaded);
+        return 1;
+    } 
+     
+    static int S_graphicsShaderLevel(ILuaState lua) {
+           //out int
+          lua.PushInteger( SystemInfo.graphicsShaderLevel);
+          return 1;
+    } 
+    static int S_maxTextureSize(ILuaState lua)  {
+           //out int
+          lua.PushInteger( SystemInfo.maxTextureSize);
+          return 1;
+    } 
+   // static int S_npotSupport(ILuaState lua) { }NPOTSupport  { get; }
+    static int S_operatingSystem(ILuaState lua)  {
+           //out string
+          lua.PushString( SystemInfo.operatingSystem);
+          return 1;
+    } 
+    static int S_processorCount(ILuaState lua)  {
+           //out int
+          lua.PushInteger( SystemInfo.processorCount);
+          return 1;
+    } 
+    static int S_processorFrequency(ILuaState lua) {
+           //out int
+          lua.PushInteger( SystemInfo.processorFrequency);
+          return 1;
+    } 
+    static int S_processorType(ILuaState lua) {
+           //out string
+          lua.PushString( SystemInfo.processorType);
+          return 1;
+    } 
+    static int S_supportedRenderTargetCount(ILuaState lua)  {
+           //out int
+          lua.PushInteger( SystemInfo.supportedRenderTargetCount);
+          return 1;
+    } 
+    static int S_supports3DTextures(ILuaState lua){
+           //out bool
+          lua.PushBoolean( SystemInfo.supports3DTextures);
+          return 1;
+    } 
+    static int S_supportsAccelerometer(ILuaState lua) {
+           //out bool
+          lua.PushBoolean( SystemInfo.supportsAccelerometer);
+          return 1;
+    } 
+    static int S_supportsComputeShaders(ILuaState lua) {
+           //out bool
+          lua.PushBoolean( SystemInfo.supportsComputeShaders);
+          return 1;
+    } 
+    static int S_supportsGyroscope(ILuaState lua) {
+           //out bool
+          lua.PushBoolean( SystemInfo.supportsGyroscope);
+          return 1;
+    } 
+    static int S_supportsImageEffects(ILuaState lua){
+           //out bool
+          lua.PushBoolean( SystemInfo.supportsImageEffects);
+          return 1;
+    } 
+    static int S_supportsInstancing(ILuaState lua) {
+           //out bool
+          lua.PushBoolean( SystemInfo.supportsInstancing);
+          return 1;
+    } 
+    static int S_supportsLocationService(ILuaState lua) {
+           //out bool
+          lua.PushBoolean( SystemInfo.supportsLocationService);
+          return 1;
+    } 
+    static int S_supportsRawShadowDepthSampling(ILuaState lua){
+           //out bool
+          lua.PushBoolean( SystemInfo.supportsRawShadowDepthSampling);
+          return 1;
+    } 
+    static int S_supportsRenderTextures(ILuaState lua) {
+           //out bool
+          lua.PushBoolean( SystemInfo.supportsRenderTextures);
+          return 1;
+    } 
+    static int S_supportsRenderToCubemap(ILuaState lua){
+           //out bool
+          lua.PushBoolean( SystemInfo.supportsRenderToCubemap);
+          return 1;
+    } 
+    static int S_supportsShadows(ILuaState lua) {
+           //out bool
+          lua.PushBoolean( SystemInfo.supportsShadows);
+          return 1;
+    } 
+    static int S_supportsSparseTextures(ILuaState lua) {
+           //out bool
+          lua.PushBoolean( SystemInfo.supportsSparseTextures);
+          return 1;
+    } 
+    static int S_supportsStencil(ILuaState lua)  {
+           //out int
+          lua.PushInteger( SystemInfo.supportsStencil);
+          return 1;
+    }  
+    static int S_supportsVibration(ILuaState lua){
+           //out bool
+          lua.PushBoolean( SystemInfo.supportsVibration);
+          return 1;
+    } 
+    static int S_systemMemorySize(ILuaState lua) {
+           //out int
+          lua.PushInteger( SystemInfo.systemMemorySize);
+          return 1;
+    } 
+} 

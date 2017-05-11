@@ -1,0 +1,45 @@
+using System;
+using System.Collections.Generic;
+using LuaInterface;
+
+public class SData_ArmyCardQualityCost_C : MonoEX.Singleton<SData_ArmyCardQualityCost_C>
+{
+    public void setData(LuaTable table1, LuaTable table2)
+    {
+        var head = new string[table1.Length];
+        SDataUtils.dealTable(table1, (Object o1, Object o2) =>
+        {
+            head[(int)(double)o1 - 1] = (string)o2;
+        });
+        SDataUtils.dealTable(table2, (Object o1, Object o2) =>
+        {
+            ArmyCardQualityCost_CInfo dif = new ArmyCardQualityCost_CInfo();
+            SDataUtils.dealTable((LuaTable)o2, (Object o11, Object o22) =>
+            {
+                switch (head[(int)(double)o11 - 1])
+				{
+					case "QualityLevel": dif.QualityLevel = (short)(double)o22; break;
+					case "Gold": dif.Gold = (int)(double)o22; break;
+                }
+            });
+            if (Data.ContainsKey(dif.QualityLevel))
+                MonoEX.Debug.Logout(MonoEX.LOG_TYPE.LT_ERROR, "重复的ID：" + dif.QualityLevel.ToString());
+            Data.Add(dif.QualityLevel, dif);
+        });
+    }
+
+    public ArmyCardQualityCost_CInfo GetDataOfID(int Id)
+    {
+        if (!Data.ContainsKey(Id)) throw new Exception(String.Format("ArmyCardQualityCost_CInfo::GetDataOfID() not found data  Id:{0}", Id));
+        return Data[Id];
+    }
+
+    internal Dictionary<int, ArmyCardQualityCost_CInfo> Data = new Dictionary<int, ArmyCardQualityCost_CInfo>();
+}
+
+
+public struct ArmyCardQualityCost_CInfo
+{
+	public short QualityLevel;
+	public int Gold;
+}

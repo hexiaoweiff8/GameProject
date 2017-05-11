@@ -1,0 +1,69 @@
+
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+
+class LuaLogicOpenLibs
+{
+
+    public static void OpenLibs(ILuaState lua)
+    {
+        NameFuncPair[] define = new NameFuncPair[]
+        {
+            new NameFuncPair(LuaMsgBoxLib.LIB_NAME, LuaMsgBoxLib.OpenLib),
+            new NameFuncPair(LuaLogicInitLibs.LIB_NAME, LuaLogicInitLibs.OpenLib),
+
+            new NameFuncPair(LuaGamePlatformLogicLib.LIB_NAME, LuaGamePlatformLogicLib.OpenLib),
+            //new NameFuncPair(LuaBuffMathInfoLibs.LIB_NAME, LuaBuffMathInfoLibs.OpenLib),
+            //new NameFuncPair(LuaTexiaoInfoLibs.LIB_NAME, LuaTexiaoInfoLibs.OpenLib),
+            //new NameFuncPair(LuaSData_TexiaoLibs.LIB_NAME, LuaSData_TexiaoLibs.OpenLib),
+            //new NameFuncPair(LuaSkillEffectLibs.LIB_NAME, LuaSkillEffectLibs.OpenLib),
+            //new NameFuncPair(LuaSkillInfoLibs.LIB_NAME, LuaSkillInfoLibs.OpenLib),
+            //new NameFuncPair(LuaSData_SkillLibs.LIB_NAME, LuaSData_SkillLibs.OpenLib),
+            new NameFuncPair(LuaSData_Id2StringLibs.LIB_NAME, LuaSData_Id2StringLibs.OpenLib),
+            //new NameFuncPair(LuaEquipDataInfoLibs.LIB_NAME, LuaEquipDataInfoLibs.OpenLib),
+            //new NameFuncPair(LuaSData_EquipDataLibs.LIB_NAME, LuaSData_EquipDataLibs.OpenLib),
+            //new NameFuncPair(LuaAvatarActInfoLibs.LIB_NAME, LuaAvatarActInfoLibs.OpenLib),
+            //new NameFuncPair(LuaSData_AvatarActLibs.LIB_NAME, LuaSData_AvatarActLibs.OpenLib),
+            //new NameFuncPair(LuaArmyInfoLibs.LIB_NAME, LuaArmyInfoLibs.OpenLib),
+            //new NameFuncPair(LuaSData_ArmyLibs.LIB_NAME, LuaSData_ArmyLibs.OpenLib),
+
+            //new NameFuncPair(LuaHeroInfoLibs.LIB_NAME, LuaHeroInfoLibs.OpenLib),
+            //new NameFuncPair(LuaSData_HeroLibs.LIB_NAME, LuaSData_HeroLibs.OpenLib),
+            //new NameFuncPair(LuaSData_ZhenfaLibs.LIB_NAME, LuaSData_ZhenfaLibs.OpenLib),
+            //new NameFuncPair(LuaZhenfaInfoLibs.LIB_NAME, LuaZhenfaInfoLibs.OpenLib),
+            //new NameFuncPair(LuaPoptipLib.LIB_NAME, LuaPoptipLib.OpenLib),
+            //new NameFuncPair(LuaCMUIHeroBanshenLib.LIB_NAME, LuaCMUIHeroBanshenLib.OpenLib),
+            //new NameFuncPair(LuaCMUISoldiersBanshenLib.LIB_NAME, LuaCMUISoldiersBanshenLib.OpenLib),
+            //new NameFuncPair(LuaCMUIZhenFaViewLib.LIB_NAME, LuaCMUIZhenFaViewLib.OpenLib),
+            //new NameFuncPair(LuaCMUIScrollPointLib.LIB_NAME, LuaCMUIScrollPointLib.OpenLib),
+            //new NameFuncPair(LuaCMUIAlphaTipLib.LIB_NAME, LuaCMUIAlphaTipLib.OpenLib),
+            //new NameFuncPair(LuaCMUIAudioFxLibs.LIB_NAME, LuaCMUIAudioFxLibs.OpenLib),
+
+            //new NameFuncPair(LuaFightParameterLibs.LIB_NAME, LuaFightParameterLibs.OpenLib),
+            //new NameFuncPair(LuaEquipLibs.LIB_NAME, LuaEquipLibs.OpenLib),
+            //new NameFuncPair(LuaArmySquareInfoLibs.LIB_NAME, LuaArmySquareInfoLibs.OpenLib),
+            new NameFuncPair(LuaBattlefieldLibs.LIB_NAME, LuaBattlefieldLibs.OpenLib),
+
+            //new NameFuncPair(LuaFightResultLibs.LIB_NAME, LuaFightResultLibs.OpenLib),
+            //new NameFuncPair(LuaHeroFightResultLibs.LIB_NAME, LuaHeroFightResultLibs.OpenLib),
+            new NameFuncPair(LuaQKGameSettingLib.LIB_NAME, LuaQKGameSettingLib.OpenLib),
+            new NameFuncPair(LuaAAttrLibs.LIB_NAME, LuaAAttrLibs.OpenLib),
+            new NameFuncPair(LuaQKUIQuadLibs.LIB_NAME, LuaQKUIQuadLibs.OpenLib),
+
+            new NameFuncPair(LuaUserDatasLib.LIB_NAME, LuaUserDatasLib.OpenLib),
+
+            new NameFuncPair(LuaCHttpRequestLib.LIB_NAME, LuaCHttpRequestLib.OpenLib),
+            new NameFuncPair(LuaGameConnLib.LIB_NAME, LuaGameConnLib.OpenLib),
+        };
+
+        for (var i = 0; i < define.Length; ++i)
+        {
+            //通过L_RequireF 引用静态c#库
+            lua.L_RequireF(define[i].Name, define[i].Func, true);
+            lua.Pop(1);
+        }
+    }
+}

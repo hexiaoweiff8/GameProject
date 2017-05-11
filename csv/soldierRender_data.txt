@@ -1,0 +1,8 @@
+20170420173537
+ArmyID I32
+CmType I16
+ColorMat I16
+FlagColorIdx I16
+MeshPackName S
+TexturePackName S
+IsHero I16

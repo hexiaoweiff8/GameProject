@@ -1,0 +1,99 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+
+
+/// <summary>
+/// 士兵半身像
+/// </summary>
+[AddComponentMenu("QK/UI/UISoldiersBanshen")]
+[RequireComponent(typeof(UITexture))]
+class UISoldiersBanshen : MonoBehaviour
+{ 
+    public void Awake()
+    {
+        m_Texture = GetComponent<UITexture>();
+    }
+
+    void OnDestroy()
+    {
+        ReleasePack();
+    }
+
+    //士兵ID
+    public void SetIcon(int armyID,bool isZhuansheng)
+    {
+        m_SetID = armyID;
+        m_SetIsZhuanshen = isZhuansheng;
+        if(!m_coDoing)
+        {
+            m_coDoing = true;
+
+            //用monoex协程，组件被删了携程也会继续执行，防止资源装到一半时删除本组件，导致资源包一直占内存
+            MonoEX.CoroutineManage.Single.StartCoroutine(coSetHeroID());
+        } 
+    }
+
+    IEnumerator coSetHeroID()
+    {
+        while (m_SetID >0)
+        {
+            int armyid = m_SetID;
+            bool isZhuanshen = m_SetIsZhuanshen;
+            m_SetID = -1;
+             
+          
+
+            //先卸掉原来的资源
+            ReleasePack();
+
+            bool loading = true;
+
+            //装入新的资源包
+            string newPackName = SData_Army.Single.Get(armyid).SoldierBanshen;
+           
+            PacketLoader loader = new PacketLoader();
+            List<string> packNames = new List<string>(); packNames.Add(newPackName);
+            loader.Start(
+                PackType.Res,
+                packNames,
+                (isdone)=>{
+                    loading = false;
+                    ResourceRefManage.Single.AddRef(newPackName);//包引用数增加
+                    m_ArmyID = armyid;//设置当前士兵id
+
+                    //从包中取出纹理
+                    var pack = PacketManage.Single.GetPacket(newPackName);
+                    var texture = pack.Load(newPackName + (isZhuanshen ? "_2" : "_1")) as Texture;
+
+                    //设置主纹理
+                    m_Texture.mainTexture = texture;
+                }
+            );
+
+            while (loading) yield return null;//等待资源装载完成
+        }
+
+        if(gameObject==null)//组件已经被删除 
+            ReleasePack(); 
+
+        m_coDoing = false;
+    }
+
+    void ReleasePack()
+    {
+        if (m_ArmyID <= 0) return;
+        ResourceRefManage.Single.SubRef(SData_Army.Single.Get(m_ArmyID).SoldierBanshen);
+        m_ArmyID = 0;
+    }
+     
+    int m_SetID = -1;
+    bool m_SetIsZhuanshen = false;
+
+    bool m_coDoing = false;
+    UITexture m_Texture;
+    int m_ArmyID = 0;
+} 

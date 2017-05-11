@@ -1,0 +1,21 @@
+20170420173537
+ArmyID I32
+ArrayID I16
+Name S
+TrainCost I16
+ArmyType I16
+Attack F
+Clipsize I16
+AttackRate F
+ReloadTime F
+HP F
+Armor F
+AntiArmor F
+AntiCrit F
+Crit F
+Dodge F
+Hit F
+AttackRange F
+MoveSpeed F
+ModelID S
+CardImageID S

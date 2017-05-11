@@ -1,0 +1,100 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+
+
+class LuaCMBillboardLib
+{
+    class CMBillboardInfo : ICoreComponentInfo
+    {
+        public Type type { get { return typeof(CMBillboard); } }
+        public string name { get { return LuaCMBillboardLib.LIB_NAME; } }
+        public void newLuaObj(ILuaState lua, Component cmp)
+        {
+            LuaCMBillboardLib._wrap(lua, cmp as CMBillboard);
+        }
+    }
+
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+   // static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "CMBillboard";
+
+   
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            new NameFuncPair("SetCamera",M_SetCamera),
+            new NameFuncPair("SetNormal",M_SetNormal),
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            
+        };
+
+        //注册静态属性
+        NameValuePair[] static_property = new NameValuePair[]
+        {
+            new NameValuePair("Name",LIB_NAME),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define,static_property);
+
+        LuaGameObjectLib.RegComponent(new CMBillboardInfo());
+        return 1;
+    }
+
+
+    public static void _wrap(ILuaState lua, CMBillboard comp)
+    {
+        LuaOpenLibs._wrapComponent(lua, comp, LIB_NAME, m_ClassRegHelper);
+    }
+
+    public static CMBillboard Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<CMBillboard>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    
+    static int M_SetCamera(ILuaState lua)
+    {
+        //in self,CMCamera
+        //out void
+        
+        CMBillboard self = Lua2Obj(lua, 1); 
+        Camera camera = LuaCMCameraLib.Lua2Obj(lua, 2);
+        self.EyeCamera = camera; 
+
+        return 0;
+    }
+   
+    static int M_SetNormal(ILuaState lua)
+    {
+        //in self,dir
+        //out void
+        CMBillboard self = Lua2Obj(lua, 1);
+        Vector3 dir; LuaVector3Lib.Lua2Obj(lua, 2, out dir);
+        self.Normal = dir;
+        return 0;
+    }
+
+}
+ 

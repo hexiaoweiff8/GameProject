@@ -1,0 +1,81 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+using UniLua;
+
+class LuaCMUITable
+{
+    class CMUITableInfo : ICoreComponentInfo
+    {
+        public Type type { get { return typeof(UITable); } }
+        public string name { get { return LuaCMUITable.LIB_NAME; } }
+        public void newLuaObj(ILuaState lua, Component cmp)
+        {
+            LuaCMUITable._wrap(lua, cmp as UITable);
+        }
+    }
+
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    //static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "CMUITable";
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        { 
+            new NameFuncPair("Reposition",M_Reposition),
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+           
+            
+        };
+        //注册静态属性
+        NameValuePair[] static_property = new NameValuePair[]
+        {
+            new NameValuePair("Name",LIB_NAME),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define, static_property);
+
+        LuaGameObjectLib.RegComponent(new CMUITableInfo());
+
+        return 1;
+    }
+
+    public static void _wrap(ILuaState lua, UITable comp)
+    {
+        LuaOpenLibs._wrapComponent(lua, comp, LIB_NAME, m_ClassRegHelper);
+    }
+
+    public static UITable Lua2Obj(ILuaState lua, int index)
+    {
+       LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<UITable>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    static int M_Reposition(ILuaState lua)
+    {
+        //in self
+        //out nil
+        UITable self = Lua2Obj(lua, 1);
+        //self.repositionNow = true;
+        self.Reposition();
+        return 0;
+    }
+
+}

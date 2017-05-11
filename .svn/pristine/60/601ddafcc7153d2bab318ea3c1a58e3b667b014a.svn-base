@@ -1,0 +1,65 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class VOBase
+{
+    private int _voType;
+    private int _totalHP;
+    private int _currentHP;
+    private int _entityID;
+    private string _name;
+    private ObjectID _objID;
+    /// <summary>
+    /// 存储在vo类身上的ObjectID 通过它 把数据和显示对象关联
+    /// </summary>
+    public ObjectID ObjID
+    {
+        get { return _objID; }
+        set { _objID = value; }
+    }
+    
+    /// <summary>
+    /// 模版中存储的名字 
+    /// </summary>
+    public string Name
+    {
+        get { return _name; }
+        set { _name = value; }
+    }
+
+    /// <summary>
+    /// 数据类型 1.普通单位 2.机甲单位 3.建筑物  
+    /// </summary>
+    public int VOType
+    {
+        get { return _voType; }
+        set { _voType = value; }
+    }
+    /// <summary>
+    /// 总血量所有可被攻击的对象都有总血量和血量属性
+    /// </summary>
+    public int TotalHp
+    {
+        get { return _totalHP; }
+        set { _totalHP = value; }
+    }
+    /// <summary>
+    /// 当前实际血量[0,TotalHp]
+    /// </summary>
+    public int CurrentHP
+    {
+        get { return _currentHP; }
+        set { _currentHP = value; }
+    }
+
+    /// <summary>
+    /// 对象的实体ID 唯一id 
+    /// </summary>
+    public int EntityID
+    {
+        get { return _entityID; }
+        set { _entityID = value; }
+    }
+    //----------------------------字段声明都在上半部分---------------------------------
+
+}

@@ -1,0 +1,50 @@
+local class = require("common/middleclass")
+local item = class("item")
+
+-- 物品类型
+ItemType = {
+    -- 武器
+    "Weapon",
+    -- 头盔
+    "Casque",
+    -- 衣服
+    "Clothing",
+    -- 戒指
+    "Ring",
+    -- 鞋子
+    "Shoes",
+    -- 裤子
+    "Trousers",
+    -- 药剂
+    "Potion",
+}
+
+
+-- 构造函数
+function item:initialize(name, id, nameCN, desc, max_num, _type, price)
+    self.itemName = name
+    -- 物品名称
+    self.itemID = id
+    -- 物品ID
+    self.itemNameCN = nameCN
+    -- 物品中文名
+    self.itemDesc = desc
+    -- 物品说明
+    self.itemIcon = GameResFactory.Instance():GetGoFromPrefab(name)
+    -- 物品图标
+    self.itemMaxNum = max_num
+    -- 物品数量
+    self.itemType = _type
+    -- 物品数量上
+    self.itemPrice = price
+    -- 物品类型
+    self.itemNum = 1
+    -- 物品价格
+end
+
+-- 功能
+function item:gongneng()
+    print("您使用了" .. itemNameCN)
+end
+
+return item

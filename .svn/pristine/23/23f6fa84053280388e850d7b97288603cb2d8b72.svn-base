@@ -1,0 +1,82 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+using UniLua;
+public class LuaShaderLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    
+
+    public const string LIB_NAME = "Shader";
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        { 
+            new NameFuncPair("Name",M_Name), 
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+                new NameFuncPair("Find",S_Find), 
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+    //每次获取对象时，重新产生包装类
+    public static void _wrap(ILuaState lua, Shader obj)
+    {
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,obj),
+        };
+        m_ClassRegHelper.InstanceLuaClass(lua, propertys);
+    }
+
+    public static Shader Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+        return LuaMemberHelper.GetObject<Shader>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+     
+
+    static int S_Find(ILuaState lua)
+    {
+        //in name
+        //out void
+
+        var shader = Shader.Find(lua.L_CheckString(1));
+        if (shader == null) 
+            lua.PushNil();
+        else
+            _wrap(lua, shader);
+
+        return 1;
+    }
+
+    static int M_Name(ILuaState lua)
+    {
+        //in self
+        //out string
+        var shader = Lua2Obj(lua,1);
+
+        lua.PushString( shader.name);
+
+        return 1;
+    }
+} 
+

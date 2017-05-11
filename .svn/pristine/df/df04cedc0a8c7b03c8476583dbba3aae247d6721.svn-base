@@ -1,0 +1,114 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+using UniLua;
+ 
+class LuaPacketLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+   // static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "Packet";
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            new NameFuncPair("Get",M_Get),
+            new NameFuncPair("GetText",M_GetText),
+            new NameFuncPair("GetTexture",M_GetTexture),            
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+           
+            
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+    public static void _wrap(ILuaState lua, PacketRouting obj)
+    {
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,obj),
+        };
+
+        m_ClassRegHelper.InstanceLuaClass(lua, propertys);
+    }
+
+    public static PacketRouting Lua2Obj(ILuaState lua, int index)
+    {
+       LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<PacketRouting>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    static int M_Get(ILuaState lua)
+    {
+        //in self,resName
+        //out proObj
+        PacketRouting self = Lua2Obj(lua, 1);
+        String resName = lua.L_CheckString(2);
+        
+        lua.PushLightUserData(
+            self.Load(resName)
+            );
+        return 1;
+    }
+
+    static int M_GetText(ILuaState lua)
+    {
+        //in self,resName
+        //out proObj
+        PacketRouting self = Lua2Obj(lua, 1);
+        String resName = lua.L_CheckString(2);
+
+        object obj = self.Load(resName);
+        if(obj == null)
+        {
+            lua.PushNil();
+        }
+        else
+        {
+            TextAsset textAsset = obj as TextAsset;
+            if (textAsset == null)
+                lua.PushNil();
+            else
+            {
+                string text = FileSystem.NetFileBuff2String(textAsset.bytes);
+                lua.PushString(text);
+            }
+        }
+           
+        return 1;
+    }
+
+    static int M_GetTexture(ILuaState lua)
+    {
+        //in self,resName
+        //out proObj
+        PacketRouting self = Lua2Obj(lua, 1);
+        String resName = lua.L_CheckString(2);
+
+        Texture texture = self.Load(resName) as Texture;
+        LuaTextureLib._wrap(lua, texture);
+
+        return 1;
+    }
+}
+ 

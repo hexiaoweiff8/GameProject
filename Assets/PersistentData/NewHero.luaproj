@@ -1,0 +1,232 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>E439935D-B2A2-46AE-856D-2AA408428F33</ProjectGuid>
+    <!--$guid1$-->
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>
+    </StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="pack_script\" />
+    <Folder Include="pack_script\pk_lualibs\" />
+    <Folder Include="pack_script\pk_lualibs\LuaLibs\" />
+    <Folder Include="pack_script\pk_script\" />
+    <Folder Include="pack_script\pk_script\login\" />
+    <Folder Include="pack_script\pk_script\network\" />
+    <Folder Include="pack_script\pk_script\init\" />
+    <Folder Include="pack_script\pk_script\dydata\" />
+    <Folder Include="pack_script\pk_script\littleFunction\" />
+    <Folder Include="pack_script\pk_script\component\" />
+    <Folder Include="pack_script\pk_script\scene\" />
+    <Folder Include="pack_script\pk_script\sound\" />
+    <Folder Include="pack_script\pk_script\sdata\" />
+    <Folder Include="pack_script\pk_script\wnd\" />
+    <Folder Include="pack_script\pk_tabs\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="pack_script\pk_lualibs\LuaLibs.meta" />
+    <Content Include="pack_script\pk_lualibs\LuaLibs\.git" />
+    <Content Include="pack_script\pk_script\scene\__cm_armyai.lua" />
+    <Content Include="pack_script\pk_script\init\cm_gameinit.lua" />
+    <Content Include="pack_script\pk_script\jsonparse.lua" />
+    <Content Include="pack_script\pk_script\login\___cm_loginsys.lua" />
+    <Content Include="pack_script\pk_script\login\cm_serverlist_update.lua" />
+    <Content Include="pack_script\pk_script\network\___cm_serverlink.lua" />
+    <Content Include="pack_script\pk_script\dydata\playerdata.lua" />
+    <Content Include="pack_script\pk_script\init\_requirefiles.lua" />
+    <Content Include="pack_script\pk_script\sdata\sdata_MonsterData.lua" />
+    <Content Include="pack_script\pk_script\sdata\sdata_uidefine.lua" />
+    <Content Include="pack_script\pk_script\tmp.lua" />
+    <Content Include="pack_script\pk_script\wnd\wnd_gameinit.lua" />
+    <Content Include="pack_script\pk_script\wnd\wnd_main.lua" />
+    <Content Include="pack_script\pk_script\_tmp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="pack_script\pk_lualibs\LuaLibs\class.lua" />
+    <Compile Include="pack_script\pk_lualibs\LuaLibs\cm_coroutine.lua" />
+    <Compile Include="pack_script\pk_lualibs\LuaLibs\debug.lua" />
+    <Compile Include="pack_script\pk_lualibs\LuaLibs\delegate.lua" />
+    <Compile Include="pack_script\pk_lualibs\LuaLibs\event.lua" />
+    <Compile Include="pack_script\pk_lualibs\LuaLibs\exlua.lua" />
+    <Compile Include="pack_script\pk_lualibs\LuaLibs\exmath.lua" />
+    <Compile Include="pack_script\pk_lualibs\LuaLibs\exstring.lua" />
+    <Compile Include="pack_script\pk_lualibs\LuaLibs\extable.lua" />
+    <Compile Include="pack_script\pk_lualibs\LuaLibs\exVector2.lua" />
+    <Compile Include="pack_script\pk_lualibs\LuaLibs\exVector3.lua" />
+    <Compile Include="pack_script\pk_lualibs\LuaLibs\luacsv.lua" />
+    <Compile Include="pack_script\pk_lualibs\LuaLibs\progress_statistical.lua" />
+    <Compile Include="pack_script\pk_lualibs\LuaLibs\resultwait.lua" />
+    <Compile Include="pack_script\pk_lualibs\LuaLibs\sceneJump.lua" />
+    <Compile Include="pack_script\pk_lualibs\LuaLibs\wnd_base.lua" />
+    <Compile Include="pack_script\pk_lualibs\LuaLibs\_libmain.lua" />
+    <Compile Include="pack_script\pk_script\component\CMUICountDown.lua" />
+    <Compile Include="pack_script\pk_script\component\CMUIInScreen.lua" />
+    <Compile Include="pack_script\pk_script\dydata\AHeroInfos.lua" />
+    <Compile Include="pack_script\pk_script\dydata\CommItems.lua" />
+    <Compile Include="pack_script\pk_script\dydata\Equip.lua" />
+    <Compile Include="pack_script\pk_script\dydata\EquipMaterials.lua" />
+    <Compile Include="pack_script\pk_script\dydata\formation.lua" />
+    <Compile Include="pack_script\pk_script\dydata\AvaHero.lua" />
+    <Compile Include="pack_script\pk_script\dydata\Frms.lua" />
+    <Compile Include="pack_script\pk_script\dydata\GKInfo.lua" />
+    <Compile Include="pack_script\pk_script\dydata\Hero.lua" />
+    <Compile Include="pack_script\pk_script\dydata\HHero.lua" />
+    <Compile Include="pack_script\pk_script\dydata\JLBag.lua" />
+    <Compile Include="pack_script\pk_script\dydata\Player.lua" />
+    <Compile Include="pack_script\pk_script\dydata\OOSyncList.lua" />
+    <Compile Include="pack_script\pk_script\dydata\SJM.lua" />
+    <Compile Include="pack_script\pk_script\GameCookies.lua" />
+    <Compile Include="pack_script\pk_script\memdebug.lua" />
+    <Compile Include="pack_script\pk_script\network\HttpLoaderEX.lua" />
+    <Compile Include="pack_script\pk_script\network\LoaderEX.lua" />
+    <Compile Include="pack_script\pk_script\littleFunction\DataConversion.lua" />
+    <Compile Include="pack_script\pk_script\main.lua" />
+    <Compile Include="pack_script\pk_script\network\cm_AutoReConn.lua" />
+    <Compile Include="pack_script\pk_script\network\GameConn.lua" />
+    <Compile Include="pack_script\pk_script\network\nm_chat.lua" />
+    <Compile Include="pack_script\pk_script\network\nm_dispatcher.lua" />
+    <Compile Include="pack_script\pk_script\network\__nm_login.lua" />
+    <Compile Include="pack_script\pk_script\network\nm_uattr.lua" />
+    <Compile Include="pack_script\pk_script\scene\__cm_lightai.lua" />
+    <Compile Include="pack_script\pk_script\scene\__cm_CameraCtrl.lua" />
+    <Compile Include="pack_script\pk_script\scene\__cm_GameScene.lua" />
+    <Compile Include="pack_script\pk_script\sdata\client_config.lua" />
+    <Compile Include="pack_script\pk_script\EventHandles.lua" />
+    <Compile Include="pack_script\pk_script\login\cm_serverst_update.lua" />
+    <Compile Include="pack_script\pk_script\login\logincm_setup.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_Buzhenxuanze.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_DialogueData.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_DiaoluoType.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_DramaData.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_EquipData.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_equiplist.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_FirstPay.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_HardMission.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_itemdata.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_JunlingbaoData.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_KeyValueMath.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_Pay.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_keyvalue.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_LeijiChongzhi.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_Mission.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_NormalHead.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_PKAward.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_suiji.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_SurrenderCost.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_username_boy.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_username_girl.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_username_xing.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_username_xingming.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_VIP.lua" />
+    <Compile Include="pack_script\pk_script\sdata\sdata_XilianshiData.lua" />
+    <Compile Include="pack_script\pk_script\sound\cm_BackgroundMusic.lua" />
+    <Compile Include="pack_script\pk_script\TestFight.lua" />
+    <Compile Include="pack_script\pk_script\wnd\CodingEasyer.lua" />
+    <Compile Include="pack_script\pk_script\wnd\DragDropCtrlBase.lua" />
+    <Compile Include="pack_script\pk_script\wnd\exui_AlphaTip.lua" />
+    <Compile Include="pack_script\pk_script\wnd\exui_CardCollection.lua" />
+    <Compile Include="pack_script\pk_script\wnd\exui_Formation.lua" />
+    <Compile Include="pack_script\pk_script\wnd\exui_HeroCard.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_CreateRole.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_DanXuan.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_GuankaJuqing.lua" />
+    <Compile Include="pack_script\pk_script\wnd\item_popMenu.lua" />
+    <Compile Include="pack_script\pk_script\wnd\TestCode.lua" />
+    <Compile Include="pack_script\pk_script\wnd\WndJumpManage.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_achievements.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_background.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_beibao.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_buzheng.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_CardHouse.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_chat.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_chongzhi.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_ChouJiang.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_dailytasks.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_daohang.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_debug.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_enemy_info.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_fightwin.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_gainmethod.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_healthadvice.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_heroinfo.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_HeroPerview.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_itemget.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_liezhuan.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_Lesson.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_Mail.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_NetConnectWait.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_paihangbang.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_playerinfo.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_qianzhuang.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_randomEvents.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_readyfight.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_ReadyToFight.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_recruitHero.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_replay.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_fight_info.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_guanka.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_jingjichang.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_PlayerCreate.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_login.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_replayinfo.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_rewardbox.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_serverlist.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_ShuangXuan.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_Storybooks.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_success.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_TitlesVideo.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_tuiguan.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_tuiguanfail.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_TYTips.lua" />
+    <Compile Include="pack_script\pk_script\wnd\wnd_xilian.lua" />
+    <Compile Include="pack_script\pk_script\wnd\_wnddefine.lua" />
+    <Compile Include="pack_script\pk_tabs\DialogueData.lua" />
+    <Compile Include="pack_script\pk_tabs\DiaoluoType.lua" />
+    <Compile Include="pack_script\pk_tabs\DramaData.lua" />
+    <Compile Include="pack_script\pk_tabs\EquipData.lua" />
+    <Compile Include="pack_script\pk_tabs\equiplist.lua" />
+    <Compile Include="pack_script\pk_tabs\FirstPay.lua" />
+    <Compile Include="pack_script\pk_tabs\HardMission.lua" />
+    <Compile Include="pack_script\pk_tabs\Huodong.lua" />
+    <Compile Include="pack_script\pk_tabs\Id2String.lua" />
+    <Compile Include="pack_script\pk_tabs\ItemData.lua" />
+    <Compile Include="pack_script\pk_tabs\JunlingbaoData.lua" />
+    <Compile Include="pack_script\pk_tabs\KeyValue.lua" />
+    <Compile Include="pack_script\pk_tabs\KeyValueMath.lua" />
+    <Compile Include="pack_script\pk_tabs\Mission.lua" />
+    <Compile Include="pack_script\pk_tabs\MissionCity.lua" />
+    <Compile Include="pack_script\pk_tabs\MissionMonster.lua" />
+    <Compile Include="pack_script\pk_tabs\MissionPart.lua" />
+    <Compile Include="pack_script\pk_tabs\MissionState.lua" />
+    <Compile Include="pack_script\pk_tabs\NormalHead.lua" />
+    <Compile Include="pack_script\pk_tabs\OfflicalRank.lua" />
+    <Compile Include="pack_script\pk_tabs\Pay.lua" />
+    <Compile Include="pack_script\pk_tabs\PKAward.lua" />
+    <Compile Include="pack_script\pk_tabs\SuijiBaoxiang.lua" />
+    <Compile Include="pack_script\pk_tabs\SuijiMonster.lua" />
+    <Compile Include="pack_script\pk_tabs\SuijiShop.lua" />
+    <Compile Include="pack_script\pk_tabs\SurrenderCost.lua" />
+    <Compile Include="pack_script\pk_tabs\UiDefine.lua" />
+    <Compile Include="pack_script\pk_tabs\username_boy.lua" />
+    <Compile Include="pack_script\pk_tabs\username_girl.lua" />
+    <Compile Include="pack_script\pk_tabs\username_xing.lua" />
+    <Compile Include="pack_script\pk_tabs\VIP.lua" />
+    <Compile Include="pack_script\pk_tabs\XilianshiData.lua" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+</Project>

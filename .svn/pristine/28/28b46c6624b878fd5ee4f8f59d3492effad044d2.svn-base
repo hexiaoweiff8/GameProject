@@ -1,0 +1,97 @@
+using UnityEngine;
+public class UIPanelEX : UIPanel
+{
+    /// <summary>
+    /// Cache components.
+    /// </summary>
+    public float tsartSpanX;
+    public float tsartSpanY;
+    private UIScrollView.Movement um;
+    private UIScrollView usw;
+    private Vector4 lastClipOffset;
+    private Vector3 lastlocalPosition;
+    private Vector4 lastBaseClipRegion;
+    protected override void Awake()
+    {
+        base.Awake();
+        usw = GetComponent<UIScrollView>();
+        um = usw.movement;
+        if (um == UIScrollView.Movement.Horizontal)
+        {
+            tsartSpanX = finalClipRegion.z / 2 + usw.bounds.min.x - finalClipRegion.x;
+        }
+        else if (um == UIScrollView.Movement.Vertical)
+        {
+            tsartSpanY = finalClipRegion.w / 2 - usw.bounds.max.y + finalClipRegion.y;
+        }
+
+        lastClipOffset = clipOffset;
+        lastBaseClipRegion = baseClipRegion;
+        lastlocalPosition = transform.localPosition;
+    }
+
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+        reset();
+    }
+
+    public void reset()
+    {
+        usw.DisableSpring();
+        clipOffset = lastClipOffset;
+        baseClipRegion = lastBaseClipRegion;
+        transform.localPosition = lastlocalPosition;
+    }
+
+    /// <summary>
+    /// Calculate the offset needed to be constrained within the panel's bounds.
+    /// </summary>
+    public override Vector3 CalculateConstrainOffset(Vector2 min, Vector2 max)
+    {
+        Vector4 cr;
+        bool b = false;
+        if (um == UIScrollView.Movement.Horizontal && usw.bounds.size.x < finalClipRegion.z)
+        {
+            cr = new Vector4(finalClipRegion.x - (finalClipRegion.z / 2 - usw.bounds.size.x / 2) + tsartSpanX, finalClipRegion.y, usw.bounds.size.x, usw.bounds.size.y);
+        }
+        else if (um == UIScrollView.Movement.Vertical && usw.bounds.size.y < finalClipRegion.w)
+        {
+            cr = new Vector4(finalClipRegion.x, finalClipRegion.y + (finalClipRegion.w / 2 - usw.bounds.size.y / 2) - tsartSpanY, usw.bounds.size.x, usw.bounds.size.y);
+        }
+        else
+        {
+            cr = finalClipRegion;
+            b = true;
+        }
+
+        float offsetX = cr.z * 0.5f;
+        float offsetY = cr.w * 0.5f;
+
+        Vector2 minRect = new Vector2(min.x, min.y);
+        Vector2 maxRect = new Vector2(max.x, max.y);
+        Vector2 minArea = new Vector2(cr.x - offsetX, cr.y - offsetY);
+        Vector2 maxArea = new Vector2(cr.x + offsetX, cr.y + offsetY);
+
+        if (softBorderPadding && clipping == UIDrawCall.Clipping.SoftClip)
+        {
+            minArea.x += clipSoftness.x;
+            minArea.y += clipSoftness.y;
+            maxArea.x -= clipSoftness.x;
+            maxArea.y -= clipSoftness.y;
+        }
+        Vector3 constraint = NGUIMath.ConstrainRect(minRect, maxRect, minArea, maxArea);
+        if (b && constraint.sqrMagnitude > 0.1f)
+        {
+            if (constraint.y > 0)
+            {
+                constraint.y -= tsartSpanY;
+            }
+            else if (constraint.x < 0)
+            {
+                constraint.x += tsartSpanX;
+            }
+        }
+        return constraint;
+    }
+}

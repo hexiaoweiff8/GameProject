@@ -1,0 +1,48 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+using UniLua;
+public class LuaInputLibs
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    //  static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+
+    public const string LIB_NAME = "Input";
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+         };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+        
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair("mousePosition",S_mousePosition), 
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+    static int S_mousePosition(ILuaState lua)
+    {
+        //in 
+        //out int 
+        LuaVector3Lib._wrap(lua , Input.mousePosition);
+        return 1;
+    }
+     
+}

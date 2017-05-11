@@ -1,0 +1,188 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+
+/// <summary>
+/// 战斗参数
+/// </summary>
+public class LuaFightParameterLibs
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+
+    public const string LIB_NAME = "FightParameter";
+
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            new NameFuncPair("SetLeftZhenfaID",M_SetLeftZhenfaID), 
+            new NameFuncPair("SetRightZhenfaID",M_SetRightZhenfaID), 
+            new NameFuncPair("SetMusic",M_SetMusic),
+            new NameFuncPair("SetSceneID",M_SetSceneID),
+            new NameFuncPair("SetSquares",M_SetSquares),
+            new NameFuncPair("SetQixiSquare",M_SetQixiSquare), 
+            new NameFuncPair("SetFightType",M_SetFightType), 
+            new NameFuncPair("SetTuiguanJie",M_SetTuiguanJie),
+            new NameFuncPair("SetTuiguanZhang",M_SetTuiguanZhang), 
+        }; 
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        { 
+            new NameFuncPair("new",S_new),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+         
+        return 1;
+    }
+
+
+
+    public static void _wrap(ILuaState lua, FightParameter obj)
+    {
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,obj),
+        };
+
+        m_ClassRegHelper.InstanceLuaClass(lua, propertys);
+    }
+
+    public static FightParameter Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<FightParameter>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    static int S_new(ILuaState lua)
+    {
+        //in
+        //out FightParameter
+        _wrap(lua, new FightParameter());
+        return 1;
+    }
+
+
+    static int M_SetLeftZhenfaID(ILuaState lua)
+    {
+        //in self,id
+
+        var self = Lua2Obj(lua, 1);
+        var zhanfaID = (short)lua.L_CheckInteger(2);
+
+        self.LeftZhenfaID = zhanfaID;
+        return 0;
+    }
+
+    static int M_SetRightZhenfaID(ILuaState lua)
+    {
+        //in self,id
+
+        var self = Lua2Obj(lua, 1);
+        var zhanfaID = (short)lua.L_CheckInteger(2);
+
+        self.RightZhenfaID = zhanfaID;
+        return 0;
+    }
+
+    static int M_SetMusic(ILuaState lua)
+    {
+        //in self,musicName
+
+        var self = Lua2Obj(lua, 1);
+        var musicName = lua.L_CheckString(2);
+
+        self.Music = musicName;
+        return 0;
+    }
+
+    static int M_SetSceneID(ILuaState lua)
+    {
+        //in self,sceneID
+
+        var self = Lua2Obj(lua, 1);
+        var sceneID = lua.L_CheckInteger(2);
+
+        self.sceneID = sceneID;
+        
+        return 0;
+    }
+
+    static int M_SetFightType(ILuaState lua)
+    {
+        //in self,FightType
+        var self = Lua2Obj(lua, 1);
+        FightType ft = (FightType)lua.L_CheckInteger(2);
+        self.fightType = ft;
+        return 0;
+    }
+    static int M_SetTuiguanZhang(ILuaState lua)
+    {
+        //in self,zhang
+        var self = Lua2Obj(lua, 1);
+        self.tuiguan_zhang = lua.L_CheckInteger(2);
+        return 0;
+    }
+
+
+    static int M_SetTuiguanJie(ILuaState lua)
+    {
+        //in self,zhang
+        var self = Lua2Obj(lua, 1);
+        self.tuiguan_jie = lua.L_CheckInteger(2);
+        return 0;
+    }
+
+     
+    static int M_SetQixiSquare(ILuaState lua)
+    {
+        //in self,ArmySquareInfo
+        var self = Lua2Obj(lua, 1);
+        var squareInfo = lua.IsNil(2)?null: LuaArmySquareInfoLibs.Lua2Obj(lua, 2);
+        self.QixiSquare = squareInfo;
+        if (self.QixiSquare!=null)
+        {
+            self.QixiSquare.flag = ArmyFlag.Attacker;//必须是进攻方
+            self.QixiSquare.fid = 6;//fid必须是6
+        }
+        return 0;
+    }
+
+    static int M_SetSquares(ILuaState lua)
+    {
+        //in self,table{ArmySquareInfo1,ArmySquareInfo2,...}
+
+        var self = Lua2Obj(lua, 1);
+        lua.L_ArgCheck(lua.IsTable(2), 2, "必须是一个lua表");
+
+
+        var SquareList = new List<ArmySquareInfo>();
+        //遍历传入的lua表
+        lua.PushNil();
+        while (lua.Next(-2))
+        {
+            /* 处理相应数据。此时栈上 -1 处为 value, -2 处为 key */
+            var square = LuaArmySquareInfoLibs.Lua2Obj(lua, -1);
+            SquareList.Add(square);
+            lua.Pop(1);
+        }
+
+        self.Squares = SquareList;
+        return 0;
+    }
+     
+} 

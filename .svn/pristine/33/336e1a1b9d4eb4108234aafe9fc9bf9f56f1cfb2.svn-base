@@ -1,0 +1,531 @@
+local class = require("common/middleclass")
+local ui_fight = class("ui_fight", ui_session)
+
+--读取士兵配置表
+require "framework.luacsv"
+sdata_soldier_data = luacsv.new(require("pk_tabs/soldier_data"))
+
+function ui_fight.show_me()
+    local sd = ui_session_data(ui_session_type.FIXED, ui_session_id.UI_fight)
+    m_ui_manager:show_session(ui_fight(sd))
+end
+
+function ui_fight:initialize(session_data)
+    ui_session.initialize(self, session_data)
+    self.session_id = ui_session_id.UI_shopScene
+end
+
+
+function ui_fight:on_post_load()
+    math.newrandomseed()
+    local time_txt = self.transform:Find("Win/time_bg/txt"):GetComponent("UILabel")
+    local t = TimeTicker()
+    t:Start(5 * 60)
+    t.OnTick = GameResFactory.Instance():getEDC2(function(go)
+        local tempInt = math.ceil(t.OverTime)
+        time_txt.text = string.format("%02d", math.modf(tempInt / 60)) .. ":" .. string.format("%02d", tempInt % 60)
+    end)
+    
+    t.OnEnd = GameResFactory.Instance():getEDC2(function(go)
+        time_txt.text = "00:00"
+    end)
+    
+    local myBloodBar = self.transform:Find("Win/defence_widget1/hp_fg"):GetComponent("UISprite")
+    --    myBloodBar.fillAmount = 0.5
+    localpaiStr = "1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,19,19,1,2,3,4,5,6,7,8,1,10,10,10,10,10"
+    -- localpaiStr = "1,2,3,4,5,6"
+    --剩余牌库
+    self.paiKutb = string.splitToInt(localpaiStr, ",")
+    --打乱牌库
+    for i = #self.paiKutb, 1, -1 do
+        local index = math.random(#self.paiKutb);
+        local tempNum = self.paiKutb[i];
+        self.paiKutb[i] = self.paiKutb[index];
+        self.paiKutb[index] = tempNum;
+    end
+    --当前手牌库
+    self.nowHandpaiKutb = {}
+    --取前4张为手牌库
+    for i = 1, 4 do
+        self.nowHandpaiKutb[i] = self.paiKutb[1]
+        table.remove(self.paiKutb, 1)
+    end
+    
+    --牌库UI
+    self.paiKuBg = self.transform:Find("Win/paiKuBg")
+    --单击屏幕牌库消失
+    UIEventListener.Get(self.paiKuBg.gameObject).onPress = LuaHelper.BoolDelegate(function(go, args)
+        if args == false then
+            self.paiKuBg.gameObject:SetActive(false)
+        end
+    end)
+    --长按牌库显示
+    local shengyu_bgDelay1Ct
+    UIEventListener.Get(self.transform:Find("Win/shengyu_bg").gameObject).onPress = LuaHelper.BoolDelegate(function(go, args)
+        if args then -- 开启协程
+            shengyu_bgDelay1Ct = coroutine.start(function()
+                coroutine.wait(1)
+                --设置牌库信息
+                self:getPaiKuPerCardNum();
+                self.paiKuBg.gameObject:SetActive(true)
+            end)
+        else -- 停止协程
+            coroutine.stop(shengyu_bgDelay1Ct)
+        end
+    end)
+    --剩余兵力值
+    self.sumLastBingLi = 0
+    for i = 2, #self.paiKutb do
+        self.sumLastBingLi = self.sumLastBingLi + sdata_soldier_data:GetV(sdata_soldier_data.I_TrainCost, self.paiKutb[i])
+    end
+    --剩余兵力Label
+    self.allBingLiLabel = self.transform:Find("Win/shengyu_bg/allBingLi"):GetComponent(typeof(UILabel))
+    self.allBingLiLabel.text = self.sumLastBingLi
+    
+    -- UI卡牌框数
+    self.uiCardNum = 4
+    -- UI技能框数
+    self.uiSkillNum = 3
+    -- 当前3d相机
+    self.nowWorldCamera = GameObject.Find("/PTZCamera/SceneryCamera"):GetComponent(typeof(UnityEngine.Camera))
+    -- 当前UI相机
+    self.nowUICamera = GameObject.Find("/UIRoot/Camera_UI"):GetComponent(typeof(UnityEngine.Camera))
+    -- DragDropRoot
+    self.DragDropRoot = GameObject.Find("/UIRoot/DragDropRoot").transform
+    -- 装载ui卡牌的panel
+    self.currentCards_bg = self.transform:Find("Win/currentCards_bg")
+    -- 下一张卡牌的UISprite
+    self.nextCardSpr = self.transform:Find("Win/currentCards_bg/nextCard"):GetComponent(typeof(UISprite))
+    self.nextCardSpr.spriteName = sdata_soldier_data:GetV(sdata_soldier_data.I_CardImageID, self.paiKutb[1])
+    -- 下一张卡牌的UILabel
+    self.nextCardLabel = self.transform:Find("Win/currentCards_bg/nextCard/costLabel"):GetComponent(typeof(UILabel))
+    self.nextCardLabel.text = sdata_soldier_data:GetV(sdata_soldier_data.I_TrainCost, self.paiKutb[1])
+    --费barUISprite
+    local feiBgTf = self.transform:Find("Win/currentCards_bg/feiBg")
+    self.feiBarSpr = self.transform:Find("Win/currentCards_bg/feiBg/feiBar"):GetComponent(typeof(UISprite))
+    --总费Label
+    self.allFeiLabel = self.transform:Find("Win/currentCards_bg/feiBg/allFeiLabel"):GetComponent(typeof(UILabel))
+    --当前费Label
+    self.nowFeiLabel = self.transform:Find("Win/currentCards_bg/feiBg/nowFeiLabel"):GetComponent(typeof(UILabel))
+    --回收费Label
+    self.huiShouLabel = self.transform:Find("Win/currentCards_bg/feiBg/addFeiLabel"):GetComponent(typeof(UILabel))
+    --总费
+    self.allFei = 1000; self.allFeiLabel.text = self.allFei .. ""
+    --当前费
+    self.nowFei = 1000; self.nowFeiLabel.text = self.nowFei .. ""
+    -- 拖动中的卡牌table
+    self.onPressMyCardtb = {}
+    -- 下方卡牌缩放间距
+    self.onPressMyCardSpantb = {}
+    -- 拖动中的卡牌模型table
+    self.onPressArmytb = {}
+    -- UI卡牌table
+    self.nowMyCardtb = {}
+    -- UI卡牌CDtable
+    self.nowMyCardCDtbUISpritetb = {}
+    -- UI技能table
+    self.uiSkilltb = {}
+    -- UI卡牌原始位置
+    self.myCardConstPostb = {}
+    --费Bounds
+    local feiUIWidget = feiBgTf:GetComponent(typeof(UIWidget))
+    feiBgTf.parent = self.DragDropRoot
+    self.feiBounds = Bounds(Vector3(feiBgTf.localPosition.x, feiBgTf.localPosition.y, 0), Vector3(feiUIWidget.width, feiUIWidget.height, 0))
+    feiBgTf.parent = self.currentCards_bg
+    -- UIRoot的locationScale
+    self.urlc = GameObject.Find("/UIRoot").transform.localScale.x
+    
+    
+    -----------------------------------卡牌UI获取
+    for var = 1, self.uiCardNum do
+        local tf = self.transform:Find("Win/currentCards_bg/currentCard" .. var)
+        self.nowMyCardtb[var] = tf
+        self.myCardConstPostb[var] = tf.position
+        --添加拖拽脚本
+        tf.gameObject:AddComponent(typeof(UIDragObjectEX))
+        local go = tf.gameObject
+        self.nowMyCardCDtbUISpritetb[var] = tf:Find("CDBar"):GetComponent("UISprite")
+        tf:GetComponent(typeof(UISprite)).spriteName = sdata_soldier_data:GetV(sdata_soldier_data.I_CardImageID, self.nowHandpaiKutb[var])
+        tf:Find("costLabel"):GetComponent(typeof(UILabel)).text = sdata_soldier_data:GetV(sdata_soldier_data.I_TrainCost, self.nowHandpaiKutb[var])
+        UIEventListener.Get(tf.gameObject).onPress = LuaHelper.BoolDelegate(function(go, args)
+            if args then
+                print("点击事件")
+                -- 点击事件
+                -- 把其他前置状态的牌归位
+                for var2 = 1, self.uiCardNum do
+                    -- 如果处于前置状态
+                    if self.nowMyCardtb[var2].localPosition.y > 10 then
+                        -- 如果卡牌没有点击中
+                        if table.indexof(self.onPressMyCardtb, self.nowMyCardtb[var2]) == false then
+                            -- 如果不是自己
+                            if var ~= var2 then
+                                TweenPosition.Begin(self.nowMyCardtb[var2].gameObject, Vector3.Distance(self.nowMyCardtb[var2].position, self.myCardConstPostb[var2]) / 2, self.myCardConstPostb[var2], true)
+                            end
+                        end
+                    end
+                end
+                
+                --计算下方卡牌缩放间距
+                local tempInt = #self.onPressMyCardtb + 1
+                if tf.localPosition.y < 20 then
+                    self.onPressMyCardSpantb[tempInt] = 88
+                else
+                    self.onPressMyCardSpantb[tempInt] = 88 - 25
+                end
+                
+                self.onPressMyCardtb[tempInt] = tf
+                tf.parent = self.DragDropRoot
+                self.DragDropRoot.gameObject:SetActive(false)
+                self.DragDropRoot.gameObject:SetActive(true)
+                
+                
+                --生成模型
+                local ct = DP_FightPrefabManage.InstantiateAvatar(AvatarCM.CavalryHero_RH, false, 0, "xiahoudun", "xiahoudun", true).transform
+                ct.localScale = Vector3.zero
+                ct.gameObject:SetActive(true)
+                ct:Find("Quan"):GetComponent("MeshCollider").enabled = false
+                self.onPressArmytb[tempInt] = ct
+            else --松开卡牌
+                if self.nowFei >= sdata_soldier_data:GetV(sdata_soldier_data.I_TrainCost, self.nowHandpaiKutb[var]) and (tf.position.y > -1.16) and (tf.position.y < 0.9) then --拖到屏幕中
+                    self:onUnPress(tf, var, 3)
+                else
+                    local cardBounds = Bounds(tf.localPosition, Vector3(self.nowMyCardSizetb.x, self.nowMyCardSizetb.y, 0) * tf.localScale.x)
+                    if self.feiBounds:Intersects(cardBounds) then --回收卡
+                        self:onUnPress(tf, var, 1)
+                    else --拖回下方
+                        self:onUnPress(tf, var, 0)
+                    end
+                end
+            end
+        end)
+    end
+    local cardWidget = self.nowMyCardtb[1]:GetComponent(typeof(UIWidget))
+    -- UI卡牌Size
+    self.nowMyCardSizetb = Vector2(cardWidget.width, cardWidget.height) / 8
+    -----------------------------------技能UI获取
+    for var = 1, self.uiSkillNum do
+        local tf = self.transform:Find("Win/currentCards_bg/skill" .. var)
+        self.uiSkilltb[var] = tf
+        local go = tf.gameObject
+        UIEventListener.Get(tf.gameObject).onPress = LuaHelper.BoolDelegate(function(go, args)
+            if args then
+                end
+        end)
+    end
+    -----------------------------------单击屏幕出牌
+    GameResFactory.Instance():TouchStartHandler2(function()
+        self.lastMousePosition = Input.mousePosition
+    end)
+    GameResFactory.Instance():TouchUpHandler1(function()
+        if self.lastMousePosition then --可能一瞬间会有1次以上的回调，保证只走一次逻辑
+            -- local nP = self.nowUICamera:ScreenToWorldPoint(mp)
+            -- print(nP.x .. "==============" .. nP.y)
+            local mp = Input.mousePosition
+            if mp.y > 110 and mp.y < 608 then --下兵
+                for var = 1, 4 do
+                    if self.nowMyCardtb[var].localPosition.y > 20 and self.nowFei >= sdata_soldier_data:GetV(sdata_soldier_data.I_TrainCost, self.nowHandpaiKutb[var]) and Vector3.Distance(self.lastMousePosition, mp) < 20 then
+                        self:onUnPress(self.nowMyCardtb[var], var, 4)
+                        break
+                    end
+                end
+            --单击费回收卡（屏蔽）
+            -- else
+            --     local nP = self.nowUICamera:ScreenToWorldPoint(mp)
+            --     nP.z = 0
+            --     if self.feiBounds:Contains(nP / self.urlc) then --回收卡
+            --         for var = 1, 4 do
+            --             if self.nowMyCardtb[var].localPosition.y > 20 then
+            --                 self:onUnPress(self.nowMyCardtb[var], var, 2)
+            --                 break
+            --             end
+            --         end
+            --     end
+            end
+        end
+        self.lastMousePosition = nil
+    end)
+    
+    -----------------------------------长按头像显示用户信息
+    local delay1Ct = {}
+    local userInfoBg = self.transform:Find("Win/userInfoBg")
+    --单击屏幕用户信息消失
+    UIEventListener.Get(userInfoBg.gameObject).onPress = LuaHelper.BoolDelegate(function(go, args)
+        if args == false then
+            userInfoBg.gameObject:SetActive(false)
+        end
+    end)
+    for var = 1, 2 do
+        UIEventListener.Get(self.transform:Find("Win/defence_widget" .. var .. "/bg2").gameObject).onPress = LuaHelper.BoolDelegate(function(go, args)
+            if args then -- 开启协程
+                delay1Ct[var] = coroutine.start(function()
+                    coroutine.wait(1)
+                    userInfoBg.localPosition = Vector3(-107 + (var - 1) * 240.8, 355, 0)
+                    userInfoBg.gameObject:SetActive(true)
+                end)
+            else -- 停止协程
+                coroutine.stop(delay1Ct[var])
+            end
+        end)
+    end
+    
+    --小地图显隐标志
+    local isMapOut = true
+    --小地图隐藏panel
+    local mapPanel = self.transform:Find("Win/mapPanel")
+    --小地图
+    local map_bg = self.transform:Find("Win/map_bg")
+    --小地图显隐按钮 UISprite
+    local btn_backMapSpr = self.transform:Find("Win/btn_backMap"):GetComponent(typeof(UISprite))
+    
+    local tp
+    UIEventListener.Get(self.transform:Find("Win/btn_backMap").gameObject).onPress = LuaHelper.BoolDelegate(function(go, args)
+        if args == false then --打开关闭小地图
+            if isMapOut then
+                map_bg.parent = mapPanel
+                mapPanel.gameObject:SetActive(true)
+                btn_backMapSpr.flip = UIBasicSprite.Flip.Nothing
+                tp = TweenPosition.Begin(map_bg.gameObject, map_bg.position:Distance(Vector3(-0.75, 0, 0)) / 5, Vector3(-0.75, 0, 0), true)
+            else
+                map_bg.parent = self.transform:Find("Win")
+                btn_backMapSpr.flip = UIBasicSprite.Flip.Horizontally
+                -- TweenPosition.Begin(map_bg.gameObject, map_bg.position:Distance(Vector3.zero) / 5, Vector3.zero, true)
+                tp:PlayReverse()
+            end
+            isMapOut = not isMapOut
+        end
+    end)
+end
+
+
+--算出每个元素各有几个
+function ui_fight:getPaiKuPerCardNum()
+    local lastPaiID = {}
+    local lastPaiNum = {}
+    local tempPaiKutb = {}
+    table.merge(tempPaiKutb, self.paiKutb)
+    table.remove(tempPaiKutb, 1)
+    local tempInt1 = 1
+    local tempInt2 = 1
+    while #tempPaiKutb > 0 do
+        local i = 2
+        while i <= #tempPaiKutb do
+            if tempPaiKutb[i] == tempPaiKutb[1] then
+                tempInt2 = tempInt2 + 1
+                table.remove(tempPaiKutb, i)
+                i = i - 1
+            end
+            i = i + 1
+        end
+        
+        lastPaiID[tempInt1] = tempPaiKutb[1]
+        lastPaiNum[tempInt1] = tempInt2
+        table.remove(tempPaiKutb, 1)
+        tempInt2 = 1
+        tempInt1 = tempInt1 + 1
+    end
+    
+    local tempInt = #lastPaiID
+    local pai
+    if tempInt > 9 then
+        tempInt = 8
+        pai = self.paiKuBg.transform:Find("paikuCard" .. 9)
+        pai:GetComponent(typeof(UISprite)).spriteName = "face_3"
+        pai:Find("costLabel").gameObject:SetActive(false)
+        local tempInt2 = 0
+        for i = 9, #lastPaiID do
+            tempInt2 = tempInt2 + lastPaiNum[i]
+        end
+        pai:Find("remainNumLabel"):GetComponent(typeof(UILabel)).text = "*" .. tempInt2
+        pai.gameObject:SetActive(true)
+    elseif tempInt == 9 then
+        self.paiKuBg.transform:Find("paikuCard" .. 9):Find("costLabel").gameObject:SetActive(true)
+    else
+        for i = tempInt + 1, 9 do
+            self.paiKuBg.transform:Find("paikuCard" .. i).gameObject:SetActive(false)
+        end
+    end
+    for i = 1, tempInt do
+        pai = self.paiKuBg.transform:Find("paikuCard" .. i)
+        pai:GetComponent(typeof(UISprite)).spriteName = sdata_soldier_data:GetV(sdata_soldier_data.I_CardImageID, lastPaiID[i])
+        pai:Find("costLabel"):GetComponent(typeof(UILabel)).text = sdata_soldier_data:GetV(sdata_soldier_data.I_TrainCost, lastPaiID[i])
+        pai:Find("remainNumLabel"):GetComponent(typeof(UILabel)).text = "*" .. lastPaiNum[i]
+        pai.gameObject:SetActive(true)
+    end
+end
+
+
+
+--松开卡牌
+function ui_fight:onUnPress(tf, var, isXiaBing)
+    if isXiaBing > 0 then -- 下兵或回收事件
+        print("下兵或回收事件")
+        if isXiaBing > 2 then -- 下兵
+            self.nowFei = self.nowFei - sdata_soldier_data:GetV(sdata_soldier_data.I_TrainCost, self.nowHandpaiKutb[var])
+            self.nowFeiLabel.text = self.nowFei .. ""
+            if isXiaBing == 3 then --拖动下兵
+                self:backCallback(tf)
+            elseif isXiaBing == 4 then --点击下兵
+                --生成模型
+                local ct = DP_FightPrefabManage.InstantiateAvatar(AvatarCM.CavalryHero_RH, false, 0, "xiahoudun", "xiahoudun", true).transform
+                ct.gameObject:SetActive(true)
+                ct:Find("Quan"):GetComponent("MeshCollider").enabled = false
+                ray = self.nowWorldCamera:ScreenPointToRay(Input.mousePosition)
+                local isC, hit = UnityEngine.Physics.Raycast(ray, hit)
+                if isC then
+                    ct.position = hit.point
+                end
+            end
+        else -- 回收卡
+            print("回收卡")
+            self.huiShouLabel.gameObject:SetActive(false)
+            if isXiaBing == 1 then
+                self:backCallback(tf, var)
+            end
+            if (self.nowFei < self.allFei) == false then --如果满费则什么也不做
+                if isXiaBing == 1 then
+                    -- 卡牌前置
+                    tf.position = self.myCardConstPostb[var]
+                    tf.localPosition = tf.localPosition + Vector3(0, 25, 0)
+                end
+                return
+            end
+            self.nowFei = self.nowFei + sdata_soldier_data:GetV(sdata_soldier_data.I_TrainCost, self.nowHandpaiKutb[var])
+        end
+        
+        tf.localPosition = Vector3(-566, 2.9, 0)
+        tf.localScale = Vector3(0, 0, 1)
+        
+        -- 延迟1秒从下一张卡牌位置飞到原位置
+        local t = TimeTicker()
+        t:Start(1)
+        t.OnEnd = GameResFactory.Instance():getEDC2(function(go)
+            if #self.paiKutb > 0 then --牌库有牌
+                TweenPosition.Begin(self.nowMyCardtb[var].gameObject, 0.2, self.myCardConstPostb[var], true)
+                TweenScale.Begin(self.nowMyCardtb[var].gameObject, 0.2, Vector3.one)
+                --设置补充手牌为下一张手牌信息
+                tf:GetComponent(typeof(UISprite)).spriteName = self.nextCardSpr.spriteName
+                tf:Find("costLabel"):GetComponent(typeof(UILabel)).text = self.nextCardLabel.text
+                --牌库第一张补充到手牌中并移除
+                self.nowHandpaiKutb[var] = self.paiKutb[1]
+                table.remove(self.paiKutb, 1)
+                if #self.paiKutb > 0 then --牌库有牌
+                    --设置下一张手牌为牌库第一张
+                    local costFei = sdata_soldier_data:GetV(sdata_soldier_data.I_TrainCost, self.paiKutb[1])
+                    self.nextCardSpr.spriteName = sdata_soldier_data:GetV(sdata_soldier_data.I_CardImageID, self.paiKutb[1])
+                    self.nextCardLabel.text = costFei
+                    --剩余兵力减少
+                    self.sumLastBingLi = self.sumLastBingLi - costFei
+                    self.allBingLiLabel.text = self.sumLastBingLi
+                else --牌库没有牌了
+                    self.transform:Find("Win/currentCards_bg/nextCard").gameObject:SetActive(false)
+                end
+            end
+        end)
+    else -- 返回事件
+        print("返回事件")
+        self:backCallback(tf, var)
+        -- 卡牌前置
+        tf.position = self.myCardConstPostb[var]
+        tf.localPosition = tf.localPosition + Vector3(0, 25, 0)
+    end
+end
+
+function ui_fight:backCallback(tf, var)
+    --父节点还原，临时table清空，模型销毁
+    tf.parent = self.currentCards_bg
+    self.currentCards_bg.gameObject:SetActive(false)
+    self.currentCards_bg.gameObject:SetActive(true)
+    local i = table.removebyvalue2(self.onPressMyCardtb, tf)
+    if var then
+        tf.localScale = Vector3.one
+        Object.Destroy(table.remove(self.onPressArmytb, i).gameObject)
+    else
+        self.onPressArmytb[i]:Find("Quan"):GetComponent("MeshCollider").enabled = true
+        self.onPressArmytb[i].gameObject:AddComponent(typeof(myTest));
+        table.remove(self.onPressArmytb, i)
+    end
+end
+
+function ui_fight:Update()
+    local tempInt = #self.onPressMyCardtb
+    local tempY
+    for var = 1, tempInt do
+        tempY = self.onPressMyCardtb[var].localPosition.y
+        if tempY < -300 then --卡牌在下方区域显示并缩放，模型隐藏
+            tempY = (-300 - tempY) / self.onPressMyCardSpantb[var]
+            if tempY > 1 then
+                self.onPressMyCardtb[var].localScale = Vector3.one
+            else
+                self.onPressArmytb[var].localScale = Vector3.zero
+                self.onPressMyCardtb[var].localScale = Vector3(tempY, tempY, 1)
+            end
+            
+            --卡牌滑动在费上显示回收价格
+            local cardBounds = Bounds(self.onPressMyCardtb[var].localPosition, Vector3(self.nowMyCardSizetb.x, self.nowMyCardSizetb.y, 0) * self.onPressMyCardtb[var].localScale.x)
+            if self.feiBounds:Intersects(cardBounds) then --回收卡
+                self.huiShouLabel.text = "+50"
+                self.huiShouLabel.gameObject:SetActive(true)
+            else
+                self.huiShouLabel.gameObject:SetActive(false)
+            end
+        elseif tempY > 210 then --卡牌在上方区域显示并缩放，模型隐藏
+            tempY = (tempY - 210) / 88
+            if tempY > 1 then
+                self.onPressMyCardtb[var].localScale = Vector3.one
+            else
+                self.onPressArmytb[var].localScale = Vector3.zero
+                self.onPressMyCardtb[var].localScale = Vector3(tempY, tempY, 1)
+            end
+        else --卡牌在中间区域隐藏，模型显示
+            self.onPressMyCardtb[var].localScale = Vector3(0, 0, 1)
+            self.onPressArmytb[var].localScale = Vector3.one
+        end
+        
+        -- 模型跟随鼠标位置移动
+        local ray
+        if Input.touchCount == 0 then -- 编辑器平台和手机平台不同的触摸
+            ray = self.nowWorldCamera:ScreenPointToRay(Input.mousePosition)
+        else
+            ray = self.nowWorldCamera:ScreenPointToRay(Vector3(Input.GetTouch(var - 1).position.x, Input.GetTouch(var - 1).position.y, 0))
+        end
+        
+        local isC, hit = UnityEngine.Physics.Raycast(ray, hit, 1000, 256)--256 == bit.lshift(1, 8) == 1<<8
+        -- local isC, hit = UnityEngine.Physics.Raycast(ray, hit)
+        if isC then
+            self.onPressArmytb[var].position = hit.point
+        end
+    end
+    
+    --卡牌CD
+    for var = 1, 4 do
+        local tempInt = sdata_soldier_data:GetV(sdata_soldier_data.I_TrainCost, self.nowHandpaiKutb[var])
+        if self.nowFei < tempInt then
+            self.nowMyCardCDtbUISpritetb[var].fillAmount = 1 - self.nowFei / tempInt
+        else
+            self.nowMyCardCDtbUISpritetb[var].fillAmount = 0
+        end
+    
+    end
+    
+    --费每秒增长
+    self.nowFei = self.nowFei + 1
+    if self.nowFei > self.allFei then
+        self.nowFei = self.allFei
+        self.feiBarSpr.fillAmount = 1
+    else
+        self.feiBarSpr.fillAmount = self.nowFei / self.allFei
+    end
+    self.nowFeiLabel.text = math.round(self.nowFei) .. ""
+end
+
+function ui_fight:reset_window(args)
+
+end
+
+--销毁时清除该类中easytouch回调
+function ui_fight:on_pre_destroy()
+    GameResFactory.Instance():RemoveTouchUpHandler1()
+    GameResFactory.Instance():RemoveTouchStartHandler2()
+end
+
+return ui_fight

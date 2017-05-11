@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+<<<<<<< HEAD
+guid: fd8c594fead29b643b319c96f2776dc7
+timeCreated: 1446522086
+licenseType: Free
+=======
+guid: b5e2b00eb2b9ed6409a52eef3fcf0b39
+timeCreated: 1446521727
+licenseType: Pro
+>>>>>>> remotes/origin/master
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

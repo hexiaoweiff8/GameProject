@@ -1,0 +1,217 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+public class LuaMaterialLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    //static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "Material";
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            new NameFuncPair("GetMainTexture",M_GetMainTexture), 
+            new NameFuncPair("SetMainTexture",M_SetMainTexture), 
+            new NameFuncPair("GetTexture",M_GetTexture),
+            new NameFuncPair("SetTexture",M_SetTexture),
+            new NameFuncPair("SetTextureOffset",M_SetTextureOffset),
+            new NameFuncPair("SetTextureScale",M_SetTextureScale),
+            new NameFuncPair("GetTextureOffset",M_GetTextureOffset),
+            new NameFuncPair("GetTextureScale",M_GetTextureScale),
+
+             new NameFuncPair("GetMainTextureOffset",M_GetMainTextureOffset),
+            new NameFuncPair("GetMainTextureScale",M_GetMainTextureScale),
+            new NameFuncPair("SetMainTextureOffset",M_SetMainTextureOffset),
+            new NameFuncPair("SetMainTextureScale",M_SetMainTextureScale),
+            new NameFuncPair("SetColor",M_SetColor),
+            new NameFuncPair("GetColor",M_GetColor),
+        };
+
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        { 
+            //new NameFuncPair("new",S_new),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+
+    public static void _wrap(ILuaState lua, Material newObj)
+    {
+        LuaOpenLibs._wrap(m_ClassRegHelper, lua, newObj);
+    }
+
+
+    public static Material Lua2Obj(ILuaState lua, int index)
+    {
+        return LuaOpenLibs.Lua2Obj<Material>(lua, index);
+    }
+
+
+
+    public static int M_GetMainTexture(ILuaState lua)
+    {
+        //in self
+        //out Texture
+        
+        Material self = Lua2Obj(lua, 1);
+        LuaTextureLib._wrap(lua,self.mainTexture);
+        return 1;
+    } 
+
+    public static int M_SetMainTexture(ILuaState lua)
+    {
+        //in self,Texture
+        //out nil
+        Material self = Lua2Obj(lua, 1);
+        self.mainTexture = LuaTextureLib.Lua2Obj(lua, 2);
+        return 0;
+    }
+
+    public static int M_GetTexture(ILuaState lua)
+    {
+        //in self,propertyName
+        //out Texture
+        Material self = Lua2Obj(lua, 1);
+        string propertyName = lua.L_CheckString(2);
+        LuaTextureLib._wrap(lua, self.GetTexture(propertyName));
+        return 1;
+    }
+
+    public static int M_SetTexture(ILuaState lua)
+    {
+        //in self,propertyName,Texture
+        //out nil
+        Material self = Lua2Obj(lua, 1);
+        string  propertyName = lua.L_CheckString(2);
+        Texture texture = LuaTextureLib.Lua2Obj(lua, 3);
+        self.SetTexture(propertyName, texture);
+        return 0;
+    }
+
+    public static int M_SetTextureOffset(ILuaState lua)
+    {
+        //in self,propertyName,offset
+        Material self = Lua2Obj(lua, 1);
+        string propertyName = lua.L_CheckString(2);
+        Vector2 offset;LuaVector2Lib.Lua2Obj(lua, 3, out offset);
+
+        self.SetTextureOffset(propertyName, offset);
+        return 0;
+    }  
+
+     public static int M_SetTextureScale(ILuaState lua)
+     {
+         //in self,propertyName,scale
+         Material self = Lua2Obj(lua, 1);
+         string propertyName = lua.L_CheckString(2);
+         Vector2 scale; LuaVector2Lib.Lua2Obj(lua, 3, out scale);
+
+         self.SetTextureScale(propertyName, scale);
+         return 0;
+     } 
+
+    public static int M_GetTextureOffset(ILuaState lua)
+    {
+        //in self,propertyName
+        //out Vector2
+        Material self = Lua2Obj(lua, 1);
+        string propertyName = lua.L_CheckString(2);
+        LuaVector2Lib._wrap(lua, self.GetTextureOffset(propertyName));
+        return 1;
+    }
+
+    public static int M_GetTextureScale(ILuaState lua)
+    {
+        //in self,propertyName
+        //out Vector2
+        Material self = Lua2Obj(lua, 1);
+        string propertyName = lua.L_CheckString(2);
+        LuaVector2Lib._wrap(lua, self.GetTextureScale(propertyName));
+        return 1;
+    }
+
+
+
+    static int M_GetMainTextureOffset(ILuaState lua)
+    {
+        //in self 
+        //out Vector2
+        Material self = Lua2Obj(lua, 1);
+        LuaVector2Lib._wrap(lua, self.mainTextureOffset);
+        return 1;
+    }
+
+    static int M_GetMainTextureScale(ILuaState lua)
+    {
+        //in self 
+        //out Vector2
+
+        Material self = Lua2Obj(lua, 1);
+        LuaVector2Lib._wrap(lua, self.mainTextureScale);
+        return 1;
+    }
+
+
+    static int M_SetMainTextureOffset(ILuaState lua)
+    {
+        //in self,Vector2
+        //out nil
+        Material self = Lua2Obj(lua, 1);
+        Vector2 v2; LuaVector2Lib.Lua2Obj(lua, 2, out v2);
+        self.mainTextureOffset = v2;
+        return 0;
+    }
+
+    static int M_SetMainTextureScale(ILuaState lua)
+    {
+        //in self,Vector2
+        //out nil 
+
+        Material self = Lua2Obj(lua, 1);
+
+        Vector2 v2; LuaVector2Lib.Lua2Obj(lua, 2, out v2);
+        self.mainTextureScale = v2;
+        return 0;
+    }
+
+    static int M_SetColor(ILuaState lua)
+    {
+        //in self,Color
+        //out nil
+        Material self = Lua2Obj(lua, 1);
+
+        Color color; LuaColorLib.Lua2Obj(lua, 2, out color);
+        self.color = color;
+        return 0;
+    }
+
+    static int M_GetColor(ILuaState lua)
+    {
+        //in self
+        //out Color
+        Material self = Lua2Obj(lua, 1);
+        LuaColorLib._wrap(lua, self.color);
+
+        return 1;
+    }
+}
+ 

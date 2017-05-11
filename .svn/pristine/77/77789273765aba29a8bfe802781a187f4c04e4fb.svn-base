@@ -1,0 +1,7 @@
+20170420173537
+EquipID I32
+EquipName S
+EquipResName S
+EquipType I16
+SuitID I16
+MainEffect I32

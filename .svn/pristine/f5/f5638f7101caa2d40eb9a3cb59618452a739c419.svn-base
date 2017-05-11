@@ -1,0 +1,315 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+ 
+/// <summary>
+/// 战斗结果
+/// </summary>
+public class LuaFightResultLibs
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+
+    public const string LIB_NAME = "FightResult";
+
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            new NameFuncPair("IsWin",M_IsWin),  
+            new NameFuncPair("FightTime",M_FightTime),   
+            new NameFuncPair("RightHeros",M_RightHeros),
+            new NameFuncPair("LeftHeros",M_LeftHeros), 
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {  
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+
+
+    public static void _wrap(ILuaState lua, FightResult obj)
+    {
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,obj),
+        };
+
+        m_ClassRegHelper.InstanceLuaClass(lua, propertys);
+    }
+
+    public static FightResult Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<FightResult>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+     
+
+    /// <summary>
+    /// 进攻方是否胜利
+    /// </summary>
+    static int M_IsWin(ILuaState lua)
+    {
+        //in self
+        //out bool
+
+        var self = Lua2Obj(lua, 1); 
+        lua.PushBoolean( self.IsWin ); 
+        
+        return 1;
+    }
+
+    /// <summary>
+    /// 战斗经历的时间 单位秒
+    /// </summary>
+    static int M_FightTime(ILuaState lua)
+    {
+        //in self
+        //out number
+        var self = Lua2Obj(lua,1);
+        lua.PushNumber(self.FightTime);
+        return 1;
+    }
+
+
+
+    static int M_LeftHeros(ILuaState lua)
+    {
+        //in self
+        //out {HeroFightResult1,HeroFightResult2,...}
+        var self = Lua2Obj(lua, 1);
+        lua.CreateTable(0, 0);
+
+        int i = 1;
+        foreach (var curr in self.LeftHeros)
+        {
+            LuaHeroFightResultLibs._wrap(lua, curr);
+            lua.RawSetI(-2, i++);
+        }
+
+        return 1;
+    }
+
+    static int M_RightHeros(ILuaState lua)
+    {
+        //in self
+        //out {HeroFightResult1,HeroFightResult2,...}
+        var self = Lua2Obj(lua, 1);
+        lua.CreateTable(0, 0);
+
+        int i = 1;
+        foreach (var curr in self.RightHeros)
+        {
+            LuaHeroFightResultLibs._wrap(lua, curr);
+            lua.RawSetI(-2, i++);
+        }
+
+        return 1;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+public class LuaHeroFightResultLibs
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+
+    public const string LIB_NAME = "HeroFightResult";
+
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {    
+            new NameFuncPair("NursedCount",M_NursedCount),
+            new NameFuncPair("KillSoldiersCount", M_KillSoldiersCount),
+            new NameFuncPair("HitCount",M_HitCount),
+            new NameFuncPair("StaticDataID",M_StaticDataID),
+            new NameFuncPair("Fid",M_Fid),
+            new NameFuncPair("CurrHP",M_CurrHP), 
+            new NameFuncPair("MaxHP",M_MaxHP), 
+            new NameFuncPair("HeroXJ",M_HeroXJ), 
+            new NameFuncPair("HeroLevel",M_HeroLevel),  
+            new NameFuncPair("AliveSoldiers",M_AliveSoldiers),  
+
+            
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {  
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+
+
+    public static void _wrap(ILuaState lua, HeroFightResult obj)
+    {
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,obj),
+        };
+
+        m_ClassRegHelper.InstanceLuaClass(lua, propertys);
+    }
+
+    public static HeroFightResult Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<HeroFightResult>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+     
+
+
+    static int M_Fid(ILuaState lua)
+    {
+        //in self
+        //out int
+
+        var self = Lua2Obj(lua, 1);
+        lua.PushInteger(self.fid);
+        
+        return 1;
+    }
+
+    static int M_CurrHP(ILuaState lua)
+    {
+        //in self
+        //out int
+
+        var self = Lua2Obj(lua, 1);
+        lua.PushInteger(self.currHP);
+        
+        return 1;
+    } 
+     
+     static int M_HeroLevel(ILuaState lua)
+    {
+        //in self
+        //out int
+
+        var self = Lua2Obj(lua, 1);
+        lua.PushInteger(self.heroLevel);
+        
+        return 1;
+    }
+
+     static int M_AliveSoldiers(ILuaState lua)
+     {
+         //in self
+         //out int
+
+         var self = Lua2Obj(lua, 1);
+         lua.PushInteger(self.AliveSoldiers);
+
+         return 1;
+     }
+
+     static int M_HeroXJ(ILuaState lua)
+    {
+        //in self
+        //out int
+
+        var self = Lua2Obj(lua, 1);
+        lua.PushInteger(self.heroXJ);
+        
+        return 1;
+    }
+    static int M_MaxHP(ILuaState lua)
+    {
+        //in self
+        //out int
+
+        var self = Lua2Obj(lua, 1);
+        lua.PushInteger(self.MaxHP);
+
+        return 1;
+    }
+        
+
+
+    static int M_StaticDataID(ILuaState lua)
+    {
+        //in self
+        //out int
+
+        var self = Lua2Obj(lua, 1);
+        lua.PushInteger(self.staticDataID);
+        return 1;
+    }
+
+    
+    static int M_HitCount(ILuaState lua)
+    {
+        //in self
+        //out int
+
+        var self = Lua2Obj(lua, 1);
+        lua.PushInteger(self.HitCount);
+        return 1;
+    }
+    static int M_NursedCount(ILuaState lua)
+    {
+        //in self
+        //out int
+
+        var self = Lua2Obj(lua, 1);
+        lua.PushInteger(self.NursedCount);
+        return 1;
+    }
+    static int M_KillSoldiersCount(ILuaState lua)
+    {
+        //in self
+        //out int
+
+        var self = Lua2Obj(lua, 1);
+        lua.PushInteger(self.KillSoldiersCount);
+        return 1;
+    }
+}

@@ -1,0 +1,39 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+
+class LuaObjRef:IDisposable
+{
+    public const int EmptyObj = 0;
+
+    public LuaObjRef(int refObj)
+    {
+        m_Ref = refObj;
+    }
+
+    public void SetRef(int refObj)
+    {
+        if(m_Ref==refObj) return;
+        Dispose();
+        m_Ref = refObj;
+    }
+
+    public void Dispose()
+    {
+        if (m_Ref > 0) { LuaRoot._Lua.L_Unref(LuaDef.LUA_REGISTRYINDEX, m_Ref); m_Ref = 0; }
+    }
+
+    public void Push(ILuaState lua)
+    {
+        //if (m_Ref == EmptyObj) throw new Exception("LuaObjRef push refObj is empty!");
+
+        lua.RawGetI(LuaDef.LUA_REGISTRYINDEX, m_Ref);
+    }
+
+    public int RefI { get { return m_Ref; } }
+
+    int m_Ref;
+}
+ 

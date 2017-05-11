@@ -1,0 +1,49 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+class LuaMathEXLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    public static void OpenLib(ILuaState lua)
+    {
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair( "clamp",S_clamp ),
+            new NameFuncPair( "lerp",S_lerp ),
+        };
+        m_ClassRegHelper.AppendStatics(lua, LuaMathLib.LIB_NAME, static_define);
+    }
+
+
+    static int S_lerp(ILuaState lua)
+    {
+        //in a,b,t
+        //out v
+        double a = lua.L_CheckNumber(1);
+        double b = lua.L_CheckNumber(2);
+        double t = lua.L_CheckNumber(3);
+        lua.PushNumber(Mathf.Lerp((float)a, (float)b, (float)t));
+        return 1;
+    }
+
+    static int S_clamp(ILuaState lua)
+    {
+        //in v min max
+        //out clampv
+
+        float v = (float)lua.L_CheckNumber(1);
+        float min = (float)lua.L_CheckNumber(2);
+        float max = (float)lua.L_CheckNumber(3);
+
+        lua.PushNumber(Mathf.Clamp(v, min, max));
+
+
+        return 1;
+    }
+
+
+}

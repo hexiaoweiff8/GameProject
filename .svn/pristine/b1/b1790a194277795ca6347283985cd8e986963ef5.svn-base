@@ -1,0 +1,1030 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+public class PixelPos
+{
+    public PixelPos(int i ,int j)
+    {
+        n = i;
+        m = j;
+    }
+    public int n;//横行的
+    public int m;//竖向的
+}
+public class QKModifyPixel : MonoBehaviour
+{
+
+	// Use this for initialization
+    public Texture2D m_tex;
+    public Texture2D m_tempTex;
+    public bool isUpdata = false;
+    public int off = 1;
+    int pointNum = 0;//周围有pointNum个不一样的点，就认为是边界
+    public int lineSize = 5;
+    public int m_curID = 1;
+    ModifyPixel m_modifyPixel;
+	void Start () {
+        UITexture uiTex = gameObject.GetComponent<UITexture>();
+        m_tempTex = (Texture2D)uiTex.mainTexture;
+        m_modifyPixel = new ModifyPixel();
+        m_modifyPixel.InitAll(m_tex, (Texture2D)uiTex.mainTexture, lineSize, pointNum, off);
+    
+	}
+	
+	// Update is called once per frame
+	void Update () {
+	
+        if(isUpdata)
+        {
+            isUpdata = false;
+            if (m_modifyPixel == null)
+            {
+                UITexture uiTex = gameObject.GetComponent<UITexture>();
+                m_tempTex = (Texture2D)uiTex.mainTexture;
+                m_modifyPixel = new ModifyPixel();
+                m_modifyPixel.InitAll(m_tex, (Texture2D)uiTex.mainTexture, lineSize, pointNum, off);
+            }
+            m_modifyPixel.SetInfo(m_curID, lineSize);
+            m_modifyPixel.StartCalcAll();
+           
+        }
+	}
+}
+public enum TTType
+{
+    TT_NEI,
+    TT_WAI,
+    TT_DD,
+}
+
+public enum MT_Mode
+{
+    MTM_All,//修改整张贴图
+    MTM_Part,//修改部分贴图
+}
+
+public class ModifyTex
+{
+
+    // Use this for initialization
+    protected Texture2D m_tex;////原始图片
+    protected Texture2D m_tempTex;//修改的图片
+    protected MT_Mode m_mode = MT_Mode.MTM_All;
+
+    protected int m_width;
+    protected int m_height;
+
+    //protected int m_off = 1;
+    protected int m_pointNum = 0;//周围有pointNum个不一样的点，就认为是边界
+    protected int m_lineSize = 5;//需要渐变的宽度
+    protected int m_curId = 2;//要描边的省的ID
+    protected Vector2[] posOff = new Vector2[9];
+    //重新写修改像素的函数
+    protected List<Color> m_pixels = new List<Color>();//注意这里不用的时候清楚吧
+    protected Dictionary<int, float> m_aphlas = new Dictionary<int, float>();//只有aphla小于1的保存
+    protected Dictionary<int, float> m_dis = new Dictionary<int, float>();//默认只保存范围外的值
+
+    //用来保存描边区域的大小，是为了减少计算量而存在的
+    protected int left = -1;
+    protected int right = -1;
+    protected int top = -1;
+    protected int bottom = -1;
+
+    protected List<PixelPos> posList = new List<PixelPos>();//边界线像素
+    #region (以下是修改部分贴图的变量及代码)
+    //m_tex贴图上的起始点和宽高
+    protected int m_startX;
+    protected int m_startY;
+    protected TTType m_OutLineType = TTType.TT_NEI;//描边效果
+    public void InitPart(Texture2D tex, UITexture uiTex, int curId = 1, int lineSize = 5, TTType type = TTType.TT_NEI, int pointNum = 0, int off = 1)
+    {
+        if(tex == null)
+        {
+            Debug.LogError(" ModifyTex InitPart  tex == null");
+            return;
+        }
+        if(uiTex == null)
+        {
+            Debug.LogError("ModifyTex InitPart  tex == null ");
+            return;
+        }
+        m_mode = MT_Mode.MTM_Part;
+        m_tex = tex;
+        m_tempTex = (Texture2D)uiTex.mainTexture;
+        m_pointNum = pointNum;
+        m_lineSize = lineSize;
+        m_curId = curId;
+
+        m_OutLineType = type;
+        m_startX = (int)(uiTex.uvRect.x * m_tex.width);
+        m_startY = (int)(uiTex.uvRect.y * m_tex.height);
+        m_width = (int)(uiTex.uvRect.width * m_tex.width);
+        m_width = (m_width + 2) > m_tex.width ? m_width : (m_width + 2);
+        m_height = (int)(uiTex.uvRect.height * m_tex.height);
+        m_height = (m_height + 2) > m_tex.height ? m_height : (m_height + 2);
+        m_pixels.Clear();
+        m_pixels.AddRange(m_tex.GetPixels(m_startX, m_startY, m_width, m_height));
+
+        m_aphlas.Clear();
+        m_dis.Clear();
+        posList.Clear();
+      
+       // m_off = off;      
+        InitPos(off);
+
+        //Debug.Log("m_startX " + m_startX + " " + m_startY + " " + m_width + " " + m_height + " " + m_tex.width + " " + m_tex.height);
+        //Debug.Log(m_pixels.Length + "==part=" + m_width + "===" + m_width + " curId " + curId);
+
+    }
+    public void StartCalcPart()
+    {
+        if (m_mode == MT_Mode.MTM_All)
+            return;
+        ResetPart();
+        CalcPartEdge();
+        Clear();
+    }
+    void CalcPartEdge()
+    {
+        if (m_mode == MT_Mode.MTM_All)
+            return;
+        posList.Clear();
+        Color[] colors = new Color[9];
+        int[] tempID = new int[9];
+        float[] aphlas = new float[9];
+        int showNum = 0;
+        if (m_tex != null)
+        {
+            // Debug.LogError(m_pixels.Length + "===" + m_tex.height + "===" + m_tex.width);
+
+            //初步设置0和1来判断区域
+            for (int i = 0; i < m_height; ++i)
+            {
+                for (int j = 0; j < m_width; ++j)
+                {
+                    showNum = 0;
+                    for (int n = 0; n < colors.Length; ++n)
+                    {
+                        colors[n] = GetPixel(j + (int)posOff[n].x, i + (int)posOff[n].y);
+                        tempID[n] = CalcID(colors[n]);
+
+                        if (m_curId == tempID[n])
+                        {
+                            aphlas[n] = 1;
+                        }
+                        else
+                        {
+                            aphlas[n] = 0;//范围外面都设置成0
+                            showNum++;
+                            //减少计算量，因为值为1 说明不是要扣掉的颜色，这样就不用计算了
+                            if (n == 0)
+                            {
+                                break;
+                            }
+                            else if (aphlas[0] == 1 && showNum > m_pointNum)
+                            {
+                                break;
+                            }
+
+                        }
+                    }
+                    if (aphlas[0] == 1)
+                    {
+                        //说明靠边了
+                        if (showNum > m_pointNum)
+                        {
+                            SetLeft(j);
+                            SetRight(j);
+                            SetTop(i);
+                            SetBottom(i);
+                            PixelPos p = new PixelPos(j, i);
+                            posList.Add(p);
+                        }
+                        if (m_OutLineType == TTType.TT_DD || m_OutLineType == TTType.TT_NEI)
+                        {
+                            SetDis(j, i, m_lineSize + 1);
+                        }
+
+                    }
+                    else
+                    {
+
+                        SetAphla(j, i, aphlas[0]);//设置的都是0
+                        if (m_OutLineType == TTType.TT_DD || m_OutLineType == TTType.TT_WAI)
+                        {
+                            SetDis(j, i, m_lineSize + 1);
+                        }
+                    }
+
+
+                    //Debug.LogError("===" + i + "==" + j + "  color r = " + r3.ToString());
+
+                }
+            }
+            // yield return null;
+            //Debug.LogError("===" + left + "==" + right + " " + top + " " + bottom + " posList.Count " + posList.Count);
+            for (int i = 0; i < posList.Count; ++i)
+            {
+                for (int m = -m_lineSize; m <= m_lineSize; m++)
+                {
+                    for (int n = -m_lineSize; n <= m_lineSize; n++)
+                    {
+                        SetOutLineDis(posList[i].n, posList[i].m, n, m);
+                    }
+                }
+                int indexw = posList[i].n + posList[i].m * m_width;
+                m_pixels[indexw] = Color.green;
+            }
+            //yield return null;
+            //这里是为了只计算包括边界的像素
+
+            left = (left - m_lineSize) >= 0 ? (left - m_lineSize) : 0;
+            right = (right + m_lineSize) < m_width ? (right + m_lineSize) : m_width - 1;
+            top = (top - m_lineSize) >= 0 ? (top - m_lineSize) : 0;
+            bottom = (bottom + m_lineSize) < m_height ? (bottom + m_lineSize) : m_height - 1;
+            for (int i = top; i <= bottom; ++i)
+            {
+                for (int j = left; j <= right; ++j)
+                {
+                    float a = CalcAphlaByDis(j, i);
+                    //只保存的aphla小于1的
+                    if (a < 1)
+                    {
+                        SetAphla(j, i, a);
+                    }
+                }
+
+            }
+            // yield return null;
+            int index = 0;
+            for (int i = 0; i < m_height; ++i)
+            {
+                for (int j = 0; j < m_width; ++j)
+                {
+                    index = j + i * m_width;
+                    if (m_aphlas.ContainsKey(index))
+                    {
+                        if (m_pixels[index] == Color.green)
+                        {
+                            // if (m_pixels[index].a < 1.0)
+                            //m_pixels[index] = Color.black;
+                            m_pixels[index] = new Color(0,0,0,m_aphlas[index]);
+                        }
+                        else
+                        {
+                            //if (m_pixels[index].a < 1.0)
+                            //m_pixels[index] = Color.red;
+                            m_pixels[index] = new Color(1, 0, 0, m_aphlas[index]);
+                        }
+                        // m_pixels[index].a = m_aphlas[index];
+
+
+                    }
+                    else
+                    {
+
+                        m_pixels[index] = new Color(m_pixels[index].r, m_pixels[index].g, m_pixels[index].b,1);
+                    }
+                }
+            }
+        }
+        m_tempTex.SetPixels(m_startX, m_startY, m_width, m_height, m_pixels.ToArray());
+        m_tempTex.Apply();
+        //byte[] byt = m_tempTex.EncodeToPNG();
+        //File.WriteAllBytes(Application.dataPath + "/Resources/ui/@ui_tuiguan/Atlas/test1.png", byt);
+
+        ////m_tex.CreateExternalTexture(m_tex.width, m_tex.height, TextureFormat.ARGB32, false, false, m_tex);
+        Debug.Log("ddddddddddddddddddddddddddd");
+        // yield return null;
+    }
+    protected void ResetPart()
+    {
+        if (m_mode == MT_Mode.MTM_Part)
+        {
+            if (m_tex != null)
+            {
+                //m_pixels.Clear();
+                //m_pixels.AddRange(m_tex.GetPixels(m_startX, m_startY, m_width, m_height));
+                m_aphlas.Clear();
+                m_dis.Clear();
+                left = -1;
+                right = -1;
+                top = -1;
+                bottom = -1;
+                //Debug.Log(m_pixels.Count + "=ResetPart==" + m_width + "===" + m_width);
+            }
+            posList.Clear();
+        }
+
+    }
+    #endregion
+    #region (以下是修改整张贴图的代码)
+    public void InitAll(Texture2D tex, Texture2D uiTex, int curId = 1, int lineSize = 5, int pointNum = 0, int off = 1)
+    {
+        if (tex == null)
+        {
+            Debug.LogError(" ModifyTex InitAll  tex == null");
+            return;
+        }
+        if (uiTex == null)
+        {
+            Debug.LogError("ModifyTex InitAll  tex == null ");
+            return;
+        }
+        m_mode = MT_Mode.MTM_All;
+        m_tex = tex;
+        m_tempTex = uiTex;
+        m_pointNum = pointNum;
+        m_lineSize = lineSize;
+        m_curId = curId;
+
+        m_width = m_tex.width;
+        m_height = m_tex.height;
+        m_pixels.Clear();
+        m_pixels.AddRange(m_tex.GetPixels());
+
+        m_aphlas.Clear();
+        m_dis.Clear();
+        posList.Clear();
+
+        InitPos(off);
+
+        Debug.Log(m_pixels.Count + "=all==" + m_width + "===" + m_width + " curId " + curId);
+    }
+    public void StartCalcAll()
+    {
+        if (m_mode == MT_Mode.MTM_Part)
+            return;
+        ResetAll();
+        CalcAllEdge();
+        Clear();
+
+    }
+    void CalcAllEdge()
+    {
+        if (m_mode == MT_Mode.MTM_Part)
+            return;
+        posList.Clear();
+        Color[] colors = new Color[9];
+        int[] tempID = new int[9];
+        float[] aphlas = new float[9];
+        int showNum = 0;
+        if (m_tex != null)
+        {
+            // Debug.LogError(m_pixels.Length + "===" + m_tex.height + "===" + m_tex.width);
+
+            //初步设置0和1来判断区域
+            for (int i = 0; i < m_height; ++i)
+            {
+                for (int j = 0; j < m_width; ++j)
+                {
+                    showNum = 0;
+                    for (int n = 0; n < colors.Length; ++n)
+                    {
+                        colors[n] = GetPixel(j + (int)posOff[n].x, i + (int)posOff[n].y);
+                        tempID[n] = CalcID(colors[n]);
+
+                        if (m_curId < tempID[n])
+                        {
+                            aphlas[n] = 1;
+                            showNum++;
+                            //减少计算量，因为值为1 说明不是要扣掉的颜色，这样就不用计算了
+                            if (n == 0)
+                            {
+                                break;
+                            }
+                            else if (aphlas[0] == 0 && showNum > m_pointNum)
+                            {
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            aphlas[n] = 0;
+
+                        }
+                    }
+                    if (aphlas[0] == 0)
+                    {
+                        //说明靠边了
+                        if (showNum > m_pointNum)
+                        {
+                            SetLeft(j);
+                            SetRight(j);
+                            SetTop(i);
+                            SetBottom(i);
+                            PixelPos p = new PixelPos(j, i);
+                            posList.Add(p);
+                        }
+                        SetAphla(j, i, aphlas[0]);
+                    }
+                    else
+                    {
+                        SetDis(j, i, m_lineSize + 1);
+                    }
+
+
+                    //Debug.LogError("===" + i + "==" + j + "  color r = " + r3.ToString());
+
+                }
+            }
+            // yield return null;
+            Debug.Log("===" + left + "==" + right + " " + top + " " + bottom + " posList.Count " + posList.Count);
+
+            for (int i = 0; i < posList.Count; ++i)
+            {
+                for (int m = -m_lineSize; m <= m_lineSize; m++)
+                {
+                    for (int n = -m_lineSize; n <= m_lineSize; n++)
+                    {
+                        SetOutLineDis(posList[i].n, posList[i].m, n, m);
+                    }
+                }
+            }
+            //yield return null;
+            //这里是为了只计算包括边界的像素
+
+            left = (left - m_lineSize) >= 0 ? (left - m_lineSize) : 0;
+            right = (right + m_lineSize) < m_width ? (right + m_lineSize) : m_width - 1;
+            top = (top - m_lineSize) >= 0 ? (top - m_lineSize) : 0;
+            bottom = (bottom + m_lineSize) <= m_height ? (bottom + m_lineSize) : m_height - 1;
+            for (int i = top; i <= bottom; ++i)
+            {
+                for (int j = left; j <= right; ++j)
+                {
+                    float a = CalcAphlaByDis(j, i);
+                    //只保存的aphla小于1的
+                    if (a < 1)
+                    {
+                        SetAphla(j, i, a);
+                    }
+                }
+
+            }
+            // yield return null;
+            int index = 0;
+            for (int i = 0; i < m_height; ++i)
+            {
+                for (int j = 0; j < m_width; ++j)
+                {
+                    index = j + i * m_width;
+                    if (m_aphlas.ContainsKey(index))
+                    {
+                       
+                        m_pixels[index] = new Color(m_pixels[index].r,m_pixels[index].g,m_pixels[index].b,m_aphlas[index]);
+                    }
+                    else
+                    {
+                        m_pixels[index] = new Color(m_pixels[index].r, m_pixels[index].g, m_pixels[index].b, 1);
+                        
+                        
+                    }
+                }
+            }
+        }
+        m_tempTex.SetPixels(m_pixels.ToArray());
+        m_tempTex.Apply();
+        
+       // byte[] byt = m_tempTex.EncodeToPNG();
+        //File.WriteAllBytes(Application.dataPath + "/Resources/ui/@ui_tuiguan/Atlas/test.png", byt);
+
+        ////m_tex.CreateExternalTexture(m_tex.width, m_tex.height, TextureFormat.ARGB32, false, false, m_tex);
+        Debug.Log("ddddddddddddddddddddddddddd");
+        //yield return null;
+    }
+    void ModifyPixed()
+    {
+        if (m_mode == MT_Mode.MTM_Part)
+            return;
+        int counts = 0;
+        Color r3 = new Color();
+        Color[] colors = new Color[9];
+        int[] tempID = new int[9];
+        float[] aphlas = new float[9];
+
+        int r = 0;
+        int g = 0;
+        int b = 0;
+        if (m_tex != null)
+        {
+            for (int i = 0; i < m_tex.height; ++i)
+            {
+                for (int j = 0; j < m_tex.width; ++j)
+                {
+
+                    r3 = m_tex.GetPixel(j, i);
+                    if (!SerialColor(r3, out  colors[0]))
+                    {
+                        //这里是将过渡颜色改成相近的颜色值
+                        for (int n = 1; n <= 8; ++n)
+                        {
+                            colors[n] = m_tex.GetPixel(j + (int)posOff[n].x, i + (int)posOff[n].y);
+                            if (SerialColor(colors[n], out  colors[n]))
+                            {
+                                r3 = colors[n];
+                                break;
+                            }
+                        }
+                    }
+
+                    m_tempTex.SetPixel(j, i, r3);
+                }
+                //yield return null;
+            }
+        }
+        m_tempTex.Apply();
+        byte[] byt = m_tempTex.EncodeToPNG();
+        File.WriteAllBytes(Application.dataPath + "/Resources/ui/@ui_tuiguan/Atlas/citymask.png", byt);
+
+        //m_tex.CreateExternalTexture(m_tex.width, m_tex.height, TextureFormat.ARGB32, false, false, m_tex);
+        Debug.Log(counts);
+        //yield return null;
+    }
+
+    void ModifyPic()
+    {
+        if (m_mode == MT_Mode.MTM_Part)
+            return;
+        int counts = 0;
+        int off = 1;
+        Color[] colors = new Color[9];
+        int[] tempID = new int[9];
+        float[] aphlas = new float[9];
+        int showNum = 0;
+        if (m_tex != null)
+        {
+            for (int i = 0; i < m_tex.height; ++i)
+            {
+                for (int j = 0; j < m_tex.width; ++j)
+                {
+
+                    showNum = 0;
+                    colors[0] = m_tex.GetPixel(j, i);
+                    colors[1] = m_tex.GetPixel(j + off, i);
+                    colors[2] = m_tex.GetPixel(j - off, i);
+                    colors[3] = m_tex.GetPixel(j, i + off);
+                    colors[4] = m_tex.GetPixel(j, i - off);
+                    colors[5] = m_tex.GetPixel(j + off, i + off);
+                    colors[6] = m_tex.GetPixel(j + off, i - off);
+                    colors[7] = m_tex.GetPixel(j - off, i - off);
+                    colors[8] = m_tex.GetPixel(j - off, i + off);
+
+                    for (int n = 0; n < colors.Length; ++n)
+                    {
+                        tempID[n] = CalcID(colors[n]);
+                        if (m_curId < tempID[n])
+                        {
+                            aphlas[n] = 1;
+                            showNum++;
+                        }
+                        else
+                        {
+                            aphlas[n] = 0;
+                        }
+                    }
+                    //当前点的值是1，代表是在外边
+                    if (aphlas[0] == 1)
+
+                        colors[0].a = 0.1f * showNum;
+                    m_tempTex.SetPixel(j, i, colors[0]);
+                    //Debug.LogError("===" + i + "==" + j + "  color r = " + r3.ToString());
+
+                }
+                //yield return null;
+            }
+        }
+        m_tempTex.Apply();
+        byte[] byt = m_tempTex.EncodeToPNG();
+        File.WriteAllBytes(Application.dataPath + "/Resources/ui/@ui_tuiguan/Atlas/test.png", byt);
+
+        //m_tex.CreateExternalTexture(m_tex.width, m_tex.height, TextureFormat.ARGB32, false, false, m_tex);
+        Debug.Log(counts);
+        //yield return null;
+    }
+    void ReloadTex()
+    {
+        if (m_tempTex != null)
+        {
+            //注意（如果直接修改内存里的图片）这里可能需要重新读取图片
+        }
+    }
+    //羽化边界
+    void ModifyPicEdge()
+    {
+        if (m_mode == MT_Mode.MTM_Part)
+            return;
+        int counts = 0;
+        int off = 1;
+        Color[] colors = new Color[9];
+        int[] tempID = new int[9];
+        float[] aphlas = new float[9];
+        int showNum = 0;
+        if (m_tex != null)
+        {
+            for (int i = 0; i < m_tex.height; ++i)
+            {
+                for (int j = 0; j < m_tex.width; ++j)
+                {
+                    showNum = 0;
+                    //r3 = m_tex.GetPixel(j, i);
+
+                    //r = (int)(r3.r * 255);
+                    //g = (int)(r3.g * 255);
+                    //b = (int)(r3.b * 255);
+                    colors[0] = m_tex.GetPixel(j, i);
+                    colors[1] = m_tex.GetPixel(j + off, i);
+                    colors[2] = m_tex.GetPixel(j - off, i);
+                    colors[3] = m_tex.GetPixel(j, i + off);
+                    colors[4] = m_tex.GetPixel(j, i - off);
+                    colors[5] = m_tex.GetPixel(j + off, i + off);
+                    colors[6] = m_tex.GetPixel(j + off, i - off);
+                    colors[7] = m_tex.GetPixel(j - off, i - off);
+                    colors[8] = m_tex.GetPixel(j - off, i + off);
+
+                    for (int n = 0; n < colors.Length; ++n)
+                    {
+                        tempID[n] = CalcID(colors[n]);
+                        if (m_curId < tempID[n])
+                        {
+                            aphlas[n] = 1;
+                            showNum++;
+                        }
+                        else
+                        {
+                            aphlas[n] = 0;
+                        }
+                    }
+                    colors[0] = new Color(1.0f, 0, 0, 0f);
+                    colors[0].a = 0.1f * showNum;
+                    m_tempTex.SetPixel(j, i, colors[0]);
+                    //Debug.LogError("===" + i + "==" + j + "  color r = " + r3.ToString());
+
+                }
+                //yield return null;
+            }
+        }
+        m_tempTex.Apply();
+        byte[] byt = m_tempTex.EncodeToPNG();
+        File.WriteAllBytes(Application.dataPath + "/Resources/ui/@ui_tuiguan/Atlas/test.png", byt);
+
+        //m_tex.CreateExternalTexture(m_tex.width, m_tex.height, TextureFormat.ARGB32, false, false, m_tex);
+        Debug.Log(counts);
+        //yield return null;
+    }
+    protected void ResetAll()
+    {
+        if (m_mode == MT_Mode.MTM_All)
+        {
+            if (m_tex != null)
+            {
+                //m_pixels.Clear();
+                //m_pixels.AddRange(m_tex.GetPixels());
+                m_width = m_tex.width;
+                m_height = m_tex.height;
+                left = -1;
+                right = -1;
+                top = -1;
+                bottom = -1;
+                m_aphlas.Clear();
+                m_dis.Clear();
+                //Debug.LogError(m_pixels.Length + "===" + m_width + "===" + m_width);
+            }
+            posList.Clear();
+        }
+    }
+    #endregion
+    void InitPos(int off)
+    {
+        posOff[0] = new Vector2(0, 0);
+        posOff[1] = new Vector2(off, 0);
+        posOff[2] = new Vector2(-off, 0);
+        posOff[3] = new Vector2(0, off);
+        posOff[4] = new Vector2(0, -off);
+        posOff[5] = new Vector2(off, off);
+        posOff[6] = new Vector2(off, -off);
+        posOff[7] = new Vector2(-off, -off);
+        posOff[8] = new Vector2(-off, off);
+    }
+
+    protected void Clear()
+    {
+        m_aphlas.Clear();
+        m_dis.Clear();
+        m_pixels.Clear();
+    }
+    //设置计算时的相关数据
+    public void SetInfo(int curId = 1, int lineSize = 5, TTType type = TTType.TT_NEI, int pointNum = 0, int off = 1)
+    {
+        m_OutLineType = type;
+        m_pointNum = pointNum;
+        m_lineSize = lineSize;
+        m_curId = curId;
+        InitPos(off);
+    }
+    protected int CalcID(Color c)
+    {
+        //Color c =  m_tex.GetPixel(j, i);
+        float t = c.r * 5 * 36 + c.g * 5 * 6 + c.b * 5;
+        if (t == 0)
+            return 215;
+        return (int)t;
+    }
+    //查找过渡颜色
+    protected bool SerialColor(Color c, out Color oc)
+    {
+        int count = 0;
+        int r = 0;
+        int g = 0;
+        int b = 0;
+        r = (int)(c.r * 255);
+        g = (int)(c.g * 255);
+        b = (int)(c.b * 255);
+
+        if (r % 51 != 0)
+        {
+            c.r = (r + 51) / 51 * 0.2f;
+            count++;
+        }
+        if (g % 51 != 0)
+        {
+            c.g = (g + 51) / 51 * 0.2f;
+            count++;
+
+        }
+        if (b % 51 != 0)
+        {
+            c.b = (b + 51) / 51 * 0.2f;
+            count++;
+        }
+        oc = c;
+        if (count > 0)
+        {
+            return false;
+        }
+        return true;
+
+    }
+
+    //注意这里边界出界的都当时黑色了
+    protected Color GetPixel(int i, int j)
+    {
+        if (i < 0 || i >= m_width || j < 0 || j >= m_height)
+            return Color.black;
+        int index = i + j * m_width;
+        return m_pixels[index];
+    }
+    protected void SetPixel(int i, int j, Color c)
+    {
+        if (i < 0 || i >= m_width || j < 0 || j >= m_height)
+            return;
+        int index = i + j * m_width;
+        m_pixels[index] = c;
+    }
+    //默认只保存小于1的值
+    protected float GetAphla(int i, int j)
+    {
+        if (i < 0 || i >= m_width || j < 0 || j >= m_height)
+            return 1;
+        int index = i + j * m_width;
+        if (m_aphlas.ContainsKey(index))
+        {
+            return m_aphlas[index];
+        }
+        else
+        {
+            return 1;
+        }
+    }
+    protected void SetAphla(int i, int j, float a)
+    {
+        if (i < 0 || i >= m_width || j < 0 || j >= m_height)
+            return;
+        int index = i + j * m_width;
+        if (m_aphlas.ContainsKey(index))
+        {
+            m_aphlas[index] = a;
+        }
+        else
+        {
+            m_aphlas.Add(index, a);
+        }
+
+    }
+    protected void SetLeft(int i)
+    {
+        if (left < 0 || left > i)
+            left = i;
+    }
+    protected void SetRight(int i)
+    {
+        if (right < i)
+            right = i;
+    }
+    protected void SetTop(int i)
+    {
+        if (top < 0 || top > i)
+            top = i;
+    }
+    protected void SetBottom(int i)
+    {
+        if (bottom < i)
+            bottom = i;
+    }
+    protected void SetDis(int i, int j, float dis)
+    {
+        if (i < 0 || i >= m_width || j < 0 || j >= m_height)
+            return;
+        int index = i + j * m_width;
+        if (m_dis.ContainsKey(index))
+        {
+            m_dis[index] = dis;
+        }
+        else
+        {
+            m_dis.Add(index, dis);
+        }
+    }
+    //根据距离计算透明度
+    float CalcAphlaByDis(int i, int j)
+    {
+
+        if (m_mode == MT_Mode.MTM_All)
+        {
+            if (i < 0 || i >= m_width || j < 0 || j >= m_height)
+                return 1;
+            int index = i + j * m_width;
+            if (m_dis.ContainsKey(index))
+            {
+                if (m_dis[index] == 0)
+                    return 0;
+                return m_dis[index] / m_lineSize;
+            }
+            else
+            {
+                //只有边界外的像素才进入dis的字典里
+                return 0;
+            }
+        }
+        else if (m_mode == MT_Mode.MTM_Part)
+        {
+            if (i < 0 || i >= m_width || j < 0 || j >= m_height)
+                return 0;
+            int index = i + j * m_width;
+            if (m_dis.ContainsKey(index))
+            {
+                if (m_dis[index] == 0)
+                    return 1;
+                return 1 - m_dis[index] / m_lineSize;
+            }
+            else
+            {
+                if (m_OutLineType == TTType.TT_NEI)//只有边界内的像素才进入dis的字典里
+                    return 0;
+                else if (m_OutLineType == TTType.TT_WAI)
+                {
+                    if (m_dis.ContainsKey(index))
+                    {
+                        if (m_dis[index] == 0)
+                            return 1;
+                        return 1 - m_dis[index] / m_lineSize;
+                    }
+                }
+                else if (m_OutLineType == TTType.TT_DD)
+                {
+                    if (m_dis.ContainsKey(index))
+                    {
+                        if (m_dis[index] == 0)
+                            return 1;
+                        //if (m_dis[index] / m_lineSize < 0.3)
+                        //    return 1;
+                        return 1 - m_dis[index] / m_lineSize;
+                    }
+                }
+            }
+            return 0;
+        }
+        else
+        {
+            Debug.Log("m_mode " + m_mode.ToString() + " not have CalcAphlaByDis ");
+            return 0;
+        }
+
+    }
+    protected void SetOutLineDis(int n, int m, int ox, int oy)
+    {
+        //n,m代表边界点的坐标
+        //ox,oy代表偏移的像素点坐标
+        if (ox == 0 && oy == 0)
+            return;
+        if (n < 0 || n >= m_width || m < 0 || m >= m_height)
+            return;
+        int px = (n + ox);
+        int py = (m + oy);
+        if ((px) < 0 || (px) >= m_width || py < 0 || py >= m_height)
+            return;
+        //float cura = GetAphla(ox,oy);
+        //if(cura == 0)//这里默认的范围内的像素，距离都是0
+        //  return;
+
+        int index = px + py * m_width;
+        if (!m_dis.ContainsKey(index))
+        {
+            return;
+        }
+        float dis = Mathf.Sqrt((Mathf.Pow(Mathf.Abs(ox), 2) + Mathf.Pow(Mathf.Abs(oy), 2)));
+        if (m_dis[index] > dis)
+        {
+            m_dis[index] = dis;
+        }
+    }
+}
+public class ModifyPixel : ModifyTex
+{
+
+    // Use this for initialization
+   // public Texture2D m_tex;//原始图片
+   // public Texture2D m_tempTex;//应用的图片
+   //// public int m_off = 1;
+   // public int m_curId = 1;      //代表最后要开启的省，小于等于这个值的省都是透明的;
+
+   // //重新写修改像素的函数
+   // private Color[] m_pixels;
+   // private Dictionary<int, float> m_aphlas = new Dictionary<int, float>();//只有aphla小于1的保存
+   // private Dictionary<int, float> m_dis = new Dictionary<int, float>();//默认只保存范围外的值
+    //代表整个图片的宽高
+    // int m_width;
+    // int m_height;
+    
+    //public void Init(Texture2D tex, Texture2D uiTex, int curId = 1,int lineSize = 5, int pointNum = 0, int off = 1)
+    //{
+    //    m_tex = tex;
+    //    m_tempTex = uiTex;
+    //    m_pointNum = pointNum;
+    //    m_lineSize = lineSize;
+    //    m_curId = curId;
+    //    posOff[0] = new Vector2(0, 0);
+    //    posOff[1] = new Vector2(off, 0);
+    //    posOff[2] = new Vector2(-off, 0);
+    //    posOff[3] = new Vector2(0, off);
+    //    posOff[4] = new Vector2(0, -off);
+    //    posOff[5] = new Vector2(off, off);
+    //    posOff[6] = new Vector2(off, -off);
+    //    posOff[7] = new Vector2(-off, -off);
+    //    posOff[8] = new Vector2(-off, off);
+
+    //    if (m_tex != null)
+    //    {
+    //        m_pixels = m_tex.GetPixels();
+    //        m_width = m_tex.width;
+    //        m_height = m_tex.height;
+    //        m_aphlas.Clear();
+    //        m_dis.Clear();
+    //        Debug.LogError(m_pixels.Length + "===" + m_width + "===" + m_width);
+    //    }
+    //    posList.Clear();
+    //}
+
+    // Update is called once per frame
+
+    //剔除过渡像素
+
+    ////查找过渡颜色
+    //bool SerialColor(Color c, out Color oc)
+    //{
+    //    int count = 0;
+    //    int r = 0;
+    //    int g = 0;
+    //    int b = 0;
+    //    r = (int)(c.r * 255);
+    //    g = (int)(c.g * 255);
+    //    b = (int)(c.b * 255);
+
+    //    if (r % 51 != 0)
+    //    {
+    //        c.r = (r + 51) / 51 * 0.2f;
+    //        count++;
+    //    }
+    //    if (g % 51 != 0)
+    //    {
+    //        c.g = (g + 51) / 51 * 0.2f;
+    //        count++;
+
+    //    }
+    //    if (b % 51 != 0)
+    //    {
+    //        c.b = (b + 51) / 51 * 0.2f;
+    //        count++;
+    //    }
+    //    oc = c;
+    //    if (count > 0)
+    //    {
+    //        return false;
+    //    }
+    //    return true;
+
+    //}
+
+   
+}
+

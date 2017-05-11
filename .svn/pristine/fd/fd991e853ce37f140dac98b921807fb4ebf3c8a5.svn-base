@@ -1,0 +1,32 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+using UnityEngine;
+using UnityEditor;
+using System.IO;
+using System.ComponentModel;
+
+
+[CustomEditor(typeof(CMLua_Light), true)]
+class CMLua_LightInspector : Editor
+{
+    CMLua_Light model;
+
+    void OnEnable()
+    {
+        model = target as CMLua_Light; 
+    }
+
+
+    public override void OnInspectorGUI()
+    {
+        base.DrawDefaultInspector();
+        model = target as CMLua_Light;
+
+        GUILayout.Label("组件名:" + model.m_Funcs.cmName); 
+        
+    } 
+}
+ 

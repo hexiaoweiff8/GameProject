@@ -1,0 +1,181 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+public class LuaOpenLibs
+{
+    public const string CMOBJ_NAME = "type";
+    public const string OBJ_HANDELNAME = "_objhanel";
+    public const string CMOBJ_LUA_GAMEOBJ = "gameObject";
+
+    public static void _wrapComponent(
+        ILuaState lua, Component comp, //int luaGameObjRef,
+        string libName,
+        LuaClassRegHelper regHelper
+        )
+    {
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,comp),
+            new NameValuePair(LuaOpenLibs.CMOBJ_NAME,libName),
+        };
+
+        regHelper.InstanceLuaClass(lua, propertys);
+
+        //追加GameObject成员
+        lua.PushString(LuaOpenLibs.CMOBJ_LUA_GAMEOBJ);
+        LuaGameObjectLib._wrap(lua,comp.gameObject);
+        lua.RawSet(-3);
+
+        //追加组件通用方法
+        {
+            lua.PushString("SetEnable");
+            lua.PushCSharpFunction(M_Component_SetEnable);
+            lua.RawSet(-3);
+
+
+            lua.PushString("GetEnable");
+            lua.PushCSharpFunction(M_Component_GetEnable);
+            lua.RawSet(-3);
+        }
+
+    }
+
+    static int M_Component_SetEnable(ILuaState lua)
+    {
+        //in self,bool
+        //out nil
+        LuaMemberHelper.CheckClass(lua, 1);
+        Component _self = LuaMemberHelper.GetObject<Component>(lua, 1, OBJ_HANDELNAME);
+        bool enabled = lua.ToBoolean(2);
+
+
+        Behaviour behaviourSelf = _self as Behaviour;
+        if (behaviourSelf != null)
+            behaviourSelf.enabled = enabled;
+        else
+        {
+            Collider colliderSelf = _self as Collider;
+            if (colliderSelf != null)
+                colliderSelf.enabled = enabled;
+        }
+
+        return 0;
+    }
+
+    static int M_Component_GetEnable(ILuaState lua)
+    {
+        //in self
+        //out bool
+        LuaMemberHelper.CheckClass(lua, 1);
+        Component _self = LuaMemberHelper.GetObject<Component>(lua, 1, OBJ_HANDELNAME);
+        Behaviour behaviourSelf = _self as Behaviour;
+        if (behaviourSelf != null)  
+            lua.PushBoolean(behaviourSelf.enabled);
+        else
+        {
+            Collider colliderSelf = _self as Collider;
+            if (colliderSelf != null)
+                lua.PushBoolean(colliderSelf.enabled);
+            else
+                lua.PushBoolean(true);
+        }
+
+        return 1;
+    }
+
+
+    public static void OpenLibs(ILuaState lua)
+    {
+        NameFuncPair[] define = new NameFuncPair[]
+		{ 
+            new NameFuncPair( LuaGameObjectLib.LIB_NAME,	LuaGameObjectLib.OpenLib 	),
+            new NameFuncPair( LuaVector3Lib.LIB_NAME,	LuaVector3Lib.OpenLib 	),
+            new NameFuncPair( LuaVector2Lib.LIB_NAME,LuaVector2Lib.OpenLib), 
+            new NameFuncPair( LuaByteArrayLib.LIB_NAME,LuaByteArrayLib.OpenLib), 
+            new NameFuncPair( LuaTimeLib.LIB_NAME,LuaTimeLib.OpenLib), 
+            new NameFuncPair(LuaXMLLib.LIB_NAME,LuaXMLLib.OpenLib), 
+            new NameFuncPair(LuaWWWLib.LIB_NAME,LuaWWWLib.OpenLib), 
+            new NameFuncPair(LuaTimeSpanLib.LIB_NAME,LuaTimeSpanLib.OpenLib), 
+            new NameFuncPair(LuaTimerLib.LIB_NAME,LuaTimerLib.OpenLib), 
+            new NameFuncPair(LuaTextureLib.LIB_NAME,LuaTextureLib.OpenLib), 
+            new NameFuncPair(LuaSceneManageLib.LIB_NAME,LuaSceneManageLib.OpenLib), 
+            new NameFuncPair(LuaCMQKNodeClientLib.LIB_NAME,LuaCMQKNodeClientLib.OpenLib), 
+            new NameFuncPair(LuaQKJsonLib.LIB_NAME,LuaQKJsonLib.OpenLib), 
+            new NameFuncPair(LuaPacketManageLib.LIB_NAME,LuaPacketManageLib.OpenLib), 
+            new NameFuncPair(LuaPacketLoaderLib.LIB_NAME,LuaPacketLoaderLib.OpenLib), 
+            new NameFuncPair(LuaPacketLib.LIB_NAME,LuaPacketLib.OpenLib), 
+            new NameFuncPair(LuaMaterialLib.LIB_NAME,LuaMaterialLib.OpenLib), 
+            new NameFuncPair(LuaLoaderLib.LIB_NAME,LuaLoaderLib.OpenLib), 
+            new NameFuncPair(LuaI32BoolValueLib.LIB_NAME,LuaI32BoolValueLib.OpenLib), 
+            new NameFuncPair(LuaEventLib.LIB_NAME,LuaEventLib.OpenLib), 
+            new NameFuncPair(LuaEncodingLib.LIB_NAME,LuaEncodingLib.OpenLib), 
+            new NameFuncPair(LuaDateTimeLib.LIB_NAME,LuaDateTimeLib.OpenLib), 
+            new NameFuncPair(LuaCookiesLib.LIB_NAME,LuaCookiesLib.OpenLib), 
+            new NameFuncPair(LuaColorLib.LIB_NAME,LuaColorLib.OpenLib), 
+            new NameFuncPair(LuaCMScrollItemLib.LIB_NAME,LuaCMScrollItemLib.OpenLib), 
+            new NameFuncPair(LuaCMScrollContainerLib.LIB_NAME,LuaCMScrollContainerLib.OpenLib), 
+            new NameFuncPair(LuaCMScrollContainerDragLib.LIB_NAME,LuaCMScrollContainerDragLib.OpenLib), 
+            new NameFuncPair(LuaCMRendererLib.LIB_NAME,LuaCMRendererLib.OpenLib), 
+            new NameFuncPair(LuaCMPlayMovieLib.LIB_NAME,LuaCMPlayMovieLib.OpenLib), 
+            new NameFuncPair(LuaCMLightLib.LIB_NAME,LuaCMLightLib.OpenLib), 
+            new NameFuncPair(LuaCMCameraLib.LIB_NAME,LuaCMCameraLib.OpenLib), 
+            new NameFuncPair(LuaCMBoxColliderLib.LIB_NAME,LuaCMBoxColliderLib.OpenLib), 
+            new NameFuncPair(LuaCMBillboardLib.LIB_NAME,LuaCMBillboardLib.OpenLib), 
+            new NameFuncPair(LuaCMAvatarAnimator_ManualLib.LIB_NAME,LuaCMAvatarAnimator_ManualLib.OpenLib), 
+            new NameFuncPair(LuaCMAvatarAnimator_AutoLib.LIB_NAME,LuaCMAvatarAnimator_AutoLib.OpenLib), 
+            new NameFuncPair(LuaCMAudioSourceLib.LIB_NAME,LuaCMAudioSourceLib.OpenLib), 
+            new NameFuncPair(LuaCMAudioListener.LIB_NAME,LuaCMAudioListener.OpenLib), 
+            new NameFuncPair(LuaCMAnimatorLib .LIB_NAME,LuaCMAnimatorLib .OpenLib), 
+            new NameFuncPair(LuaBackgroundMusicManageLib.LIB_NAME,LuaBackgroundMusicManageLib.OpenLib), 
+            new NameFuncPair(LuaAudioClipLib.LIB_NAME,LuaAudioClipLib.OpenLib), 
+            new NameFuncPair(LuaApplicationLibs.LIB_NAME,LuaApplicationLibs.OpenLib),  
+            new NameFuncPair(LuaCMAnimationEventsTriggerLib.LIB_NAME,LuaCMAnimationEventsTriggerLib.OpenLib),  
+            new NameFuncPair(LuaProtoZipLib.LIB_NAME,LuaProtoZipLib.OpenLib),   
+            new NameFuncPair(LuaSystemInfoLib.LIB_NAME,LuaSystemInfoLib.OpenLib),   
+            new NameFuncPair(LuaHttpLoaderLib.LIB_NAME,LuaHttpLoaderLib.OpenLib),  
+            new NameFuncPair(LuaShaderLib.LIB_NAME,LuaShaderLib.OpenLib),    
+            new NameFuncPair(LuaScreenLibs.LIB_NAME,LuaScreenLibs.OpenLib),    
+            new NameFuncPair(LuaInputLibs.LIB_NAME,LuaInputLibs.OpenLib),    
+            
+		};
+
+        for (var i = 0; i < define.Length; ++i)
+        {
+            lua.L_RequireF(define[i].Name, define[i].Func, true);
+            lua.Pop(1);
+        }
+        LuaDebugExLib.OpenLib(lua);
+        LuaStringEXLib.OpenLib(lua);
+        LuaMathEXLib.OpenLib(lua);
+    }
+
+
+    public static void _wrap<T>(LuaClassRegHelper classRegHelper, ILuaState lua, T obj) where T : class
+    {
+        if (obj == null)
+        {
+            lua.PushNil();
+            return;
+        }
+
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,obj),
+        };
+
+        classRegHelper.InstanceLuaClass(lua, propertys);
+    }
+
+    public static T Lua2Obj<T>( ILuaState lua, int index) where T : class
+    {
+        if (lua.IsNil(index)) return null;
+
+        LuaMemberHelper.CheckClass(lua, index);
+        return LuaMemberHelper.GetObject<T>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+}
+ 

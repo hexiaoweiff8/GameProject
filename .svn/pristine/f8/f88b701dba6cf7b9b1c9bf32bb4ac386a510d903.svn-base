@@ -1,0 +1,119 @@
+--region *.lua
+--Date 20150910
+--摄像机控制组件
+--Author Wenchuan
+--[[
+
+local cm_CameraCtrl = class()
+
+CameraCtrl = nil --单例
+
+function cm_CameraCtrl:Start()
+    CameraCtrl = self
+    self.SceneCameraObject = GameObject.Find("/SceneRoot/SceneCamera")--获取场景渲染相机游戏对象
+    self.cmSceneCamera = self.SceneCameraObject:GetComponent(CMCamera.Name)--获取相机组件 
+
+    self.GroundCameraObject = GameObject.Find("/SceneRoot/GroundCamera")
+    self.cmGroundCamera = self.GroundCameraObject:GetComponent(CMCamera.Name)--获取相机组件 
+
+    self.SceneBGCameraObject = GameObject.Find("/SceneRoot/SceneBGCamera")--背景渲染相机
+    self.cmSceneBGCamera = self.SceneBGCameraObject:GetComponent(CMCamera.Name)
+
+    self.ForegroundCameraObject = GameObject.Find("/SceneRoot/ForegroundCamera")--前景渲染相机
+    self.cmForegroundCamera = self.ForegroundCameraObject:GetComponent(CMCamera.Name)
+
+
+    self.mediumShotObject = GameObject.Find("/SceneRoot/MediumShot")
+    self.perspectiveObject = GameObject.Find("/SceneRoot/Perspective")
+    self.foregroundObject = GameObject.Find("/SceneRoot/Foreground")
+
+     --记录相机y值
+    self.CameraY=1.2
+
+    --设定相机初始位置
+    self.SceneCameraObject:SetLocalPosition(Vector3.new(50,self.CameraY , 0)) 
+    self.SceneCameraObject:LookAtPos(Vector3.new(50, 0, 6)) 
+
+    self.GroundCameraObject:SetLocalPosition(Vector3.new(50, self.CameraY, 0)) 
+    self.GroundCameraObject:LookAtPos(Vector3.new(50, 0, 6)) 
+
+    --self.foregroundYPos = self:GetFarBlockViewportPos().y * 2 - 1 - 0.02
+    
+end
+
+--设置背景视口的y值
+function cm_CameraCtrl:SetBGViewPortY(bgViewPortY)
+    self.bgViewPortY = bgViewPortY
+    self.cmForegroundCamera:SetViewportRect(0,bgViewPortY,1,1)
+    self.cmSceneBGCamera:SetViewportRect(0,bgViewPortY,1,1)
+end
+
+--获取地图滚动位置，被CMScrollItem组件调用
+function cm_CameraCtrl:GetItemScroll()
+    return Vector2.new(0,0)--此接口当前无用
+end
+
+--取得地形最远处的块视口坐标
+function cm_CameraCtrl:GetFarBlockViewportPos()
+    local FarBlockPos = Vector3.new(0,0,GameScene.SceneHeight)--取得地形最远处的块，3D坐标
+    local FarBlockViewportPos = self.cmSceneCamera:WorldToViewportPoint(FarBlockPos) 
+    return FarBlockViewportPos
+end
+
+--设置地图滚动位置，被CMScrollItem组件调用
+function cm_CameraCtrl:SetItemScroll(pos)
+    --print("cm_CameraCtrl:SetItemScroll",pos)
+
+    --移动地面渲染相机和avatar渲染相机
+    self.SceneCameraObject:SetLocalPosition( Vector3.new(pos.x,self.CameraY,pos.y) )
+    self.GroundCameraObject:SetLocalPosition( Vector3.new(pos.x,self.CameraY,pos.y) )
+
+    
+    local screenW,screenH = Application.GetScreenSize()--视口尺寸
+    local xs_x = 2.0/screenH * (1+(1 - self.bgViewPortY))--显示尺寸和相机渲染尺寸缩放系数
+    local t_x =  pos.x/GameScene.SceneWidth--背景x方向滚动插值系数
+
+    local t_y = pos.y/GameScene.SceneHeight--背景y方向滚动插值系数
+    
+    --矫正前景y位置,并滚动前景 
+    self.foregroundObject:SetLocalPosition(
+        Vector3.new(
+            -GameScene.foregroundWidth  * t_x * xs_x,
+            -1 + math.lerp(GameScene.foregroundInfo.min_yoffset,GameScene.foregroundInfo.max_yoffset,t_y),
+            0
+         )
+     )
+
+    --移动中景
+    self.mediumShotObject:SetLocalPosition(
+        Vector3.new(
+            -GameScene.mediumShotWidth  * t_x * xs_x,
+            -1 + math.lerp(GameScene.mediumShotInfo.min_yoffset,GameScene.mediumShotInfo.max_yoffset,t_y),
+            0
+         )
+    )
+
+    --移动背景
+    self.perspectiveObject:SetLocalPosition(
+        Vector3.new(
+            -GameScene.perspectiveWidth  * t_x * xs_x,
+            -1 + math.lerp(GameScene.perspectiveInfo.min_yoffset,GameScene.perspectiveInfo.max_yoffset,t_y),
+            0
+         )
+    ) 
+end
+
+--获取地图尺寸，被CMScrollItem组件调用
+function cm_CameraCtrl:GetItemSize()
+    return Vector2.new(GameScene.SceneWidth+18,GameScene.SceneHeight-1)
+end
+
+--获取地图起始位置，被CMScrollItem组件调用
+function cm_CameraCtrl:GetItemPos()
+    return Vector2.new(-15,-5)
+end
+
+return cm_CameraCtrl.new
+
+--]]
+--endregion

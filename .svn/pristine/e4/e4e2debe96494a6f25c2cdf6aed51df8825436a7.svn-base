@@ -1,0 +1,172 @@
+ManifestFileVersion: 0
+CRC: 1235839341
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 935d1c1dd5d8882e042444cc57ce327c
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 9fa919accfb7de8b57dd67cf3e6bd252
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 20
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 64
+  Script: {instanceID: 0}
+- Class: 74
+  Script: {instanceID: 0}
+- Class: 81
+  Script: {instanceID: 0}
+- Class: 91
+  Script: {instanceID: 0}
+- Class: 92
+  Script: {instanceID: 0}
+- Class: 95
+  Script: {instanceID: 0}
+- Class: 108
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: a1da353243062479a9b31c85074a796b, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4185bc77c7194462ca3b1097ef4a5de0, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 0d2f50a8e0bb841a5aaa90ae55db8849, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: de2ab2b9ac93bb544b9552e49030371b, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: fea7b13af3077854db9d7d5ea70ad5f6, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 42e7f46d0e5a84171a3909479c1646ba, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2a91e8dd37cdd41efb4859b65aced7a2, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 124
+  Script: {instanceID: 0}
+- Class: 198
+  Script: {instanceID: 0}
+- Class: 199
+  Script: {instanceID: 0}
+Assets:
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_chuan1.mat
+- Assets/Resources/scenes/@scene_03/modle/Materials/No Name.mat
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs_03qiao.mat
+- Assets/Resources/scenes/@scene_03/texture/cs03_diaoqian.png
+- Assets/Resources/scenes/@scene_03/modle/Materials/SC_DiGong01_XingJuCi01.mat
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_qiao.mat
+- Assets/Resources/scenes/@scene_03/modle/Cs03_DiaoqiaoModel.FBX
+- Assets/Resources/scenes/@scene_03/modle/Materials/diaoqian.mat
+- Assets/Resources/scenes/@scene_03/modle/Materials/T_Y_gu001.mat
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_haixian.mat
+- Assets/Resources/scenes/@scene_03/modle/Materials/01.mat
+- Assets/Resources/scenes/@scene_03/modle/Cs03_chuan2.FBX
+- Assets/Resources/scenes/@scene_03/texture/cs03_chuan1.png
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_gui 1.mat
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_ZhongYuan_BeiKe01.mat
+- Assets/Resources/scenes/@scene_03/modle/cs03_huopen.FBX
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_toushiche.mat
+- Assets/Resources/scenes/@scene_03/T4MOBJ/Terrains/Texture/cs03_ArathiHighlandsRubbleBase.tga
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_penyan.mat
+- Assets/Resources/scenes/@scene_03/texture/cs03_yan.tga
+- Assets/Resources/scenes/@scene_03/modle/cs03_yuanjingshu.FBX
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_fanyuta.mat
+- Assets/Resources/scenes/@scene_03/modle/cs03_huopenhuopen.prefab
+- Assets/Resources/scenes/@scene_03/cs03_shui.prefab
+- Assets/Resources/scenes/@scene_03/texture/Materials/sc-003chuan1.mat
+- Assets/Resources/scenes/@scene_03/texture/cs03_Jianta_texture.png
+- Assets/Resources/scenes/@scene_03/modle/Materials/1.mat
+- Assets/Resources/scenes/@scene_03/texture/cs03_liaowangta.png
+- Assets/Resources/scenes/@scene_03/T4MOBJ/Terrains/Meshes/Cs03_shui.obj
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_pianshu.mat
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_T_Y_pochuan001_a.mat
+- Assets/Resources/scenes/@scene_03/modle/Materials/T_Y_Bixi001_Gui.mat
+- Assets/Resources/scenes/@scene_03/texture/cs03_qiao.png
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_mudu.mat
+- Assets/Resources/scenes/@scene_03/texture/cs03_gui.png
+- Assets/Resources/scenes/@scene_03/modle/cs03_chuanpian.FBX
+- Assets/Resources/scenes/@scene_03/modle/cs_03mudun.FBX
+- Assets/Resources/scenes/@scene_03/T4MOBJ/Terrains/Meshes/Materials/defaultMat.mat
+- Assets/Resources/scenes/@scene_03/modle/cs03_Huaiche.FBX
+- Assets/Resources/scenes/@scene_03/modle/cs03_liaowangta.FBX
+- Assets/Resources/scenes/@scene_03/texture/Materials/sc-003cao.mat
+- Assets/Resources/scenes/@scene_03/texture/cs03_huopen_textures.png
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_jianta.mat
+- Assets/Resources/scenes/@scene_03/texture/cs03_huopen.png
+- Assets/Resources/scenes/@scene_03/texture/cs03_zhanda0.png
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_huopen_textures.mat
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_huopenyan.mat
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_Fire.mat
+- Assets/Resources/scenes/@scene_03/modle/Materials/T_Y_pochuan001_a.mat
+- Assets/Resources/scenes/@scene_03/modle/Materials/qiao.mat
+- Assets/Resources/scenes/@scene_03/modle/Cs03_qiao.FBX
+- Assets/Resources/scenes/@scene_03/Animation/Cs03_chuan2.controller
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_liaowangta.mat
+- Assets/Resources/scenes/@scene_03/T4MOBJ/Terrains/Material/cs03_terrain.mat
+- Assets/Resources/scenes/@scene_03/texture/cs03_yuanshu.png
+- "Assets/Resources/scenes/@scene_03/modle/Materials/MF063\u68E7\u90531.mat"
+- Assets/Resources/scenes/@scene_03/T4MOBJ/Terrains/Texture/cs03_DeadwindPassDirt.tga
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs_03yan.mat
+- Assets/Resources/scenes/@scene_03/modle/cs03_JiantaModel.FBX
+- Assets/Resources/scenes/@scene_03/texture/cs03_toushiche.png
+- Assets/Resources/scenes/@scene_03/texture/Materials/sc-003qiao.mat
+- Assets/Resources/scenes/@scene_03/modle/Cs03_pochuan.FBX
+- Assets/Resources/scenes/@scene_03/texture/Materials/sc-003haixian.mat
+- Assets/Resources/scenes/@scene_03/modle/Materials/T_Y_Bixi002_Bei.mat
+- Assets/Resources/scenes/@scene_03/modle/Materials/68bbd75a.mat
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_huanpian.mat
+- Assets/Resources/scenes/@scene_03/T4MOBJ/Terrains/Texture/cs03_WestFallRockBase.tga
+- Assets/Resources/scenes/@scene_03/texture/cs03_mudun.png
+- Assets/Resources/scenes/@scene_03/texture/cs03_pochuan.png
+- Assets/Resources/scenes/@scene_03/modle/Materials/sc_shuizhai01_toushiche01.mat
+- Assets/Resources/scenes/@scene_03/Animation/chuan1.anim
+- Assets/Resources/scenes/@scene_03/modle/Materials/SC_BuJian01_HuoPen01_001.mat
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_shuimian.mat
+- Assets/Resources/scenes/@scene_03/modle/cs03_shu.FBX
+- Assets/Resources/scenes/@scene_03/texture/cs03_shu.tga
+- Assets/Resources/scenes/@scene_03/modle/cs03_gu.FBX
+- Assets/Resources/scenes/@scene_03/texture/Materials/waterfalls_D02.mat
+- Assets/Resources/scenes/@scene_03/T4MOBJ/Terrains/Texture/cs03_AshzaraDirt.tga
+- Assets/Resources/scenes/@scene_03/modle/Materials/chuan1.mat
+- Assets/Resources/scenes/@scene_03/modle/Materials/d00d927e.mat
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_chengmnen.mat
+- Assets/Resources/scenes/@scene_03/modle/cs03_chengmen.FBX
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_zhandao.mat
+- Assets/Resources/scenes/@scene_03/modle/cs03_zhnadao.FBX
+- Assets/Resources/scenes/@scene_03/texture/cs03_Fire_Sprite_006.tga
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_gu.mat
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_cs.mat
+- Assets/Resources/scenes/@scene_03/modle/Materials/chuanpian.mat
+- Assets/Resources/scenes/@scene_03/T4MOBJ/Terrains/Texture/cs03_ArathiHighlandsDirt.tga
+- Assets/Resources/scenes/@scene_03/T4MOBJ/Terrains/Texture/cs03_terrain.png
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_cao.mat
+- Assets/Resources/scenes/@scene_03/texture/cs03_chuanpian.png
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_yan.mat
+- Assets/Resources/scenes/@scene_03/modle/cs03_gui.FBX
+- Assets/Resources/scenes/@scene_03/texture/cs03_chengmen.png
+- Assets/Resources/scenes/@scene_03/texture/cs03_gu.png
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_toushiche 1.mat
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_huopen.mat
+- Assets/Resources/scenes/@scene_03/Animation/Cs03_chuan1.controller
+- Assets/Resources/scenes/@scene_03/modle/Cs03_chuan1.FBX
+- Assets/Resources/scenes/@scene_03/modle/cs03_toushiche.FBX
+- Assets/Resources/scenes/@scene_03/texture/Materials/cs03_shu.mat
+- Assets/Resources/scenes/@scene_03/modle/Materials/bb19.mat
+Dependencies:
+- C:/unityhello/ResProject/Now/Assets/StreamingAssets/win64/packets/scene_share
+- C:/unityhello/ResProject/Now/Assets/StreamingAssets/win64/packets/scene_04

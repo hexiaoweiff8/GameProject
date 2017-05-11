@@ -1,0 +1,30 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using YQ2Common.CObjects;
+public class UIConstraint : MonoBehaviour
+{
+    public GameObject Target = null;
+
+    public Vector3 Position;
+    public bool x = false;
+    public bool y = false;
+    public bool z = false;
+
+    void Start()
+    {
+
+    }
+
+    void Update()
+    {
+        Vector3 OldPosition = Target.transform.localPosition;
+
+        if (x) OldPosition.x = Position.x;
+        if (y) OldPosition.y = Position.y;
+        if (z) OldPosition.z = Position.z;
+
+        Target.transform.localPosition = OldPosition;
+    }
+}
+   

@@ -1,0 +1,227 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+
+class LuaBuffMathInfoLibs
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+
+    public const string LIB_NAME = "BuffMathInfo";
+
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            new NameFuncPair("AtcMB",M_AtcMB), 
+            new NameFuncPair("AtcID",M_AtcID),  
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        { 
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+
+
+    public static void _wrap(ILuaState lua, BuffMathInfo obj)
+    {
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,obj),
+        };
+
+        m_ClassRegHelper.InstanceLuaClass(lua, propertys);
+    }
+
+    public static BuffMathInfo Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<BuffMathInfo>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    static int M_AtcMB(ILuaState lua)
+    {
+        //in self
+        //out int
+        BuffMathInfo self = Lua2Obj(lua, 1);
+        lua.PushString(self.AtcMB);
+        return 1;
+    }
+
+    static int M_AtcID(ILuaState lua)
+    {
+        //in self
+        //out int
+        BuffMathInfo self = Lua2Obj(lua, 1);
+        lua.PushInteger(self.AtcID);
+        return 1;
+    }
+     
+}
+
+class LuaTexiaoInfoLibs
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+
+    public const string LIB_NAME = "TexiaoInfo";
+
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+           // new NameFuncPair("AtcMB",M_AtcMB), 
+            //new NameFuncPair("AtcID",M_AtcID),  
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        { 
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+
+
+    public static void _wrap(ILuaState lua, TexiaoInfo obj)
+    {
+        NameValuePair[] propertys = new NameValuePair[]
+        {
+            new NameValuePair(LuaOpenLibs.OBJ_HANDELNAME,obj),
+        };
+
+        m_ClassRegHelper.InstanceLuaClass(lua, propertys);
+    }
+
+    public static TexiaoInfo Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<TexiaoInfo>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+    /*
+    static int M_AtcMB(ILuaState lua)
+    {
+        //in self
+        //out int
+        TexiaoInfo self = Lua2Obj(lua, 1);
+        lua.PushString(self.AtcMB);
+        return 1;
+    }
+
+    static int M_AtcID(ILuaState lua)
+    {
+        //in self
+        //out int
+        TexiaoInfo self = Lua2Obj(lua, 1);
+        lua.PushInteger(self.AtcID);
+        return 1;
+    }*/
+     
+}
+ 
+class LuaSData_TexiaoLibs
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+
+    public const string LIB_NAME = "SData_Texiao";
+
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            
+            
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair("GetTexiao",S_GetTexiao),    
+            new NameFuncPair("GetBuffMathInfo",S_GetBuffMathInfo),  
+            new NameFuncPair("GetBuffMathList",S_GetBuffMathList),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+
+        return 1;
+    }
+
+    static int S_GetTexiao(ILuaState lua)
+    {
+        //in id
+        //out TexiaoInfo
+        int id = lua.L_CheckInteger(1);
+
+        TexiaoInfo info = SData_Texiao.Single.Get(id);
+        LuaTexiaoInfoLibs._wrap(lua, info);
+        return 1;
+    }
+
+
+    static int S_GetBuffMathInfo(ILuaState lua)
+    {
+        //in id
+        //out BuffMathInfo
+         int id = lua.L_CheckInteger(1);
+        BuffMathInfo info = SData_BuffMath.Single.Get(id);
+        LuaBuffMathInfoLibs._wrap(lua, info);
+        return 1;
+    }
+
+    static int S_GetBuffMathList(ILuaState lua)
+    {
+        //in id
+        //out {id,id,...}
+        int id = lua.L_CheckInteger(1);
+        int[] BuffMathInfoIDs = SData_BuffData.Single.Get(id);
+        lua.CreateTable(0, 0);
+        int index = 1;
+        foreach(int curr in BuffMathInfoIDs)
+        {
+            lua.PushInteger(curr);
+            lua.RawSetI(index++, -2);
+        }
+        return 1;
+    }
+} 

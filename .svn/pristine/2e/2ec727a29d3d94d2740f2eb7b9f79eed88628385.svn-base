@@ -1,0 +1,258 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+class LuaCMAudioSourceLib
+{
+    class CMAudioSourceInfo : ICoreComponentInfo
+    {
+        public Type type { get { return typeof(AudioSource); } }
+        public string name { get { return LuaCMAudioSourceLib.LIB_NAME; } }
+        public void newLuaObj(ILuaState lua, Component cmp)
+        {
+            LuaCMAudioSourceLib._wrap(lua, cmp as AudioSource);
+        }
+    }
+
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+   // static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "CMAudioSource";
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            new NameFuncPair("Stop",M_Stop),
+            new NameFuncPair("SetClip",M_SetClip),
+            new NameFuncPair("GetClip",M_GetClip),
+            new NameFuncPair("isPlaying",M_isPlaying),
+            new NameFuncPair("GetLoop",M_GetLoop),
+            new NameFuncPair("SetLoop",M_SetLoop),
+            new NameFuncPair("GetMaxDistance",M_GetMaxDistance),
+            new NameFuncPair("SetMaxDistance",M_SetMaxDistance),
+            new NameFuncPair("GetMinDistance",M_GetMinDistance),
+            new NameFuncPair("SetMinDistance",M_SetMinDistance),            
+            new NameFuncPair("GetVolume",M_GetVolume),
+            new NameFuncPair("SetVolume",M_SetVolume),
+            new NameFuncPair("GetMute",M_GetMute),
+            new NameFuncPair("SetMute",M_SetMute),
+            new NameFuncPair("SetPause",M_SetPause),
+            new NameFuncPair("Play",M_Play),
+        }; 
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair("PlayClipAtPoint",S_PlayClipAtPoint),
+        };
+
+        //注册静态属性
+        NameValuePair[] static_property = new NameValuePair[]
+        {
+            new NameValuePair("Name",LIB_NAME),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define, static_property);
+
+        LuaGameObjectLib.RegComponent(new CMAudioSourceInfo());
+
+        return 1;
+    }
+
+    public static void _wrap(ILuaState lua, AudioSource comp)
+    {
+        LuaOpenLibs._wrapComponent(lua, comp, LIB_NAME, m_ClassRegHelper);
+    }
+
+    public static AudioSource Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<AudioSource>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    static int M_SetClip(ILuaState lua)
+    {
+        //in self,AudioClip
+        //out void
+
+        AudioSource self = Lua2Obj(lua, 1);
+        AudioClip audioClip = LuaAudioClipLib.Lua2Obj(lua, 2);
+
+        self.clip = audioClip;
+
+        return 0;
+    }
+
+    static int M_GetClip(ILuaState lua)
+    {
+        //in self
+        //out AudioClip
+        AudioSource self = Lua2Obj(lua, 1);
+        LuaAudioClipLib._wrap(lua, self.clip);
+        return 1;
+    }
+     
+    static int M_isPlaying(ILuaState lua)
+    {
+        //in self
+        //out bool
+        AudioSource self = Lua2Obj(lua, 1);
+        lua.PushBoolean(self.isPlaying);
+        return 1;
+    }
+
+    static int M_GetLoop(ILuaState lua)
+    {
+        //in self
+        //out bool
+        AudioSource self = Lua2Obj(lua, 1);
+        lua.PushBoolean(self.loop);
+        return 1;
+    }
+
+    static int M_SetLoop(ILuaState lua)
+    {
+        //in self,bool
+        //out nil
+        AudioSource self = Lua2Obj(lua, 1);
+        self.loop = lua.ToBoolean(2);
+        return 0;
+    }
+
+
+
+    static int M_GetMinDistance(ILuaState lua)
+    {
+        //in self
+        //out float
+        AudioSource self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.minDistance);
+        return 1;
+    }
+
+    static int M_SetMinDistance(ILuaState lua)
+    {
+        //in self,float
+        //out nil
+        AudioSource self = Lua2Obj(lua, 1);
+        self.minDistance = (float)lua.L_CheckNumber(2);
+        return 0;
+    }
+
+
+    static int M_GetMaxDistance(ILuaState lua)
+    {
+        //in self
+        //out float
+        AudioSource self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.maxDistance);
+        return 1;
+    }
+
+    static int M_SetMaxDistance(ILuaState lua)
+    {
+        //in self,float
+        //out nil
+        AudioSource self = Lua2Obj(lua, 1);
+        self.maxDistance = (float)lua.L_CheckNumber(2);
+        return 0;
+    }
+
+
+
+    static int M_GetVolume(ILuaState lua)
+    {
+        //in self
+        //out float
+        AudioSource self = Lua2Obj(lua, 1);
+        lua.PushNumber(self.volume);
+        return 1;
+    }
+
+    static int M_SetVolume(ILuaState lua)
+    {
+        //in self,float
+        //out nil
+        AudioSource self = Lua2Obj(lua, 1);
+        self.volume = (float)lua.L_CheckNumber(2);
+        return 0;
+    }
+
+
+    static int M_GetMute(ILuaState lua)
+    {
+        //in self
+        //out bool
+        AudioSource self = Lua2Obj(lua, 1);
+        lua.PushBoolean(self.mute);
+        return 1;
+    }
+
+    static int M_SetMute(ILuaState lua)
+    {
+        //in self,bool
+        //out nil
+        AudioSource self = Lua2Obj(lua, 1);
+        self.mute = lua.ToBoolean(2);
+        return 0;
+    }    
+
+    static int M_SetPause(ILuaState lua)
+    {
+        //in self,bool
+        //out nil
+        AudioSource self = Lua2Obj(lua, 1);
+        bool pause = lua.ToBoolean(2);
+        if (pause)
+            self.Pause();
+        else
+            self.UnPause();
+        return 0;
+    }
+
+    static int M_Play(ILuaState lua)
+    {
+        //in self
+        //out nil
+        AudioSource self = Lua2Obj(lua, 1);
+        self.Play();
+        return 0;
+    } 
+
+    static int M_Stop(ILuaState lua)
+    {
+        //in self
+        //out nil
+        AudioSource self = Lua2Obj(lua, 1);
+        self.Stop();
+        return 0;
+    }
+
+  
+    public static int S_PlayClipAtPoint(ILuaState lua)
+    {
+        //in AudioClip,pos[,volume]
+        int n = lua.GetTop();
+        AudioClip clip = LuaAudioClipLib.Lua2Obj(lua, 1);
+        Vector3 pos; LuaVector3Lib.Lua2Obj(lua, 2, out pos);
+        float volume = n >= 3 ? (float)lua.L_CheckNumber(3) : 1;
+        
+        AudioSource.PlayClipAtPoint(clip, pos, volume);
+
+        return 0;
+    } 
+}
+ 

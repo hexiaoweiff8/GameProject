@@ -1,0 +1,132 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+class LuaCMUITextureLib
+{
+
+    class CMUITextureInfo : ICoreComponentInfo
+    {
+        public Type type { get { return typeof(UITexture); } }
+        public string name { get { return LuaCMUITextureLib.LIB_NAME; } }
+        public void newLuaObj(ILuaState lua, Component cmp)
+        {
+            LuaCMUITextureLib._wrap(lua, cmp as UITexture);
+        }
+    }
+
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+    public const string LIB_NAME = "CMUITexture";
+
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {  
+            new NameFuncPair("GetMaterial",M_GetMaterial),
+            new NameFuncPair("SetMaterial",M_SetMaterial),
+            new NameFuncPair("SetUVOffset",M_SetUVOffset),
+            new NameFuncPair("SetShader",M_SetShader),
+            new NameFuncPair("GetShader",M_GetShader),
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+           
+            
+        };
+        //注册静态属性
+        NameValuePair[] static_property = new NameValuePair[]
+        {
+            new NameValuePair("Name",LIB_NAME),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define, static_property);
+
+        LuaGameObjectLib.RegComponent(new CMUITextureInfo());
+
+        return 1;
+    }
+
+    public static void _wrap(ILuaState lua, UITexture comp)
+    {
+        LuaOpenLibs._wrapComponent(lua, comp, LIB_NAME, m_ClassRegHelper);
+    }
+
+    public static UITexture Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<UITexture>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+
+    static int M_GetMaterial(ILuaState lua)
+    {
+        //in self
+        //out Material
+        UITexture self = Lua2Obj(lua, 1);
+        LuaMaterialLib._wrap(lua, self.material);
+        return 1;
+    }
+
+    static int M_SetMaterial(ILuaState lua)
+    {
+        //in self,Material
+        //out nil
+        UITexture self = Lua2Obj(lua, 1);
+        self.material = LuaMaterialLib.Lua2Obj(lua, 2);
+        return 0;
+    }
+
+    static int M_SetUVOffset(ILuaState lua)
+    {
+        //in self,uoffset,voffset
+        //out nil
+        UITexture self = Lua2Obj(lua, 1);
+        float uoffset = (float)lua.L_CheckNumber(2);
+        float voffset = (float)lua.L_CheckNumber(3);
+        Rect old = self.uvRect;
+        self.uvRect = new Rect(uoffset, voffset, old.width, old.height);
+        return 0;
+    }
+
+    static int M_SetShader(ILuaState lua)
+    {
+        //in self,shader
+        //in self,shaderName
+        //out void
+        var self = Lua2Obj(lua, 1);
+        if (lua.IsString(2))//用shaderName
+        {
+            self.shader = Shader.Find(lua.L_CheckString(2));
+        }
+        else //用shader对象
+        {
+            self.shader = LuaShaderLib.Lua2Obj(lua, 2);
+        }
+        return 0;
+    }
+
+    static int M_GetShader(ILuaState lua)
+    {
+        //in self
+        //out shader
+        var self = Lua2Obj(lua, 1);
+        LuaShaderLib._wrap(lua, self.shader);
+        return 1;
+    }
+}

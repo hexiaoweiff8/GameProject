@@ -1,0 +1,78 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+public class LuaCMUIAudioFxLibs
+{
+    class CMUIAudioFxInfo : ICoreComponentInfo
+    {
+        public Type type { get { return typeof(UIAudioFx); } }
+        public string name { get { return LuaCMUIAudioFxLibs.LIB_NAME; } }
+        public void newLuaObj(ILuaState lua, Component cmp)
+        {
+            LuaCMUIAudioFxLibs._wrap(lua, cmp as UIAudioFx);
+        }
+    }
+
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+    public const string LIB_NAME = "CMUIAudioFx";
+
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        { 
+            new NameFuncPair("ReStart",M_ReStart)
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        { 
+            
+        };
+        //注册静态属性
+        NameValuePair[] static_property = new NameValuePair[]
+        {
+            new NameValuePair("Name",LIB_NAME),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define, static_property);
+
+        LuaGameObjectLib.RegComponent(new CMUIAudioFxInfo());
+
+        return 1;
+    }
+
+    public static void _wrap(ILuaState lua, UIAudioFx comp)
+    {
+        LuaOpenLibs._wrapComponent(lua, comp, LIB_NAME, m_ClassRegHelper);
+    }
+
+    public static UIAudioFx Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<UIAudioFx>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+     
+    static int M_ReStart(ILuaState lua)
+    {
+        //in self
+
+        var self = Lua2Obj(lua, 1);
+        self.ReStart();
+        return 0;
+    }
+} 

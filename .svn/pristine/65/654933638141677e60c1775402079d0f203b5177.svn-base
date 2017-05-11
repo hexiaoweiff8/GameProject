@@ -1,0 +1,703 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+
+class LuaBattlefieldLibs
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+
+    public const string LIB_NAME = "Battlefield";
+
+    public static int OpenLib(ILuaState lua)
+    {
+
+        //注册成员函数 
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+            
+            
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair("LoadSceneOnly",S_LoadSceneOnly),
+            new NameFuncPair("Reset",S_Reset),            
+            new NameFuncPair("StartFight",S_StartFight),
+            new NameFuncPair("ShowGrid",S_ShowGrid), 
+            new NameFuncPair("OnFightEnd",S_OnFightEnd), 
+            new NameFuncPair("SetFightResult",S_SetFightResult), 
+            new NameFuncPair("Charge",S_Charge), 
+            new NameFuncPair("SetFightSpeed",S_SetFightSpeed), 
+            new NameFuncPair("UnloadScene",S_UnloadScene), 
+            new NameFuncPair("LoadMainSceneActors", S_LoadMainSceneActors)
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define);
+         
+        //注册枚举
+        NameValuePair[] ArmyFlag_define = new NameValuePair[]
+        {
+            new NameValuePair("None", ArmyFlag.None),
+            new NameValuePair("Attacker",ArmyFlag.Attacker),
+            new NameValuePair("Defender",ArmyFlag.Defender), 
+            new NameValuePair("All",ArmyFlag.All),
+        };
+        m_ClassRegHelper.RegEnum(lua, "ArmyFlag", ArmyFlag_define);
+
+        //绑定战斗结束事件
+        DP_FightEvent.OnFightEnd += OnFightEnd;
+
+        return 1;
+    }
+
+
+
+    static QKEvent evt_FightEnd = new QKEvent();
+
+    static void OnFightEnd(FightResult result)
+    {
+        //存储摄像机当前的值到账户信息中
+        float scaleAA = YQ2CameraCtrl.Single.m_Scale;
+        float scaleYY = YQ2CameraCtrl.Single.m_YRotScale;
+        CPlayerPrefs.Single.SetUserDate("CameraScale", scaleAA.ToString("f5"));
+        CPlayerPrefs.Single.SetUserDate("CameraYRot", scaleYY.ToString("f5"));
+
+        YQ2CameraCtrl.Single.istuiguan = false;
+
+        LuaFightResultLibs._wrap(LuaRoot._Lua, result);
+        using (LuaValue_Any luaFightResult = new LuaValue_Any(LuaRoot._Lua.L_Ref(LuaDef.LUA_REGISTRYINDEX)))
+        {
+            evt_FightEnd.Call(luaFightResult);
+        }
+    }
+    /// <summary>
+    /// 主城角色开始上场 演出开始
+    /// </summary>
+    static void MainSceneStartShow()
+    {
+        //立即回收被隐藏的窗口
+        WndManage.Single.DestroyHideWnds();
+
+        //清理战场
+        DP_Battlefield.Single.Reset();
+
+        //卸掉场景
+        DP_Battlefield.Single.SwapScene(0, null, null);
+
+        //设置战斗参数
+        //AI_Single.Single.Battlefield.SetFightParameter();
+
+        //立即垃圾回收
+        //GC.Collect();
+        Resources.UnloadUnusedAssets();
+    }
+     
+    static int S_Reset(ILuaState lua)
+    {
+        //in
+        //out 
+        if (FightLoading) return 0;//场景装载中
+
+        DP_Battlefield.Single.Reset();
+
+        
+        //等待一会儿卸载场景资源
+        /*
+        if (UnloadSceneTimer == null)
+        {
+            UnloadSceneTimer = UROMSystem.Single.AddComponent<UTimer>();
+            UnloadSceneTimer.OnComplete += OnUnloadSceneTimerRecall;
+        }
+        UnloadSceneTimer.Reset(1);//1秒后执行
+         */
+        //UnloadSceneTimer.enabled = true;//激活
+
+
+        //隐藏战斗界面
+        if (wnd_fight.Single.IsVisible)  wnd_fight.Single.Hide(0);
+        if (wnd_scene.Single.IsVisible) wnd_scene.Single.Hide(0);
+        DP_Battlefield.Single.SwapScene(0, null, null);
+       
+       
+        //立即回收被隐藏的窗口
+        WndManage.Single.DestroyHideWnds();
+
+        //GC
+        Resources.UnloadUnusedAssets();
+        //GC.Collect();
+
+       // DrawCallDebug.Dump();
+
+        return 0;
+    }
+    //卸载场景 
+      static int S_UnloadScene(ILuaState lua)
+    {
+        DP_Battlefield.Single.SwapScene(0, null, null);
+        return 0;
+    }
+
+    //static UTimer UnloadSceneTimer = null;
+
+    static int S_OnFightEnd(ILuaState lua)
+    {
+        //in
+        //out QKEvent
+        LuaEventLib._wrap(lua, evt_FightEnd);
+        return 1;
+    }
+
+
+    /// <summary>
+    /// 直接设定战斗胜负
+    /// </summary> 
+    static int S_SetFightResult(ILuaState lua)
+    {
+        //in iswin
+
+        if (AI_Single.Single == null || AI_Single.Single.Battlefield.FightST < FightST.StartDone) return 0;
+
+        var aicmd = new AICmd_SetResult();
+        aicmd.IsWin = lua.ToBoolean(1);
+        DP_BattlefieldDraw.Single.PushAICmd(aicmd);
+
+        return 0;
+    }
+    static bool FightLoading = false;
+
+
+    static int S_LoadMainSceneActors(ILuaState lua)
+    {
+        //in FightParameter[,talkRecallClass,talkRecallFunc]
+        if (FightLoading) return 0;
+
+        var n = lua.GetTop();
+        FightParameter param = new FightParameter();
+
+        param.LeftZhenfaID = 6;
+        param.RightZhenfaID = 5;
+        param.Music = "battlemusic1";
+        param.QixiSquare = null;
+        param.sceneID = 3;
+        param.tuiguan_zhang = 1;
+        param.tuiguan_jie = 1;
+        param.fightType = FightType.Tuiguan;
+
+        param.Squares = new List<ArmySquareInfo>();
+        //for(int i = 0; i < 10; i++)
+        //{
+
+        var army = new ArmySquareInfo();
+        army.cd = -1f;
+        army.fid = 1;
+        army.flag = ArmyFlag.Attacker;
+        army.heroLevel = 1;
+        army.hp = -1;
+        army.hxj = 1;
+        army.soldiersCount = 1;
+        army.staticHeroID = 5001;
+        army.sxj = 1;
+        army.zs = false;
+        army.Equips = new Equip[0];
+        army.sklv = new short[9];
+        army.sklv[0] = 1;
+        army.sklv[1] = 1;
+        army.sklv[2] = 1;
+        army.sklv[3] = 1;
+        army.sklv[4] = 1;
+        army.sklv[5] = 1;
+        army.sklv[6] = 0;
+        army.sklv[7] = 0;
+        army.sklv[8] = 0;
+        param.Squares.Add(army);
+
+
+        var army1 = new ArmySquareInfo();
+        army1.cd = -1f;
+        army1.fid = 2;
+        army1.flag = ArmyFlag.Attacker;
+        army1.heroLevel = 1;
+        army1.hp = -1;
+        army1.hxj = 1;
+        army1.soldiersCount = 1;
+        army1.staticHeroID = 5002;
+        army1.sxj = 1;
+        army1.zs = false;
+        army1.Equips = new Equip[0];
+        army1.sklv = new short[9];
+        army1.sklv[0] = 1;
+        army1.sklv[1] = 1;
+        army1.sklv[2] = 1;
+        army1.sklv[3] = 1;
+        army1.sklv[4] = 1;
+        army1.sklv[5] = 1;
+        army1.sklv[6] = 0;
+        army1.sklv[7] = 0;
+        army1.sklv[8] = 0;
+        param.Squares.Add(army1);
+
+
+        //}
+
+        var reCall = (n == 3) ? LuaRoot.LDelegate2Event<LuaEventCallback>(lua, 2, 3) : null;
+
+        FightLoading = true;
+
+        //if (UnloadSceneTimer!=null) UnloadSceneTimer.enabled = false;//禁用卸载场景定时器
+
+        CoroutineManage.Single.StartCoroutine(LoadMainSceneActor(param, reCall));
+        return 0;
+    }
+
+    private static IEnumerator LoadMainSceneActor(FightParameter param, QKEvent talkRecall)
+    {
+        //显示战斗装载界面
+        wnd_prefight.Single.Show(Wnd.DefaultDuration);
+
+        //停顿一段时间，等界面显示完全
+        {
+            float t = Wnd.DefaultDuration;
+            while (t > 0)
+            {
+                yield return null;
+                t -= Time.deltaTime;
+            }
+        }
+
+        //等待推关界面隐藏
+        var tuiguanWnd = WndManage.Single._GetWnd("ui_tuiguan");
+        if (tuiguanWnd != null)
+            while (tuiguanWnd.IsVisible)
+            {
+                yield return null;
+            }
+
+        var buzhengWnd = WndManage.Single._GetWnd("ui_buzheng");
+        if (buzhengWnd != null)
+            while (buzhengWnd.IsVisible)
+            {
+                yield return null;
+            }
+
+
+        //立即回收被隐藏的窗口
+        WndManage.Single.DestroyHideWnds();
+
+        //清理战场
+        DP_Battlefield.Single.Reset();
+
+        //卸掉场景
+        DP_Battlefield.Single.SwapScene(0, null, null);
+
+        //设置战斗参数
+        AI_Single.Single.Battlefield.SetFightParameter(param);
+
+        //立即垃圾回收
+        //GC.Collect();
+        Resources.UnloadUnusedAssets();
+
+        //装载资源包
+        List<string> dyPacks = AI_Single.Single.Battlefield.GeneratePackList();
+
+        //显示战斗界面(初始化所有控件，并没有真正显示出来)
+        wnd_fight.Single.Show(1); //Wnd.DefaultDuration
+        wnd_scene.Single.Show(1);
+
+        while (
+            !wnd_fight.Single.IsInitd || //等待鹰眼图初始化完毕
+            !wnd_scene.Single.IsInitd //等待场景中的界面初始化完成
+            ) yield return null;
+
+
+        //装载场景
+        bool loadDone = false;
+        DP_Battlefield.Single.SwapScene(param.sceneID, dyPacks, () => loadDone = true);
+        while (!loadDone) yield return null; //等待场景装载完成
+
+
+        //重新装载3D物体预置
+        DP_FightPrefabManage.ReLoad3DObjects();
+
+
+        //启动战斗
+        AI_Single.Single.Battlefield.StartFight();
+
+
+        //停止背景音
+        BackgroundMusicManage.Single.Stop(0.3f);
+
+        //等待人全部进场 
+        {
+            float t = 1.0f;
+            while (t > 0)
+            {
+                yield return null;
+                t -= Time.deltaTime;
+            }
+        }
+
+        //隐藏loading
+        wnd_prefight.Single.Hide(Wnd.DefaultDuration);
+
+        BackgroundMusic = param.Music;
+
+
+        YQ2CameraCtrl.Single.istuiguan = true;
+    }
+
+    static int S_LoadSceneOnly(ILuaState lua)
+    {
+        return 0;
+        CoroutineManage.Single.StartCoroutine(testFightStart());
+        return 0;
+    }
+    static int S_StartFight(ILuaState lua)
+    {
+        //in FightParameter[,talkRecallClass,talkRecallFunc]
+        if (FightLoading) return 0;
+
+        var n = lua.GetTop();
+        FightParameter param = LuaFightParameterLibs.Lua2Obj(lua, 1); 
+        var reCall = (n == 3) ?LuaRoot.LDelegate2Event<LuaEventCallback>(lua, 2, 3): null;
+
+        FightLoading = true;
+
+        //if (UnloadSceneTimer!=null) UnloadSceneTimer.enabled = false;//禁用卸载场景定时器
+
+        CoroutineManage.Single.StartCoroutine(coFightStart(param, reCall));
+        return 0;
+    }
+
+    static int S_SetFightSpeed(ILuaState lua)//float scale
+    {
+        //in scale
+        if (FightLoading) return 0;
+        DP_Battlefield.Single.SetFightSpeed((float)lua.L_CheckNumber(1));
+        return 0;
+    }
+
+
+    //显示或隐藏调试地图网格
+    static int S_ShowGrid(ILuaState lua)
+    {
+        GameObject SceneryCameraObj = GameObject.Find("/PTZCamera/SceneryCamera");
+
+        var mgr = SceneryCameraObj.GetComponent<MapGridRender>();
+
+        //自动绑定调试格子渲染组件
+        if (mgr == null)
+        {
+            mgr = SceneryCameraObj.AddComponent<MapGridRender>();
+            mgr.enabled = true;
+            return 0;
+        }
+
+        mgr.enabled = !mgr.enabled;
+        return 0;
+    }
+
+    static IEnumerator testFightStart()
+    {
+        wnd_prefight.Single.Show(Wnd.DefaultDuration);
+        {
+            float t = Wnd.DefaultDuration;
+            while (t > 0)
+            {
+                yield return null;
+                t -= Time.deltaTime;
+            }
+        }
+        WndManage.Single.DestroyHideWnds();
+        //清理战场
+        DP_Battlefield.Single.Reset();
+        //卸掉场景0
+        DP_Battlefield.Single.SwapScene(0, null, null);
+
+        //立即垃圾回收
+        //GC.Collect();
+        Resources.UnloadUnusedAssets();
+
+        //装载资源包
+        List<string> dyPacks = AI_Single.Single.Battlefield.GeneratePackList(true);
+
+        //显示战斗界面(初始化所有控件，并没有真正显示出来)
+        wnd_fight.Single.Show(0);//Wnd.DefaultDuration
+        wnd_scene.Single.Show(0);
+
+        while (
+            !wnd_fight.Single.IsInitd ||//等待鹰眼图初始化完毕
+            !wnd_scene.Single.IsInitd//等待场景中的界面初始化完成
+            ) yield return null;
+
+
+        //装载场景
+        bool loadDone = false;
+        DP_Battlefield.Single.SwapScene(3, dyPacks, () => loadDone = true);
+        while (!loadDone) yield return null;//等待场景装载完成
+
+
+        //重新装载3D物体预置
+        DP_FightPrefabManage.ReLoad3DObjects();
+
+
+        //启动战斗
+        //AI_Single.Single.Battlefield.StartFight();
+        AI_Single.Single.Battlefield.MainSceneActorEnter();
+
+
+        //停止背景音
+        BackgroundMusicManage.Single.Stop(0.3f);
+
+        //等待人全部进场 
+        {
+            float t = 1.0f;
+            while (t > 0) { yield return null; t -= Time.deltaTime; }
+        }
+
+        //隐藏loading
+        wnd_prefight.Single.Hide(Wnd.DefaultDuration);
+
+       // BackgroundMusic = param.Music;
+
+
+        YQ2CameraCtrl.Single.istuiguan = true;
+
+        //环视战场
+        //DP_CameraTrackObjectManage.Single.LookAround(null);
+    }
+
+    static IEnumerator coFightStart(FightParameter param, QKEvent talkRecall)
+    {
+        //显示战斗装载界面
+        wnd_prefight.Single.Show(Wnd.DefaultDuration);
+
+        //停顿一段时间，等界面显示完全
+        {
+            float t = Wnd.DefaultDuration;
+            while (t > 0) { yield return null; t -= Time.deltaTime; }
+        }
+
+        //等待推关界面隐藏
+        var tuiguanWnd = WndManage.Single._GetWnd("ui_tuiguan");
+        if (tuiguanWnd!=null) while (tuiguanWnd.IsVisible) { yield return null;}
+
+        var buzhengWnd = WndManage.Single._GetWnd("ui_buzheng");
+        if (buzhengWnd != null) while (buzhengWnd.IsVisible) { yield return null; }
+
+
+        //立即回收被隐藏的窗口
+        WndManage.Single.DestroyHideWnds();
+
+        //清理战场
+        DP_Battlefield.Single.Reset();
+
+        //卸掉场景
+        DP_Battlefield.Single.SwapScene(0, null, null);
+
+        //设置战斗参数
+        AI_Single.Single.Battlefield.SetFightParameter(param);
+
+        //立即垃圾回收
+        //GC.Collect();
+        Resources.UnloadUnusedAssets();
+
+        //装载资源包
+        List<string> dyPacks = AI_Single.Single.Battlefield.GeneratePackList(); 
+
+        //显示战斗界面(初始化所有控件，并没有真正显示出来)
+        wnd_fight.Single.Show(1);//Wnd.DefaultDuration
+        wnd_scene.Single.Show(1);
+
+        while (
+            !wnd_fight.Single.IsInitd ||//等待鹰眼图初始化完毕
+            !wnd_scene.Single.IsInitd//等待场景中的界面初始化完成
+            ) yield return null;
+
+
+        //装载场景
+        bool loadDone = false;
+        DP_Battlefield.Single.SwapScene(param.sceneID, dyPacks, () => loadDone = true);
+        while (!loadDone) yield return null;//等待场景装载完成
+
+
+        //重新装载3D物体预置
+        DP_FightPrefabManage.ReLoad3DObjects();
+
+
+        //启动战斗
+        AI_Single.Single.Battlefield.StartFight();
+
+
+        //停止背景音
+        BackgroundMusicManage.Single.Stop(0.3f);
+
+        //等待人全部进场 
+        {
+            float t = 1.0f;
+            while (t > 0) { yield return null; t -= Time.deltaTime; }
+        }
+
+        //隐藏loading
+        wnd_prefight.Single.Hide(Wnd.DefaultDuration);
+
+        BackgroundMusic = param.Music; 
+
+        
+        YQ2CameraCtrl.Single.istuiguan = true;
+
+        //环视战场
+        DP_CameraTrackObjectManage.Single.LookAround(
+            //环视完成回调
+            () =>
+            {
+                //进入下一流程
+                if (talkRecall != null)
+                    using (talkRecall) talkRecall.Call(null);
+                else
+                    OnTalkDone();
+            }
+        );
+    }
+
+    static IEnumerator MainSceneLoadActor()
+    {
+        //等待一秒
+        {
+            float t = 1.0f;
+            while (t > 0) { yield return null; t -= Time.deltaTime; }
+        }
+
+    }
+
+    static string BackgroundMusic;
+
+    /// <summary>
+    /// 冲锋
+    /// </summary>
+    static int S_Charge(ILuaState lua)
+    {
+        if (!FightLoading) return 0;
+
+        OnTalkDone();
+
+        return 0;
+    }
+
+
+    static void OnTalkDone()
+    {
+        if (!FightLoading) return ;
+        CoroutineManage.Single.StartCoroutine(coOnTalkDone( ));
+    }
+
+    static IEnumerator coOnTalkDone()
+    {
+        //播放界面显示动画
+        wnd_fight.Single.PlayShowAnimation();
+
+
+        //主公喊话
+        if (SData_FightKeyValue.Single.ZhanqianRoleAudioFxObj != null)
+        {
+            //播放主公喊话 
+            YQ2AudioFx fx = DP_BattlefieldDraw.Single.CreateAudioFx3D(
+                SData_FightKeyValue.Single.ZhanqianRoleAudioFxObj.ID,
+                0,
+                1, 0
+                );
+            fx.ReStart();
+
+            //等待喊话结束
+            {
+                float t = SData_FightKeyValue.Single.ZhanqianRoleAudioFxObj.LiveTime;
+
+                if (t > 100)
+                {
+                    t = 3;
+                    Debug.LogWarning("ZhanqianRoleAudioFx 时间过大，自动设置为3秒 ");
+                }
+
+
+                while (t > 0) { yield return null; t -= Time.deltaTime; }
+            }
+
+            //销毁喊话游戏物体
+            GameObject.Destroy(fx.gameObject);
+        }
+
+        //武将+士兵喊话
+        if (SData_FightKeyValue.Single.ZhanqianAllAudioFxObj != null)
+        {
+            List<GameObject> soundObjs = new List<GameObject>();
+            var it = AI_Single.Single.Battlefield.ArmySquareListEnumerator;
+            while(it.MoveNext())
+            {
+                var square = it.Current;
+                if (square.flag != ArmyFlag.Attacker) continue;
+
+                var grid = square.hero.ownerGrid;
+
+                var fx = DP_BattlefieldDraw.Single.CreateAudioFx3D(
+                    SData_FightKeyValue.Single.ZhanqianAllAudioFxObj.ID,
+                    0,
+                    1, 0
+                );
+                fx.gameObject.transform.position = new Vector3(grid.WorldX, 12f, grid.WorldZ);
+                fx.ReStart();
+
+                //随机一个等待时间
+                {
+                    var t = (float)DP_BattlefieldDraw.Single.RandomInt(0, 300) / 1000f;
+                    while (t > 0) { yield return null; t -= Time.deltaTime; }
+                }
+                soundObjs.Add(fx.gameObject);
+            }
+
+            
+            //等待喊话结束
+            {
+                float t = SData_FightKeyValue.Single.ZhanqianAllAudioFxObj.LiveTime;
+                if(t>100)
+                {
+                    t = 3;
+                    Debug.LogWarning("ZhanqianAllAudioFx 时间过大，自动设置为3秒 ");
+                }
+                
+                while (t > 0) { yield return null; t -= Time.deltaTime; }
+            }
+
+            foreach(var g in soundObjs)  GameObject.Destroy(g); 
+        } 
+
+        //播放号角音
+        BackgroundMusicManage.Single.Play("battlehaojiao", "battlehaojiao", 0f);
+
+        //间隔一会儿淡出
+        {
+            float t = 0.7f;
+            while (t > 0) { yield return null; t -= Time.deltaTime; }
+        } 
+
+        //播放背景音
+        BackgroundMusicManage.Single.Play(BackgroundMusic, BackgroundMusic, 0.3f);
+
+        //冲锋
+        var aicmd = new AICmd_Charge();
+        DP_BattlefieldDraw.Single.PushAICmd(aicmd);
+        FightLoading = false; 
+    }
+}

@@ -1,0 +1,107 @@
+﻿ 
+
+//----------------------------------------------
+//            NGUI: Next-Gen UI kit
+// Copyright © 2011-2015 Tasharen Entertainment
+//----------------------------------------------
+
+using UnityEngine;
+using UnityEditor;
+using System.Collections.Generic;
+
+/// <summary>
+/// Inspector class used to edit UITextures.
+/// </summary>
+
+[CanEditMultipleObjects]
+[CustomEditor(typeof(UIEagleEyeMap), true)]
+public class UIEagleEyeMapInspector : UIWidgetInspector
+{
+    UIEagleEyeMap mCanvas;
+
+	protected override void OnEnable ()
+	{
+		base.OnEnable();
+        mCanvas = target as UIEagleEyeMap;
+	}
+
+    void OnSelectAtlas(Object obj)
+    {
+        serializedObject.Update();
+        SerializedProperty sp = serializedObject.FindProperty("mAtlas");
+        sp.objectReferenceValue = obj;
+        serializedObject.ApplyModifiedProperties();
+        NGUITools.SetDirty(serializedObject.targetObject);
+        NGUISettings.atlas = obj as UIAtlas;
+    }
+
+	protected override bool ShouldDrawProperties ()
+	{
+		if (target == null) return false;
+
+        GUILayout.BeginHorizontal();
+        if (NGUIEditorTools.DrawPrefixButton("Atlas"))
+            ComponentSelector.Show<UIAtlas>(OnSelectAtlas);
+        SerializedProperty atlas = NGUIEditorTools.DrawProperty("", serializedObject, "mAtlas", GUILayout.MinWidth(20f));
+
+        if (GUILayout.Button("Edit", GUILayout.Width(40f)))
+        {
+            if (atlas != null)
+            {
+                UIAtlas atl = atlas.objectReferenceValue as UIAtlas;
+                NGUISettings.atlas = atl;
+                NGUIEditorTools.Select(atl.gameObject);
+            }
+        }
+        GUILayout.EndHorizontal();
+
+        if (atlas != null)
+        {
+            NGUIEditorTools.DrawSpriteField("VisualFieldLineSpriteName", serializedObject, atlas, serializedObject.FindProperty("VisualFieldLineSpriteName"), true);
+            NGUIEditorTools.DrawSpriteField("VisualFieldSpriteName", serializedObject, atlas, serializedObject.FindProperty("VisualFieldSpriteName"), true);
+
+            
+        }
+		//SerializedProperty sp = NGUIEditorTools.DrawProperty("Texture", serializedObject, "mTexture");
+		 /*NGUIEditorTools.DrawProperty("Material", serializedObject, "mMat");
+
+		if (sp != null) NGUISettings.texture = sp.objectReferenceValue as Texture;
+
+        if (mCanvas != null && (mCanvas.material == null || serializedObject.isEditingMultipleObjects))
+		{
+			NGUIEditorTools.DrawProperty("Shader", serializedObject, "mShader");
+		}*/
+         
+		return true;
+	}
+
+	/// <summary>
+	/// Allow the texture to be previewed.
+	/// </summary>
+
+	public override bool HasPreviewGUI ()
+	{
+		return (Selection.activeGameObject == null || Selection.gameObjects.Length == 1) &&
+            (mCanvas != null) && (mCanvas.mainTexture as Texture2D != null);
+	}
+
+	/// <summary>
+	/// Draw the sprite preview.
+	/// </summary>
+
+	public override void OnPreviewGUI (Rect rect, GUIStyle background)
+	{
+        /*
+        Texture2D tex = mCanvas.mainTexture as Texture2D;
+
+		if (tex != null)
+		{
+            Rect tc = mCanvas.uvRect;
+			tc.xMin *= tex.width;
+			tc.xMax *= tex.width;
+			tc.yMin *= tex.height;
+			tc.yMax *= tex.height;
+			NGUIEditorTools.DrawSprite(tex, rect, mTex.color, tc, mTex.border);
+		}*/
+	}
+}

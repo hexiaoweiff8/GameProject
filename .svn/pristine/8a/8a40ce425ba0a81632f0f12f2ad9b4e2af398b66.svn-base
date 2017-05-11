@@ -1,0 +1,23 @@
+ManifestFileVersion: 0
+CRC: 293331684
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 976051164664452b31560dbdfa213b01
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 1033bf7ddfd4c6d43e7a6382c0a0a61a
+HashAppended: 0
+ClassTypes:
+- Class: 49
+  Script: {instanceID: 0}
+Assets:
+- Assets/TmpLua/framework/fw_startcommand.lua.bytes
+- Assets/TmpLua/framework/fw_facade.lua.bytes
+- Assets/TmpLua/framework/fw_message.lua.bytes
+- Assets/TmpLua/framework/init.lua.bytes
+- Assets/TmpLua/framework/StateMachine.lua.bytes
+- Assets/TmpLua/framework/fw_controller.lua.bytes
+- Assets/TmpLua/framework/fw_command.lua.bytes
+- Assets/TmpLua/framework/Component.lua.bytes
+Dependencies: []

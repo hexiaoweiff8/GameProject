@@ -1,0 +1,97 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+class LuaCMUIAlphaTipLib
+{
+    class UIAlphaTipInfo : ICoreComponentInfo
+    {
+        public Type type { get { return typeof(UIAlphaTip); } }
+        public string name { get { return LuaCMUIAlphaTipLib.LIB_NAME; } }
+        public void newLuaObj(ILuaState lua, Component cmp)
+        {
+            LuaCMUIAlphaTipLib._wrap(lua, cmp as UIAlphaTip);
+        }
+    }
+
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    // static LuaMemberHelper m_MemberHelper = new LuaMemberHelper();
+
+    public const string LIB_NAME = "CMUIAlphaTip";
+
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {
+           //new NameFuncPair("SetNote",M_SetNote),
+           //new NameFuncPair("SetImage",M_SetImage),
+           //new NameFuncPair("Bind",m_Bind),
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+           
+            
+        };
+        //注册静态属性
+        NameValuePair[] static_property = new NameValuePair[]
+        {
+            new NameValuePair("Name",LIB_NAME),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define, static_property);
+
+        LuaGameObjectLib.RegComponent(new UIAlphaTipInfo());
+
+        return 1;
+    }
+
+    public static void _wrap(ILuaState lua, UIAlphaTip comp)
+    {
+        LuaOpenLibs._wrapComponent(lua, comp, LIB_NAME, m_ClassRegHelper);
+    }
+
+    public static UIAlphaTip Lua2Obj(ILuaState lua, int index)
+    {
+
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<UIAlphaTip>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+
+    //static int M_SetNote(ILuaState lua)
+    //{
+    //    UIAlphaTip self = Lua2Obj(lua, 1) as UIAlphaTip;
+    //    string sNote = lua.L_CheckString(2);
+    //    self.SetNote(sNote);
+    //    return 0;
+    //}
+    //
+    //static int M_SetImage(ILuaState lua)
+    //{
+    //    UIAlphaTip self = Lua2Obj(lua, 1);
+    //    string sImage = lua.L_CheckString(2);
+    //    self.SetImage(sImage);
+    //    return 0;
+    //}
+    //static int m_Bind(ILuaState lua)
+    //{
+    //    UIAlphaTip self = Lua2Obj(lua, 1);
+    //    self.Bind();
+    //    return 0;
+    //}
+}
+ 

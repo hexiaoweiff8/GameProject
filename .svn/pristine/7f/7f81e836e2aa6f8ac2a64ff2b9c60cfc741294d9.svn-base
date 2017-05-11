@@ -1,0 +1,101 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UniLua;
+ 
+class LuaDebugExLib
+{
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+    public static void OpenLib(ILuaState lua)
+    {
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+            new NameFuncPair("IsDev",S_IsDev), 
+
+            new NameFuncPair("LogError",S_LogError), 
+            new NameFuncPair("LogWarning",S_LogWarning), 
+            new NameFuncPair("LogDebug",S_LogDebug), 
+            new NameFuncPair("LogInfo",S_LogInfo), 
+        };
+        m_ClassRegHelper.AppendStatics(lua,LuaDebugLib.LIB_NAME, static_define);
+    }
+
+    static int S_IsDev(ILuaState lua)
+    {
+        //in void
+        //out bool
+        lua.PushBoolean(GameConfig.Single.IsDev);
+        return 1;
+    }
+
+    static int S_LogInfo(ILuaState lua)
+    {
+        //in msg
+        //out void
+        LuaStringEXLib.S_sformat(lua);
+        string msg = lua.L_CheckString(-1);
+        lua.Pop(1);
+
+        msg = makemsg(msg);
+
+        UnityEngine.Debug.Log("[INFO] "+msg);
+        CMLuaDebugger.Log(LOG_TYPE.Info, msg);
+        return 0;
+    }
+
+    static int S_LogDebug(ILuaState lua)
+    {
+        //in msg
+        //out void
+        LuaStringEXLib.S_sformat(lua);
+        string msg = lua.L_CheckString(-1);
+        lua.Pop(1);
+
+        msg = makemsg(msg);
+
+        UnityEngine.Debug.Log("[DBG] " + msg);
+        CMLuaDebugger.Log(LOG_TYPE.Debug, msg);
+        return 0;
+    }
+
+    static int S_LogWarning(ILuaState lua)
+    {
+        //in msg
+        //out void
+        LuaStringEXLib.S_sformat(lua);
+        string msg = lua.L_CheckString(-1);
+        lua.Pop(1);
+
+        msg = makemsg(msg);
+
+        UnityEngine.Debug.Log("[WARNING] " + msg);
+        CMLuaDebugger.Log(LOG_TYPE.Warning, msg);
+        return 0;
+    }
+
+    static int S_LogError(ILuaState lua)
+    {
+        //in msg
+        //out void
+        LuaStringEXLib.S_sformat(lua);
+        string msg = lua.L_CheckString(-1);
+        lua.Pop(1);
+
+        msg = makemsg(msg);
+
+        UnityEngine.Debug.Log("[ERROR] " + msg);
+        CMLuaDebugger.Log(LOG_TYPE.Error, msg);
+        return 0;
+    }
+
+    static string makemsg(string msg)
+    {
+        //return DateTime.Now.ToString() + DateTime.Now.Millisecond + " " + msg;
+        return msg;
+    }
+
+    
+}
+ 

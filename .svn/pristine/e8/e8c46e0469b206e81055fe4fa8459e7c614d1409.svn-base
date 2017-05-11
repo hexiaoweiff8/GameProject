@@ -1,0 +1,129 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UniLua;
+using UnityEngine;
+class LuaCMUIPopupListLib
+{
+    class CMUIPopupListInfo : ICoreComponentInfo
+    {
+        public Type type { get { return typeof(QKUIPopupList); } }
+        public string name { get { return LuaCMUIPopupListLib.LIB_NAME; } }
+        public void newLuaObj(ILuaState lua, Component cmp)
+        {
+            LuaCMUIPopupListLib._wrap(lua, cmp as QKUIPopupList);
+        }
+    }
+
+    static LuaClassRegHelper m_ClassRegHelper = new LuaClassRegHelper();
+
+    public const string LIB_NAME = "CMUIPopupList";
+
+
+    public static int OpenLib(ILuaState lua)
+    {
+        //注册成员函数
+        NameFuncPair[] member_define = new NameFuncPair[]
+        {             
+            new NameFuncPair("GetValue",M_GetValue),
+            new NameFuncPair("SetValue",M_SetValue), 
+            new NameFuncPair("AddItem",M_AddItem),  
+            new NameFuncPair("RemoveItem",M_RemoveItem),   
+            new NameFuncPair("Clear",M_Clear),   
+        };
+
+        NameFuncPair[] operator_define = new NameFuncPair[]
+        {
+           
+        };
+
+        m_ClassRegHelper.RegMembers(lua, member_define, operator_define);
+
+
+        //注册静态成员
+        NameFuncPair[] static_define = new NameFuncPair[]
+        {
+           
+            
+        };
+        //注册静态属性
+        NameValuePair[] static_property = new NameValuePair[]
+        {
+            new NameValuePair("Name",LIB_NAME),
+        };
+        m_ClassRegHelper.RegStatics(lua, static_define, static_property);
+
+        LuaGameObjectLib.RegComponent(new CMUIPopupListInfo());
+
+        return 1;
+    }
+
+    public static void _wrap(ILuaState lua, QKUIPopupList comp)
+    {
+        LuaOpenLibs._wrapComponent(lua, comp, LIB_NAME, m_ClassRegHelper);
+    }
+
+    public static QKUIPopupList Lua2Obj(ILuaState lua, int index)
+    {
+        LuaMemberHelper.CheckClass(lua, index);
+
+        return LuaMemberHelper.GetObject<QKUIPopupList>(lua, index, LuaOpenLibs.OBJ_HANDELNAME);
+    }
+
+    static int M_GetValue(ILuaState lua)
+    {
+        //in self
+        //out string
+
+        var self = Lua2Obj(lua, 1);
+
+        lua.PushString(self.value);
+        return 1;
+    }
+
+    static int M_SetValue(ILuaState lua)
+    {
+        //in self,value
+        //out nil
+
+        var self = Lua2Obj(lua, 1);
+        var v = lua.L_CheckString(2);
+
+        self.value = v;
+        return 0;
+    } 
+     
+
+
+    static int M_AddItem(ILuaState lua)
+    {
+        //in self,value
+        //out nil
+        var self = Lua2Obj(lua, 1);
+        var v = lua.L_CheckString(2);
+        self.AddItem(v);
+
+        return 0;
+    }
+
+    static int M_RemoveItem(ILuaState lua)
+    {
+        //in self,value
+        //out nil
+        var self = Lua2Obj(lua, 1);
+        var v = lua.L_CheckString(2);
+        self.RemoveItem(v);
+
+        return 0;
+    }
+
+    static int M_Clear(ILuaState lua)
+    {
+        //in self,value
+        //out nil
+        var self = Lua2Obj(lua, 1);
+        self.Clear();
+        return 0;
+    }
+}

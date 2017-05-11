@@ -1,0 +1,39 @@
+﻿using UnityEngine;
+using System.Collections;
+public enum SClickType
+{
+    ST_Click,
+}
+
+public class UIBtnPlayAudio : MonoBehaviour
+{
+    public GameObject BTN = null;
+    public UIAudioFx AFX = null;
+    public SClickType type = SClickType.ST_Click;
+	// Use this for initialization
+	void Start () {
+        if (BTN == null)
+            BTN = gameObject;
+        if (AFX == null)
+            AFX = gameObject.GetComponent<UIAudioFx>();
+         if(BTN != null)
+         {
+             if (type == SClickType.ST_Click)
+                 UIEventListener.Get(BTN).onClick += PlaySound;
+            
+         }
+
+	}
+	
+	
+    void PlaySound(GameObject go)
+    {
+        if(AFX != null)
+        {
+            bool isAct = go.activeSelf;
+            go.SetActive(true);
+            AFX.ReStart();
+            go.SetActive(isAct);
+        }
+    }
+}

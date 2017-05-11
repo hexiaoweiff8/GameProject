@@ -1,0 +1,8 @@
+S$Name,S$Clips,±¸×¢
+CavalryCommon,HeroRun01;HeroAttack_A01;HeroAttack_B01;HeroAttack_C01;HeroWait01;HeroYinchang01;HeroHuanhu01,Æï±øÍ¨ÓÃ
+CavalryCommonDie,HeroDie,Æï±øÍ¨ÓÃËÀÍö
+CavalryArcher,HeroRun01;HeroAttack_A02;HeroAttack_B02;HeroAttack_C02;HeroWait01;HeroYinchang02;HeroHuanhu01,Ô¶³ÌÆï±ø
+Daobing,SoldiersHuanhu01;SoldiersWait01;SoldiersRun01;SoldiersAttack_A01;SoldiersAttack_B01;SoldiersCommonDie,µ¶±ø
+Gongbing,SoldiersHuanhu01;SoldiersWait01;SoldiersRun01;SoldiersAttack_A03;SoldiersCommonDie,¹­±ø
+Gongbing_B,SoldiersWait01;SoldiersAttack_A02,¹­±ø½ü¾àÀë´ÌÉ±
+Qiangbing,SoldiersHuanhu01;SoldiersWait02;SoldiersRun02;SoldiersAttack_A04;SoldiersAttack_B02;SoldiersCommonDie,Ç¹±ø
