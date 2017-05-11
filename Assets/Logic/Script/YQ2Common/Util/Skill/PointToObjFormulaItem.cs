@@ -1,5 +1,6 @@
 ﻿using System;
 using MonoEX;
+using UnityEngine;
 
 
 /// <summary>
@@ -30,12 +31,22 @@ public class PointToObjFormulaItem : IFormulaItem
     public TrajectoryAlgorithmType FlyType { get; private set; }
 
 
-    public PointToObjFormulaItem(int formulaType, string effectKey, float speed, TrajectoryAlgorithmType flyType)
+    /// <summary>
+    /// 缩放
+    /// </summary>
+    private float[] scale = new[] { 1f, 1f, 1f };
+
+
+    public PointToObjFormulaItem(int formulaType, string effectKey, float speed, TrajectoryAlgorithmType flyType, float[] scale = null)
     {
         FormulaType = formulaType;
         EffectKey = effectKey;
         Speed = speed;
         FlyType = flyType;
+        if (scale != null)
+        {
+            this.scale = scale;
+        }
     }
 
 
@@ -75,7 +86,7 @@ public class PointToObjFormulaItem : IFormulaItem
             // 判断发射与接收位置
             // TODO 父级暂时没有
             EffectsFactory.Single.CreatePointToObjEffect(EffectKey, null, paramsPacker.StartPos,
-                                paramsPacker.TargetObj, paramsPacker.Scale, Speed, FlyType, callback).Begin();
+                                paramsPacker.TargetObj, new Vector3(scale[0], scale[1], scale[2]), Speed, FlyType, callback).Begin();
         }, FormulaType);
 
         return result;

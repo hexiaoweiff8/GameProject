@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
@@ -95,13 +94,127 @@ public class FormulaParamsPackerFactroy
         return result;
     }
 
-
-    public IList<FormulaParamsPacker> GetFormulaParamsPackerList(ICollisionGraphics graphics, GameObject startObj, int targetMaxCount)
+    /// <summary>
+    /// 获取图形范围内的单位数据包列表
+    /// </summary>
+    /// <param name="graphics">图形类</param>
+    /// <param name="startObj">起始点(释放技能单位)</param>
+    /// <param name="camp">阵营</param>
+    /// <param name="targetMaxCount">获取最大数量单位</param>
+    /// <returns></returns>
+    public IList<FormulaParamsPacker> GetFormulaParamsPackerList(ICollisionGraphics graphics, GameObject startObj, TargetCampsType camp, int targetMaxCount)
     {
+        if (graphics == null || startObj == null)
+        {
+            return null;
+        }
         // 获取集群中的单位列表
         IList<FormulaParamsPacker> result = null;
 
+        var positionObjList = ClusterManager.Single.GetPositionObjectListByGraphics(graphics);
+        if (positionObjList != null && positionObjList.Count != 0)
+        {
+            result = new List<FormulaParamsPacker>();
+            for (var i = 0; i < positionObjList.Count; i++)
+            {
+                // 最大数量
+                if (targetMaxCount > 0 && result.Count >= targetMaxCount)
+                {
+                    break;
+                }
+                var posObj = positionObjList[i];
 
+                //判断阵营
+                var camps = -1;
+                switch (camp)
+                {
+                    // 非己方
+                    case TargetCampsType.Different:
+                        camps = 1;
+                        break;
+                    // 己方
+                    case TargetCampsType.Same:
+                        camps = 2;
+                        break;
+                }
+                // 如果不是对应阵营排除
+                if (posObj.MemberData.Camp == camps)
+                {
+                    continue;
+                }
+
+                // 加入列表
+                result.Add(new FormulaParamsPacker()
+                {
+                    StartObj = startObj,
+                    StartPos = startObj.transform.position,
+                    TargetObj = posObj.gameObject,
+                    TargetPos = posObj.transform.position
+                });
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 获取图形范围内的单位数据包列表
+    /// </summary>
+    /// <param name="graphics">图形类</param>
+    /// <param name="startPos">起始点(释放技能单位)</param>
+    /// <param name="camp">阵营</param>
+    /// <param name="targetMaxCount">获取最大数量单位</param>
+    /// <returns></returns>
+    public IList<FormulaParamsPacker> GetFormulaParamsPackerList(ICollisionGraphics graphics, Vector3 startPos, TargetCampsType camp, int targetMaxCount)
+    {
+        if (graphics == null)
+        {
+            return null;
+        }
+        // 获取集群中的单位列表
+        IList<FormulaParamsPacker> result = null;
+
+        var positionObjList = ClusterManager.Single.GetPositionObjectListByGraphics(graphics);
+        if (positionObjList != null && positionObjList.Count != 0)
+        {
+            result = new List<FormulaParamsPacker>();
+            for (var i = 0; i < positionObjList.Count; i++)
+            {
+                // 最大数量
+                if (targetMaxCount > 0 && result.Count >= targetMaxCount)
+                {
+                    break;
+                }
+                var posObj = positionObjList[i];
+
+                //判断阵营
+                var camps = -1;
+                switch (camp)
+                {
+                    // 非己方
+                    case TargetCampsType.Different:
+                        camps = 1;
+                        break;
+                    // 己方
+                    case TargetCampsType.Same:
+                        camps = 2;
+                        break;
+                }
+                // 如果不是对应阵营排除
+                if (posObj.MemberData.Camp == camps)
+                {
+                    continue;
+                }
+
+                // 加入列表
+                result.Add(new FormulaParamsPacker()
+                {
+                    StartPos = startPos,
+                    TargetObj = posObj.gameObject,
+                    TargetPos = posObj.transform.position
+                });
+            }
+        }
 
         return result;
     }

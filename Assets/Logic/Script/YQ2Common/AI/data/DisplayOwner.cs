@@ -26,10 +26,10 @@ public class DisplayOwner
     /// </summary>
     public RanderControl RanderControl { get; set; }
 
-    /// <summary>
-    /// 对象数据引用
-    /// </summary>
-    public VOBase MemberData { get; set; }
+    ///// <summary>
+    ///// 对象数据引用
+    ///// </summary>
+    //public VOBase MemberData { get; set; }
 
 
 
@@ -39,7 +39,7 @@ public class DisplayOwner
         ClusterData = clusterData;
         MFAModelRender = modelRender;
         RanderControl = randerControl;
-        MemberData = memberData;
+        //MemberData = memberData;
     }
 
 
@@ -51,7 +51,7 @@ public class DisplayOwner
         GameObject.Destroy(GameObj);
         ClusterData = null;
         MFAModelRender = null;
-        MemberData = null;
+        //MemberData = null;
     }
 
 
@@ -62,6 +62,6 @@ public class DisplayOwner
     {
         ClusterData = null;
         MFAModelRender = null;
-        MemberData = null;
+        //MemberData = null;
     }
 }

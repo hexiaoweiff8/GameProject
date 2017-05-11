@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 
 /// <summary>
@@ -35,6 +36,13 @@ public class PointFormulaItem : IFormulaItem
     /// </summary>
     public float DurTime { get; private set; }
 
+
+
+    /// <summary>
+    /// 缩放
+    /// </summary>
+    private float[] scale = new[] { 1f, 1f, 1f };
+
     /// <summary>
     /// 初始化
     /// </summary>
@@ -43,13 +51,18 @@ public class PointFormulaItem : IFormulaItem
     /// <param name="targetPos">出现位置</param>
     /// <param name="speed">播放速度</param>
     /// <param name="durTime">持续时间</param>
-    public PointFormulaItem(int formulaType, string effectKey, int targetPos, float speed, float durTime)
+    /// <param name="scale">缩放</param>
+    public PointFormulaItem(int formulaType, string effectKey, int targetPos, float speed, float durTime, float[] scale = null)
     {
         FormulaType = formulaType;
         EffectKey = effectKey;
         TargetPos = targetPos;
         Speed = speed;
         DurTime = durTime;
+        if (scale != null)
+        {
+            this.scale = scale;
+        }
     }
 
 
@@ -82,7 +95,7 @@ public class PointFormulaItem : IFormulaItem
             var pos = tmpTargetPos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
             // 判断发射与接收位置
             // TODO 父级暂时没有
-            EffectsFactory.Single.CreatePointEffect(EffectKey, null, pos, paramsPacker.Scale, DurTime, Speed, callback).Begin();
+            EffectsFactory.Single.CreatePointEffect(EffectKey, null, pos, new Vector3(scale[0], scale[1], scale[2]), DurTime, Speed, callback).Begin();
         }, FormulaType);
 
         return result;

@@ -15,7 +15,6 @@ public class DisplayOwnerWrap
 		L.RegVar("ClusterData", get_ClusterData, set_ClusterData);
 		L.RegVar("MFAModelRender", get_MFAModelRender, set_MFAModelRender);
 		L.RegVar("RanderControl", get_RanderControl, set_RanderControl);
-		L.RegVar("MemberData", get_MemberData, set_MemberData);
 		L.EndClass();
 	}
 
@@ -156,24 +155,24 @@ public class DisplayOwnerWrap
 		}
 	}
 
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_MemberData(IntPtr L)
-	{
-		object o = null;
+    //[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+    //static int get_MemberData(IntPtr L)
+    //{
+    //    object o = null;
 
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			DisplayOwner obj = (DisplayOwner)o;
-			VOBase ret = obj.MemberData;
-			ToLua.PushObject(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MemberData on a nil value" : e.Message);
-		}
-	}
+    //    try
+    //    {
+    //        o = ToLua.ToObject(L, 1);
+    //        DisplayOwner obj = (DisplayOwner)o;
+    //        VOBase ret = obj.MemberData;
+    //        ToLua.PushObject(L, ret);
+    //        return 1;
+    //    }
+    //    catch(Exception e)
+    //    {
+    //        return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MemberData on a nil value" : e.Message);
+    //    }
+    //}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_GameObj(IntPtr L)
@@ -251,23 +250,23 @@ public class DisplayOwnerWrap
 		}
 	}
 
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_MemberData(IntPtr L)
-	{
-		object o = null;
+    //[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+    //static int set_MemberData(IntPtr L)
+    //{
+    //    object o = null;
 
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			DisplayOwner obj = (DisplayOwner)o;
-			VOBase arg0 = (VOBase)ToLua.CheckObject(L, 2, typeof(VOBase));
-			obj.MemberData = arg0;
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MemberData on a nil value" : e.Message);
-		}
-	}
+    //    try
+    //    {
+    //        o = ToLua.ToObject(L, 1);
+    //        DisplayOwner obj = (DisplayOwner)o;
+    //        VOBase arg0 = (VOBase)ToLua.CheckObject(L, 2, typeof(VOBase));
+    //        obj.MemberData = arg0;
+    //        return 0;
+    //    }
+    //    catch(Exception e)
+    //    {
+    //        return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MemberData on a nil value" : e.Message);
+    //    }
+    //}
 }
 

@@ -125,15 +125,13 @@ public class AstarTest : MonoBehaviour {
         // 加载技能
         string formulaStr = @"SkillNum(1001)
 {
-        Point(1,test/ExplordScope,0,0,3),
+        Point(1,test/ExplordScope,0,0,3,10,1,10),
         CollisionDetection(0, 10, 1, 0, -1, 1002, 10)
 }";
         string formulaStr2 = @"SkillNum(1002)
 {
-        PointToPoint(1,test/TrailPrj,1,0,10,1),
-        Point(1,test/ExplordScope,0,0,3),
-        PointToPoint(1,test/TrailPrj,0,1,10,1),
-        Point(1,test/ExplordScope,1,0,3),
+        PointToPoint(1,test/TrailPrj,0,1,10,1,10,1,10),
+        Point(1,test/ExplordScope,1,0,3,10,1,10),
 }";
         var skillInfo = FormulaConstructor.Constructor(formulaStr);
         var skillInfo2 = FormulaConstructor.Constructor(formulaStr2);

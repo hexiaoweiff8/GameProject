@@ -39,7 +39,11 @@ public class FormulaParamsPacker
     /// <summary>
     /// 目标数量如果为-1则选择范围内所有单位
     /// </summary>
-    public int TargetMaxCount { get; set; }
+    public int TargetMaxCount
+    {
+        get { return targetMaxCount; }
+        set { targetMaxCount = value; }
+    }
 
     ///// <summary>
     ///// 子集技能ID, 如果为-1则没有子集技能
@@ -55,6 +59,8 @@ public class FormulaParamsPacker
     ///// 单位列表
     ///// </summary>
     //public TargetList<PositionObject> TargetList { get; set; }
+
+    private int targetMaxCount = -1;
 }
 
 /// <summary>

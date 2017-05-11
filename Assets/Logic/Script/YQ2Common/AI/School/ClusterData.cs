@@ -69,7 +69,7 @@ public class ClusterData: PositionObject
                     group.MemberList.Remove(this);
                 }
 
-                var newGroup = ClusterManager.GetGroupById(value);
+                var newGroup = ClusterManager.Single.GetGroupById(value);
                 if (newGroup == null){
                     newGroup = new ClusterGroup(value);
                     ClusterManager.GroupList.Add(newGroup);

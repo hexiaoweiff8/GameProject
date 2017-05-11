@@ -216,11 +216,60 @@ public class ClusterManager : ILoopItem
     /// </summary>
     private void Stop()
     {
+        ClearAll();
         isStop = true;
         LooperManager.Single.Remove(looperNum);
         single = null;
     }
 
+
+    /// <summary>
+    /// 清除所有组
+    /// </summary>
+    public void ClearAll()
+    {
+        // 清除已有所有单元
+        foreach (var group in GroupList)
+        {
+            group.CleanGroup();
+        }
+
+        GroupList.Clear();
+        targetList.List.Clear();
+    }
+
+    /// <summary>
+    /// 根据ID查询group
+    /// </summary>
+    /// <param name="groupId">被查询groupId</param>
+    /// <returns>返回查询到的groupId 如果不存在则返回null</returns>
+    public ClusterGroup GetGroupById(int groupId)
+    {
+        for (var i = 0; i < GroupList.Count; i++)
+        {
+            var tmpGroup = GroupList[i];
+            if (tmpGroup.GroupId == groupId)
+            {
+                return tmpGroup;
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 获取图形范围内的单位
+    /// </summary>
+    /// <param name="graphics">图形对象</param>
+    /// <returns>范围内单位列表</returns>
+    public IList<PositionObject> GetPositionObjectListByGraphics(ICollisionGraphics graphics)
+    {
+        if (targetList == null)
+        {
+            return null;
+        }
+        IList<PositionObject> result = targetList.QuadTree.GetScope(graphics);
+        return result;
+    } 
 
     // ------------------------私有方法--------------------------
 
@@ -665,37 +714,5 @@ public class ClusterManager : ILoopItem
     //    Debug.DrawLine(new Vector3(pos.x + rectangle.Width, 0, pos.y + rectangle.Height), new Vector3(pos.x, 0, pos.y + rectangle.Height), color);
     //    Debug.DrawLine(new Vector3(pos.x + rectangle.Width, 0, pos.y + rectangle.Height), new Vector3(pos.x + rectangle.Width, 0, pos.y), color);
     //}
-
-    /// <summary>
-    /// 清除所有组
-    /// </summary>
-    public void ClearAll(){
-        // 清除已有所有单元
-        foreach (var group in GroupList)
-        {
-            group.CleanGroup();
-        }
-
-        GroupList.Clear();
-        targetList.List.Clear();
-    }
-
-    /// <summary>
-    /// 根据ID查询group
-    /// </summary>
-    /// <param name="groupId">被查询groupId</param>
-    /// <returns>返回查询到的groupId 如果不存在则返回null</returns>
-    public static ClusterGroup GetGroupById(int groupId)
-    {
-        for (var i = 0; i < GroupList.Count; i++)
-        {
-            var tmpGroup = GroupList[i];
-            if (tmpGroup.GroupId == groupId)
-            {
-                return tmpGroup;
-            }
-        }
-        return null;
-    }
 
 }

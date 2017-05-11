@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 
 /// <summary>
@@ -42,8 +43,13 @@ public class PointToPointFormulaItem : IFormulaItem
     /// </summary>
     private int receivePos = 1;
 
+    /// <summary>
+    /// 缩放
+    /// </summary>
+    private float[] scale = new[] { 1f, 1f, 1f };
 
-    public PointToPointFormulaItem(int formulaType, string effectKey, float speed, int releasePos, int receivePos, TrajectoryAlgorithmType flyType)
+
+    public PointToPointFormulaItem(int formulaType, string effectKey, float speed, int releasePos, int receivePos, TrajectoryAlgorithmType flyType, float[] scale = null)
     {
         FormulaType = formulaType;
         EffectKey = effectKey;
@@ -51,6 +57,10 @@ public class PointToPointFormulaItem : IFormulaItem
         this.releasePos = releasePos;
         this.receivePos = receivePos;
         FlyType = flyType;
+        if (scale != null)
+        {
+            this.scale = scale;
+        }
     }
 
 
@@ -90,7 +100,7 @@ public class PointToPointFormulaItem : IFormulaItem
             var receivePosition = tmpRecvPos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
             // TODO 父级暂时没有
             EffectsFactory.Single.CreatePointToPointEffect(EffectKey, null, releasePosition,
-                                receivePosition, paramsPacker.Scale, Speed, FlyType, callback).Begin();
+                                receivePosition, new Vector3(scale[0], scale[1], scale[2]), Speed, FlyType, callback).Begin();
         }, FormulaType);
 
         return result;

@@ -103,57 +103,16 @@ public class CollisionDetection : IFormulaItem
                     break;
             }
 
-            //// TODO 将图形传入某个类, 传出FormulaParamsPacker列表
-            //// 检查范围内对象
-            //IList<PositionObject> targetList = new List<PositionObject>();
-            //var aroundList = paramsPacker.TargetList.QuadTree.GetScope(graphics);
-
-            //var camps = -1;
-            //// 分判阵营
-            //switch (TargetCamps)
-            //{
-            //    // 非己方
-            //    case TargetCampsType.Different:
-            //        camps = 1;
-            //        break;
-            //    // 己方
-            //    case TargetCampsType.Same:
-            //        camps = 2;
-            //        break;
-            //}
-            //for (var i = 0; i < aroundList.Count; i++)
-            //{
-            //    var item = aroundList[i];
-            //    // 非己方
-            //    if (item.MemberData.Camp != camps)
-            //    {
-            //        targetList.Add(item);
-            //    }
-            //}
-
-
-            //// 获取目标数量个单位
-            //if (aroundList.Count > TargetCount)
-            //{
-            //    for (var i = 0; i < TargetCount; i++)
-            //    {
-            //        targetList.Add(aroundList[i]);
-            //    }
-            //}
-            //else
-            //{
-            //    targetList = aroundList;
-            //}
-            //// Debug.Log("搜索到" + targetList.Count + "个单位.");
-            //// 对他们释放技能(技能编号)
-            //foreach (var target in targetList)
-            //{
-            //    // TODO 构建新的Packer
-            //    //Debug.Log(target.name);
-            //    //paramsPacker.TargetObj = target.gameObject;
-            //    //paramsPacker.TargetPos = target.transform.position;
-            //    SkillManager.Single.DoSkillNum(SkillNum, paramsPacker);
-            //}
+            var packerList = FormulaParamsPackerFactroy.Single.GetFormulaParamsPackerList(graphics, paramsPacker.StartPos, TargetCamps,
+                paramsPacker.TargetMaxCount);
+            // 对他们释放技能(技能编号)
+            if (packerList != null)
+            {
+                foreach (var packer in packerList)
+                {
+                    SkillManager.Single.DoSkillNum(SkillNum, packer);
+                }
+            }
         });
        
 

@@ -146,49 +146,62 @@ public class FormulaConstructor
             switch (type)
             {
                 case "PointToPoint":
-                    { 
+                    {
+                        var argsCount = 9;
                         // 解析参数
-                        if (argsArray.Length < 6)
+                        if (argsArray.Length < argsCount)
                         {
-                            errorMsg = "参数数量错误.需求参数数量:6 实际数量:" + argsArray.Length;
+                            errorMsg = "参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + argsArray.Length;
                             break;
                         }
-                        // 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),命中位置(0放技能方, 1目标方),速度,飞行轨迹
+                        // 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),命中位置(0放技能方, 1目标方),速度,飞行轨迹, 缩放
                         var effectKey = argsArray[1];
                         var releasePos = Convert.ToInt32(argsArray[2]);
                         var receivePos = Convert.ToInt32(argsArray[3]);
                         var speed = Convert.ToSingle(argsArray[4]);
                         var flyType = (TrajectoryAlgorithmType) Enum.Parse(typeof (TrajectoryAlgorithmType), argsArray[5]);
-                        // 点对点特效
 
-                        result = new PointToPointFormulaItem(formulaType, effectKey, speed, releasePos, receivePos, flyType);
+                        float[] scale = new float[3];
+                        scale[0] = Convert.ToSingle(argsArray[6]);
+                        scale[1] = Convert.ToSingle(argsArray[7]);
+                        scale[2] = Convert.ToSingle(argsArray[8]);
+
+                        // 点对点特效
+                        result = new PointToPointFormulaItem(formulaType, effectKey, speed, releasePos, receivePos, flyType, scale);
                     }
                     break;
                 case "PointToObj":
                     // 点对对象特效
                     {
+                        var argsCount = 7;
                         // 解析参数
-                        if (argsArray.Length < 4)
+                        if (argsArray.Length < argsCount)
                         {
-                            errorMsg = "参数数量错误.需求参数数量:4 实际数量:" + argsArray.Length;
+                            errorMsg = "参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + argsArray.Length;
                             break;
                         }
                         // 是否等待完成,特效Key,速度,飞行轨迹
                         var effectKey = argsArray[1];
                         var speed = Convert.ToSingle(argsArray[2]);
                         var flyType = (TrajectoryAlgorithmType)Enum.Parse(typeof(TrajectoryAlgorithmType), argsArray[3]);
-                        // 点对点特效
 
-                        result = new PointToObjFormulaItem(formulaType, effectKey, speed, flyType);
+
+                        float[] scale = new float[3];
+                        scale[0] = Convert.ToSingle(argsArray[4]);
+                        scale[1] = Convert.ToSingle(argsArray[5]);
+                        scale[2] = Convert.ToSingle(argsArray[6]);
+
+                        result = new PointToObjFormulaItem(formulaType, effectKey, speed, flyType, scale);
                     }
                     break;
                 case "Point":
                     // 点特效
-                    { 
+                    {
+                        var argsCount = 8;
                         // 解析参数
-                        if (argsArray.Length < 5)
+                        if (argsArray.Length < argsCount)
                         {
-                            errorMsg = "参数数量错误.需求参数数量:4 实际数量:" + argsArray.Length;
+                            errorMsg = "参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + argsArray.Length;
                             break;
                         }
                         // 是否等待完成,特效Key,速度,持续时间
@@ -196,7 +209,12 @@ public class FormulaConstructor
                         var targetPos = Convert.ToInt32(argsArray[2]);
                         var speed = Convert.ToSingle(argsArray[3]);
                         var durTime = Convert.ToSingle(argsArray[4]);
-                        result = new PointFormulaItem(formulaType, effectKey, targetPos, speed, durTime);
+
+                        float[] scale = new float[3];
+                        scale[0] = Convert.ToSingle(argsArray[5]);
+                        scale[1] = Convert.ToSingle(argsArray[6]);
+                        scale[2] = Convert.ToSingle(argsArray[7]);
+                        result = new PointFormulaItem(formulaType, effectKey, targetPos, speed, durTime, scale);
                     }
                     break;
                 case "Scope":
@@ -293,9 +311,9 @@ public class FormulaConstructor
      
      */
     // -----------------特效-------------------- 
-    // PointToPoint 点对点特效        参数 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),命中位置(0放技能方, 1目标方),速度,飞行轨迹
-    // PointToObj 点对对象特效        参数 是否等待完成,特效Key,速度,飞行轨迹
-    // Point 点特效                   参数 是否等待完成,特效Key,速度,持续时间
+    // PointToPoint 点对点特效        参数 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),命中位置(0放技能方, 1目标方),速度,飞行轨迹,缩放(三位)
+    // PointToObj 点对对象特效        参数 是否等待完成,特效Key,速度,飞行轨迹,缩放(三位)
+    // Point 点特效                   参数 是否等待完成,特效Key,速度,持续时间,缩放(三位)
     // Scope 范围特效                 参数 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),持续时间,范围半径
 
     // --------------目标选择方式---------------

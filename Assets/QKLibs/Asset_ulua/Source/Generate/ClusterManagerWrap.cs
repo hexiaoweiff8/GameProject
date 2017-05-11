@@ -213,7 +213,7 @@ public class ClusterManagerWrap
 		{
 			ToLua.CheckArgsCount(L, 1);
 			int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
-			ClusterGroup o = ClusterManager.GetGroupById(arg0);
+			ClusterGroup o = ClusterManager.Single.GetGroupById(arg0);
 			ToLua.PushObject(L, o);
 			return 1;
 		}
