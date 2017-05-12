@@ -4,6 +4,13 @@
 /// </summary>
 public interface IFormulaItem
 {
+
+    /// <summary>
+    /// 当前行为节点所属数据层级
+    /// 用于分级获取数据
+    /// </summary>
+    int Level { get; }
+
     /// <summary>
     /// 行为类型
     /// 0: 不等待其执行结束继续

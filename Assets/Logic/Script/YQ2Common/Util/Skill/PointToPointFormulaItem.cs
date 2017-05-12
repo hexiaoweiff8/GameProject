@@ -7,6 +7,12 @@ using UnityEngine;
 /// </summary>
 public class PointToPointFormulaItem : IFormulaItem
 {
+
+    /// <summary>
+    /// 当前数据层级
+    /// </summary>
+    public int Level { get; private set; }
+
     /// <summary>
     /// 行为类型
     /// 0: 不等待其执行结束继续

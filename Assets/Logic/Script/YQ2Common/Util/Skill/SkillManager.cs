@@ -37,7 +37,10 @@ public class SkillManager
     /// <summary>
     /// 技能字典
     /// </summary>
-    public Dictionary<int, SkillInfo> SkillInfoDic = new Dictionary<int, SkillInfo>(); 
+    public Dictionary<int, SkillInfo> SkillInfoDic = new Dictionary<int, SkillInfo>();
+
+
+
     
 
     /// <summary>

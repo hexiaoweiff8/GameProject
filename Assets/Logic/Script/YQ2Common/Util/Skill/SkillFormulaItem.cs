@@ -8,6 +8,12 @@ using System.Text;
 /// </summary>
 public class SkillFormulaItem : IFormulaItem
 {
+
+    /// <summary>
+    /// 当前数据层级
+    /// </summary>
+    public int Level { get; private set; }
+
     /// <summary>
     /// 行为节点类型
     /// </summary>

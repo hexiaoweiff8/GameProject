@@ -5,7 +5,10 @@
 /// </summary>
 public class CollisionDetectionFormulaItem : IFormulaItem
 {
-    // 使用目标选择器选择范围内适合的单位
+    /// <summary>
+    /// 当前数据层级
+    /// </summary>
+    public int Level { get; private set; }
 
     /// <summary>
     /// 行为类型
@@ -103,6 +106,7 @@ public class CollisionDetectionFormulaItem : IFormulaItem
                     break;
             }
 
+            // TODO 获得单位列表后将他们压入堆栈
             var packerList = FormulaParamsPackerFactroy.Single.GetFormulaParamsPackerList(graphics, paramsPacker.StartPos, TargetCamps,
                 paramsPacker.TargetMaxCount);
             // 对他们释放技能(技能编号)
