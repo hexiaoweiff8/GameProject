@@ -178,7 +178,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
 
 
         // 创建外层持有类
-        var displayOwner = new DisplayOwner(display, mfa.Cluster, mfa, null, soldier);
+        var displayOwner = new DisplayOwner(display, mfa.Cluster, mfa, null);
         DisplayerManager.Single.AddElement(soldier.ObjID, displayOwner);
         // 启动单位状态机
         //randerControl.StartFSM(displayOwner);

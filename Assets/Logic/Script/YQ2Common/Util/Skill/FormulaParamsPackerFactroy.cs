@@ -59,12 +59,12 @@ public class FormulaParamsPackerFactroy
     /// <param name="targetObj">目标对象</param>
     /// <param name="targetMaxCount">技能目标上限 如果-1则无数量限制</param>
     /// <returns>数据包装类</returns>
-    public FormulaParamsPacker GetFormulaParamsPacker(GameObject startObj, GameObject targetObj, int targetMaxCount)
+    public FormulaParamsPacker GetFormulaParamsPacker(DisplayOwner startObj, DisplayOwner targetObj, int targetMaxCount)
     {
         var result = new FormulaParamsPacker()
         {
-            StartObj = startObj,
-            TargetObj = targetObj,
+            ReleaseMember = startObj,
+            ReceiverMenber = targetObj,
             TargetMaxCount = targetMaxCount
         };
 
@@ -82,12 +82,12 @@ public class FormulaParamsPackerFactroy
     /// <param name="targetObj">目标对象</param>
     /// <param name="targetMaxCount">技能目标上限 如果-1则无数量限制</param>
     /// <returns>数据包装类</returns>
-    public FormulaParamsPacker GetFormulaParamsPacker(Vector3 startPos, Vector3 targetPos, GameObject startObj, GameObject targetObj, int targetMaxCount)
+    public FormulaParamsPacker GetFormulaParamsPacker(Vector3 startPos, Vector3 targetPos, DisplayOwner startObj, DisplayOwner targetObj, int targetMaxCount)
     {
         var result = new FormulaParamsPacker()
         {
-            StartObj = startObj,
-            TargetObj = targetObj,
+            ReleaseMember = startObj,
+            ReceiverMenber = targetObj,
             TargetMaxCount = targetMaxCount
         };
 
@@ -102,7 +102,7 @@ public class FormulaParamsPackerFactroy
     /// <param name="camp">阵营</param>
     /// <param name="targetMaxCount">获取最大数量单位</param>
     /// <returns></returns>
-    public IList<FormulaParamsPacker> GetFormulaParamsPackerList(ICollisionGraphics graphics, GameObject startObj, TargetCampsType camp, int targetMaxCount)
+    public IList<FormulaParamsPacker> GetFormulaParamsPackerList(ICollisionGraphics graphics, DisplayOwner startObj, TargetCampsType camp, int targetMaxCount)
     {
         if (graphics == null || startObj == null)
         {
@@ -143,12 +143,14 @@ public class FormulaParamsPackerFactroy
                     continue;
                 }
 
+                // 查询外层持有类
+                var targetDisplayOwner = DisplayerManager.Single.GetElementById(posObj.MemberData.ObjID);
                 // 加入列表
                 result.Add(new FormulaParamsPacker()
                 {
-                    StartObj = startObj,
-                    StartPos = startObj.transform.position,
-                    TargetObj = posObj.gameObject,
+                    ReleaseMember = startObj,
+                    StartPos = startObj.GameObj.transform.position,
+                    ReceiverMenber = targetDisplayOwner,
                     TargetPos = posObj.transform.position
                 });
             }
@@ -206,11 +208,13 @@ public class FormulaParamsPackerFactroy
                     continue;
                 }
 
+                // 查询外层持有类
+                var targetDisplayOwner = DisplayerManager.Single.GetElementById(posObj.MemberData.ObjID);
                 // 加入列表
                 result.Add(new FormulaParamsPacker()
                 {
                     StartPos = startPos,
-                    TargetObj = posObj.gameObject,
+                    ReceiverMenber = targetDisplayOwner,
                     TargetPos = posObj.transform.position
                 });
             }

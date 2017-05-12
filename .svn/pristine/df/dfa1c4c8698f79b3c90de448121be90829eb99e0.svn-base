@@ -1,8 +1,0 @@
-local data ={
-	info={key="SkillID",keytype=keytype.int},
-	head={"SkillID","Name","Des","SkillIcon"},
-	body={
-		[10001]={10001,"精准射击","bia！的一声，敌人就死啦","skill0001"},
-	}
-}
-return data

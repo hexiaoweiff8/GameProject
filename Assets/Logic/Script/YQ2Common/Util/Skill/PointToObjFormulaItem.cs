@@ -71,7 +71,7 @@ public class PointToObjFormulaItem : IFormulaItem
         {
             errorMsg = "物体飞行速度不合法, <=0";
         }
-        else if (paramsPacker.TargetObj == null)
+        else if (paramsPacker.ReceiverMenber == null)
         {
             errorMsg = "弹道特效目标对象为空.";
         }
@@ -86,7 +86,7 @@ public class PointToObjFormulaItem : IFormulaItem
             // 判断发射与接收位置
             // TODO 父级暂时没有
             EffectsFactory.Single.CreatePointToObjEffect(EffectKey, null, paramsPacker.StartPos,
-                                paramsPacker.TargetObj, new Vector3(scale[0], scale[1], scale[2]), Speed, FlyType, callback).Begin();
+                                paramsPacker.ReceiverMenber.GameObj, new Vector3(scale[0], scale[1], scale[2]), Speed, FlyType, callback).Begin();
         }, FormulaType);
 
         return result;

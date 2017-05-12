@@ -1,0 +1,4 @@
+SkillNum(1000)
+{
+	PointToPoint(1, test/TrailPrj, 0, 1, 10, 0, 1,1,1);
+}

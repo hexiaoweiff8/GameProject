@@ -1,3 +1,0 @@
-local data = require "ItemData"
-local class_sdata_itemdata = class(luacsv) 
-sdata_itemdata =  class_sdata_itemdata.new(data)

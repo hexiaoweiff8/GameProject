@@ -25,14 +25,13 @@ public class DisplayOwnerWrap
 		{
 			int count = LuaDLL.lua_gettop(L);
 
-			if (count == 5)
+			if (count == 4)
 			{
 				UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 1, typeof(UnityEngine.GameObject));
 				ClusterData arg1 = (ClusterData)ToLua.CheckUnityObject(L, 2, typeof(ClusterData));
 				MFAModelRender arg2 = (MFAModelRender)ToLua.CheckUnityObject(L, 3, typeof(MFAModelRender));
 				RanderControl arg3 = (RanderControl)ToLua.CheckUnityObject(L, 4, typeof(RanderControl));
-				VOBase arg4 = (VOBase)ToLua.CheckObject(L, 5, typeof(VOBase));
-				DisplayOwner obj = new DisplayOwner(arg0, arg1, arg2, arg3, arg4);
+				DisplayOwner obj = new DisplayOwner(arg0, arg1, arg2, arg3);
 				ToLua.PushObject(L, obj);
 				return 1;
 			}

@@ -33,7 +33,7 @@ public class DisplayOwner
 
 
 
-    public DisplayOwner(GameObject gameObj, ClusterData clusterData, MFAModelRender modelRender, RanderControl randerControl, VOBase memberData)
+    public DisplayOwner(GameObject gameObj, ClusterData clusterData, MFAModelRender modelRender, RanderControl randerControl)
     {
         GameObj = gameObj;
         ClusterData = clusterData;

@@ -117,7 +117,7 @@ public class AstarTest : MonoBehaviour {
     /// <summary>
     /// 集群单位列表
     /// </summary>
-    private IList<PositionObject> itemList = new List<PositionObject>(); 
+    private IList<PositionObject> itemList = new List<PositionObject>();
     
 
     void Start ()
@@ -130,7 +130,7 @@ public class AstarTest : MonoBehaviour {
 }";
         string formulaStr2 = @"SkillNum(1002)
 {
-        PointToPoint(1,test/TrailPrj,0,1,10,1,10,1,10),
+        PointToObj(1,test/TrailPrj,0,1,10,1,10,1,10),
         Point(1,test/ExplordScope,1,0,3,10,1,10),
 }";
         var skillInfo = FormulaConstructor.Constructor(formulaStr);
@@ -144,6 +144,7 @@ public class AstarTest : MonoBehaviour {
         var loadMapPos = LoadMap.GetLeftBottom();
         ClusterManager.Single.Init(loadMapPos.x + LoadMap.MapWidth * LoadMap.UnitWidth, loadMapPos.z + LoadMap.MapHeight * LoadMap.UnitWidth, MapWidth, MapHeight, UnitWidth, null);
         InitMapInfo();
+        DisplayerManager.AutoInstance();
     }
     
     void Update()
@@ -197,8 +198,7 @@ public class AstarTest : MonoBehaviour {
                 {
                     StartPos = new Vector3(hit.point.x, hit.point.z, hit.point.z),
                     TargetPos = new Vector3(hit.point.x, hit.point.z, hit.point.z),
-                    //GType = GraphicType.Circle,
-                    //TargetList = ClusterManager.Single.targetList
+                    ReleaseMember = new DisplayOwner(null,null,null,null),
                 });
             }
         }
@@ -278,7 +278,7 @@ public class AstarTest : MonoBehaviour {
         var mapInfoStr = Utils.LoadFileInfo(mapInfoPath);
         var mapInfoData = DeCodeInfo(mapInfoStr);
         LoadMap.Init(mapInfoData, UnitWidth);
-        ClusterManager.Single.Init(-MapWidth / 2, -MapHeight / 2, MapWidth, MapHeight, 10, mapInfoData);
+        ClusterManager.Single.Init(-MapWidth * 0.5f, -MapHeight * 0.5f, MapWidth, MapHeight, 10, mapInfoData);
         MapWidth = mapInfoData[0].Length;
         MapHeight = mapInfoData.Length;
         return mapInfoData;
@@ -407,12 +407,14 @@ public class AstarTest : MonoBehaviour {
         var start = Utils.NumToPosition(LoadMap.transform.position, new Vector2(startX, startY), UnitWidth, MapWidth, MapHeight);
         for (int i = 0; i < ItemCount; i++)
         {
+            var objId = new ObjectID(ObjectID.ObjectType.MySoldier);
             schoolItem = GameObject.CreatePrimitive(PrimitiveType.Cube);
             school = schoolItem.AddComponent<ClusterData>();
             school.MemberData = new VOBase()
             {
                 AttackRange = 20,
-                SpaceSet = 3
+                SpaceSet = 3,
+                ObjID = objId
             };
             school.GroupId = 1;
             // TODO 物理信息中一部分来自于数据
@@ -429,6 +431,7 @@ public class AstarTest : MonoBehaviour {
             //school.Complete = (a) => { Debug.Log(a.name + "Complete"); };
             itemList.Add(school);
             ClusterManager.Single.Add(school);
+            DisplayerManager.Single.AddElement(objId, new DisplayOwner(schoolItem, school, null, null));
 
 
             Action<ClusterGroup> lam = (thisGroup) =>

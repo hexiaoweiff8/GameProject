@@ -1,7 +1,0 @@
-local data ={
-	info={key="SuitID",keytype=keytype.int},
-	head={"SuitID","SuitEffect2","Effect2Point","SuitEffect3","Effect3Point","SuitEffect5","Effect5Point"},
-	body={
-	}
-}
-return data

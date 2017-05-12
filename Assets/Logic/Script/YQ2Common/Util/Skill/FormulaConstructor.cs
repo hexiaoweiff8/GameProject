@@ -247,7 +247,7 @@ public class FormulaConstructor
                             scopeArgs[i] = Convert.ToSingle(argsArray[i + argsCount]);
                         }
                         
-                        result = new CollisionDetection(formulaType, targetCount, receivePos, targetTypeCamps, scopeType, scopeArgs, skillNum);
+                        result = new CollisionDetectionFormulaItem(formulaType, targetCount, receivePos, targetTypeCamps, scopeType, scopeArgs, skillNum);
                     }
                     break;
                 case "Audio":
@@ -320,7 +320,7 @@ public class FormulaConstructor
     // CollisionDetection 碰撞检测    参数 是否等待完成, 目标数量, 检测位置(0放技能方, 1目标方), 检测范围形状(0圆, 1方), 
     // 目标阵营(-1:都触发, 0: 己方, 1: 非己方),碰撞单位被释放技能ID范围大小(方 第一个宽, 第二个长, 第三个旋转角度, 圆的就取第一个值当半径, 扇形第一个半径, 第二个开口角度, 第三个旋转角度有更多的参数都放进来)
     //{
-    //  被释放技能
+    //  自己功能
     //}
     // -----------------音效--------------------
     // Audio 音效                     参数 是否等待完成,点音,持续音,持续时间
@@ -329,7 +329,10 @@ public class FormulaConstructor
     // Buff buff                      参数 是否等待完成,buffID
 
     // -----------------结算--------------------
-    // Calculate 结算                 参数 是否等待完成,伤害,治疗,目标数据,技能数据
+    // Calculate 结算                 参数 是否等待完成,伤害或治疗(0,1),技能编号
+
+    // -----------------子技能------------------
+    // Skill 释放技能                 参数 是否等待完成,技能编号
 
 
 }
