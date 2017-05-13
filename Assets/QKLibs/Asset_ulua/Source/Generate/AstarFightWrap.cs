@@ -40,9 +40,8 @@ public class AstarFightWrap
 			AstarFight obj = (AstarFight)ToLua.CheckObject(L, 1, typeof(AstarFight));
 			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 2);
 			int arg1 = (int)LuaDLL.luaL_checknumber(L, 3);
-			UnityEngine.Vector3 o = obj.isZhangAi(arg0, arg1);
-			ToLua.Push(L, o);
-			return 1;
+			obj.isZhangAi(arg0, arg1);
+			return 0;
 		}
 		catch(Exception e)
 		{
@@ -91,11 +90,12 @@ public class AstarFightWrap
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 3);
+			ToLua.CheckArgsCount(L, 4);
 			AstarFight obj = (AstarFight)ToLua.CheckObject(L, 1, typeof(AstarFight));
-			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+			UnityEngine.Transform arg0 = (UnityEngine.Transform)ToLua.CheckUnityObject(L, 2, typeof(UnityEngine.Transform));
 			int arg1 = (int)LuaDLL.luaL_checknumber(L, 3);
-			obj.setZhenxingInfo(arg0, arg1);
+			int arg2 = (int)LuaDLL.luaL_checknumber(L, 4);
+			obj.setZhenxingInfo(arg0, arg1, arg2);
 			return 0;
 		}
 		catch(Exception e)

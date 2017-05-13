@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// 点特效
 /// </summary>
-public class PointFormulaItem : IFormulaItem
+public class PointFormulaItem : AbstractFormulaItem
 {
     /// <summary>
     /// 当前数据层级
@@ -75,7 +75,7 @@ public class PointFormulaItem : IFormulaItem
     /// 获取行为构建器
     /// </summary>
     /// <returns>构建完成的单个行为</returns>
-    public IFormula GetFormula(FormulaParamsPacker paramsPacker)
+    public override IFormula GetFormula(FormulaParamsPacker paramsPacker)
     {
         // 验证数据正确, 如果有问题直接抛错误
         string errorMsg = null;
@@ -97,6 +97,7 @@ public class PointFormulaItem : IFormulaItem
 
         IFormula result = new Formula((callback) =>
         {
+            Debug.Log("Point");
             var pos = tmpTargetPos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
             // 判断发射与接收位置
             // TODO 父级暂时没有

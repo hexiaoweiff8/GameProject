@@ -130,7 +130,7 @@ public class AstarTest : MonoBehaviour {
 }";
         string formulaStr2 = @"SkillNum(1002)
 {
-        PointToObj(1,test/TrailPrj,0,1,10,1,10,1,10),
+        PointToObj(1,test/TrailPrj,10,0,10,1,10),
         Point(1,test/ExplordScope,1,0,3,10,1,10),
 }";
         var skillInfo = FormulaConstructor.Constructor(formulaStr);

@@ -1,14 +1,10 @@
 ﻿using System;
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 public class AstarFight : MonoBehaviour
 {
-
-    private GameObject main;
 
     /// <summary>
     /// 寻路X轴宽度
@@ -91,13 +87,9 @@ public class AstarFight : MonoBehaviour
     private int maxX;
 
     /// <summary>
-    /// 以触摸点为中心循环扩大搜索半径来搜索可下兵的点，tempList记录搜索正方形范围边上的所有点
-    /// </summary>
-    private List<int> tempList = new List<int>();
-    /// <summary>
     /// 记录同半径下所有可下兵的点，为了计算哪个点离触摸点最近
     /// </summary>
-    private List<int> tempList2 = new List<int>();
+    private readonly List<int> tempList2 = new List<int>();
 
     /// <summary>
     /// 创建集群个数
@@ -107,40 +99,73 @@ public class AstarFight : MonoBehaviour
 
     private int[][] mapInfoData;
 
+
+    /// <summary>
+    /// 4个触摸+敌方 5个物体父物体
+    /// </summary>
+    private readonly Transform[] parentArray = new Transform[5];
+    /// <summary>
+    /// 4个触摸+敌方 5个物体宽高
+    /// </summary>
+    private readonly int[][] widthHeightArray = new int[5][];
     /// <summary>
     /// 4个触摸+敌方 5个阵型列表
     /// </summary>
-    private int[][] zhenxingArray = new int[5][];
+    private readonly int[][] zhenxingArray = new int[5][];
     /// <summary>
     /// 当前关卡所有换算了宽高的阵型字典
     /// </summary>
-    private Dictionary<int, int[]> allZhenxingList = new Dictionary<int, int[]>();
+    private readonly Dictionary<int, int[]> allZhenxingList = new Dictionary<int, int[]>();
 
-    /// <summary>
-    /// 当前阵型最远的X值(单位：格子)，避免下兵时右半侧的部队可以下到最远区域外
-    /// </summary>
-    private int[] zhenxingMaxXArray = new int[5];
-    /// <summary>
-    /// 当前关卡所有换算了宽高的阵型最远的X值字典
-    /// </summary>
-    private Dictionary<int, int> allZhenxingMaxX = new Dictionary<int, int>();
     /// <summary>
     /// 向中点偏移距离;
     /// </summary>
-    private Dictionary<int, Vector3> allCenternOffset = new Dictionary<int, Vector3>();
+    private readonly Dictionary<int, Vector3> allCenternOffset = new Dictionary<int, Vector3>();
 
     /// <summary>
     /// 向中点偏移距离
     /// </summary>
-    private Vector3[] zhenxingCenternOffsetArray = new Vector3[5];
-
+    private readonly Vector3[] zhenxingCenternOffsetArray = new Vector3[5];
+    /// <summary>
+    /// 按半径扩大的4边上的点阵数组，保存10组，不够再动态计算
+    /// </summary>
+    private readonly int[][] serchPathArray = new int[10][];
     void Start()
     {
         // 初始化
         Init();
+        //初始化点阵数组
+        // 以触摸点为中心循环扩大搜索半径来搜索可下兵的点，tempList记录搜索正方形范围边上的所有点
+        serchPathArray[0] = new[] { 0, 0 };
+        var spani = 1;
+        while (spani < 10)
+        {
+            serchPathArray[spani] = new int[2 * spani * 8];
+            var a1 = -spani;
+            var b1 = -spani;
+            var a2 = spani;
+            var b2 = spani;
+            //获取搜索区域边上的点
+            var tempCount = 0;
+            for (int i2 = 1; i2 < 2 * spani + 1; i2++)
+            {
+                serchPathArray[spani][tempCount++] = a1;
+                serchPathArray[spani][tempCount++] = b1 + i2;
+                serchPathArray[spani][tempCount++] = a1 + i2;
+                serchPathArray[spani][tempCount++] = b1;
+                serchPathArray[spani][tempCount++] = a2;
+                serchPathArray[spani][tempCount++] = b2 - i2;
+                serchPathArray[spani][tempCount++] = a2 - i2;
+                serchPathArray[spani][tempCount++] = b2;
+            }
+            int templ = serchPathArray[spani].Length;
+            serchPathArray[spani][templ - 4] = a1;
+            serchPathArray[spani][templ - 3] = b1;
+            serchPathArray[spani][templ - 2] = a2;
+            serchPathArray[spani][templ - 1] = b2;
+            spani++;
+        }
     }
-
-
 
     //private void setAllZhenxingList()
     //{
@@ -167,7 +192,6 @@ public class AstarFight : MonoBehaviour
         {
             TargetY = MapHeight - 1;
         }
-
         LoadMap.Init(mapInfoData, UnitWidth);
         // 初始化集群管理
         var loadMapPos = LoadMap.GetLeftBottom();
@@ -183,18 +207,18 @@ public class AstarFight : MonoBehaviour
     }
 
 
+
+    //TODODO  超过红色max的坐标提前转换到max内
     /// <summary>
-    /// 向lua返回最优的可下兵的点
+    /// 设置阵型中每个物体的位置确保不压障碍
     /// </summary>
-    /// <param name="mp">物体起始点，我方为世界坐标，地方为格子坐标</param>
+    /// <param name="mp">物体起始点，我方为世界坐标，敌人方为格子坐标</param>
     /// <param name="index">多点触摸模式下的触摸Index，为4是为敌方</param>
     /// <returns>最优的可下兵的点</returns>
-    public Vector3 isZhangAi(Vector3 mp, int index)
+    public void isZhangAi(Vector3 mp, int index)
     {
-        mp += zhenxingCenternOffsetArray[index];
+        //触摸点所对应格子坐标
         int[] a = new int[2];
-        int spani = 1;//搜索半径
-        int tempMax = maxX - zhenxingMaxXArray[index];
         if (index == 4)//如果为敌人
         {
             a[0] = (int)mp.x;
@@ -202,85 +226,166 @@ public class AstarFight : MonoBehaviour
         }
         else
         {
+            mp += zhenxingCenternOffsetArray[index];
             a = Utils.PositionToNum(LoadMap.MapPlane.transform.position, mp, UnitWidth, MapWidth, MapHeight);
         }
-        Vector3 tempP = Utils.NumToPosition(LoadMap.transform.position, new Vector2(a[0], a[1]), UnitWidth,
-        MapWidth, MapHeight);
-        ////触摸点世界坐标转换为格子坐标
-        //float[] aC = { (tempP.x - mp.x) / UnitWidth, (tempP.z - mp.z) / UnitWidth };
-
-        tempList2.Clear();
-        while (true)
+        int tempCount = 0, tempCount2 = 0;
+        int an = zhenxingArray[index].Length;
+        int _width = widthHeightArray[index][0];//物体宽
+        int _height = widthHeightArray[index][1];//物体高
+        int[] bianjie = { (-1 + _width), (-1 + _height), (MapWidth - _width), (MapHeight - _height), (maxX - _width) };
+        if (index == 4)//如果为敌方
         {
-            tempList.Clear();
-            if (spani == 1)//半径为1时添加触摸点本身
+            bianjie[4] = maxX + _width;
+            if (a[0] < bianjie[4] - 13)//如果超过最远下兵范围
             {
-                tempList.Add(0);
-                tempList.Add(0);
+                a[0] = bianjie[4] - 13;
             }
-            int a1 = -spani;
-            int b1 = -spani;
-            int a2 = spani;
-            int b2 = spani;
-            //获取搜索区域边上的点
-            for (int i = 1; i < 2 * spani + 1; i++)
+        }
+        else
+        {
+            if (a[0] > bianjie[4] + 13) //如果超过最远下兵范围
             {
-                tempList.Add(a1);
-                tempList.Add(b1 + i);
-                tempList.Add(a1 + i);
-                tempList.Add(b1);
-                tempList.Add(a2);
-                tempList.Add(b2 - i);
-                tempList.Add(a2 - i);
-                tempList.Add(b2);
+                a[0] = bianjie[4] + 13;
             }
-            int templ = tempList.Count;
-            tempList[templ - 4] = a1;
-            tempList[templ - 3] = b1;
-            tempList[templ - 2] = a2;
-            tempList[templ - 1] = b2;
-            spani++;
+        }
 
-            for (int i = 0; i < tempList.Count; i += 2)
+        int[] tempA3 = new int[zhenxingArray[index].Length * _width * _height];
+        for (int i = 0; i < an; i += 2)
+        {
+            var tempA1 = new[] { zhenxingArray[index][i] + a[0], zhenxingArray[index][i + 1] + a[1] };
+            tempList2.Clear();
+            var spani = 0;//搜索半径
+            while (true)
             {
-                //测试是否是可下兵的点
-                if (testPoint(a[0] + tempList[i], a[1] + tempList[i + 1], index) && (((a[0] + tempList[i]) < tempMax && index != 4) || ((a[0] + tempList[i]) > tempMax && index == 4)))
+                int[] tempArray;
+                if (spani < 10)
                 {
-                    tempList2.Add(tempList[i]);
-                    tempList2.Add(tempList[i + 1]);
+                    tempArray = serchPathArray[spani];
                 }
-            }
-
-            if (tempList2.Count > 0)
-            {
-                float min = 9999;
-                float tempFloat;
-                int tempInt2 = 0;
-                //计算哪个点离触摸点最近
-                for (int i = 0; i < tempList2.Count; i += 2)
+                else
                 {
-                    //tempFloat = (float)(Math.Pow(aC[0] - tempList2[i], 2) + Math.Pow(aC[1] - tempList2[i + 1], 2));
-                    tempFloat = (float)(Math.Pow(tempList2[i], 2) + Math.Pow(tempList2[i + 1], 2));
-                    if (tempFloat < min)
+                    // 以触摸点为中心循环扩大搜索半径来搜索可下兵的点，tempList记录搜索正方形范围边上的所有点
+                    tempArray = new int[2 * spani * 8];
+                    var a1 = -spani;
+                    var b1 = -spani;
+                    var a2 = spani;
+                    var b2 = spani;
+                    //获取搜索区域边上的点
+                    var tempCount333 = 0;
+                    for (int i2 = 1; i2 < 2 * spani + 1; i2++)
                     {
-                        min = tempFloat;
-                        tempInt2 = i;
+                        tempArray[tempCount333++] = a1;
+                        tempArray[tempCount333++] = b1 + i2;
+                        tempArray[tempCount333++] = a1 + i2;
+                        tempArray[tempCount333++] = b1;
+                        tempArray[tempCount333++] = a2;
+                        tempArray[tempCount333++] = b2 - i2;
+                        tempArray[tempCount333++] = a2 - i2;
+                        tempArray[tempCount333++] = b2;
+                    }
+                    int templ = tempArray.Length;
+                    tempArray[templ - 4] = a1;
+                    tempArray[templ - 3] = b1;
+                    tempArray[templ - 2] = a2;
+                    tempArray[templ - 1] = b2;
+                }
+
+                for (int i3 = 0; i3 < tempArray.Length; i3 += 2)
+                {
+                    var state = false;
+                    var tempA2 = new[] { tempA1[0] + tempArray[i3], tempA1[1] + tempArray[i3 + 1] };
+                    if (
+                        !(((tempA2[0] < bianjie[4] && index != 4) || (tempA2[0] > bianjie[4] && index == 4)) &&
+                          tempA2[0] > bianjie[0] && tempA2[1] > bianjie[1] && tempA2[0] < bianjie[2] &&
+                          tempA2[1] < bianjie[3]))
+                    {
+                        continue;
+                    }
+                    for (int j = 0; j < _width; j++)
+                    {
+                        for (int k = 0; k < _height; k++)
+                        {
+                            var x = tempA2[0] + j;
+                            var y = tempA2[1] + k;
+                            if (mapInfoData[y][x] == 1)
+                            {
+                                state = true;
+                                break;
+                            }
+                            else
+                            {
+                                for (int l = 0; l < tempCount2; l += 2)
+                                {
+                                    if (tempA3[l] == x && tempA3[l + 1] == y)
+                                    {
+                                        state = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (state)
+                        {
+                            break;
+                        }
+                    }
+                    if (!state)
+                    {
+                        tempList2.Add(tempA2[0]);
+                        tempList2.Add(tempA2[1]);
                     }
                 }
+                if (tempList2.Count > 0)
+                {
+                    float min = 9999;
+                    int tempInt2 = 0;
+                    //计算哪个点离触摸点最近
+                    for (int i33 = 0; i33 < tempList2.Count; i33 += 2)
+                    {
+                        var tempFloat =
+                            (float)
+                                (Math.Pow(tempA1[0] - tempList2[i33], 2) + Math.Pow(tempA1[1] - tempList2[i33 + 1], 2));
 
-                //向lua返回最优的可下兵的点
-                                return Utils.NumToPosition(LoadMap.transform.position, new Vector2(a[0] + tempList2[tempInt2], a[1] + tempList2[tempInt2 + 1]), UnitWidth, MapWidth, MapHeight);
+                        if (tempFloat < min)
+                        {
+                            min = tempFloat;
+                            tempInt2 = i33;
+                        }
+                    }
+
+                    parentArray[index].GetChild(tempCount++).position = Utils.NumToPosition(LoadMap.transform.position,
+                        new Vector2(tempList2[tempInt2], tempList2[tempInt2 + 1]), UnitWidth, MapWidth, MapHeight);
+                    if (tempCount < an)
+                    {
+                        for (int j = 0; j < _width; j++)
+                        {
+                            for (int k = 0; k < _height; k++)
+                            {
+                                tempA3[tempCount2++] = tempList2[tempInt2] + j;
+                                tempA3[tempCount2++] = tempList2[tempInt2 + 1] + k;
+                            }
+                        }
+                    }
+                    break;
+                }
+                else
+                {
+                    spani++;
+                }
             }
+
+
         }
     }
 
     /// <summary>
     /// 设置可下兵的最远的X坐标
     /// </summary>
-    /// <param name="X">可下兵的最远的X坐标</param>
+    /// <param name="X">可下兵的最远的X坐标(格子坐标)</param>
     public void setMaxX(float X)
     {
-        maxX = (int)((X - LoadMap.MapPlane.transform.position.x + MapWidth * UnitWidth / 2) / UnitWidth);
+        maxX = (int)((X - LoadMap.MapPlane.transform.position.x) / UnitWidth + MapWidth / 2f);
     }
 
 
@@ -292,12 +397,10 @@ public class AstarFight : MonoBehaviour
     /// <returns></returns>
     public Dictionary<int, int[]> setAllZhenxingList(int[] cardID, int[] level)
     {
-        Dictionary<int, int[]> allrenderZhenxingList = new Dictionary<int, int[]>(); // 当前关卡所有换算了宽高的阵型字典
-
         for (int starti = 0; starti < cardID.Length; starti++)
         {
             int _cardID = cardID[starti];
-            if (allZhenxingMaxX.ContainsKey(_cardID))
+            if (allZhenxingList.ContainsKey(_cardID))
             {
                 continue;
             }
@@ -307,16 +410,11 @@ public class AstarFight : MonoBehaviour
 
             //解析阵型数据到数组中
             string s = SData_zhenxing_data.Single.GetDataOfID(SData_armycardbase_c.Single.GetDataOfID(_cardID).ArrayID).Position;
-            int idx = 0;
-            int tempidx = 0;
             List<int> tempA = new List<int>();
-            string tempS;
-            string[] tempS1;
-            string[] tempS2;
-            tempS1 = s.Split(';');
+            var tempS1 = s.Split(';');
             for (int i = 0; i < tempS1.Length; i++)
             {
-                tempS2 = tempS1[i].Split(',');
+                var tempS2 = tempS1[i].Split(',');
                 tempA.Add(int.Parse(tempS2[0]));
                 tempA.Add(int.Parse(tempS2[1]));
             }
@@ -328,8 +426,6 @@ public class AstarFight : MonoBehaviour
             {
                 //把加入宽高转换后的阵型数据放入一维数组中传回lua
                 int[] t = new int[a.Length];//显示数组
-                int[] t2 = new int[2];//做碰撞判断的数组
-                int tempCount2 = 0;
                 int tempMax = 0;//最远的x值
                 int tempMaxX = 0;//最大的x值
                 int tempMinX = 0; //最小的x值
@@ -360,10 +456,8 @@ public class AstarFight : MonoBehaviour
                     t[i] = a[i];
                     t[i + 1] = a[i + 1];
                 }
-                allZhenxingMaxX[_cardID] = tempMax + _width;
                 allZhenxingList[_cardID] = t;
-                allrenderZhenxingList[_cardID] = t;
-                allCenternOffset[_cardID] = new Vector3((tempMaxX + tempMinX - _width) * UnitWidth / 2, 0, (tempMaxY + tempMinY - _width) * UnitWidth / 2);//TODODO 半径为1时中心点还没有设置
+                allCenternOffset[_cardID] = new Vector3((tempMaxX + tempMinX - _width) * UnitWidth / 2f, 0, (tempMaxY + tempMinY - _width) * UnitWidth / 2f);
             }
             else
             {
@@ -392,10 +486,9 @@ public class AstarFight : MonoBehaviour
                 }
 
                 int tempCount = 1;//记录偏移次数
-                bool b;//记录是否阵型中所有点都不重叠
                 while (true)
                 {
-                    b = true;
+                    var b = true;//记录是否阵型中所有点都不重叠
                     //冒泡法遍历阵型中所有点验证是否有重复的点
                     for (int i = 0; i < a3.Length; i++)
                     {
@@ -433,10 +526,6 @@ public class AstarFight : MonoBehaviour
                         int[] t = new int[a.Length];//显示数组
                         int[] t2 = new int[a3.Length * a2.Length];//做碰撞判断的数组
                         int tempCount2 = 0;
-                        int tempIntMaxX = 0;
-                        int tempIntMinX = 0;
-                        int tempIntMaxY = 0;
-                        int tempIntMinY = 0;
                         int tempMaxX = 0;//最大的x值
                         int tempMinX = 0; //最小的x值
                         int tempMaxY = 0; //最大的y值
@@ -448,8 +537,8 @@ public class AstarFight : MonoBehaviour
                                 t2[tempCount2++] = a2[j] + a[i] * tempCount;//阵型*偏移次数
                                 t2[tempCount2++] = a2[j + 1] + a[i + 1] * tempCount; //阵型*偏移次数
                             }
-                            tempIntMaxX = a[i] * tempCount;
-                            tempIntMaxY = a[i + 1] * tempCount;
+                            var tempIntMaxX = a[i] * tempCount;
+                            var tempIntMaxY = a[i + 1] * tempCount;
                             if (tempIntMaxX > tempMaxX)
                             {
                                 tempMaxX = tempIntMaxX;
@@ -470,10 +559,8 @@ public class AstarFight : MonoBehaviour
                             t[i] = a2[a2.Length - 2] + tempIntMaxX;
                             t[i + 1] = a2[a2.Length - 1] + tempIntMaxY;
                         }
-                        allZhenxingMaxX[_cardID] = tempMaxX + _width;
-                        allZhenxingList[_cardID] = t2;
-                        allrenderZhenxingList[_cardID] = t;
-                        allCenternOffset[_cardID] = new Vector3((tempMaxX + tempMinX - _width) * UnitWidth / 2, 0, (tempMaxY + tempMinY - _width) * UnitWidth / 2);//TODODO 半径为1时中心点还没有设置
+                        allZhenxingList[_cardID] = t;
+                        allCenternOffset[_cardID] = new Vector3((tempMaxX + tempMinX - _width) * UnitWidth / 2f, 0, (tempMaxY + tempMinY - _width) * UnitWidth / 2f);
 
                         break;
                     }
@@ -497,17 +584,18 @@ public class AstarFight : MonoBehaviour
                 }
             }
         }
-        return allrenderZhenxingList;
+        return allZhenxingList;
     }
 
-    public void setZhenxingInfo(int cardID, int index)
+    public void setZhenxingInfo(Transform go, int cardID, int index)
     {
-        zhenxingMaxXArray[index] = allZhenxingMaxX[cardID];
         zhenxingArray[index] = allZhenxingList[cardID];
         zhenxingCenternOffsetArray[index] = allCenternOffset[cardID];
+        int armyID = int.Parse(string.Format("{0}{1:D3}", SData_armycardbase_c.Single.GetDataOfID(cardID).ArmyID, 1));
+        widthHeightArray[index] = new[] { (int)Math.Ceiling(SData_armybase_c.Single.GetDataOfID(armyID).SpaceSet), (int)SData_armybase_c.Single.GetDataOfID(armyID).SpaceSet };
+        parentArray[index] = go;
         if (index == 4)
         {
-            zhenxingMaxXArray[index] = -zhenxingMaxXArray[index];
             //如果是敌方则阵型水平翻转
             for (int i = 0; i < zhenxingArray[index].Length; i += 2)
             {
@@ -532,9 +620,10 @@ public class AstarFight : MonoBehaviour
     /// <summary>
     /// 物体寻路
     /// </summary>
+    /// <param name="data"></param>
     /// <param name="isEnemy">是否为地方阵营</param>
     /// <param name="groupIndex">队伍index</param>
-    /// <param name="go">物体GameObject</param>
+    /// <param name="displayOwner"></param>
     internal void toXunLu(ClusterData data, bool isEnemy, int groupIndex, DisplayOwner displayOwner)
     {
         var go = displayOwner.GameObj;
@@ -544,17 +633,7 @@ public class AstarFight : MonoBehaviour
         }
         //把物体当前世界坐标转换为格子坐标
         int[] a = Utils.PositionToNum(LoadMap.MapPlane.transform.position, go.transform.position, UnitWidth, MapWidth, MapHeight);
-        IList<Node> path;
-        if (!isEnemy)//敌我阵营的起始位置相反
-        {
-            path = AStarPathFinding.SearchRoad(mapInfoData, a[0], a[1], TargetX, a[1], DiameterX, DiameterY,
-                IsJumpPoint);
-        }
-        else
-        {
-            path = AStarPathFinding.SearchRoad(mapInfoData, a[0], a[1], 1, a[1], DiameterX, DiameterY,
-                IsJumpPoint);
-        }
+        var path = AStarPathFinding.SearchRoad(mapInfoData, a[0], a[1], !isEnemy ? TargetX : 1, a[1], DiameterX, DiameterY, IsJumpPoint);
 
 
         ClusterData clusterData = data;
@@ -564,6 +643,8 @@ public class AstarFight : MonoBehaviour
         clusterData.RotateSpeed = 1;
         clusterData.RotateWeight = 1;
         clusterData.Diameter = 1 * UnitWidth;
+        // 默认出事状态不行进
+        clusterData.Stop();
 
         //clusterData.transform.localPosition = new Vector3((tempInt % 3) * 2, 1, tempInt / 3 * 2) + Utils.NumToPosition(LoadMap.transform.position, new Vector2(a[0], a[1]), UnitWidth, MapWidth, MapHeight);
 
@@ -572,7 +653,7 @@ public class AstarFight : MonoBehaviour
         // 外层对象持有ClusterData引用
         displayOwner.ClusterData = clusterData;
 
-        Action<ClusterGroup> lambdaComplete = (thisGroup) =>
+        Action<ClusterGroup> lambdaComplete = thisGroup =>
         {
             //Debug.Log("GroupComplete:" + thisGroup.Target);
             // 数据本地化
@@ -591,29 +672,6 @@ public class AstarFight : MonoBehaviour
         };
         clusterData.Group.ProportionOfComplete = 1;
         clusterData.Group.Complete = lambdaComplete;
-    }
-
-    /// <summary>
-    /// //测试是否是可下兵的点
-    /// </summary>
-    /// <param name="a0"></param>
-    /// <param name="a1"></param>
-    /// <param name="index">多点触摸模式下的触摸Index，为4是为敌方</param>
-    /// <returns></returns>
-    private bool testPoint(int a0, int a1, int index)
-    {
-        int an = zhenxingArray[index].Length;
-        int x, y;
-        for (int i = 0; i < an; i += 2)
-        {
-            x = a0 + zhenxingArray[index][i];
-            y = a1 + zhenxingArray[index][i + 1];
-            if (x > -1 && y > -1 && x < MapWidth && y < MapHeight && mapInfoData[y][x] == 1)
-            {
-                return false;
-            }
-        }
-        return true;
     }
 
     /// <summary>

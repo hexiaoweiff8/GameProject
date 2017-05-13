@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// 点对点飞行特效行为构建器
 /// </summary>
-public class PointToPointFormulaItem : IFormulaItem
+public class PointToPointFormulaItem : AbstractFormulaItem
 {
 
     /// <summary>
@@ -74,7 +74,7 @@ public class PointToPointFormulaItem : IFormulaItem
     /// 获取行为构建器
     /// </summary>
     /// <returns>构建完成的单个行为</returns>
-    public IFormula GetFormula(FormulaParamsPacker paramsPacker)
+    public override IFormula GetFormula(FormulaParamsPacker paramsPacker)
     {
         // UnityEngine.Debug.Log("点对对象");
         // 验证数据正确, 如果有问题直接抛错误

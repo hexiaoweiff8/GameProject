@@ -25,6 +25,10 @@ public class FormulaConstructor
             var skillId = 0;
             // 大括号标记
             var braket = false;
+            var stackLevel = 0;
+            // 创建临时堆栈, 存储不同层级的行为链
+            var stack = new Stack<IFormulaItem>();
+            IFormulaItem tmpItem = null;
 
             // 解析字符串
             // 根据对应行为列表创建Formula
@@ -65,24 +69,37 @@ public class FormulaConstructor
                     // 读取技能ID
                     var strSkillId = line.Substring(start + 1, length);
                     skillId = Convert.ToInt32(strSkillId);
-                    // 创建新技能
-                    skillInfo = new SkillInfo(skillId);
+                    //// 创建新技能
+                    //skillInfo = new SkillInfo(skillId);
                 }
                 else if (line.StartsWith("{"))
                 {
                     // 开始括号内容
-                    braket = true;
+                    stackLevel++;
+                    // 创建行为链
+
+                    // 将上级FormulaItem push进堆栈
+                    stack.Push(tmpItem);
+                    tmpItem = null;
                 }
                 else if (line.StartsWith("}"))
                 {
                     // 关闭括号内容
-                    braket = false;
+                    stackLevel--;
+                    // 将上级FormulaItem pop出来
+                    var prvLevelItem = stack.Pop();
+                    if (prvLevelItem != null)
+                    {
+                        prvLevelItem.AddSubFormulaItem(tmpItem);
+                        tmpItem = prvLevelItem;
+                    }
                 }
                 else
                 {
                     // 解析内容
-                    if (skillInfo != null && braket)
+                    if (stackLevel > 0)
                     {
+                        // TODO 判断Formula的stack等级是否与当前stack等级一直? 不一致则新建将其加入上一级formula的子集
                         // 参数列表内容
                         var start = line.IndexOf("(", StringComparison.Ordinal);
                         var end = line.IndexOf(")", StringComparison.Ordinal);
@@ -108,11 +125,32 @@ public class FormulaConstructor
                         var item = GetFormula(type, args);
                         // formula加入暂停item
                         var pauseItem = GetFormula("Pause", "1");
-                        skillInfo.AddFormulaItem(pauseItem);
 
-                        skillInfo.AddFormulaItem(item);
+                        if (tmpItem == null)
+                        {
+                            tmpItem = pauseItem;
+                        }
+                        else
+                        {
+                            tmpItem = tmpItem.After(pauseItem);
+                        }
+                        tmpItem = tmpItem.After(item);
+                        //skillInfo.AddFormulaItem(pauseItem);
+
+                        //skillInfo.AddFormulaItem(item);
+                    }
+                    else
+                    {
+                        Debug.Log("泄漏! 泄漏内容:" + line);
                     }
                 }
+            }
+            if (tmpItem != null)
+            {
+                // 获得行为链生成器的head
+                tmpItem = tmpItem.GetFirst();
+                skillInfo = new SkillInfo(skillId);
+                skillInfo.AddFormulaItem(tmpItem);
             }
         }
 
@@ -348,9 +386,9 @@ public class SkillInfo
     public int SkillNum { get; private set; }
 
     /// <summary>
-    /// 技能行为单元列表
+    /// 技能行为单元
     /// </summary>
-    private List<IFormulaItem> formulaItemList = new List<IFormulaItem>();
+    private IFormulaItem formulaItem = null;
 
     /// <summary>
     /// 构造技能信息
@@ -369,9 +407,16 @@ public class SkillInfo
     {
         if (formulaItem == null)
         {
-            return;
+            throw new Exception("行为节点为空");
         }
-        formulaItemList.Add(formulaItem);
+        if (this.formulaItem == null)
+        {
+            this.formulaItem = formulaItem;
+        }
+        else
+        {
+            formulaItem.After(formulaItem);
+        }
     }
 
     /// <summary>
@@ -387,23 +432,29 @@ public class SkillInfo
         }
         IFormula result = null;
 
-        // 设置技能ID
-        //paramsPacker.SkillNum = SkillNum;
-
-        foreach (var item in formulaItemList)
+        if (formulaItem == null)
+        {
+            return null;
+        }
+        // 循环构建行为链构造器
+        var tmpItem = formulaItem;
+        while (tmpItem != null)
         {
             if (result != null)
             {
-                result = result.After(item.GetFormula(paramsPacker));
+                result = result.After(tmpItem.GetFormula(paramsPacker));
             }
             else
             {
-                result = item.GetFormula(paramsPacker);
+                result = tmpItem.GetFormula(paramsPacker);
             }
+            tmpItem = tmpItem.NextFormulaItem;
         }
 
+        // 构造器不为空
         if (result != null)
         {
+            // 获取构造器链head
             result = result.GetFirst();
         }
         return result;

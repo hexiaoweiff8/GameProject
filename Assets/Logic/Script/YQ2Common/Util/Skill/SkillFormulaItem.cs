@@ -6,7 +6,7 @@ using System.Text;
 /// <summary>
 /// 子集技能技能行为单位
 /// </summary>
-public class SkillFormulaItem : IFormulaItem
+public class SkillFormulaItem : AbstractFormulaItem
 {
 
     /// <summary>
@@ -46,7 +46,7 @@ public class SkillFormulaItem : IFormulaItem
     /// </summary>
     /// <param name="paramsPacker"></param>
     /// <returns></returns>
-    public IFormula GetFormula(FormulaParamsPacker paramsPacker)
+    public override IFormula GetFormula(FormulaParamsPacker paramsPacker)
     {
         // 对上一级选出的目标列表释放
         IFormula result = null;

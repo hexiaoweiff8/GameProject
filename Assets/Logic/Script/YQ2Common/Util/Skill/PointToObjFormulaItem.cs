@@ -6,7 +6,7 @@ using UnityEngine;
 /// <summary>
 /// 点对对象飞行特效行为构建器
 /// </summary>
-public class PointToObjFormulaItem : IFormulaItem
+public class PointToObjFormulaItem : AbstractFormulaItem
 {
     /// <summary>
     /// 当前数据层级
@@ -59,7 +59,7 @@ public class PointToObjFormulaItem : IFormulaItem
     /// 获取行为构建器
     /// </summary>
     /// <returns>构建完成的单个行为</returns>
-    public IFormula GetFormula(FormulaParamsPacker paramsPacker)
+    public override IFormula GetFormula(FormulaParamsPacker paramsPacker)
     {
         //UnityEngine.Debug.Log("点对对象");
         // 验证数据正确, 如果有问题直接抛错误

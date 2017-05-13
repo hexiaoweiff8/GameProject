@@ -37,11 +37,8 @@ public class SkillManager
     /// <summary>
     /// 技能字典
     /// </summary>
-    public Dictionary<int, SkillInfo> SkillInfoDic = new Dictionary<int, SkillInfo>();
+    public IDictionary<int, SkillInfo> SkillInfoDic = new Dictionary<int, SkillInfo>();
 
-
-
-    
 
     /// <summary>
     /// 执行方程式
@@ -53,7 +50,7 @@ public class SkillManager
         {
             throw new Exception("方程式对象为空.");
         }
-        //Debug.Log("执行行为");
+
         CoroutineManage.AutoInstance();
         CoroutineManage.Single.StartCoroutine(LoopDoFormula(formula));
     }
@@ -69,7 +66,7 @@ public class SkillManager
         {
             throw new Exception("方程式对象为空.");
         }
-        //Debug.Log("执行技能");
+
         DoFormula(skillInfo.GetFormula(packer));
     }
 
@@ -84,7 +81,7 @@ public class SkillManager
         {
             throw new Exception("技能ID不存在:" + skillNum);
         }
-        //Debug.Log("执行技能编号:" + skillNum);
+
         var skillInfo = SkillInfoDic[skillNum];
         DoShillInfo(skillInfo, packer);
     }
@@ -224,10 +221,11 @@ public class Formula : IFormula
 
     // -----------------------公用方法-----------------------
     
-    protected Formula()
-    {
+    //protected Formula()
+    //{
         
-    }
+    //}
+
     /// <summary>
     /// 构建方法
     /// 传入执行操作

@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// 碰撞检测器
 /// </summary>
-public class CollisionDetectionFormulaItem : IFormulaItem
+public class CollisionDetectionFormulaItem : AbstractFormulaItem
 {
     /// <summary>
     /// 当前数据层级
@@ -72,7 +73,7 @@ public class CollisionDetectionFormulaItem : IFormulaItem
     /// 生成行为单元
     /// </summary>
     /// <returns>行为单元对象</returns>
-    public IFormula GetFormula(FormulaParamsPacker paramsPacker)
+    public override IFormula GetFormula(FormulaParamsPacker paramsPacker)
     {
         if (paramsPacker == null)
         {
@@ -82,6 +83,7 @@ public class CollisionDetectionFormulaItem : IFormulaItem
 
         result = new Formula((callback) =>
         {
+            Debug.Log("Collision");
             // TODO 技能数据应该在paramsPacker中
 
             // 检测范围
@@ -106,6 +108,9 @@ public class CollisionDetectionFormulaItem : IFormulaItem
                     break;
             }
 
+            // TODO 将数据传到下一层
+            // TODO 运行子集行为树
+            // TODO 如何获得子集?
             // TODO 获得单位列表后将他们压入堆栈
             var packerList = FormulaParamsPackerFactroy.Single.GetFormulaParamsPackerList(graphics, paramsPacker.StartPos, TargetCamps,
                 paramsPacker.TargetMaxCount);
@@ -117,6 +122,8 @@ public class CollisionDetectionFormulaItem : IFormulaItem
                     SkillManager.Single.DoSkillNum(SkillNum, packer);
                 }
             }
+            // 执行完成, 回调
+            callback();
         });
        
 
