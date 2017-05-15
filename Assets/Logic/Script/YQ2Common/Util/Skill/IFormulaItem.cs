@@ -90,7 +90,7 @@ public abstract class AbstractFormulaItem : IFormulaItem
     /// <summary>
     /// 子行为链
     /// </summary>
-    private IFormulaItem subFormulaItem { get; set; }
+    protected IFormulaItem subFormulaItem { get; set; }
 
     /// <summary>
     /// 是否包含下一节点
@@ -179,5 +179,4 @@ public abstract class AbstractFormulaItem : IFormulaItem
         }
         return formulaItem;
     }
-
 }

@@ -126,17 +126,31 @@ public class AstarTest : MonoBehaviour {
         string formulaStr = @"SkillNum(1001)
 {
         Point(1,test/ExplordScope,0,0,3,10,1,10),
-        CollisionDetection(0, 10, 1, 0, -1, 1002, 10)
+        CollisionDetection(0, 10, 1, 0, -1, 10)
+        {
+            Skill(1, 1002, 1)
+            //PointToObj(1,test/TrailPrj,10,0,10,1,10),
+            //Point(1,test/ExplordScope,1,0,3,10,1,10),
+        }
 }";
         string formulaStr2 = @"SkillNum(1002)
 {
         PointToObj(1,test/TrailPrj,10,0,10,1,10),
         Point(1,test/ExplordScope,1,0,3,10,1,10),
 }";
+        string formulaStr3 = @"SkillNum(1003)
+{
+        SlideCollisionDetection(1, 1, 3, 40, -1)
+        {
+            Point(1,test/ExplordScope,1,0,3,10,1,10),
+        }
+}";
         var skillInfo = FormulaConstructor.Constructor(formulaStr);
         var skillInfo2 = FormulaConstructor.Constructor(formulaStr2);
+        var skillInfo3 = FormulaConstructor.Constructor(formulaStr3);
         SkillManager.Single.AddSkillInfo(skillInfo);
         SkillManager.Single.AddSkillInfo(skillInfo2);
+        SkillManager.Single.AddSkillInfo(skillInfo3);
 
         // 设定帧数
         Application.targetFrameRate = 60;
@@ -194,10 +208,10 @@ public class AstarTest : MonoBehaviour {
 
                 // TODO 如何封装数据?
                 //SkillManager.Single.DoFormula(formula.GetFirst());
-                SkillManager.Single.DoSkillNum(1001, new FormulaParamsPacker()
+                SkillManager.Single.DoSkillNum(1003, new FormulaParamsPacker()
                 {
                     StartPos = new Vector3(hit.point.x, hit.point.z, hit.point.z),
-                    TargetPos = new Vector3(hit.point.x, hit.point.z, hit.point.z),
+                    TargetPos = new Vector3(hit.point.x, hit.point.z, hit.point.z + 40),
                     ReleaseMember = new DisplayOwner(null,null,null,null),
                 });
             }

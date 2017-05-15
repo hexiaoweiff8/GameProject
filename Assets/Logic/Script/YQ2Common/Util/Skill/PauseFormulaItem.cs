@@ -11,11 +11,6 @@ using Util;
 public class PauseFormulaItem : AbstractFormulaItem
 {
     /// <summary>
-    /// 当前数据层级
-    /// </summary>
-    public int Level { get; private set; }
-
-    /// <summary>
     /// 行为节点类型
     /// </summary>
     public int FormulaType { get { return Formula.FormulaWaitType; } }
@@ -26,16 +21,29 @@ public class PauseFormulaItem : AbstractFormulaItem
     public float CheckTime = 0.1f;
 
     /// <summary>
+    /// 初始化
+    /// </summary>
+    public PauseFormulaItem() { }
+
+    /// <summary>
+    /// 初始化
+    /// </summary>
+    /// <param name="array">数据数组</param>
+    public PauseFormulaItem(string[] array) { }
+
+    /// <summary>
     /// 获取行为节点
     /// </summary>
     /// <param name="paramsPacker"></param>
     /// <returns>暂停行为节点</returns>
     public override IFormula GetFormula(FormulaParamsPacker paramsPacker)
     {
+        // 数据本地化
+        var myCheckTime = CheckTime;
         return new Formula((callback) =>
         {
-            Debug.Log("Pause");
-            var timer = new Timer(CheckTime);
+            //Debug.Log("Pause");
+            var timer = new Timer(myCheckTime);
             Action completeCallback = () => { };
 
             completeCallback = () =>
@@ -43,8 +51,8 @@ public class PauseFormulaItem : AbstractFormulaItem
                 if (SkillManager.isPause)
                 {
                     // 继续暂停
-                    timer = new Timer(CheckTime);
-                    timer.OnCompleteCallback(completeCallback);
+                    timer = new Timer(myCheckTime);
+                    timer.OnCompleteCallback(completeCallback).Start();
                 }
                 else
                 {

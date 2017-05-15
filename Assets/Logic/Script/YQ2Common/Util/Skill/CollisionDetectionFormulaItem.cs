@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -6,11 +7,6 @@ using UnityEngine;
 /// </summary>
 public class CollisionDetectionFormulaItem : AbstractFormulaItem
 {
-    /// <summary>
-    /// 当前数据层级
-    /// </summary>
-    public int Level { get; private set; }
-
     /// <summary>
     /// 行为类型
     /// 0: 不等待其执行结束继续
@@ -43,10 +39,10 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
     /// </summary>
     public float[] ScopeParams { get; private set; }
 
-    /// <summary>
-    /// 技能ID
-    /// </summary>
-    public int SkillNum { get; private set; }
+    ///// <summary>
+    ///// 技能ID
+    ///// </summary>
+    //public int SkillNum { get; private set; }
 
     /// <summary>
     /// 初始化碰撞检测
@@ -57,8 +53,7 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
     /// <param name="targetCamps">目标阵营</param>
     /// <param name="scopeType">范围类型</param>
     /// <param name="scopeParams">范围参数</param>
-    /// <param name="skillNum">释放技能ID</param>
-    public CollisionDetectionFormulaItem(int formulaType, int targetCount, int receivePos, TargetCampsType targetCamps, GraphicType scopeType, float[] scopeParams, int skillNum)
+    public CollisionDetectionFormulaItem(int formulaType, int targetCount, int receivePos, TargetCampsType targetCamps, GraphicType scopeType, float[] scopeParams)
     {
         FormulaType = formulaType;
         TargetCount = targetCount;
@@ -66,7 +61,53 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
         TargetCamps = targetCamps;
         ScopeType = scopeType;
         ScopeParams = scopeParams;
-        SkillNum = skillNum;
+        //SkillNum = skillNum;
+    }
+
+    /// <summary>
+    /// 初始化
+    /// </summary>
+    /// <param name="array">数据数组</param>
+    /// 0>行为单元类型(0: 不等待, 1: 等待)
+    /// 1>目标数量
+    /// 2>接收技能方(0: 放技能方, 1: 目标方)
+    /// 3>目标阵营
+    /// 4>范围类型
+    /// 5[67]>范围参数
+    public CollisionDetectionFormulaItem(string[] array)
+    {
+
+        if (array == null)
+        {
+            throw new Exception("数据列表为空");
+        }
+        var argsCount = 5;
+        // 解析参数
+        if (array.Length < argsCount)
+        {
+            throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
+        }
+        // 是否等待完成, 目标数量, 检测位置(0放技能方, 1目标方), 检测范围形状(0圆, 1方),
+        // 目标阵营(-1:都触发, 0: 己方, 1: 非己方),
+        // 范围大小(方 第一个宽, 第二个长, 第三个旋转角度, 圆的就取第一个值当半径, 扇形第一个半径, 第二个开口角度, 第三个旋转角度有更多的参数都放进来)
+        var formulaType = Convert.ToInt32(array[0]);
+        var targetCount = Convert.ToInt32(array[1]);
+        var receivePos = Convert.ToInt32(array[2]);
+        var scopeType = (GraphicType)Enum.Parse(typeof(GraphicType), array[3]);
+        var targetTypeCamps = (TargetCampsType)Enum.Parse(typeof(TargetCampsType), array[4]);
+        float[] scopeArgs = new float[array.Length - argsCount];
+        // 范围参数
+        for (var i = 0; i < array.Length - argsCount; i++)
+        {
+            scopeArgs[i] = Convert.ToSingle(array[i + argsCount]);
+        }
+
+        FormulaType = formulaType;
+        TargetCount = targetCount;
+        ReceivePos = receivePos;
+        TargetCamps = targetTypeCamps;
+        ScopeType = scopeType;
+        ScopeParams = scopeArgs;
     }
 
     /// <summary>
@@ -81,15 +122,15 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
         }
         IFormula result = null;
 
+        // 数据本地化
+        var myReceivePos = ReceivePos;
+        var myTargetCamps = TargetCamps;
         result = new Formula((callback) =>
         {
-            Debug.Log("Collision");
-            // TODO 技能数据应该在paramsPacker中
-
             // 检测范围
             // 获取图形对象
             ICollisionGraphics graphics = null;
-            var pos = ReceivePos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
+            var pos = myReceivePos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
             switch (ScopeType)
             {
                 case GraphicType.Circle:
@@ -112,16 +153,25 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
             // TODO 运行子集行为树
             // TODO 如何获得子集?
             // TODO 获得单位列表后将他们压入堆栈
-            var packerList = FormulaParamsPackerFactroy.Single.GetFormulaParamsPackerList(graphics, paramsPacker.StartPos, TargetCamps,
+            var packerList = FormulaParamsPackerFactroy.Single.GetFormulaParamsPackerList(graphics, paramsPacker.StartPos, myTargetCamps,
                 paramsPacker.TargetMaxCount);
             // 对他们释放技能(技能编号)
             if (packerList != null)
             {
                 foreach (var packer in packerList)
                 {
-                    SkillManager.Single.DoSkillNum(SkillNum, packer);
+                    //SkillManager.Single.DoSkillNum(SkillNum, packer);
+                    // 执行子行为链
+                    if (subFormulaItem != null)
+                    {
+                        var subSkill = new SkillInfo(-1);
+                        subSkill.AddFormulaItem(subFormulaItem);
+                        subSkill.GetFormula(packer);
+                        SkillManager.Single.DoShillInfo(subSkill, packer);
+                    }
                 }
             }
+
             // 执行完成, 回调
             callback();
         });

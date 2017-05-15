@@ -1,14 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 
 /// <summary>
 /// 行为链构造器
 /// </summary>
-public class FormulaConstructor
+public static class FormulaConstructor
 {
-    //private IList<> 
+
+    /// <summary>
+    /// 已注册行为链生成器的字典
+    /// 新增构造器请在此处添加
+    /// </summary>
+    private static Dictionary<string, Type> registerFormulaItem = new Dictionary<string, Type>()
+    {
+        {"PointToPoint", typeof(PointToPointFormulaItem)},
+        {"PointToObj", typeof(PointToObjFormulaItem)},
+        {"Point", typeof(PointFormulaItem)},
+        {"CollisionDetection", typeof(CollisionDetectionFormulaItem)},
+        {"SlideCollisionDetection", typeof(SlideCollisionDetectionFormulaItem)},
+        {"Skill", typeof(SkillFormulaItem)},
+        {"Pause", typeof(PauseFormulaItem)},
+    };
+
+
     /// <summary>
     /// 构建行为链
     /// </summary>
@@ -88,9 +105,9 @@ public class FormulaConstructor
                     stackLevel--;
                     // 将上级FormulaItem pop出来
                     var prvLevelItem = stack.Pop();
-                    if (prvLevelItem != null)
+                    if (prvLevelItem != null && tmpItem != null)
                     {
-                        prvLevelItem.AddSubFormulaItem(tmpItem);
+                        prvLevelItem.AddSubFormulaItem(tmpItem.GetFirst());
                         tmpItem = prvLevelItem;
                     }
                 }
@@ -178,156 +195,20 @@ public class FormulaConstructor
         }
         if (string.IsNullOrEmpty(errorMsg))
         {
-
+            // 分割数据
             var argsArray = args.Split(',');
-            var formulaType = Convert.ToInt32(argsArray[0]);
-            switch (type)
+            // 注册列表中是否包含该类型
+            if (registerFormulaItem.ContainsKey(type))
             {
-                case "PointToPoint":
-                    {
-                        var argsCount = 9;
-                        // 解析参数
-                        if (argsArray.Length < argsCount)
-                        {
-                            errorMsg = "参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + argsArray.Length;
-                            break;
-                        }
-                        // 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),命中位置(0放技能方, 1目标方),速度,飞行轨迹, 缩放
-                        var effectKey = argsArray[1];
-                        var releasePos = Convert.ToInt32(argsArray[2]);
-                        var receivePos = Convert.ToInt32(argsArray[3]);
-                        var speed = Convert.ToSingle(argsArray[4]);
-                        var flyType = (TrajectoryAlgorithmType) Enum.Parse(typeof (TrajectoryAlgorithmType), argsArray[5]);
-
-                        float[] scale = new float[3];
-                        scale[0] = Convert.ToSingle(argsArray[6]);
-                        scale[1] = Convert.ToSingle(argsArray[7]);
-                        scale[2] = Convert.ToSingle(argsArray[8]);
-
-                        // 点对点特效
-                        result = new PointToPointFormulaItem(formulaType, effectKey, speed, releasePos, receivePos, flyType, scale);
-                    }
-                    break;
-                case "PointToObj":
-                    // 点对对象特效
-                    {
-                        var argsCount = 7;
-                        // 解析参数
-                        if (argsArray.Length < argsCount)
-                        {
-                            errorMsg = "参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + argsArray.Length;
-                            break;
-                        }
-                        // 是否等待完成,特效Key,速度,飞行轨迹
-                        var effectKey = argsArray[1];
-                        var speed = Convert.ToSingle(argsArray[2]);
-                        var flyType = (TrajectoryAlgorithmType)Enum.Parse(typeof(TrajectoryAlgorithmType), argsArray[3]);
-
-
-                        float[] scale = new float[3];
-                        scale[0] = Convert.ToSingle(argsArray[4]);
-                        scale[1] = Convert.ToSingle(argsArray[5]);
-                        scale[2] = Convert.ToSingle(argsArray[6]);
-
-                        result = new PointToObjFormulaItem(formulaType, effectKey, speed, flyType, scale);
-                    }
-                    break;
-                case "Point":
-                    // 点特效
-                    {
-                        var argsCount = 8;
-                        // 解析参数
-                        if (argsArray.Length < argsCount)
-                        {
-                            errorMsg = "参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + argsArray.Length;
-                            break;
-                        }
-                        // 是否等待完成,特效Key,速度,持续时间
-                        var effectKey = argsArray[1];
-                        var targetPos = Convert.ToInt32(argsArray[2]);
-                        var speed = Convert.ToSingle(argsArray[3]);
-                        var durTime = Convert.ToSingle(argsArray[4]);
-
-                        float[] scale = new float[3];
-                        scale[0] = Convert.ToSingle(argsArray[5]);
-                        scale[1] = Convert.ToSingle(argsArray[6]);
-                        scale[2] = Convert.ToSingle(argsArray[7]);
-                        result = new PointFormulaItem(formulaType, effectKey, targetPos, speed, durTime, scale);
-                    }
-                    break;
-                case "Scope":
-                    // 范围特效
-                    // TODO 仔细考虑实现 应该会比较耗
-                    break;
-                case "CollisionDetection":
-                    // 碰撞检测, 二级伤害判断
-                    {
-                        // 参数最低数量
-                        var argsCount = 6;
-                        // 解析参数
-                        if (argsArray.Length < argsCount)
-                        {
-                            errorMsg = "参数数量错误.需求参数数量最少:" + argsCount + " 实际数量:" + argsArray.Length;
-                            break;
-                        }
-                        // 是否等待完成, 目标数量, 检测位置(0放技能方, 1目标方), 检测范围形状(0圆, 1方), 范围大小(方的就取两个值, 
-                        // 圆的就取第一个值当半径), 目标阵营(-1:都触发, 0: 己方, 1: 非己方),碰撞单位被释放技能ID, 
-                        // 范围大小(方 第一个宽, 第二个长, 第三个旋转角度, 圆的就取第一个值当半径, 扇形第一个半径, 第二个开口角度, 第三个旋转角度有更多的参数都放进来)
-                        var targetCount = Convert.ToInt32(argsArray[1]);
-                        var receivePos = Convert.ToInt32(argsArray[2]);
-                        var scopeType = (GraphicType)Enum.Parse(typeof(GraphicType), argsArray[3]);
-                        var targetTypeCamps = (TargetCampsType)Enum.Parse(typeof (TargetCampsType), argsArray[4]);
-                        var skillNum = Convert.ToInt32(argsArray[5]);
-                        float[] scopeArgs = new float[argsArray.Length - argsCount];
-                        // 范围参数
-                        for (var i = 0; i < argsArray.Length - argsCount; i++)
-                        {
-                            scopeArgs[i] = Convert.ToSingle(argsArray[i + argsCount]);
-                        }
-                        
-                        result = new CollisionDetectionFormulaItem(formulaType, targetCount, receivePos, targetTypeCamps, scopeType, scopeArgs, skillNum);
-                    }
-                    break;
-                case "Audio":
-                    // 音效
-                    {
-                        
-                    }
-                    break;
-                case "Buff":
-                    // buff
-                    {
-
-                    }
-                    break;
-                //case "Demage":
-                //    // 伤害
-                //    {
-                //        
-                //    }
-                //    break;
-                //case "Cure":
-                //    // 治疗
-                //    {
-
-                //    }
-                //    break;
-                case "Calculate":
-                    // 结果结算
-                    {
-                        // TODO 伤害/治疗结算
-
-                    }
-                    break;
-
-                case "Pause":
-                    // 暂停
-                    {
-                        result = new PauseFormulaItem();
-                    }
-                    break;
-                default:
-                    throw new Exception("未知行为类型: " + type);
+                // 获取该行为的Type
+                var formulaItemType = registerFormulaItem[type];
+                // 反射方式实例化行为链构造器(因为实例化的是构造器, 所以不用担心效率问题, 实际技能是使用构造器生产产生)
+                result = (IFormulaItem)formulaItemType.InvokeMember("", BindingFlags.Public | BindingFlags.CreateInstance,
+                    null, null, new object[] { argsArray });
+            }
+            else
+            {
+                throw new Exception("未知行为类型: " + type);
             }
         }
         // 如果错误信息不为空则抛出错误
@@ -344,7 +225,10 @@ public class FormulaConstructor
      {
         PointToPoint(1,key,0,1,10,1,1),     // 需要等待其结束, 特效key(对应key,或特效path), 释放位置, 命中位置, 速度10, 飞行轨迹类型
         Point(0,key,1,0,3),                // 不需要等待其结束, 特效key(对应key,或特效path), 释放位置, 播放速度, 持续3秒
-        CollisionDetection(1, 1, 10, 0, 10001),
+        CollisionDetection(1, 1, 10, 0, 10001)
+        {
+            Skill(1, 10002, 1)
+        }
      }
      
      */
@@ -358,8 +242,13 @@ public class FormulaConstructor
     // CollisionDetection 碰撞检测    参数 是否等待完成, 目标数量, 检测位置(0放技能方, 1目标方), 检测范围形状(0圆, 1方), 
     // 目标阵营(-1:都触发, 0: 己方, 1: 非己方),碰撞单位被释放技能ID范围大小(方 第一个宽, 第二个长, 第三个旋转角度, 圆的就取第一个值当半径, 扇形第一个半径, 第二个开口角度, 第三个旋转角度有更多的参数都放进来)
     //{
-    //  自己功能
+    //  功能
     //}
+    // SlideCollisionDetection 滑动碰撞检测   参数 是否等待完成, 滑动速度, 检测宽度, 检测总长度, 目标阵营(-1:都触发, 0: 己方, 1: 非己方)
+    //{
+    //  功能
+    //}
+    // Skill 释放技能                 参数 是否等待完成,被释放技能,技能接收方(0释放者,1被释放者)
     // -----------------音效--------------------
     // Audio 音效                     参数 是否等待完成,点音,持续音,持续时间
 

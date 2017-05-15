@@ -189,6 +189,12 @@ public class FormulaParamsPackerFactroy
                 }
                 var posObj = positionObjList[i];
 
+                // 排除障碍物
+                if (posObj is FixtureData)
+                {
+                    continue;
+                }
+
                 //判断阵营
                 var camps = -1;
                 switch (camp)

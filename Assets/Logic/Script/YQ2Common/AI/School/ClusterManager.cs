@@ -165,6 +165,15 @@ public class ClusterManager : ILoopItem
     }
 
     /// <summary>
+    /// 删除对象
+    /// </summary>
+    /// <param name="member">被删除对象</param>
+    public void Remove(PositionObject member)
+    {
+        targetList.Remove(member);
+    }
+
+    /// <summary>
     /// 初始化
     /// </summary>
     /// <param name="x">四叉树位置x</param>

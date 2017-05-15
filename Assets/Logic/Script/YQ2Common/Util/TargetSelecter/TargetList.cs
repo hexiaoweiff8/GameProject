@@ -43,6 +43,11 @@ public class TargetList<T> where T : IGraphicsHolder//IGraphical<Rectangle>
     private MapInfo<T> mapinfo = null;
 
     /// <summary>
+    /// 删除列表
+    /// </summary>
+    private IList<T> removeList = new List<T>(); 
+
+    /// <summary>
     /// 单位格子宽度
     /// </summary>
     private int unitWidht;
@@ -80,6 +85,23 @@ public class TargetList<T> where T : IGraphicsHolder//IGraphical<Rectangle>
         // 加入四叉树
         quadTree.Insert(t);
     }
+
+    /// <summary>
+    /// 删除单位
+    /// </summary>
+    /// <param name="t"></param>
+    public void Remove(T t)
+    {
+        // 空对象不加入队列
+        if (t == null)
+        {
+            return;
+        }
+        list.Remove(t);
+        RebuildQuadTree();
+    }
+
+
     /// <summary>
     /// 根据范围获取对象
     /// </summary>

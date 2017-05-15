@@ -70,6 +70,48 @@ public class PointFormulaItem : AbstractFormulaItem
         }
     }
 
+    /// <summary>
+    /// 初始化
+    /// </summary>
+    /// <param name="array">数据数组</param>
+    /// 0>是否等待执行完毕 0 否, 1 是
+    /// 1>特效key(或路径)
+    /// 2>出现位置
+    /// 3>播放速度
+    /// 4>持续时间
+    /// 567>缩放
+    public PointFormulaItem(string[] array)
+    {
+        if (array == null)
+        {
+            throw new Exception("数据列表为空");
+        }
+        var argsCount = 8;
+        // 解析参数
+        if (array.Length < argsCount)
+        {
+            throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
+        }
+        // 是否等待完成,特效Key,速度,持续时间
+        var formulaType = Convert.ToInt32(array[0]);
+        var effectKey = array[1];
+        var targetPos = Convert.ToInt32(array[2]);
+        var speed = Convert.ToSingle(array[3]);
+        var durTime = Convert.ToSingle(array[4]);
+
+        float[] scale = new float[3];
+        scale[0] = Convert.ToSingle(array[5]);
+        scale[1] = Convert.ToSingle(array[6]);
+        scale[2] = Convert.ToSingle(array[7]);
+
+        FormulaType = formulaType;
+        EffectKey = effectKey;
+        TargetPos = targetPos;
+        Speed = speed;
+        DurTime = durTime;
+        this.scale = scale;
+    }
+
 
     /// <summary>
     /// 获取行为构建器
@@ -93,16 +135,21 @@ public class PointFormulaItem : AbstractFormulaItem
             throw new Exception(errorMsg);
         }
 
-        var tmpTargetPos = TargetPos;
+        // 数据本地化
+        var myFormulaType = FormulaType;
+        var myTargetPos = TargetPos;
+        var myEffectKey = EffectKey;
+        var myDurTime = DurTime;
+        var mySpeed = Speed;
+        var myScale = scale;
 
         IFormula result = new Formula((callback) =>
         {
             Debug.Log("Point");
-            var pos = tmpTargetPos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
+            var pos = myTargetPos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
             // 判断发射与接收位置
-            // TODO 父级暂时没有
-            EffectsFactory.Single.CreatePointEffect(EffectKey, null, pos, new Vector3(scale[0], scale[1], scale[2]), DurTime, Speed, callback).Begin();
-        }, FormulaType);
+            EffectsFactory.Single.CreatePointEffect(myEffectKey, null, pos, new Vector3(myScale[0], myScale[1], myScale[2]), myDurTime, mySpeed, callback).Begin();
+        }, myFormulaType);
 
         return result;
     }

@@ -434,15 +434,18 @@ public class TrajectoryAlgorithm
                                 var passedTime = ballistic.PassedTime;
 
                                 // xz平面向量
-                                var targetPosWithoutY = new Vector2(tmpTargetPos.x, tmpTargetPos.z);
-                                var theta = Math.Acos(Vector2.Dot(targetPosWithoutY.normalized, targetDir.z < 0 ? Vector2.left : Vector2.right));
+                                //var targetPosWithoutY = new Vector2(tmpTargetPos.x, tmpTargetPos.z);
+                                //var theta = Math.Acos(Vector2.Dot(targetPosWithoutY.normalized, targetDir.z < 0 ? Vector2.left : Vector2.right));
                                 // 计算位移比例
-                                var xOffsetProportion = (float)Math.Cos(theta + (targetDir.z < 0 ? Math.PI : 0));
-                                var zOffsetProportion = (float)Math.Sin(theta + (targetDir.z < 0 ? Math.PI : 0));
+                                //var xOffsetProportion = (float)Math.Cos(theta + (targetDir.x < 0 ? Math.PI : 0));
+                                //var zOffsetProportion = (float)Math.Sin(theta + (targetDir.z < 0 ? Math.PI : 0));
+                                var normalizedTargetDir = targetDir.normalized;
+                                var xOffsetProportion = normalizedTargetDir.x;
+                                var zOffsetProportion = normalizedTargetDir.z;
                                 // X位移
-                                var offsetX = ballistic.Speed * xOffsetProportion * passedTime;
+                                var offsetX = ballistic.Speed * xOffsetProportion * passedTime + ballistic.StartPos.x;
                                 // Z位移
-                                var offsetZ = ballistic.Speed * zOffsetProportion * passedTime;
+                                var offsetZ = ballistic.Speed * zOffsetProportion * passedTime + ballistic.StartPos.z;
 
                                 // 求起点与目标点的中心点
                                 var center = (ballistic.StartPos + tmpTargetPos) * 0.5f;
