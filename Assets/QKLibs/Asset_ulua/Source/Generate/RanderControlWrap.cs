@@ -7,9 +7,11 @@ public class RanderControlWrap
 	public static void Register(LuaState L)
 	{
 		L.BeginClass(typeof(RanderControl), typeof(UnityEngine.MonoBehaviour));
+		L.RegFunction("SetBloodBarValue", SetBloodBarValue);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
-		L.RegVar("BloodBar", get_BloodBar, set_BloodBar);
+		L.RegVar("bloodBarCom", get_bloodBarCom, set_bloodBarCom);
+		L.RegVar("bloodBar", get_bloodBar, set_bloodBar);
 		L.RegVar("NowWorldCamera", get_NowWorldCamera, set_NowWorldCamera);
 		L.RegVar("Head", get_Head, set_Head);
 		L.RegVar("isEnemy", get_isEnemy, set_isEnemy);
@@ -17,6 +19,22 @@ public class RanderControlWrap
 		L.RegVar("groupIndex", get_groupIndex, set_groupIndex);
 		L.RegVar("ModelRander", get_ModelRander, set_ModelRander);
 		L.EndClass();
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int SetBloodBarValue(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			RanderControl obj = (RanderControl)ToLua.CheckObject(L, 1, typeof(RanderControl));
+			obj.SetBloodBarValue();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
@@ -38,7 +56,7 @@ public class RanderControlWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_BloodBar(IntPtr L)
+	static int get_bloodBarCom(IntPtr L)
 	{
 		object o = null;
 
@@ -46,13 +64,32 @@ public class RanderControlWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			RanderControl obj = (RanderControl)o;
-			UnityEngine.Transform ret = obj.BloodBar;
+			BloodBar ret = obj.bloodBarCom;
 			ToLua.Push(L, ret);
 			return 1;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index BloodBar on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index bloodBarCom on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_bloodBar(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			RanderControl obj = (RanderControl)o;
+			UnityEngine.Transform ret = obj.bloodBar;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index bloodBar on a nil value" : e.Message);
 		}
 	}
 
@@ -171,7 +208,26 @@ public class RanderControlWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_BloodBar(IntPtr L)
+	static int set_bloodBarCom(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			RanderControl obj = (RanderControl)o;
+			BloodBar arg0 = (BloodBar)ToLua.CheckUnityObject(L, 2, typeof(BloodBar));
+			obj.bloodBarCom = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index bloodBarCom on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_bloodBar(IntPtr L)
 	{
 		object o = null;
 
@@ -180,12 +236,12 @@ public class RanderControlWrap
 			o = ToLua.ToObject(L, 1);
 			RanderControl obj = (RanderControl)o;
 			UnityEngine.Transform arg0 = (UnityEngine.Transform)ToLua.CheckUnityObject(L, 2, typeof(UnityEngine.Transform));
-			obj.BloodBar = arg0;
+			obj.bloodBar = arg0;
 			return 0;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index BloodBar on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index bloodBar on a nil value" : e.Message);
 		}
 	}
 

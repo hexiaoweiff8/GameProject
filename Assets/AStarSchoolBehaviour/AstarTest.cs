@@ -140,17 +140,23 @@ public class AstarTest : MonoBehaviour {
 }";
         string formulaStr3 = @"SkillNum(1003)
 {
-        SlideCollisionDetection(1, 1, 3, 40, -1)
+        SlideCollisionDetection(1, 1, 10, 40, -1)
         {
             Point(1,test/ExplordScope,1,0,3,10,1,10),
         }
 }";
+        string formulaStr4 = @"SkillNum(1004)
+{
+        Move(1, 3, 0)
+}";
         var skillInfo = FormulaConstructor.Constructor(formulaStr);
         var skillInfo2 = FormulaConstructor.Constructor(formulaStr2);
         var skillInfo3 = FormulaConstructor.Constructor(formulaStr3);
+        var skillInfo4 = FormulaConstructor.Constructor(formulaStr4);
         SkillManager.Single.AddSkillInfo(skillInfo);
         SkillManager.Single.AddSkillInfo(skillInfo2);
         SkillManager.Single.AddSkillInfo(skillInfo3);
+        SkillManager.Single.AddSkillInfo(skillInfo4);
 
         // 设定帧数
         Application.targetFrameRate = 60;
@@ -210,9 +216,9 @@ public class AstarTest : MonoBehaviour {
                 //SkillManager.Single.DoFormula(formula.GetFirst());
                 SkillManager.Single.DoSkillNum(1003, new FormulaParamsPacker()
                 {
-                    StartPos = new Vector3(hit.point.x, hit.point.z, hit.point.z),
-                    TargetPos = new Vector3(hit.point.x, hit.point.z, hit.point.z + 40),
-                    ReleaseMember = new DisplayOwner(null,null,null,null),
+                    StartPos = new Vector3(hit.point.x, 0, hit.point.z),
+                    TargetPos = new Vector3(hit.point.x - 40, 0, hit.point.z + 40),
+                    ReleaseMember = new DisplayOwner(scaner.gameObject, scaner, null, null),
                 });
             }
         }
@@ -243,6 +249,11 @@ public class AstarTest : MonoBehaviour {
                 lastTimeTargetY = posOnMap[1];
 
             }
+        }
+
+        if (Input.GetMouseButton(0))
+        {
+            Utils.DrawGraphics(new RectGraphics(new Vector2(0,0), 10, 10, 90), Color.white);
         }
 
         // 上下左右移动

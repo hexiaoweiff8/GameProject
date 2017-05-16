@@ -148,7 +148,7 @@ function ui_equip:OnShowDone()
     Camera3D:GetComponent(typeof(UnityEngine.Camera)).targetTexture = self.myTexture
     playerModelTexture:GetComponent(typeof(UITexture)).mainTexture = self.myTexture
     --添加玩家3d模型
-    tempMod = DP_FightPrefabManage.InstantiateAvatar(CreateActorParam(AvatarCM.Infantry_R, false, 0, "daobing", "daobing", true, 0)).transform
+    tempMod = DP_FightPrefabManage.InstantiateAvatar(CreateActorParam(AvatarCM.Infantry_R, false, 0, "gongjianbing", "gongjianbing", true, 0, 0)).transform
     tempMod.parent = Camera3D
     tempMod.localScale = Vector3(1, 1, 1);
     tempMod.localRotation = Quaternion(0, 180, 0, 1);
@@ -788,7 +788,7 @@ function ui_equip:setAllInfo()
             --显示主属性
             tf = GameObjectExtension.InstantiateFromPacket("ui_equip", "shuxing", self.bg51Grid.gameObject).transform
             ul = tf:GetComponent(typeof(UILabel))
-            ul.text = sdata_EffectName_data:GetV(sdata_EffectName_data.I_EffectName, v.MainEffectID) .. "+" .. sdata_EquipPlan_data[sdata_Equip_data:GetV(sdata_Equip_data.I_MainEffect, v.EquipID)][v.MainEffectID].up .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_Symbol, v.MainEffectID)
+            ul.text = sdata_attribute_data:GetV(sdata_attribute_data.I_AttributeName, v.MainEffectID) .. "+" .. sdata_EquipPlan_data[sdata_equip_data:GetV(sdata_equip_data.I_MainAttribute, v.EquipID)][v.MainEffectID].up .. sdata_attribute_data:GetV(sdata_attribute_data.I_Symbol, v.MainEffectID)
             tf.localPosition = Vector3(tempInt % self.bg51GridWHL.maxPerLine * self.bg51GridWHL.cellWidth, -math.modf(tempInt / self.bg51GridWHL.maxPerLine) * self.bg51GridWHL.cellHeight, 0)
             tempInt = tempInt + 1
             
@@ -796,7 +796,7 @@ function ui_equip:setAllInfo()
             for j, v in ipairs(v.ViceEffect) do
                 tf = GameObjectExtension.InstantiateFromPacket("ui_equip", "shuxing", self.bg51Grid.gameObject).transform
                 ul = tf:GetComponent(typeof(UILabel))
-                ul.text = sdata_EffectName_data:GetV(sdata_EffectName_data.I_EffectName, v.ShuXingID) .. "+" .. v.ShuXingNum .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_Symbol, v.ShuXingID)
+                ul.text = sdata_attribute_data:GetV(sdata_attribute_data.I_AttributeName, v.ShuXingID) .. "+" .. v.ShuXingNum .. sdata_attribute_data:GetV(sdata_attribute_data.I_Symbol, v.ShuXingID)
                 tf.localPosition = Vector3(tempInt % self.bg51GridWHL.maxPerLine * self.bg51GridWHL.cellWidth, -math.modf(tempInt / self.bg51GridWHL.maxPerLine) * self.bg51GridWHL.cellHeight, 0)
                 tempInt = tempInt + 1
             end
@@ -820,28 +820,28 @@ function ui_equip:setAllInfo()
             end
             self.suitSV[tempInt].parent.gameObject:SetActive(true)
             if v > 1 then --2件套属性
-                effectID = sdata_Equip_suit_data:GetV(sdata_Equip_suit_data.I_SuitEffect2, k)
+                effectID = sdata_equipsuit_data:GetV(sdata_equipsuit_data.I_SuitEffect2, k)
                 tf = GameObjectExtension.InstantiateFromPacket("ui_equip", "suitshuxing", self.suitSV[tempInt].gameObject).transform
                 ul = tf:GetComponent(typeof(UILabel))
-                ul.text = string.gsub(str, "#N", 2) .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_EffectName, effectID) .. "+" .. sdata_Equip_suit_data:GetV(sdata_Equip_suit_data.I_Effect2Point, k) .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_Symbol, effectID)
+                ul.text = string.gsub(str, "#N", 2) .. sdata_attribute_data:GetV(sdata_attribute_data.I_AttributeName, effectID) .. "+" .. sdata_equipsuit_data:GetV(sdata_equipsuit_data.I_Effect2Point, k) .. sdata_attribute_data:GetV(sdata_attribute_data.I_Symbol, effectID)
                 tf.localPosition = Vector3(lp.x, lp.y - height - 6, lp.z)
                 height = ul.height
                 lp = tf.localPosition
             end
             if v > 2 then --3件套属性
-                effectID = sdata_Equip_suit_data:GetV(sdata_Equip_suit_data.I_SuitEffect3, k)
+                effectID = sdata_equipsuit_data:GetV(sdata_equipsuit_data.I_SuitEffect3, k)
                 tf = GameObjectExtension.InstantiateFromPacket("ui_equip", "suitshuxing", self.suitSV[tempInt].gameObject).transform
                 ul = tf:GetComponent(typeof(UILabel))
-                ul.text = string.gsub(str, "#N", 3) .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_EffectName, effectID) .. "+" .. sdata_Equip_suit_data:GetV(sdata_Equip_suit_data.I_Effect3Point, k) .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_Symbol, effectID)
+                ul.text = string.gsub(str, "#N", 3) .. sdata_attribute_data:GetV(sdata_attribute_data.I_AttributeName, effectID) .. "+" .. sdata_equipsuit_data:GetV(sdata_equipsuit_data.I_Effect3Point, k) .. sdata_attribute_data:GetV(sdata_attribute_data.I_Symbol, effectID)
                 tf.localPosition = Vector3(lp.x, lp.y - height - 6, lp.z)
                 height = ul.height
                 lp = tf.localPosition
             end
             if v > 4 then --5件套属性
-                effectID = sdata_Equip_suit_data:GetV(sdata_Equip_suit_data.I_SuitEffect5, k)
+                effectID = sdata_equipsuit_data:GetV(sdata_equipsuit_data.I_SuitEffect5, k)
                 tf = GameObjectExtension.InstantiateFromPacket("ui_equip", "suitshuxing", self.suitSV[tempInt].gameObject).transform
                 ul = tf:GetComponent(typeof(UILabel))
-                ul.text = string.gsub(str, "#N", 5) .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_EffectName, effectID) .. "+" .. sdata_Equip_suit_data:GetV(sdata_Equip_suit_data.I_Effect5Point, k) .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_Symbol, effectID)
+                ul.text = string.gsub(str, "#N", 5) .. sdata_attribute_data:GetV(sdata_attribute_data.I_AttributeName, effectID) .. "+" .. sdata_equipsuit_data:GetV(sdata_equipsuit_data.I_Effect5Point, k) .. sdata_attribute_data:GetV(sdata_attribute_data.I_Symbol, effectID)
                 tf.localPosition = Vector3(lp.x, lp.y - height - 6, lp.z)
                 height = ul.height
                 lp = tf.localPosition
@@ -860,7 +860,7 @@ end
 function setEqIconView(tf, v)
     tf:GetComponent(typeof(UISprite)).spriteName = pingzhiName[v.EquipQuality]
     local sprite = tf:Find("eqSpr"):GetComponent(typeof(UISprite))
-    tf:Find("eqSpr"):GetComponent(typeof(UISprite)).spriteName = sdata_Equip_data:GetV(sdata_Equip_data.I_EquipResName, v.EquipID)
+    tf:Find("eqSpr"):GetComponent(typeof(UISprite)).spriteName = sdata_equip_data:GetV(sdata_equip_data.I_EquipIcon, v.EquipID)
     if v.IsBad == 1 then
         sprite.color = badColor
     else
@@ -871,7 +871,7 @@ end
 
 --设置装备详情显示 v为详情table
 function ui_equip:setEqView(i, v)
-    self.bgShuXing[i].EqSprSprite.spriteName = sdata_Equip_data:GetV(sdata_Equip_data.I_EquipResName, v.EquipID)
+    self.bgShuXing[i].EqSprSprite.spriteName = sdata_equip_data:GetV(sdata_equip_data.I_EquipIcon, v.EquipID)
     if v.IsBad == 1 then
         self.bgShuXing[i].EqSprSprite.color = badColor
     else
@@ -879,18 +879,18 @@ function ui_equip:setEqView(i, v)
     end
     self.bgShuXing[i].EqBgSprSprite.spriteName = pingzhiName[v.EquipQuality]
     self.bgShuXing[i].EQLevelLabel.text = "lv" .. v.QiangHuaLevel
-    self.bgShuXing[i].eqName.text = sdata_Equip_data:GetV(sdata_Equip_data.I_EquipName, v.EquipID)
+    self.bgShuXing[i].eqName.text = sdata_equip_data:GetV(sdata_equip_data.I_EquipName, v.EquipID)
     self.bgShuXing[i].eqName.color = eqNameColor[v.EquipQuality]
     
     --设置主属性
-    self.bgShuXing[i].shuxingMain.text = sdata_EffectName_data:GetV(sdata_EffectName_data.I_EffectName, v.MainEffectID) .. "+" .. sdata_EquipPlan_data[sdata_Equip_data:GetV(sdata_Equip_data.I_MainEffect, v.EquipID)][v.MainEffectID].up .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_Symbol, v.MainEffectID)
+    self.bgShuXing[i].shuxingMain.text = sdata_attribute_data:GetV(sdata_attribute_data.I_AttributeName, v.MainEffectID) .. "+" .. sdata_EquipPlan_data[sdata_equip_data:GetV(sdata_equip_data.I_MainAttribute, v.EquipID)][v.MainEffectID].up .. sdata_attribute_data:GetV(sdata_attribute_data.I_Symbol, v.MainEffectID)
     
     
     --设置附加属性
     for j, v in ipairs(v.ViceEffect) do
         self.bgShuXing[i]["shuxingFuJia" .. j].enabled = true
         self.bgShuXing[i]["shuxingFuJia" .. j .. "SuoSpr"].gameObject:SetActive(false)
-        self.bgShuXing[i]["shuxingFuJia" .. j].text = sdata_EffectName_data:GetV(sdata_EffectName_data.I_EffectName, v.ShuXingID) .. "+" .. v.ShuXingNum .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_Symbol, v.ShuXingID)
+        self.bgShuXing[i]["shuxingFuJia" .. j].text = sdata_attribute_data:GetV(sdata_attribute_data.I_AttributeName, v.ShuXingID) .. "+" .. v.ShuXingNum .. sdata_attribute_data:GetV(sdata_attribute_data.I_Symbol, v.ShuXingID)
     end
     local str = sdata_UILiteral:GetV(sdata_UILiteral.I_Literal, 10001)
     for j = #v.ViceEffect + 1, v.EquipQuality - 1 do
@@ -904,15 +904,15 @@ function ui_equip:setEqView(i, v)
     end
     
     --设置套装属性
-    local suitID = sdata_Equip_data:GetV(sdata_Equip_data.I_SuitID, v.EquipID)
-    local effectID2 = sdata_Equip_suit_data:GetV(sdata_Equip_suit_data.I_SuitEffect2, suitID)
-    local effectID3 = sdata_Equip_suit_data:GetV(sdata_Equip_suit_data.I_SuitEffect3, suitID)
-    local effectID5 = sdata_Equip_suit_data:GetV(sdata_Equip_suit_data.I_SuitEffect5, suitID)
+    local suitID = sdata_equip_data:GetV(sdata_equip_data.I_SuitID, v.EquipID)
+    local effectID2 = sdata_equipsuit_data:GetV(sdata_equipsuit_data.I_SuitEffect2, suitID)
+    local effectID3 = sdata_equipsuit_data:GetV(sdata_equipsuit_data.I_SuitEffect3, suitID)
+    local effectID5 = sdata_equipsuit_data:GetV(sdata_equipsuit_data.I_SuitEffect5, suitID)
     
     str = sdata_UILiteral:GetV(sdata_UILiteral.I_Literal, 10002)
-    self.bgShuXing[i]["shuxingSuit" .. 1].text = string.gsub(str, "#N", 2) .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_EffectName, effectID2) .. "+" .. sdata_Equip_suit_data:GetV(sdata_Equip_suit_data.I_Effect2Point, suitID) .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_Symbol, effectID2) .. "32432222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222"
-    self.bgShuXing[i]["shuxingSuit" .. 2].text = string.gsub(str, "#N", 3) .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_EffectName, effectID3) .. "+" .. sdata_Equip_suit_data:GetV(sdata_Equip_suit_data.I_Effect3Point, suitID) .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_Symbol, effectID3)
-    self.bgShuXing[i]["shuxingSuit" .. 3].text = string.gsub(str, "#N", 5) .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_EffectName, effectID5) .. "+" .. sdata_Equip_suit_data:GetV(sdata_Equip_suit_data.I_Effect5Point, suitID) .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_Symbol, effectID5)
+    self.bgShuXing[i]["shuxingSuit" .. 1].text = string.gsub(str, "#N", 2) .. sdata_attribute_data:GetV(sdata_attribute_data.I_AttributeName, effectID2) .. "+" .. sdata_equipsuit_data:GetV(sdata_equipsuit_data.I_Effect2Point, suitID) .. sdata_attribute_data:GetV(sdata_attribute_data.I_Symbol, effectID2) .. "32432222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222"
+    self.bgShuXing[i]["shuxingSuit" .. 2].text = string.gsub(str, "#N", 3) .. sdata_attribute_data:GetV(sdata_attribute_data.I_AttributeName, effectID3) .. "+" .. sdata_equipsuit_data:GetV(sdata_equipsuit_data.I_Effect3Point, suitID) .. sdata_attribute_data:GetV(sdata_attribute_data.I_Symbol, effectID3)
+    self.bgShuXing[i]["shuxingSuit" .. 3].text = string.gsub(str, "#N", 5) .. sdata_attribute_data:GetV(sdata_attribute_data.I_AttributeName, effectID5) .. "+" .. sdata_equipsuit_data:GetV(sdata_equipsuit_data.I_Effect5Point, suitID) .. sdata_attribute_data:GetV(sdata_attribute_data.I_Symbol, effectID5)
     
     local lp = self.bgShuXing[i]["shuxingSuit" .. 1].transform.localPosition
     self.bgShuXing[i]["shuxingSuit" .. 2].transform.localPosition = Vector3(lp.x, self.bgShuXing[i]["shuxingSuit" .. 1].transform.localPosition.y - self.bgShuXing[i]["shuxingSuit" .. 1].height - 6, lp.z)
@@ -925,7 +925,7 @@ function ui_equip:setEqView(i, v)
     if i == 3 then --如果是背包中的装备
         local isAdd = true
         if equipP.nowEqList[eqChangeType] ~= 0 then --如果该装备位有装备
-            local suitID2 = sdata_Equip_data:GetV(sdata_Equip_data.I_SuitID, equipP.nowEqList[eqChangeType].EquipID)
+            local suitID2 = sdata_equip_data:GetV(sdata_equip_data.I_SuitID, equipP.nowEqList[eqChangeType].EquipID)
             if suitID == suitID2 then --如果待替换的两件装备属于同一套装
                 isAdd = false
             end
@@ -986,7 +986,7 @@ function ui_equip:setSuitData()
     self.suitData = {}--当前穿戴套装数据
     for i = 1, #equipP.nowEqList do
         if equipP.nowEqList[i] ~= 0 then
-            local suitID = sdata_Equip_data:GetV(sdata_Equip_data.I_SuitID, equipP.nowEqList[i].EquipID)
+            local suitID = sdata_equip_data:GetV(sdata_equip_data.I_SuitID, equipP.nowEqList[i].EquipID)
             if self.suitData[suitID] == nil then
                 self.suitData[suitID] = 0
             end

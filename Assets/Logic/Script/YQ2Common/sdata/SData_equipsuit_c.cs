@@ -19,6 +19,8 @@ public class SData_equipsuit_c : MonoEX.Singleton<SData_equipsuit_c>
                 switch (head[(int)(double)o11 - 1])
 				{
 					case "SuitID": dif.SuitID = (short)(double)o22; break;
+					case "SuitIcon": dif.SuitIcon = (string)o22; break;
+					case "SuitName": dif.SuitName = (string)o22; break;
 					case "SuitEffect2": dif.SuitEffect2 = (int)(double)o22; break;
 					case "Effect2Point": dif.Effect2Point = (float)(double)o22; break;
 					case "SuitEffect3": dif.SuitEffect3 = (int)(double)o22; break;
@@ -49,6 +51,14 @@ public struct equipsuit_cInfo
 	 ///套装ID
 	 /// </summary>
 	public short SuitID;
+	 /// <summary>
+	 ///套装图标
+	 /// </summary>
+	public string SuitIcon;
+	 /// <summary>
+	 ///套装名称
+	 /// </summary>
+	public string SuitName;
 	 /// <summary>
 	 ///两件套属性
 	 /// </summary>

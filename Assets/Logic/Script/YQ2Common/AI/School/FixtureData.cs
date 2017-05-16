@@ -70,6 +70,7 @@ public class FixtureData : PositionObject
                 {
                     case Utils.Obstacle:
                         var fixItem = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        fixItem.layer = LayerMask.NameToLayer("Scenery");//TODODO 下边测试
                         fixItem.name += i;
                         var fix = fixItem.AddComponent<FixtureData>();
                         fix.MemberData = new VOBase()

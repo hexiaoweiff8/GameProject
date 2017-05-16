@@ -25,6 +25,10 @@ public class SoldierFSMSystem {
     /// 是否已经做好战斗准备 可以进入战斗的标记（普通攻击）
     /// </summary>
     public bool IsCanInJinenggongji = false;
+    /// <summary>
+    /// 标记角色血量是否为0
+    /// </summary>
+    public bool IsDie = false;
 
 
     private SoldierStateID _currentStateId;
@@ -38,6 +42,10 @@ public class SoldierFSMSystem {
     /// 通过目标选择器筛选并锁定的敌人
     /// </summary>
     public DisplayOwner EnemyTarget;
+    /// <summary>
+    /// 标记攻击目标是否失效 如果目标失效需要切除状态
+    /// </summary>
+    public bool TargetIsLoseEfficacy;
 
     public SoldierFSMSystem()
     {
@@ -75,33 +83,6 @@ public class SoldierFSMSystem {
     }
 
     /// <summary>
-    /// 跟据ID来从容器states中定向移除FSMState实例
-    /// </summary>
-    /// <param name="id"></param>
-    public void DeleteState(SoldierStateID id)
-    {
-
-        if (id == SoldierStateID.NullState)
-
-        {
-            Debug.LogError("FSM ERROR: NullStateID is not allowed for a real state");
-            return;
-        }
-
-
-        foreach (SoldierFSMState state in _states)
-
-        {
-            if (state.StateID == id)
-            {
-                _states.Remove(state);
-                return;
-            }
-        }
-        Debug.LogError("FSM ERROR: Impossible to delete state " + id.ToString() +
-                       ". It was not on the list of _states");
-    }
-    /// <summary>
     /// 查找并切换对应id的状态 
     /// </summary>
     /// <param name="stateId"></param>
@@ -125,7 +106,7 @@ public class SoldierFSMSystem {
                 //只允许在这里切换状态
                 _currentState = state;
                 _currentStateId = state.StateID;
-                Debug.Log("执行状态切换-------------------" + state.StateID);
+                //Debug.Log("执行状态切换-------------------" + state.StateID);
                 if (null != _currentState)
                 {
                     _currentState.DoBeforeEntering(this);
@@ -133,5 +114,14 @@ public class SoldierFSMSystem {
                 break;
             }
         }
+    }
+
+    public void Destory()
+    {
+        foreach (var state in _states)
+        {
+            state.Destory();
+        }
+        _states.Clear();
     }
 }

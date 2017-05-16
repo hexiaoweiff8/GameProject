@@ -8,10 +8,10 @@ public class AstarFightWrap
 	{
 		L.BeginClass(typeof(AstarFight), typeof(UnityEngine.MonoBehaviour));
 		L.RegFunction("isZhangAi", isZhangAi);
-		L.RegFunction("setMaxX", setMaxX);
 		L.RegFunction("setAllZhenxingList", setAllZhenxingList);
 		L.RegFunction("setZhenxingInfo", setZhenxingInfo);
 		L.RegFunction("getNum", getNum);
+		L.RegFunction("setMaxX", setMaxX);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("DiameterX", get_DiameterX, set_DiameterX);
@@ -41,23 +41,6 @@ public class AstarFightWrap
 			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 2);
 			int arg1 = (int)LuaDLL.luaL_checknumber(L, 3);
 			obj.isZhangAi(arg0, arg1);
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int setMaxX(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 2);
-			AstarFight obj = (AstarFight)ToLua.CheckObject(L, 1, typeof(AstarFight));
-			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
-			obj.setMaxX(arg0);
 			return 0;
 		}
 		catch(Exception e)
@@ -115,6 +98,23 @@ public class AstarFightWrap
 			UnityEngine.Vector3 o = obj.getNum(arg0);
 			ToLua.Push(L, o);
 			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int setMaxX(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			AstarFight obj = (AstarFight)ToLua.CheckObject(L, 1, typeof(AstarFight));
+			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
+			obj.setMaxX(arg0);
+			return 0;
 		}
 		catch(Exception e)
 		{

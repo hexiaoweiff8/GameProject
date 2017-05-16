@@ -333,7 +333,7 @@ public class Utils
     /// <param name="color">绘制颜色</param>
     public static void DrawRect(Vector3 position, float width, float height, float rotation, Color color)
     {
-        var angle = rotation*Math.PI/360;
+        var angle = rotation*Math.PI/180;
         var halfWidth = width*0.5f;
         var halfHeight = height*0.5f;
 

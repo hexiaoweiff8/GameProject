@@ -10,10 +10,6 @@ using Util;
 /// </summary>
 public class PauseFormulaItem : AbstractFormulaItem
 {
-    /// <summary>
-    /// 行为节点类型
-    /// </summary>
-    public int FormulaType { get { return Formula.FormulaWaitType; } }
 
     /// <summary>
     /// 检查时间间隔

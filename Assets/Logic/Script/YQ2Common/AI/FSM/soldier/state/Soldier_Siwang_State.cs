@@ -8,9 +8,15 @@ public class Soldier_Siwang_State : SoldierFSMState
     {
         this.StateID = SoldierStateID.SiWang;
     }
+    public override void DoBeforeEntering(SoldierFSMSystem fsm)
+    {
+        base.DoBeforeEntering(fsm);
+        fsm.Display.ClusterData.Stop();
+        FightUnitFactory.DeleteUnit(fsm.Display.ClusterData.MemberData);
+    }
 
     public override void Action(SoldierFSMSystem fsm)
     {
-        throw new NotImplementedException();
+        //throw new NotImplementedException();
     }
 }

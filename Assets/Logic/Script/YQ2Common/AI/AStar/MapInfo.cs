@@ -59,6 +59,7 @@ public class MapInfo<T> where T : IGraphicsHolder//IGraphical<Rectangle>
         this.unitWidth = unitw;
         mapWidth = width;
         mapHeight = height;
+        
     }
 
 

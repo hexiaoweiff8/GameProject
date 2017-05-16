@@ -3,6 +3,25 @@ using System.Collections;
 
 public class SoldierFSMControl{
     private SoldierFSMSystem fsm;//内置一个fsm
+    /// <summary>
+    /// 标记状态机是否唤醒的 如果宿主在对象池中需要把它置为休眠
+    /// </summary>
+    private bool _iSAwake = false;
+    /// <summary>
+    /// 进入休眠状态
+    /// </summary>
+    public void Sleep()
+    {
+        _iSAwake = true;
+    }
+
+    /// <summary>
+    /// 重新唤醒状态机 一般用在从对象池中pop出宿主的时候
+    /// </summary>
+    public void Awaken()
+    {
+        _iSAwake = false;
+    }
 
     public void StartFSM(DisplayOwner obj)
     {
@@ -46,8 +65,14 @@ public class SoldierFSMControl{
         fsm.AddState(siwang);
     }
 
+    public void Destory()
+    {
+        fsm.Destory();
+    }
+
     public void UpdateFSM()//作为驱动源
     {
+        if (_iSAwake) return;
         fsm.CurrentState.CheckTrigger(fsm);
         fsm.CurrentState.Action(fsm);
     }

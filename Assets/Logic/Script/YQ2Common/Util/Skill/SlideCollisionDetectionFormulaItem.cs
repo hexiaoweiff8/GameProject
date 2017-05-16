@@ -7,11 +7,6 @@ using Util;
 
 public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
 {
-    /// <summary>
-    /// 行为节点类型
-    /// </summary>
-    public int FormulaType { get; private set; }
-
 
     /// <summary>
     /// 检查时间间隔
@@ -103,23 +98,29 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
         {
             throw new Exception("滑动碰撞检测的速度不能小于等于0");
         }
+
+        // 数据本地化
+        var mySpeed = Speed;
+        var myCheckTime = CheckTime;
+        var myLength = Length;
+        var myTargetCamps = TargetCamps;
+
+        var selecterData = paramsPacker.ReleaseMember.ClusterData.MemberData;
+
+        // 上一次列表
+        List<FormulaParamsPacker> prvPackerList = new List<FormulaParamsPacker>();
+        IList<FormulaParamsPacker> tmpPackerList = null;
+
         IFormula result = new Formula((callback) =>
         {
-            // 数据本地化
-            var mySpeed = Speed;
-            var myCheckTime = CheckTime;
-            var myLength = Length;
-            var myTargetCamps = TargetCamps;
 
             // 当前长度
             var nowLength = 0f;
 
             // 计时器
-            var timer = new Timer(myCheckTime);
+            var timer = new Timer(myCheckTime, true);
             // 计时器行为
-            Action completeCallback = () => { };
-
-            completeCallback = () =>
+            Action completeCallback = () =>
             {
                 // 是否到达目标
                 if (nowLength < Length)
@@ -130,24 +131,65 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
                     // 速度影响单次搜索的长度
                     var diffPos = paramsPacker.TargetPos - paramsPacker.StartPos;
                     var pos = (diffPos) * nowLength / myLength + paramsPacker.StartPos;
-                    Debug.Log(nowLength + " " + pos);
                     // 创建图形
                     var diffPosNoY = new Vector3(diffPos.x, 0, diffPos.z);
                     // 求旋转角度
                     var rotation = Vector3.Angle(Vector3.forward, diffPosNoY);
                     // 求旋转方向
-                    float dir = (Vector3.Dot(Vector3.up, Vector3.Cross(Vector3.forward, diffPosNoY)) < 0 ? -1 : 1);
+                    float dir = (Vector3.Dot(Vector3.up, Vector3.Cross(Vector3.forward, diffPosNoY)) < 0 ? 1 : -1);
                     // 获得图形
                     var graphics = new RectGraphics(new Vector2(pos.x, pos.z), Width, mySpeed, rotation * dir);
                     Utils.DrawGraphics(graphics, Color.white);
                     // 搜索当前节范围内的单位
-                    var packerList = FormulaParamsPackerFactroy.Single.GetFormulaParamsPackerList(graphics, paramsPacker.StartPos, myTargetCamps, 
-                paramsPacker.TargetMaxCount);
+                    tmpPackerList = FormulaParamsPackerFactroy.Single.GetFormulaParamsPackerList(graphics, paramsPacker.StartPos, myTargetCamps, 
+                        paramsPacker.TargetMaxCount);
 
                     // 执行子技能
-                    if (packerList != null && packerList.Count > 0 && subFormulaItem != null)
+                    if (tmpPackerList != null && tmpPackerList.Count > 0 && subFormulaItem != null)
                     {
-                        foreach (var packer in packerList)
+                        // 排除不可选择目标
+                        for (var i = 0; i < tmpPackerList.Count; i++)
+                        {
+                            var nowPacker = tmpPackerList[i];
+                            if (!TargetSelecter.CouldSelectTarget(nowPacker.ReceiverMenber.ClusterData.MemberData, selecterData))
+                            {
+                                tmpPackerList.RemoveAt(i);
+                                i--;
+                            }
+                        }
+
+                        // 排除上次被攻击过的目标
+                        bool isExist;
+                        for (var j = 0; j < prvPackerList.Count; j++)
+                        {
+                            isExist = false;
+                            var prvPacker = prvPackerList[j];
+                            // 判断是否存在上次被攻击的对象
+                            // 从列表中删除重复对象
+                            for (var i = 0; i < tmpPackerList.Count; i++)
+                            {
+                                var nowPacker = tmpPackerList[i];
+                                if (prvPacker.ReceiverMenber.Equals(nowPacker.ReceiverMenber))
+                                {
+                                    // 删除本次攻击中上次攻击存在的单位
+                                    tmpPackerList.RemoveAt(i);
+                                    i--;
+                                    isExist = true;
+                                    break;
+                                }
+                            }
+
+                            // 删除上次攻击中本次攻击不存在的单位
+                            if (!isExist)
+                            {
+                                prvPackerList.RemoveAt(j);
+                                j--;
+                            }
+                        }
+
+                        prvPackerList.AddRange(tmpPackerList);
+
+                        foreach (var packer in tmpPackerList)
                         {
                             var subSkill = new SkillInfo(-1);
                             subSkill.AddFormulaItem(subFormulaItem);
@@ -155,15 +197,13 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
                             SkillManager.Single.DoShillInfo(subSkill, packer);
                         }
                     }
-
-                    // 继续向前搜索目标
-                    timer = new Timer(myCheckTime);
-                    timer.OnCompleteCallback(completeCallback).Start();
                     
                 }
                 else
                 {
-                    // 暂停结束
+                    // 结束计时
+                    timer.Kill();
+                    // 完成回调
                     callback();
                 }
             };

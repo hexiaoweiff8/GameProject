@@ -1,7 +1,6 @@
 local class = require("common/middleclass")
 local ui_kejitree = class("ui_kejitree", wnd_base)
 
-local sdataTB
 local maxKejiNum = 6 --最大的科技图标数
 local perKejiNum = {6, 6, 6, 6}--每页最大科技图标数
 local maxShengJiNum = 1 --最大升级序列数
@@ -9,7 +8,6 @@ function ui_kejitree:OnShowDone()
     self.temp = 0
     ui_kejitree = self
     self.ui_keji_jiasu = nil
-    sdataTB = {sdata_kejitree_jingji_data, sdata_kejitree_gongji_data, sdata_kejitree_fangyu_data, sdata_kejitree_shengming_data}
     local bg = self.transform:Find("bg")
     local bg2 = self.transform:Find("bg2")
     self.page1_jingji = self.transform:Find("page1_jingji")--经济标签
@@ -150,17 +148,17 @@ function ui_kejitree:changePage(index)
         if kejiLevel == 0 then --未激活
             kejiID = tonumber(kejiP[index][i].kejiID .. string.format("%03d", 1))--0级时显示1级的信息
             self.kejiLevel[i].text = sdata_UILiteral:GetV(sdata_UILiteral.I_Literal, 10011)
-            self.kejiBtnUISprite[i].spriteName = sdataTB[index]:GetFieldV("TechIcon", kejiID)
-            self.kejiName[i].text = sdataTB[index]:GetFieldV("TechName", kejiID)
+            self.kejiBtnUISprite[i].spriteName = sdata_tech_data:GetFieldV("TechIcon", kejiID)
+            self.kejiName[i].text = sdata_tech_data:GetFieldV("TechName", kejiID)
         else --已激活
             kejiID = tonumber(kejiP[index][i].kejiID .. string.format("%03d", kejiLevel))
             if kejiLevelAdd >= 80 then --满级
                 self.kejiLevel[i].text = sdata_UILiteral:GetV(sdata_UILiteral.I_Literal, 10013)
             else
-                self.kejiLevel[i].text = sdataTB[index]:GetFieldV("Level", kejiID) .. sdata_UILiteral:GetV(sdata_UILiteral.I_Literal, 10012)
+                self.kejiLevel[i].text = sdata_tech_data:GetFieldV("Level", kejiID) .. sdata_UILiteral:GetV(sdata_UILiteral.I_Literal, 10012)
             end
-            self.kejiBtnUISprite[i].spriteName = sdataTB[index]:GetFieldV("TechIcon", kejiID)
-            self.kejiName[i].text = sdataTB[index]:GetFieldV("TechName", kejiID)
+            self.kejiBtnUISprite[i].spriteName = sdata_tech_data:GetFieldV("TechIcon", kejiID)
+            self.kejiName[i].text = sdata_tech_data:GetFieldV("TechName", kejiID)
         end
     end
     --根据当前页面科技图标数隐藏多余图标
@@ -196,16 +194,16 @@ function ui_kejitree:changeInfo(index)
         self.keji1Bg.localPosition = Vector3(0, self.keji1Bg.localPosition.y, self.keji1Bg.localPosition.z)
         --左侧升级信息展示
         self.keji1LevelUL.text = kejiLevel .. sdata_UILiteral:GetV(sdata_UILiteral.I_Literal, 10012)
-        self.keji1InfoUL.text = sdataTB[nowPageIndex]:GetFieldV("FunctionDes", kejiID)
-        self.keji1NumUL.text = "+" .. sdataTB[nowPageIndex]:GetFieldV("Point", kejiID)
-        self.costNumUL.text = sdataTB[nowPageIndex]:GetFieldV("RequireGold", kejiID)--消耗信息展示
-        self.timeUL.text = sdataTB[nowPageIndex]:GetFieldV("RequireTime", kejiID)--耗时信息展示
+        self.keji1InfoUL.text = sdata_tech_data:GetFieldV("FunctionDes", kejiID)
+        self.keji1NumUL.text = "+" .. sdata_tech_data:GetFieldV("Point", kejiID)
+        self.costNumUL.text = sdata_tech_data:GetFieldV("RequireGold", kejiID)--消耗信息展示
+        self.timeUL.text = sdata_tech_data:GetFieldV("RequireTime", kejiID)--耗时信息展示
     else --已激活
         kejiID = tonumber(kejiP[nowPageIndex][index].kejiID .. string.format("%03d", kejiLevel))
         --左侧升级信息展示
         self.keji1LevelUL.text = kejiLevel .. sdata_UILiteral:GetV(sdata_UILiteral.I_Literal, 10012)
-        self.keji1InfoUL.text = sdataTB[nowPageIndex]:GetFieldV("FunctionDes", kejiID)
-        self.keji1NumUL.text = "+" .. sdataTB[nowPageIndex]:GetFieldV("Point", kejiID)
+        self.keji1InfoUL.text = sdata_tech_data:GetFieldV("FunctionDes", kejiID)
+        self.keji1NumUL.text = "+" .. sdata_tech_data:GetFieldV("Point", kejiID)
         if kejiLevelAdd >= 80 then --满级
             --左侧升级信息居中，右侧升级信息隐藏
             self.keji2Bg.gameObject:SetActive(false)
@@ -218,22 +216,22 @@ function ui_kejitree:changeInfo(index)
             kejiIDAdd = kejiID + 1
             --右侧升级信息展示
             self.keji2LevelUL.text = kejiLevelAdd .. sdata_UILiteral:GetV(sdata_UILiteral.I_Literal, 10012)
-            self.keji2InfoUL.text = sdataTB[nowPageIndex]:GetFieldV("FunctionDes", kejiIDAdd)
-            self.keji2NumUL.text = "+" .. sdataTB[nowPageIndex]:GetFieldV("Point", kejiIDAdd)
-            self.costNumUL.text = sdataTB[nowPageIndex]:GetFieldV("RequireGold", kejiID)--消耗信息展示
+            self.keji2InfoUL.text = sdata_tech_data:GetFieldV("FunctionDes", kejiIDAdd)
+            self.keji2NumUL.text = "+" .. sdata_tech_data:GetFieldV("Point", kejiIDAdd)
+            self.costNumUL.text = sdata_tech_data:GetFieldV("RequireGold", kejiID)--消耗信息展示
             if kejiP[nowPageIndex][nowInfoIndex].isShengji == 1 then
                 self.timeUL.text = GetRemainTime(allTimeTickerTb["ui_kejitree_shengji" .. nowPageIndex .. nowInfoIndex].OverTime)
             else
-                self.timeUL.text = sdataTB[nowPageIndex]:GetFieldV("RequireTime", kejiID)--耗时信息展示
+                self.timeUL.text = sdata_tech_data:GetFieldV("RequireTime", kejiID)--耗时信息展示
             end
         
         end
     end
     
     --上方信息展示
-    self.kejiBgUS.spriteName = sdataTB[nowPageIndex]:GetFieldV("TechIcon", kejiID)
-    self.kejiNameUL.text = sdataTB[nowPageIndex]:GetFieldV("TechName", kejiID)
-    self.kejiInfoUL.text = sdataTB[nowPageIndex]:GetFieldV("TechDes", kejiID)
+    self.kejiBgUS.spriteName = sdata_tech_data:GetFieldV("TechIcon", kejiID)
+    self.kejiNameUL.text = sdata_tech_data:GetFieldV("TechName", kejiID)
+    self.kejiInfoUL.text = sdata_tech_data:GetFieldV("TechDes", kejiID)
     
     self.kuangSpr.localPosition = self.kejiBtn[index].localPosition
 end

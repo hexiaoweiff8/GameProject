@@ -53,39 +53,51 @@ public class SkillScriptEditor : EditorWindow
         EditorGUILayout.BeginVertical("box", GUILayout.Width(200), GUILayout.Height(400));
         #region UI
         skillId = EditorGUILayout.IntField("script ID:", skillId);
-        if (GUILayout.Button("Load Script by Script ID"))
+        if (GUILayout.Button("输入ID加载脚本"))
             LoadScript();
-        if (GUILayout.Button("Save Script"))
+        if (GUILayout.Button("保存脚本"))
             SaveScript();
-        if (GUILayout.Button("New Or Clear Script"))
+        if (GUILayout.Button("创建新脚本"))
             ClearContent();
-        if (GUILayout.Button("Delete Line"))
+        if (GUILayout.Button("删除行"))
             DeleteContent();
-        if (GUILayout.Button("Move Up"))
+        if (GUILayout.Button("上移"))
             MoveUpContent();
-        if (GUILayout.Button("Move Down"))
+        if (GUILayout.Button("下移"))
             MoveDownContent();
         #region Add Trigger
         EditorGUILayout.BeginVertical("box");
         GUI.color = Color.yellow;
 
-        if (GUILayout.Button("PointToPoint"))
+        if (GUILayout.Button("子级左括号"))
+        {
+            SkillTriggerScriptEditor.ShowSkillTriggerScriptWindow(SkillTriggerScriptEditor.TriigerType.LeftBracket, this.position);
+        }
+        if (GUILayout.Button("子级右括号"))
+        {
+            SkillTriggerScriptEditor.ShowSkillTriggerScriptWindow(SkillTriggerScriptEditor.TriigerType.RightBracket, this.position);
+        }
+        if (GUILayout.Button("点对点特效"))
         {
             SkillTriggerScriptEditor.ShowSkillTriggerScriptWindow(SkillTriggerScriptEditor.TriigerType.PointToPoint, this.position);
         }
-        if (GUILayout.Button("PointToObj"))
+        if (GUILayout.Button("点对对象特效(跟踪)"))
         {
             SkillTriggerScriptEditor.ShowSkillTriggerScriptWindow(SkillTriggerScriptEditor.TriigerType.PointToObj, this.position);
         }
-        if (GUILayout.Button("Point"))
+        if (GUILayout.Button("点特效"))
         {
             SkillTriggerScriptEditor.ShowSkillTriggerScriptWindow(SkillTriggerScriptEditor.TriigerType.Point, this.position);
         }
-        if (GUILayout.Button("CollisionDetection"))
+        if (GUILayout.Button("范围碰撞检测"))
         {
             SkillTriggerScriptEditor.ShowSkillTriggerScriptWindow(SkillTriggerScriptEditor.TriigerType.CollisionDetection, this.position);
         }
-        if (GUILayout.Button("Audio"))
+        if (GUILayout.Button("滑动碰撞检测"))
+        {
+            SkillTriggerScriptEditor.ShowSkillTriggerScriptWindow(SkillTriggerScriptEditor.TriigerType.SlideCollisionDetection, this.position);
+        }
+        if (GUILayout.Button("音效"))
         {
             SkillTriggerScriptEditor.ShowSkillTriggerScriptWindow(SkillTriggerScriptEditor.TriigerType.Audio, this.position);
         }
@@ -93,9 +105,13 @@ public class SkillScriptEditor : EditorWindow
         {
             SkillTriggerScriptEditor.ShowSkillTriggerScriptWindow(SkillTriggerScriptEditor.TriigerType.Buff, this.position);
         }
-        if (GUILayout.Button("Calculate"))
+        if (GUILayout.Button("伤害/治疗结算"))
         {
             SkillTriggerScriptEditor.ShowSkillTriggerScriptWindow(SkillTriggerScriptEditor.TriigerType.Calculate, this.position);
+        }
+        if (GUILayout.Button("移动"))
+        {
+            SkillTriggerScriptEditor.ShowSkillTriggerScriptWindow(SkillTriggerScriptEditor.TriigerType.Move, this.position);
         }
         GUI.color = Color.white;
         EditorGUILayout.EndVertical();

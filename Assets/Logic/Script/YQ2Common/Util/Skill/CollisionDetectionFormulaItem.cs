@@ -7,12 +7,6 @@ using UnityEngine;
 /// </summary>
 public class CollisionDetectionFormulaItem : AbstractFormulaItem
 {
-    /// <summary>
-    /// 行为类型
-    /// 0: 不等待其执行结束继续
-    /// 1: 等待期执行结束调用callback
-    /// </summary>
-    public int FormulaType { get; private set; }
 
     /// <summary>
     /// 选取目标数量上限
@@ -125,12 +119,13 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
         // 数据本地化
         var myReceivePos = ReceivePos;
         var myTargetCamps = TargetCamps;
+        var selecterData = paramsPacker.ReleaseMember.ClusterData.MemberData;
         result = new Formula((callback) =>
         {
             // 检测范围
-            // 获取图形对象
             ICollisionGraphics graphics = null;
             var pos = myReceivePos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
+            // 获取图形对象
             switch (ScopeType)
             {
                 case GraphicType.Circle:
@@ -149,18 +144,24 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
                     break;
             }
 
-            // TODO 将数据传到下一层
-            // TODO 运行子集行为树
-            // TODO 如何获得子集?
-            // TODO 获得单位列表后将他们压入堆栈
+            // 获取周围单位DisplayOwner列表
             var packerList = FormulaParamsPackerFactroy.Single.GetFormulaParamsPackerList(graphics, paramsPacker.StartPos, myTargetCamps,
                 paramsPacker.TargetMaxCount);
+            // 排除不可选择目标
+            for (var i = 0; i < packerList.Count; i++)
+            {
+                var nowPacker = packerList[i];
+                if (!TargetSelecter.CouldSelectTarget(nowPacker.ReceiverMenber.ClusterData.MemberData, selecterData))
+                {
+                    packerList.RemoveAt(i);
+                    i--;
+                }
+            }
             // 对他们释放技能(技能编号)
             if (packerList != null)
             {
                 foreach (var packer in packerList)
                 {
-                    //SkillManager.Single.DoSkillNum(SkillNum, packer);
                     // 执行子行为链
                     if (subFormulaItem != null)
                     {

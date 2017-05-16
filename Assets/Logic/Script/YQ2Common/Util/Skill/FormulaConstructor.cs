@@ -23,6 +23,7 @@ public static class FormulaConstructor
         {"SlideCollisionDetection", typeof(SlideCollisionDetectionFormulaItem)},
         {"Skill", typeof(SkillFormulaItem)},
         {"Pause", typeof(PauseFormulaItem)},
+        {"Move", typeof(MoveFormulaItem)},
     };
 
 
@@ -212,7 +213,7 @@ public static class FormulaConstructor
             }
         }
         // 如果错误信息不为空则抛出错误
-        if (!string.IsNullOrEmpty(errorMsg)) 
+        if (!string.IsNullOrEmpty(errorMsg))
         {
             throw new Exception(errorMsg);
         }
@@ -258,8 +259,11 @@ public static class FormulaConstructor
     // -----------------结算--------------------
     // Calculate 结算                 参数 是否等待完成,伤害或治疗(0,1),技能编号
 
-    // -----------------子技能------------------
+    // -----------------技能--------------------
     // Skill 释放技能                 参数 是否等待完成,技能编号
+
+    // -----------------位置--------------------
+    // Move 位置移动                  参数 是否等待完成,移动速度,是否瞬移(0: 否, 1: 是(如果是瞬移则速度无效))
 
 
 }

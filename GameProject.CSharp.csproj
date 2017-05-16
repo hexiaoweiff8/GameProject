@@ -104,7 +104,6 @@
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestCollision.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestEffectFactory.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestFormulaConstruct.cs" />
-    <Compile Include="Assets\AStarSchoolBehaviour\Script\TestObserver.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestQuadTree.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestSkill.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestTargetSelecter.cs" />
@@ -157,6 +156,7 @@
     <Compile Include="Assets\Logic\Script\Game\Network\NetworkManager.cs" />
     <Compile Include="Assets\Logic\Script\Game\Network\Protocal.cs" />
     <Compile Include="Assets\Logic\Script\Game\Network\SocketClient.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\BloodBar.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\DragableCard.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\LoopHorizontalScrollRect.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\LoopScrollRect.cs" />
@@ -231,6 +231,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\FSM\soldier\trigger\XingjinTrigger.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\FSM\soldier\trigger\ZhunbeizhandouTrigger.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\FightEndAdjust.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\AI\HurtResult.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\School\ClusterData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\School\ClusterManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\School\FixtureData.cs" />
@@ -261,7 +262,6 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\CSecurity\CSafeData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\FightParameter.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\RanderControl.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\Skill\Skill.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\SpinWithMouse.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Ballistic.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\BallisticFactory.cs" />
@@ -273,7 +273,6 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\EffectsFactory.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\ItemSelecter.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Looper.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Observer.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\QuadTree.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\SDataUtils.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\CollisionDetectionFormulaItem.cs" />
@@ -281,6 +280,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\FormulaParamsPacker.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\FormulaParamsPackerFactroy.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\IFormulaItem.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\MoveFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\PauseFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\PointFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\PointToObjFormulaItem.cs" />
@@ -304,6 +304,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\map\__RBTree.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\patrol\PatrolManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\patrol\SinglePatrol.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\Constant.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_Army.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_ArmyBase_C.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_Audio.cs" />
@@ -315,9 +316,6 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_ChouJiang.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_DamoxingYindao.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_DiaoluoType.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_EffectName_data.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_Equip_data.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_Equip_suit_data.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_FightKeyValue.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_FightKeyValueMath.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_GrowWithLv.cs" />
@@ -364,21 +362,20 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armycardunioncost_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armycarduselimit_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armycarduselimitcost_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_array_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_attribute_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_attributetplan_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_avatarcost_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equip_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equipdata.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equippower_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equipsuit_c.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_kejitree_fangyu_data.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_kejitree_gongji_data.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_kejitree_jingji_data.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_kejitree_shengming_data.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_kezhi_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_skill_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_soldierRender_data.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_soldier_data.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_tech_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_userdata_c.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_zhenxing_data.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\Sdata_Soldiers.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\TypeDef.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\_SData_HeroShuxingGrow.cs" />

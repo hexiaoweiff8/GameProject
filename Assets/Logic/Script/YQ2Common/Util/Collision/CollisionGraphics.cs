@@ -141,29 +141,11 @@ public abstract class CollisionGraphics : ICollisionGraphics
 
         if (circleGraphics != null && rectGraphics != null)
         {
-            //// 计算两轴长度
-            //var halfWidth = rectGraphics.Width * 0.5f;
-            //var halfHeight = rectGraphics.Height * 0.5f;
-            //var raduis = circleGraphics.Radius;
-
             var axisArray = new[]
             {
                 rectGraphics.HorizonalAxis,
                 rectGraphics.VerticalAxis,
             };
-
-            //var positionV3 = new Vector3(rectGraphics1.Postion.x, 0, rectGraphics1.Postion.y);
-            //var rightV3 = new Vector3(rectGraphics1.HorizonalAxis.x, 0, rectGraphics1.HorizonalAxis.y);
-            //var topV3 = new Vector3(rectGraphics1.VerticalAxis.x, 0, rectGraphics1.VerticalAxis.y);
-            //Debug.DrawLine(positionV3, positionV3 + rightV3 * rectGraphics1.Width, Color.red);
-            //Debug.DrawLine(positionV3, positionV3 + topV3 * rectGraphics1.Height, Color.red);
-
-
-            //positionV3 = new Vector3(rectGraphics2.Postion.x, 0, rectGraphics2.Postion.y);
-            //rightV3 = new Vector3(rectGraphics2.HorizonalAxis.x, 0, rectGraphics2.HorizonalAxis.y);
-            //topV3 = new Vector3(rectGraphics2.VerticalAxis.x, 0, rectGraphics2.VerticalAxis.y);
-            //Debug.DrawLine(positionV3, positionV3 + rightV3 * rectGraphics2.Width, Color.red);
-            //Debug.DrawLine(positionV3, positionV3 + topV3 * rectGraphics2.Height, Color.red);
 
             var positionOffset = circleGraphics.Postion - rectGraphics.Postion;
             for (var i = 0; i < axisArray.Length; i++)
@@ -183,40 +165,7 @@ public abstract class CollisionGraphics : ICollisionGraphics
                 }
             }
 
-
             return true;
-
-            //// 右侧中心点相对向量
-            //var pointRightCenter = rectGraphics.HorizonalAxis;//new Vector2(cos * halfWidth, sin * halfWidth);
-            //// 上侧中心点相对向量
-            //var pointTopCenter = rectGraphics.VerticalAxis; //new Vector2(- sin * halfHeight, cos * halfHeight);
-
-            //var positionV3 = new Vector3(rectGraphics.Postion.x, 0, rectGraphics.Postion.y);
-            //var rightV3 = new Vector3(pointRightCenter.x, 0, pointRightCenter.y);
-            //var topV3 = new Vector3(pointTopCenter.x, 0, pointTopCenter.y);
-            //Debug.DrawLine(positionV3, positionV3 + rightV3, Color.red);
-            //Debug.DrawLine(positionV3, positionV3 + topV3, Color.red);
-
-            //var toRightDistance = Utils.GetDistancePointToLine(rectGraphics.Postion, rectGraphics.Postion + pointRightCenter, circleGraphics.Postion);
-            //var toTopDistance = Utils.GetDistancePointToLine(rectGraphics.Postion, rectGraphics.Postion + pointTopCenter, circleGraphics.Postion);
-
-            //if (toRightDistance > halfWidth + raduis)
-            //{
-            //    return false;
-            //}
-            //if (toTopDistance > halfHeight + raduis)
-            //{
-            //    return false;
-            //}
-
-            //if (toRightDistance < halfWidth && toTopDistance < halfHeight)
-            //{
-            //    return true;
-            //}
-
-            //var distanceX = toRightDistance - halfWidth;
-            //var distanceY = toTopDistance - halfHeight;
-            //return (distanceX * distanceX + distanceY * distanceY) <= raduis * raduis;
         }
 
         return false;

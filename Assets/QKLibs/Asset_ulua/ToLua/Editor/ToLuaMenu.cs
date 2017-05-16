@@ -879,7 +879,7 @@ public static class ToLuaMenu
             return;
         }
 
-        beAutoGen = true;        
+        beAutoGen = true;
         AssetDatabase.Refresh();
         GenerateClassWraps();
         GenLuaBinder();

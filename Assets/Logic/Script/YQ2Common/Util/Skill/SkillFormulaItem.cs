@@ -10,11 +10,6 @@ public class SkillFormulaItem : AbstractFormulaItem
 {
 
     /// <summary>
-    /// 行为节点类型
-    /// </summary>
-    public int FormulaType { get; private set; }
-
-    /// <summary>
     /// 技能编号
     /// </summary>
     public int SkillNum { get; private set; }

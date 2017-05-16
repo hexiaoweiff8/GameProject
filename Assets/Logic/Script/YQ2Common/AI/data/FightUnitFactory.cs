@@ -40,4 +40,11 @@ public class FightUnitFactory {
         }
         return DataManager.Single.Create(vo, otherParam);
     }
+
+
+
+    public static void DeleteUnit(VOBase obj)
+    {
+        DataManager.Single.Delete<VOBase>(obj.ObjID);
+    }
 }

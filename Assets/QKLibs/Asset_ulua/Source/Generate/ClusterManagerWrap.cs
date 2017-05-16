@@ -11,12 +11,14 @@ public class ClusterManagerWrap
 		L.RegFunction("IsEnd", IsEnd);
 		L.RegFunction("OnDestroy", OnDestroy);
 		L.RegFunction("Add", Add);
+		L.RegFunction("Remove", Remove);
 		L.RegFunction("Init", Init);
 		L.RegFunction("ClearAllGroup", ClearAllGroup);
 		L.RegFunction("Pause", Pause);
 		L.RegFunction("GoOn", GoOn);
 		L.RegFunction("ClearAll", ClearAll);
 		L.RegFunction("GetGroupById", GetGroupById);
+		L.RegFunction("GetPositionObjectListByGraphics", GetPositionObjectListByGraphics);
 		L.RegFunction("New", _CreateClusterManager);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("MovementPlanePosition", get_MovementPlanePosition, set_MovementPlanePosition);
@@ -122,6 +124,23 @@ public class ClusterManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Remove(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			ClusterManager obj = (ClusterManager)ToLua.CheckObject(L, 1, typeof(ClusterManager));
+			PositionObject arg0 = (PositionObject)ToLua.CheckUnityObject(L, 2, typeof(PositionObject));
+			obj.Remove(arg0);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int Init(IntPtr L)
 	{
 		try
@@ -211,9 +230,28 @@ public class ClusterManagerWrap
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 1);
-			int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
-			ClusterGroup o = ClusterManager.Single.GetGroupById(arg0);
+			ToLua.CheckArgsCount(L, 2);
+			ClusterManager obj = (ClusterManager)ToLua.CheckObject(L, 1, typeof(ClusterManager));
+			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+			ClusterGroup o = obj.GetGroupById(arg0);
+			ToLua.PushObject(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetPositionObjectListByGraphics(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			ClusterManager obj = (ClusterManager)ToLua.CheckObject(L, 1, typeof(ClusterManager));
+			ICollisionGraphics arg0 = (ICollisionGraphics)ToLua.CheckObject(L, 2, typeof(ICollisionGraphics));
+			System.Collections.Generic.IList<PositionObject> o = obj.GetPositionObjectListByGraphics(arg0);
 			ToLua.PushObject(L, o);
 			return 1;
 		}

@@ -9,8 +9,10 @@ using System.Collections.Generic;
 public abstract class SoldierFSMState
 {
     protected SoldierStateID _stateId;
-
-    
+    /// <summary>
+    /// 本状态是否过期
+    /// </summary>
+    protected bool _stateIsLose = false;
 
     public SoldierStateID StateID
     {
@@ -78,11 +80,18 @@ public abstract class SoldierFSMState
     /// <summary>
     /// 子类中覆写，进入状态前的准备工作
     /// </summary>
-    public virtual void DoBeforeEntering(SoldierFSMSystem fsm) { }
+    public virtual void DoBeforeEntering(SoldierFSMSystem fsm)
+    {
+        _stateIsLose = false;
+    }
+
     /// <summary>
     /// 子类中覆写，离开状态之前的处理工作 清理当前状态的过期数据等
     /// </summary>
-    public virtual void DoBeforeLeaving(SoldierFSMSystem fsm) { }
+    public virtual void DoBeforeLeaving(SoldierFSMSystem fsm)
+    {
+        _stateIsLose = true;
+    }
 
     /// <summary>
     /// 状态的改变发生在这里 
@@ -111,6 +120,13 @@ public abstract class SoldierFSMState
             _fsmTrriggerList.Remove(_fsmTrriggerList.Find((e) => triggerId == e.triggerId));
         }
     }
+
+    public void Destory()
+    {
+        _fsmTrriggerList.Clear();
+        dict.Clear();
+    }
+
     public abstract void Action(SoldierFSMSystem fsm);
 }
 

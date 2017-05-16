@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using JetBrains.Annotations;
-using MonoEX;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// 四叉树
@@ -348,7 +342,7 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
         int subLevel = level + 1;
         for (var i = 0; i < 4; i++)
         {
-            subRect = GetSplitRectangle(rect, i);
+            subRect = GetSplitRectangle(rect, i, rectCache);
             if (nodeCache.Count != 0)
             {
                 node = nodeCache.Dequeue();
@@ -390,7 +384,7 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
     /// <param name="rectCacheQueue">矩形对象缓存队列</param>
     /// <returns>子节点矩形范围</returns>
     private static RectGraphics GetSplitRectangle(RectGraphics parentRect, int subRectNum,
-        Queue<RectGraphics> rectCacheQueue = null)
+        Queue<ICollisionGraphics> rectCacheQueue = null)
     {
         // 获得当前四叉树的一半宽度高度
         var subQuadTreeWidth = parentRect.Width * 0.5f;
@@ -420,11 +414,20 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
                 break;
         }
 
+        // 从cache中获取矩形单位并重新设置数据
         if (rectCacheQueue != null && rectCacheQueue.Count > 0)
         {
-            result = rectCacheQueue.Dequeue();
+            result = rectCacheQueue.Dequeue() as RectGraphics;
+            if (result != null)
+            {
+                result.Postion = new Vector2(subX, subY);
+                result.Width = subQuadTreeWidth;
+                result.Height = subQuadTreeHeight;
+                result.Rotation = 0;
+            }
         }
-        else
+        // 如果为空则重新分配矩形数据类
+        if(result == null)
         {
             result = new RectGraphics(new Vector2(subX, subY), subQuadTreeWidth, subQuadTreeHeight, 0);
         }

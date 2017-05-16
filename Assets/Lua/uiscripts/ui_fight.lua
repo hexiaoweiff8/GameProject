@@ -1,5 +1,7 @@
 local class = require("common/middleclass")
 local ui_fight = class("ui_fight", wnd_base)
+local whiteColor = Color(1, 1, 1, 1)
+local grayColor = Color(169 / 255, 169 / 255, 169 / 255, 1)
 function Onfs()
     ui_manager:ShowWB(WNDTYPE.ui_fight)
 end
@@ -15,7 +17,7 @@ function ui_fight:OnShowDone()
         function(timer)--完成回调
             time_txt.text = "00:00"
         end)
-    local myBloodBar = self.transform:Find("defence_widget1/hp_fg"):GetComponent("UISprite")
+    local myBloodBar = self.transform:Find("defence_widget1/bg/hp_fg"):GetComponent("UISprite")
     --    myBloodBar.fillAmount = 0.5
     local localEnemypaiStr = "1001,1002,1003,1004,1005,1006,1007,1008,1009,1001,1002,1003,1004,1005,1006,1007,1008,1009"
     --剩余敌人牌库
@@ -48,6 +50,8 @@ function ui_fight:OnShowDone()
             self.paiKuBg.gameObject:SetActive(false)
         end
     end
+    self.transform:Find("shengyu_bg/curBingLi"):GetComponent(typeof(UILabel)).text = sdata_UILiteral:GetFieldV("Literal", 10031)
+    
     --剩余兵力值
     self.sumLastBingLi = 0
     for i = 2, #self.paiKutb do
@@ -73,20 +77,22 @@ function ui_fight:OnShowDone()
     -- 装载ui卡牌的panel
     self.currentCards_bg = self.transform:Find("currentCards_bg")
     -- 下一张卡牌的UISprite
-    self.nextCardSpr = self.transform:Find("currentCards_bg/nextCard"):GetComponent(typeof(UISprite))
+    self.transform:Find("nextCard_bg"):GetComponent(typeof(UILabel)).text = sdata_UILiteral:GetFieldV("Literal", 10032)
+    self.nextCardSpr = self.transform:Find("nextCard_bg/nextCard/cardSprite"):GetComponent(typeof(UISprite))
     self.nextCardSpr.spriteName = sdata_armycardbase_data:GetFieldV("IconID", self.paiKutb[1])
     -- 下一张卡牌的UILabel
-    self.nextCardLabel = self.transform:Find("currentCards_bg/nextCard/costLabel"):GetComponent(typeof(UILabel))
+    self.nextCardLabel = self.transform:Find("nextCard_bg/nextCard/feiBg/costLabel"):GetComponent(typeof(UILabel))
     self.nextCardLabel.text = sdata_armycardbase_data:GetFieldV("TrainCost", self.paiKutb[1])
-    --费barUISprite
-    local feiBgTf = self.transform:Find("currentCards_bg/feiBg")
-    self.feiBarSpr = self.transform:Find("currentCards_bg/feiBg/feiBar"):GetComponent(typeof(UISprite))
+    self.feiBarSpr = self.currentCards_bg:Find("feiBg/feiBar"):GetComponent(typeof(UISprite))
+    self.feiBar2Spr = self.currentCards_bg:Find("feiBg/feiBar2"):GetComponent(typeof(UISprite))
+    self.feiBar3Spr = self.currentCards_bg:Find("feiBg/feiBar3"):GetComponent(typeof(UISprite))
+    self.feiBar4Spr = self.currentCards_bg:Find("feiBg/feiBar4"):GetComponent(typeof(UISprite))
+    self.feiBg2 = self.currentCards_bg:Find("feiBg/feiBg2")
+    self.feiBg4 = self.currentCards_bg:Find("feiBg/feiBg4")
     --总费Label
-    self.allFeiLabel = self.transform:Find("currentCards_bg/feiBg/allFeiLabel"):GetComponent(typeof(UILabel))
+    self.allFeiLabel = self.feiBg2:Find("allFeiLabel"):GetComponent(typeof(UILabel))
     --当前费Label
-    self.nowFeiLabel = self.transform:Find("currentCards_bg/feiBg/nowFeiLabel"):GetComponent(typeof(UILabel))
-    --回收费Label
-    self.huiShouLabel = self.transform:Find("currentCards_bg/feiBg/addFeiLabel"):GetComponent(typeof(UILabel))
+    self.nowFeiLabel = self.feiBg2:Find("nowFeiLabel"):GetComponent(typeof(UILabel))
     --总费
     self.allFei = 1000; self.allFeiLabel.text = self.allFei .. ""
     --当前费
@@ -110,11 +116,11 @@ function ui_fight:OnShowDone()
     -- UI卡牌原始位置
     self.myCardConstPostb = {}
     -- 下方下牌边框
-    self.downCardY = -330
+    self.downCardY = -190
     -- 上方下牌边框
     self.upCardY = 190
     -- 卡牌缩放间距
-    self.cardScaleSpan = 88
+    self.cardScaleSpan = 67
     -- UI卡牌原始位置
     self.myCardConstPostb = {}
     -- 卡牌信息tf
@@ -150,10 +156,12 @@ function ui_fight:OnShowDone()
     --组ID
     self.groupIndex = 0
     --费Bounds
-    local feiUIWidget = feiBgTf:GetComponent(typeof(UIWidget))
-    feiBgTf.parent = self.DragDropRoot
-    self.feiBounds = Bounds(Vector3(feiBgTf.localPosition.x, feiBgTf.localPosition.y, 0), Vector3(feiUIWidget.width, feiUIWidget.height, 0))
-    feiBgTf.parent = self.currentCards_bg
+    --费barUISprite
+    self.feiBg = self.transform:Find("currentCards_bg/feiBg/feiBg")
+    local feiUIWidget = self.feiBg:GetComponent(typeof(UIWidget))
+    self.feiBg.parent = self.DragDropRoot
+    self.feiBounds = Bounds(Vector3(self.feiBg.localPosition.x, self.feiBg.localPosition.y, 0), Vector3(feiUIWidget.width, feiUIWidget.height, 0))
+    self.feiBg.parent = self.currentCards_bg
     -- UIRoot的locationScale
     self.urlc = GameObject.Find("/UIRoot").transform.localScale.x
     --不可下兵区域
@@ -208,8 +216,8 @@ function ui_fight:OnShowDone()
         tf.gameObject:AddComponent(typeof(UIDragObjectEX))
         local go = tf.gameObject
         self.nowMyCardCDtbUISpritetb[var] = tf:Find("CDBar"):GetComponent("UISprite")
-        tf:GetComponent(typeof(UISprite)).spriteName = sdata_armycardbase_data:GetFieldV("IconID", self.nowHandpaiKutb[var])
-        tf:Find("costLabel"):GetComponent(typeof(UILabel)).text = sdata_armycardbase_data:GetFieldV("TrainCost", self.nowHandpaiKutb[var])
+        tf:Find("cardSprite"):GetComponent(typeof(UISprite)).spriteName = sdata_armycardbase_data:GetFieldV("IconID", self.nowHandpaiKutb[var])
+        tf:Find("feiBg/costLabel"):GetComponent(typeof(UILabel)).text = sdata_armycardbase_data:GetFieldV("TrainCost", self.nowHandpaiKutb[var])
         local shengyu_bgDelay1Ct
         local isDragedCard
         UIEventListener.Get(tf.gameObject).onDragStart = function(go)
@@ -239,6 +247,12 @@ function ui_fight:OnShowDone()
                         end
                     end
                 end
+                if self.feiBg2.gameObject.activeSelf == false then
+                    self.feiBg2.gameObject:SetActive(true)
+                    self.feiBg4.gameObject:SetActive(false)
+                end
+                self.feiBar2Spr.gameObject:SetActive(true)
+                self.nowFeiLabel.color = grayColor
                 --触摸数增加
                 self.myTouchCount = self.myTouchCount + 1
                 self.bigCardBoxCollider[var].enabled = false
@@ -306,21 +320,31 @@ function ui_fight:OnShowDone()
                     TweenPosition.Begin(tf.gameObject, Vector3.Distance(tf.position, self.myCardConstPostb[var]) / 2, self.myCardConstPostb[var], true)
                     self.bigCardBoxCollider[var].enabled = false
                     self.isCardSelected[var] = false
-                    
-                    --如果没有选中的卡牌就把不可下兵区域隐藏
-                    local tempInt = 0
-                    for var = 1, 4 do
-                        if self.isCardSelected[var] then
-                            tempInt = tempInt + 1
-                            break
-                        end
-                    end
-                    if tempInt == 0 then
-                        self.canotRect.gameObject:SetActive(false)
+                end
+                
+                --如果没有选中的卡牌就把不可下兵区域隐藏
+                local tempInt = 0
+                for var = 1, 4 do
+                    if self.isCardSelected[var] then
+                        tempInt = tempInt + 1
+                        break
                     end
                 end
+                if tempInt == 0 then
+                    self.canotRect.gameObject:SetActive(false)
+                end
+                
+                self.feiBar2Spr.gameObject:SetActive(false)
+                self.feiBar3Spr.gameObject:SetActive(false)
+                self.feiBar4Spr.gameObject:SetActive(false)
+                self.nowFeiLabel.color = whiteColor
                 --触摸数减少
                 self.myTouchCount = self.myTouchCount - 1
+                
+                if self.nowFei >= self.allFei then
+                    self.feiBg2.gameObject:SetActive(false)
+                    self.feiBg4.gameObject:SetActive(true)
+                end
             end
         end
     end
@@ -347,7 +371,7 @@ function ui_fight:OnShowDone()
     local delay1Ct = {}
     local userInfoBg = self.transform:Find("userInfoBg")
     for var = 1, 2 do
-        UIEventListener.Get(self.transform:Find("defence_widget" .. var .. "/bg2").gameObject).onPress = function(go, args)
+        UIEventListener.Get(self.transform:Find("defence_widget" .. var .. "/bg").gameObject).onPress = function(go, args)
             if args then -- 开启协程
                 delay1Ct[var] = #self.coroutineTb + 1
                 self.coroutineTb[delay1Ct[var]] = coroutine.start(function()
@@ -359,30 +383,6 @@ function ui_fight:OnShowDone()
                 userInfoBg.gameObject:SetActive(false)
                 coroutine.stop(self.coroutineTb[delay1Ct[var]])
             end
-        end
-    end
-    --小地图显隐标志
-    local isMapOut = true
-    --小地图隐藏panel
-    local mapPanel = self.transform:Find("mapPanel")
-    --小地图
-    local map_bg = self.transform:Find("map_bg")
-    --小地图显隐按钮 UISprite
-    local btn_backMapSpr = self.transform:Find("btn_backMap"):GetComponent(typeof(UISprite))
-    local tp
-    UIEventListener.Get(self.transform:Find("btn_backMap").gameObject).onPress = function(go, args)
-        if args == false then --打开关闭小地图
-            if isMapOut then
-                map_bg.parent = mapPanel
-                mapPanel.gameObject:SetActive(true)
-                btn_backMapSpr.flip = UIBasicSprite.Flip.Nothing
-                tp = TweenPosition.Begin(map_bg.gameObject, map_bg.position:Distance(Vector3(-0.75, 0, 0)) / 5, Vector3(-0.75, 0, 0), true)
-            else
-                map_bg.parent = self.transform
-                btn_backMapSpr.flip = UIBasicSprite.Flip.Horizontally
-                tp:PlayReverse()
-            end
-            isMapOut = not isMapOut
         end
     end
     ui_manager:DestroyWB(WNDTYPE.Prefight)
@@ -424,11 +424,13 @@ function ui_fight:isTouchedCard(tf)
     self.danjiPosition.z = 0
     return cardBounds:Contains(self.danjiPosition)
 end
+
+local tempInt3 = 0
 --敌人下兵逻辑
 function WANJIAXIABING(self)
-    --TODODO
-    --  if 1 then
-    --   return
+    -- TODODO
+    -- if 1 then
+    --     return
     -- end
     ------------------------------
     if #self.enemyPaiKutb == 0 then
@@ -456,7 +458,7 @@ function WANJIAXIABING(self)
         euc.gameObject:SetActive(true)
         euc.parent = self.enemyUsedCardsGridTf
         euc.localScale = self.enemyUsedCard.localScale
-        euc:GetComponent(typeof(UISprite)).spriteName = sdata_armycardbase_data:GetFieldV("IconID", tempID)
+        euc:Find("Sprite"):GetComponent(typeof(UISprite)).spriteName = sdata_armycardbase_data:GetFieldV("IconID", tempID)
         --敌人出牌UI几秒后消失
         self.enemyUsedCardsGrid:Reposition()
         self.coroutineTb[#self.coroutineTb + 1] = coroutine.start(function()
@@ -509,24 +511,23 @@ function ui_fight:getModel(id, index)
         tempMod.parent = go
         if index == 5 then --如果是敌方则阵型水平翻转
             tempMod.position = Vector3(-renderZhenxing[i], 0, renderZhenxing[i + 1]) * self.UnitWidth
+            tempMod.eulerAngles = Vector3(0, -90, 0)
+            local mt = tempMod.gameObject:AddComponent(typeof(RanderControl))
+            mt.isEnemy = true
+            mt.groupIndex = self.groupIndex
         else
+            tempMod.eulerAngles = Vector3(0, 90, 0)
             tempMod.position = Vector3(renderZhenxing[i], 0, renderZhenxing[i + 1]) * self.UnitWidth
         end
         
         tempMod:GetComponent(typeof(MFAModelRender)).speedScale = 0
         tempMod:GetComponent(typeof(UnityEngine.MeshRenderer)).material.shader = PacketManage.Single:GetPacket("rom_share"):Load("Transparent_Colored_Gray.shader", FileSystem.RES_LOCATION.auto)
-        if index == 5 then
-            tempMod.eulerAngles = Vector3(tempMod.eulerAngles.x, -tempMod.eulerAngles.y, tempMod.eulerAngles.z)
-            local mt = tempMod.gameObject:AddComponent(typeof(RanderControl))
-            mt.isEnemy = true
-            mt.groupIndex = self.groupIndex
-        end
     end
     
-    self.AstarFight:setZhenxingInfo(id, index - 1)
+    self.AstarFight:setZhenxingInfo(go, id, index - 1)
     if index == 5 then
         self.ctPosition.x = self.AstarFight.MapWidth - self.ctPosition.x
-        go.position = self.AstarFight:isZhangAi(self.ctPosition, index - 1)--前4个对应自己的4张卡牌，5为敌人序号
+        self.AstarFight:isZhangAi(self.ctPosition, index - 1)--前4个对应自己的4张卡牌，5为敌人序号
         for i = 1, go.childCount do
             go:GetChild(0).parent = nil
         end
@@ -576,16 +577,19 @@ function ui_fight:getPaiKuPerCardNum()
     if tempInt > 9 then
         tempInt = 8
         pai = self.paiKuBg.transform:Find("paikuCard" .. 9)
-        pai:GetComponent(typeof(UISprite)).spriteName = "face_3"
-        pai:Find("costLabel").gameObject:SetActive(false)
+        pai:GetComponent(typeof(UISprite)).spriteName = "zhandou_shenyubingli_gengduo"
+        pai:Find("paikuSpr").gameObject:SetActive(false)
+        pai:Find("feiBg").gameObject:SetActive(false)
         local tempInt2 = 0
         for i = 9, #lastPaiID do
             tempInt2 = tempInt2 + lastPaiNum[i]
         end
-        pai:Find("remainNumLabel"):GetComponent(typeof(UILabel)).text = "*" .. tempInt2
+        pai:Find("quan/remainNumLabel"):GetComponent(typeof(UILabel)).text = tempInt2
         pai.gameObject:SetActive(true)
     elseif tempInt == 9 then
-        self.paiKuBg.transform:Find("paikuCard" .. 9):Find("costLabel").gameObject:SetActive(true)
+        pai = self.paiKuBg.transform:Find("paikuCard" .. 9)
+        pai:Find("feiBg").gameObject:SetActive(true)
+        pai:Find("paikuSpr").gameObject:SetActive(true)
     else
         for i = tempInt + 1, 9 do
             self.paiKuBg.transform:Find("paikuCard" .. i).gameObject:SetActive(false)
@@ -609,10 +613,10 @@ function ui_fight:getPaiKuPerCardNum()
     end)
     --设置每个卡牌UI显示内容
     for i = 1, tempInt do
-        pai = self.paiKuBg.transform:Find("paikuCard" .. i)
-        pai:GetComponent(typeof(UISprite)).spriteName = sdata_armycardbase_data:GetFieldV("IconID", tempTable[i][1])
-        pai:Find("costLabel"):GetComponent(typeof(UILabel)).text = tempTable[i][3]
-        pai:Find("remainNumLabel"):GetComponent(typeof(UILabel)).text = "*" .. tempTable[i][2]
+        pai = self.paiKuBg:Find("paikuCard" .. i)
+        pai:Find("paikuSpr"):GetComponent(typeof(UISprite)).spriteName = sdata_armycardbase_data:GetFieldV("IconID", tempTable[i][1])
+        pai:Find("feiBg/costLabel"):GetComponent(typeof(UILabel)).text = tempTable[i][3]
+        pai:Find("quan/remainNumLabel"):GetComponent(typeof(UILabel)).text = tempTable[i][2]
         pai.gameObject:SetActive(true)
     end
 end
@@ -628,14 +632,17 @@ function ui_fight:doEvent(tf, var, isXiaBing)
             Event.Brocast(GameEventType.WANJIAXIABING, self)
         else -- 回收卡
             lgyPrint("回收卡")
-            self.huiShouLabel.gameObject:SetActive(false)
+            self.feiBar2Spr.gameObject:SetActive(false)
+            self.feiBar3Spr.gameObject:SetActive(false)
+            self.feiBar4Spr.gameObject:SetActive(false)
+            self.nowFeiLabel.color = whiteColor
             self:backCallback(tf, true)
             if (self.nowFei < self.allFei) == false then --如果满费则什么也不做
                 self:cardFront(tf, var)
                 self.hudtext:Add("费用已满", Color.cyan, 2)
                 return false
             end
-            self.nowFei = self.nowFei + sdata_armycardbase_data:GetFieldV("TrainCost", self.nowHandpaiKutb[var])
+            self.nowFei = self.nowFei + sdata_armycardbase_data:GetFieldV("TrainCost", self.nowHandpaiKutb[var]) / 2
         end
         self.isCardSelected[var] = false
         tf.localPosition = Vector3(-566, 2.9, 0)
@@ -649,8 +656,8 @@ function ui_fight:doEvent(tf, var, isXiaBing)
                 TweenPosition.Begin(self.nowMyCardtb[var].gameObject, 0.2, self.myCardConstPostb[var], true)
                 TweenScale.Begin(self.nowMyCardtb[var].gameObject, 0.2, Vector3.one)
                 --设置补充手牌为下一张手牌信息
-                tf:GetComponent(typeof(UISprite)).spriteName = self.nextCardSpr.spriteName
-                tf:Find("costLabel"):GetComponent(typeof(UILabel)).text = self.nextCardLabel.text
+                tf:Find("cardSprite"):GetComponent(typeof(UISprite)).spriteName = self.nextCardSpr.spriteName
+                tf:Find("feiBg/costLabel"):GetComponent(typeof(UILabel)).text = self.nextCardLabel.text
                 --牌库第一张补充到手牌中并移除
                 self.nowHandpaiKutb[var] = self.paiKutb[1]
                 table.remove(self.paiKutb, 1)
@@ -732,9 +739,13 @@ function ui_fight:Update()
     end
     --遍历拖动中的卡牌
     local tempY
+    local firstTrueVar = nil
     for var = 1, tempInt do
         local trueVar = table.indexof(self.nowMyCardtb, self.onPressMyCardtb[var])
-        tempY = self.nowUICamera:ScreenToWorldPoint(self:getTouchPoint(var - 1)).y / self.urlc
+        if var == 1 then
+            firstTrueVar = trueVar
+        end
+        tempY = self.onPressMyCardtb[var].localPosition.y
         if tempY < self.downCardY then --卡牌在下方区域显示并缩放，模型隐藏
             tempY = (self.downCardY - tempY) / self.onPressMyCardSpantb[var]
             if tempY > 1 then
@@ -750,10 +761,19 @@ function ui_fight:Update()
                 if (self.allFei - self.nowFei) < tempCost then
                     tempCost = self.allFei - self.nowFei
                 end
-                self.huiShouLabel.text = "+" .. math.floor(tempCost)
-                self.huiShouLabel.gameObject:SetActive(true)
+                if self.feiBar3Spr.gameObject.activeSelf == false then
+                    self.feiBar3Spr.gameObject:SetActive(true)
+                    self.feiBar4Spr.gameObject:SetActive(true)
+                    self.feiBar2Spr.gameObject:SetActive(false)
+                    self.nowFeiLabel.color = whiteColor
+                end
             else
-                self.huiShouLabel.gameObject:SetActive(false)
+                if self.feiBar3Spr.gameObject.activeSelf == true then
+                    self.feiBar3Spr.gameObject:SetActive(false)
+                    self.feiBar4Spr.gameObject:SetActive(false)
+                    self.feiBar2Spr.gameObject:SetActive(true)
+                    self.nowFeiLabel.color = grayColor
+                end
             end
         elseif tempY > self.upCardY then --卡牌在上方区域显示并缩放，模型隐藏
             tempY = (tempY - self.upCardY) / self.cardScaleSpan
@@ -764,16 +784,26 @@ function ui_fight:Update()
             end
             self.onPressArmytb[var].localScale = Vector3.zero
         else --卡牌在中间区域隐藏，模型显示
+            if self.feiBar3Spr.gameObject.activeSelf == true then
+                self.feiBar3Spr.gameObject:SetActive(false)
+                self.feiBar4Spr.gameObject:SetActive(false)
+                self.feiBar2Spr.gameObject:SetActive(true)
+                self.nowFeiLabel.color = grayColor
+            end
             self.onPressMyCardtb[var].localScale = Vector3(0, 0, 1)
             self.onPressArmytb[var].localScale = Vector3.one
         end
-        -- 模型跟随鼠标位置移动
-        local ray = self.nowWorldCamera:ScreenPointToRay(Vector3(self:getTouchPoint(var - 1).x, self:getTouchPoint(var - 1).y, 0))
-        local isC, hit = UnityEngine.Physics.Raycast(ray, hit, 1000, 256)--256 == bit.lshift(1, 8) == 1<<8
-        -- local isC, hit = UnityEngine.Physics.Raycast(ray, hit)
-        if isC then
-            self.onPressArmytb[var].position = self.AstarFight:isZhangAi(hit.point, var - 1)
+        
+        if self.onPressArmytb[var].localScale.x ~= 0 then
+            -- 模型跟随鼠标位置移动
+            local ray = self.nowWorldCamera:ScreenPointToRay(Vector3(self:getTouchPoint(var - 1).x, self:getTouchPoint(var - 1).y, 0))
+            local isC, hit = UnityEngine.Physics.Raycast(ray, hit, 1000, 256)--256 == bit.lshift(1, 8) == 1<<8
+            -- local isC, hit = UnityEngine.Physics.Raycast(ray, hit)
+            if isC then
+                self.AstarFight:isZhangAi(hit.point, var - 1)
+            end
         end
+    
     end
     --卡牌CD
     for var = 1, 4 do
@@ -784,15 +814,58 @@ function ui_fight:Update()
             self.nowMyCardCDtbUISpritetb[var].fillAmount = 0
         end
     end
+    local tempFei
     --费每秒增长
     self.nowFei = self.nowFei + 1
     if self.nowFei > self.allFei then
+        if firstTrueVar == nil and self.feiBg2.gameObject.activeSelf == true then
+            self.feiBg2.gameObject:SetActive(false)
+            self.feiBg4.gameObject:SetActive(true)
+        end
         self.nowFei = self.allFei
-        self.feiBarSpr.fillAmount = 1
+        --设置费条百分比
+        if firstTrueVar then
+            local TrainCost = sdata_armycardbase_data:GetFieldV("TrainCost", self.nowHandpaiKutb[firstTrueVar])
+            if self.feiBar2Spr.gameObject.activeSelf == true then
+                tempFei = self.nowFei - TrainCost
+                self.feiBarSpr.fillAmount = tempFei / self.allFei
+                self.feiBar2Spr.fillAmount = 1
+                self.nowFeiLabel.text = math.round(tempFei < 0 and 0 or tempFei) .. ""
+            else
+                self.feiBar3Spr.fillAmount = 1
+                self.feiBar4Spr.fillAmount = 1
+                self.feiBarSpr.fillAmount = 1
+                self.nowFeiLabel.text = math.round(self.nowFei) .. ""
+            end
+        else
+            self.feiBarSpr.fillAmount = 1
+            self.nowFeiLabel.text = math.round(self.nowFei) .. ""
+        end
     else
-        self.feiBarSpr.fillAmount = self.nowFei / self.allFei
+        if self.feiBg2.gameObject.activeSelf == false then
+            self.feiBg2.gameObject:SetActive(true)
+            self.feiBg4.gameObject:SetActive(false)
+        end
+        --设置费条百分比
+        if firstTrueVar then
+            local TrainCost = sdata_armycardbase_data:GetFieldV("TrainCost", self.nowHandpaiKutb[firstTrueVar])
+            if self.feiBar2Spr.gameObject.activeSelf == true then
+                tempFei = self.nowFei - TrainCost
+                self.feiBarSpr.fillAmount = tempFei / self.allFei
+                self.feiBar2Spr.fillAmount = self.nowFei / self.allFei
+                self.nowFeiLabel.text = math.round(tempFei < 0 and 0 or tempFei) .. ""
+            else
+                tempFei = self.nowFei + TrainCost / 2
+                self.feiBar3Spr.fillAmount = (self.nowFei + TrainCost) / self.allFei
+                self.feiBar4Spr.fillAmount = tempFei / self.allFei
+                self.feiBarSpr.fillAmount = self.nowFei / self.allFei
+                self.nowFeiLabel.text = math.round(tempFei > self.allFei and self.allFei or tempFei) .. ""
+            end
+        else
+            self.feiBarSpr.fillAmount = self.nowFei / self.allFei
+            self.nowFeiLabel.text = math.round(self.nowFei) .. ""
+        end
     end
-    self.nowFeiLabel.text = math.round(self.nowFei) .. ""
     --敌人费每秒增长
     self.enemyNowFei = self.enemyNowFei + 1
     if self.enemyNowFei > self.enemyAllFei then

@@ -250,9 +250,11 @@ public class AstarFight : MonoBehaviour
             }
         }
 
+        //把自己所占格子加入列表,用来给阵型中其他的物体做重叠判断
         int[] tempA3 = new int[zhenxingArray[index].Length * _width * _height];
         for (int i = 0; i < an; i += 2)
         {
+            //计算阵型中的点在当前触摸点偏移后的格子坐标
             var tempA1 = new[] { zhenxingArray[index][i] + a[0], zhenxingArray[index][i + 1] + a[1] };
             tempList2.Clear();
             var spani = 0;//搜索半径
@@ -261,7 +263,7 @@ public class AstarFight : MonoBehaviour
                 int[] tempArray;
                 if (spani < 10)
                 {
-                    tempArray = serchPathArray[spani];
+                    tempArray = serchPathArray[spani];//取出缓存的点阵
                 }
                 else
                 {
@@ -291,6 +293,7 @@ public class AstarFight : MonoBehaviour
                     tempArray[templ - 1] = b2;
                 }
 
+                //遍历点阵
                 for (int i3 = 0; i3 < tempArray.Length; i3 += 2)
                 {
                     var state = false;
@@ -298,10 +301,11 @@ public class AstarFight : MonoBehaviour
                     if (
                         !(((tempA2[0] < bianjie[4] && index != 4) || (tempA2[0] > bianjie[4] && index == 4)) &&
                           tempA2[0] > bianjie[0] && tempA2[1] > bianjie[1] && tempA2[0] < bianjie[2] &&
-                          tempA2[1] < bianjie[3]))
+                          tempA2[1] < bianjie[3]))//如果超过上下左右边界或者超过最远下兵距离
                     {
                         continue;
                     }
+                    //测试自己所占格子是否有障碍
                     for (int j = 0; j < _width; j++)
                     {
                         for (int k = 0; k < _height; k++)
@@ -315,6 +319,7 @@ public class AstarFight : MonoBehaviour
                             }
                             else
                             {
+                                //测试是否和阵型中其他的物体重叠
                                 for (int l = 0; l < tempCount2; l += 2)
                                 {
                                     if (tempA3[l] == x && tempA3[l + 1] == y)
@@ -325,27 +330,26 @@ public class AstarFight : MonoBehaviour
                                 }
                             }
                         }
-                        if (state)
+                        if (state)//如果有重叠的点或障碍
                         {
                             break;
                         }
                     }
-                    if (!state)
+                    if (!state)//如果该点可下兵
                     {
+                        //把所有可下兵格子加入列表，用来计算最近格子
                         tempList2.Add(tempA2[0]);
                         tempList2.Add(tempA2[1]);
                     }
                 }
-                if (tempList2.Count > 0)
+                if (tempList2.Count > 0)//如果有可下兵的格子
                 {
                     float min = 9999;
                     int tempInt2 = 0;
                     //计算哪个点离触摸点最近
                     for (int i33 = 0; i33 < tempList2.Count; i33 += 2)
                     {
-                        var tempFloat =
-                            (float)
-                                (Math.Pow(tempA1[0] - tempList2[i33], 2) + Math.Pow(tempA1[1] - tempList2[i33 + 1], 2));
+                        var tempFloat = (float)(Math.Pow(tempA1[0] - tempList2[i33], 2) + Math.Pow(tempA1[1] - tempList2[i33 + 1], 2));
 
                         if (tempFloat < min)
                         {
@@ -354,10 +358,12 @@ public class AstarFight : MonoBehaviour
                         }
                     }
 
+                    //根据计算出来的各个格子位置设置lua传来的物体所有子物体位置
                     parentArray[index].GetChild(tempCount++).position = Utils.NumToPosition(LoadMap.transform.position,
                         new Vector2(tempList2[tempInt2], tempList2[tempInt2 + 1]), UnitWidth, MapWidth, MapHeight);
-                    if (tempCount < an)
+                    if (tempCount < an)//如果不是阵型中最后一个物体
                     {
+                        //把自己所占格子加入列表,用来给阵型中其他的物体做重叠判断
                         for (int j = 0; j < _width; j++)
                         {
                             for (int k = 0; k < _height; k++)
@@ -369,25 +375,13 @@ public class AstarFight : MonoBehaviour
                     }
                     break;
                 }
-                else
+                else//如果没有可下兵的格子则扩大半径循环查找
                 {
                     spani++;
                 }
             }
-
-
         }
     }
-
-    /// <summary>
-    /// 设置可下兵的最远的X坐标
-    /// </summary>
-    /// <param name="X">可下兵的最远的X坐标(格子坐标)</param>
-    public void setMaxX(float X)
-    {
-        maxX = (int)((X - LoadMap.MapPlane.transform.position.x) / UnitWidth + MapWidth / 2f);
-    }
-
 
     /// <summary>
     /// 通过物体宽高计算阵型所对应物体占的格子,存入到字典中
@@ -409,12 +403,12 @@ public class AstarFight : MonoBehaviour
             int _height = (int)SData_armybase_c.Single.GetDataOfID(armyID).SpaceSet;//物体高
 
             //解析阵型数据到数组中
-            string s = SData_zhenxing_data.Single.GetDataOfID(SData_armycardbase_c.Single.GetDataOfID(_cardID).ArrayID).Position;
+            string s = SData_array_c.Single.GetDataOfID(SData_armycardbase_c.Single.GetDataOfID(_cardID).ArrayID).Position;
             List<int> tempA = new List<int>();
             var tempS1 = s.Split(';');
             for (int i = 0; i < tempS1.Length; i++)
             {
-                var tempS2 = tempS1[i].Split(',');
+                var tempS2 = tempS1[i].Split('&');
                 tempA.Add(int.Parse(tempS2[0]));
                 tempA.Add(int.Parse(tempS2[1]));
             }
@@ -614,6 +608,16 @@ public class AstarFight : MonoBehaviour
         int[] a = Utils.PositionToNum(LoadMap.MapPlane.transform.position, p, UnitWidth, MapWidth, MapHeight);
         return new Vector3(a[0], 0, a[1]);
 
+    }
+
+
+    /// <summary>
+    /// 设置可下兵的最远的X坐标
+    /// </summary>
+    /// <param name="X">可下兵的最远的X坐标(格子坐标)</param>
+    public void setMaxX(float X)
+    {
+        maxX = (int)((X - LoadMap.MapPlane.transform.position.x) / UnitWidth + MapWidth / 2f);
     }
 
 

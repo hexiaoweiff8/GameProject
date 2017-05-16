@@ -107,7 +107,7 @@ function MSGID_10002(body)
         lgyPrint('gwc.user.equip.isLock==>' .. v.isLock);
         lgyPrint('gwc.user.equip.isBad==>' .. v.isBad);
         
-        type = sdata_Equip_data:GetV(sdata_Equip_data.I_EquipType, v.eid)
+        type = sdata_equip_data:GetV(sdata_equip_data.I_EquipType, v.eid)
         --TODODO v.rarity + 1
         equipP.allEqList[temp][#equipP.allEqList[temp] + 1] = equipM(v.id, v.eid, v.lv, v.rarity + 1, v.isBad, v.isLock, v.fst_attr, tempTB1)
     end

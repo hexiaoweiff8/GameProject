@@ -177,29 +177,23 @@ function gameinit:GameStart()
     self:coStartGame()
     -- 启动一个协程
     --读取士兵阵型表
-    sdata_zhenxing_data = luacsv.new(require("pk_tabs/zhenxing_data"))
+    sdata_array_data = luacsv.new(require("pk_tabs/array_c"))
     --读取士兵模型表
     sdata_soldierRender_data = luacsv.new(require("pk_tabs/soldierRender_data"))
     --读取装备数据表
-    sdata_Equip_data = luacsv.new(require("pk_tabs/Equip_data"))
+    sdata_equip_data = luacsv.new(require("pk_tabs/equip_c"))
     --读取属性名数据表
-    sdata_EffectName_data = luacsv.new(require("pk_tabs/EffectName_data"))
+    sdata_attribute_data = luacsv.new(require("pk_tabs/attribute_c"))
     --读取装备套装数据表
-    sdata_Equip_suit_data = luacsv.new(require("pk_tabs/Equip_suit_data"))
+    sdata_equipsuit_data = luacsv.new(require("pk_tabs/equipsuit_c"))
     --读取装备属性方案数据表
     sdata_EquipPlan_data = require("pk_tabs/EquipPlan_data")
     --读取语言本地化数据表
     sdata_UILiteral = luacsv.new(require("pk_tabs/UILiteral"))
-    --科技-防御数据表
-    sdata_kejitree_fangyu_data = luacsv.new(require("pk_tabs/kejitree_fangyu_data"))
-    --科技-攻击数据表
-    sdata_kejitree_gongji_data = luacsv.new(require("pk_tabs/kejitree_gongji_data"))
-    --科技-经济数据表
-    sdata_kejitree_jingji_data = luacsv.new(require("pk_tabs/kejitree_jingji_data"))
-    --科技-生命数据表
-    sdata_kejitree_shengming_data = luacsv.new(require("pk_tabs/kejitree_shengming_data"))
-    
-    
+    --科技表
+    sdata_tech_data = luacsv.new(require("pk_tabs/tech_c"))
+
+
     --用户角色表
     sdata_userrose_data = luacsv.new(require("pk_tabs/userdata_c"))
     --卡牌表
@@ -230,12 +224,14 @@ function gameinit:GameStart()
     sdata_armycarduselimitcost_data = luacsv.new(require("pk_tabs/armycarduselimitcost_c"))
     --技能表
     sdata_skill_data = luacsv.new(require("pk_tabs/skill_c"))
+    sdata_kezhi_data = luacsv.new(require("pk_tabs/kezhi_c"))
     
     
     SDataUtils.setData("armybase_c", sdata_armybase_data.mData.head, sdata_armybase_data.mData.body)
     SDataUtils.setData("armycardbase_c", sdata_armycardbase_data.mData.head, sdata_armycardbase_data.mData.body)
-    SDataUtils.setData("zhenxing", sdata_zhenxing_data.mData.head, sdata_zhenxing_data.mData.body)
+    SDataUtils.setData("array_c", sdata_array_data.mData.head, sdata_array_data.mData.body)
     SDataUtils.setData("soldierRender", sdata_soldierRender_data.mData.head, sdata_soldierRender_data.mData.body)
+    SDataUtils.setData("kezhi_c", sdata_kezhi_data.mData.head, sdata_kezhi_data.mData.body)
 end
 --贯穿整个游戏生命周期
 function gameinit:Update()

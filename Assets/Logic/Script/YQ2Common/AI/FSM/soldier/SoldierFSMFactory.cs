@@ -8,6 +8,7 @@ public class SoldierFSMFactory
     {
         switch(stateName){
             case SoldierTriggerID.RuChang:
+
                 var xingjin = new XingjinTrigger();
                 _fsmTrriggerList.Add(xingjin);
 
@@ -24,6 +25,10 @@ public class SoldierFSMFactory
                 break;
             case SoldierTriggerID.SiWang:
                 return;
+            case SoldierTriggerID.PutongGongji:
+                var putongToXingjin = new XingjinTrigger();
+                _fsmTrriggerList.Add(putongToXingjin);
+                break;
         }
         //除死亡状态以外的任何状态都可以切死亡
         var siwang = new SiwangTrigger();

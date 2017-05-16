@@ -13985,6 +13985,9 @@ name = nil
 -- property: HideFlags RanderControl.hideFlags	get	set	
 hideFlags = nil 
 --*
+----Void RanderControl:SetBloodBarValue()
+function SetBloodBarValue() end 
+
 wndShowHideInfo = {} 
 --*
 --[Comment]
@@ -14357,20 +14360,20 @@ name = nil
 -- property: HideFlags AstarFight.hideFlags	get	set	
 hideFlags = nil 
 --*
-----Vector3 AstarFight:isZhangAi(Vector3 mp,Int32 index)
+----Void AstarFight:isZhangAi(Vector3 mp,Int32 index)
 function isZhangAi() end 
-
-----Void AstarFight:setMaxX(Single X)
-function setMaxX() end 
 
 ----Dictionary`2 AstarFight:setAllZhenxingList(Int32[] cardID,Int32[] level)
 function setAllZhenxingList() end 
 
-----Void AstarFight:setZhenxingInfo(Int32 cardID,Int32 index)
+----Void AstarFight:setZhenxingInfo(Transform go,Int32 cardID,Int32 index)
 function setZhenxingInfo() end 
 
 ----Vector3 AstarFight:getNum(Vector3 p)
 function getNum() end 
+
+----Void AstarFight:setMaxX(Single X)
+function setMaxX() end 
 
 UIFollow = {} 
 --*
@@ -14503,6 +14506,9 @@ function OnDestroy() end
 ----Void ClusterManager:Add(PositionObject member)
 function Add() end 
 
+----Void ClusterManager:Remove(PositionObject member)
+function Remove() end 
+
 ----Void ClusterManager:Init(Single x,Single y,Int32 w,Int32 h,Int32 unitw,Int32[][] map)
 function Init() end 
 
@@ -14518,8 +14524,11 @@ function GoOn() end
 ----Void ClusterManager:ClearAll()
 function ClearAll() end 
 
-----ClusterGroup ClusterManager.GetGroupById(Int32 groupId)
-function ClusterManager.GetGroupById() end 
+----ClusterGroup ClusterManager:GetGroupById(Int32 groupId)
+function GetGroupById() end 
+
+----IList`1 ClusterManager:GetPositionObjectListByGraphics(ICollisionGraphics graphics)
+function GetPositionObjectListByGraphics() end 
 
 PositionTransform = {} 
 --*
@@ -14792,7 +14801,7 @@ DisplayOwner = {}
 --[Comment]
 --consturctor for DisplayOwner overrides:
 --*
---DisplayOwner.New(GameObject gameObj,ClusterData clusterData,MFAModelRender modelRender,RanderControl randerControl,VOBase memberData)
+--DisplayOwner.New(GameObject gameObj,ClusterData clusterData,MFAModelRender modelRender,RanderControl randerControl)
 --*
 
 function DisplayOwner.New() end
@@ -14812,10 +14821,6 @@ MFAModelRender = nil
 --[Comment]
 -- property: RanderControl DisplayOwner.RanderControl	get	set	
 RanderControl = nil 
---*
---[Comment]
--- property: VOBase DisplayOwner.MemberData	get	set	
-MemberData = nil 
 --*
 ----Void DisplayOwner:Destroy()
 function Destroy() end 

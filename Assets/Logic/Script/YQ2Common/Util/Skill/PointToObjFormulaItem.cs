@@ -8,17 +8,6 @@ using UnityEngine;
 /// </summary>
 public class PointToObjFormulaItem : AbstractFormulaItem
 {
-    /// <summary>
-    /// 当前数据层级
-    /// </summary>
-    public int Level { get; private set; }
-
-    /// <summary>
-    /// 行为类型
-    /// 0: 不等待其执行结束继续
-    /// 1: 等待期执行结束调用callback
-    /// </summary>
-    public int FormulaType { get; private set; }
 
     /// <summary>
     /// 特效key(或者路径)

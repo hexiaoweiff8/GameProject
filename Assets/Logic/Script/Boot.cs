@@ -10,7 +10,6 @@ public class Boot : MonoBehaviour
     {
         ////sdk登录入口  将来特种部队可以改成自己的sdk
         //SDKInstance.SetSDKListener(GameQKSDKListener.Single);
-
     }
 
 

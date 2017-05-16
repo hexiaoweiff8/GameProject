@@ -7,17 +7,6 @@ using UnityEngine;
 /// </summary>
 public class PointFormulaItem : AbstractFormulaItem
 {
-    /// <summary>
-    /// 当前数据层级
-    /// </summary>
-    public int Level { get; private set; }
-
-    /// <summary>
-    /// 行为类型
-    /// 0: 不等待其执行结束继续
-    /// 1: 等待期执行结束调用callback
-    /// </summary>
-    public int FormulaType { get; private set; }
 
     /// <summary>
     /// 特效key(或者路径)
@@ -145,7 +134,7 @@ public class PointFormulaItem : AbstractFormulaItem
 
         IFormula result = new Formula((callback) =>
         {
-            Debug.Log("Point");
+            //Debug.Log("Point");
             var pos = myTargetPos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
             // 判断发射与接收位置
             EffectsFactory.Single.CreatePointEffect(myEffectKey, null, pos, new Vector3(myScale[0], myScale[1], myScale[2]), myDurTime, mySpeed, callback).Begin();

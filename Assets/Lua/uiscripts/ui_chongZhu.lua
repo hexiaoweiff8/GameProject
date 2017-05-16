@@ -18,9 +18,9 @@ function ui_chongzhu:OnShowDone()
     end
     
     setEqIconView(self.eqBg, v)
-    eqNameUL.text = sdata_Equip_data:GetV(sdata_Equip_data.I_EquipName, v.EquipID)
+    eqNameUL.text = sdata_equip_data:GetV(sdata_equip_data.I_EquipName, v.EquipID)
     eqNameUL.color = eqNameColor[v.EquipQuality]
-    self.bg:Find("maiShuxingBg/shuxing"):GetComponent(typeof(UILabel)).text = sdata_EffectName_data:GetV(sdata_EffectName_data.I_EffectName, v.MainEffectID) .. "+" .. sdata_EquipPlan_data[sdata_Equip_data:GetV(sdata_Equip_data.I_MainEffect, v.EquipID)][v.MainEffectID].up .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_Symbol, v.MainEffectID)
+    self.bg:Find("maiShuxingBg/shuxing"):GetComponent(typeof(UILabel)).text = sdata_attribute_data:GetV(sdata_attribute_data.I_AttributeName, v.MainEffectID) .. "+" .. sdata_EquipPlan_data[sdata_equip_data:GetV(sdata_equip_data.I_MainAttribute, v.EquipID)][v.MainEffectID].up .. sdata_attribute_data:GetV(sdata_attribute_data.I_Symbol, v.MainEffectID)
     
     
     self.shuxingBg = {}--5个附加属性btn
@@ -37,7 +37,7 @@ function ui_chongzhu:OnShowDone()
     --设置附加属性
     for i, v in ipairs(v.ViceEffect) do --已激活属性
         self.shuxingBgSpr[i].spriteName = "chongzhu_annv_shuxingxuanze_yijihuo"
-        self.shuxingUL[i].text = sdata_EffectName_data:GetV(sdata_EffectName_data.I_EffectName, v.ShuXingID) .. "+" .. v.ShuXingNum .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_Symbol, v.ShuXingID)
+        self.shuxingUL[i].text = sdata_attribute_data:GetV(sdata_attribute_data.I_AttributeName, v.ShuXingID) .. "+" .. v.ShuXingNum .. sdata_attribute_data:GetV(sdata_attribute_data.I_Symbol, v.ShuXingID)
         UIEventListener.Get(self.shuxingBg[i].gameObject).onClick = function(go)
             if self.chongzhushuxingBg.gameObject.activeSelf then
                 return
@@ -116,7 +116,7 @@ end
 function ui_chongzhu:setCZShuXingInfo(index)
     self.chongzhushuxingBg.gameObject:SetActive(true)
     for i, v in ipairs(v.ViceEffect[index].Remake) do
-        self.cz_shuxingUL[i].text = sdata_EffectName_data:GetV(sdata_EffectName_data.I_EffectName, v.RemakeShuXingID) .. "+" .. v.RemakeShuXingNum .. sdata_EffectName_data:GetV(sdata_EffectName_data.I_Symbol, v.RemakeShuXingID)
+        self.cz_shuxingUL[i].text = sdata_attribute_data:GetV(sdata_attribute_data.I_AttributeName, v.RemakeShuXingID) .. "+" .. v.RemakeShuXingNum .. sdata_attribute_data:GetV(sdata_attribute_data.I_Symbol, v.RemakeShuXingID)
     end
 end
 

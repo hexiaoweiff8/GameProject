@@ -446,4 +446,34 @@ public class TargetSelecter
     }
 
 
+    /// <summary>
+    /// 是否可以选择目标
+    /// </summary>
+    /// <param name="targetData">目标数据</param>
+    /// <param name="selecterData">选择者数据</param>
+    /// <returns>是否可以攻击</returns>
+    public static bool CouldSelectTarget(VOBase targetData, VOBase selecterData)
+    {
+        if (selecterData == null || targetData == null)
+        {
+            return false;
+        }
+        var result = false;
+
+        // 如果可选类型相等或目标是建筑
+        if (targetData.GeneralType == selecterData.AimGeneralType || targetData.GeneralType == Utils.GeneralTypeBuilding)
+        {
+            // 如果目标隐形并且选择者反隐, 或者不隐形
+            if ((targetData.IsHide && selecterData.IsAntiHide) || !targetData.IsHide)
+            {
+                // 目标可被选择
+                // TODO 假死状态排除
+                result = true;
+            }
+        }
+
+        return result;
+    }
+
+
 }

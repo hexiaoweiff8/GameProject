@@ -16,21 +16,13 @@ public class Soldier_Xingjin_State : SoldierFSMState
     /// <param name="fsm"></param>
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
-        var soldier = fsm.Display.RanderControl;
-
-        soldier.BloodBar.localScale = Vector3.one;
-        soldier.ModelRander.speedScale = 1;
-
-
-        soldier.GetComponent<Renderer>().material.shader = PacketManage.Single.GetPacket("core").Load("Avatar_N.shader") as Shader;
-        soldier.ModelRander.SetClip("run".GetHashCode());
-        AstarFight at = GameObject.Find("/AstarFight").GetComponent<AstarFight>();
-
-        at.toXunLu(fsm.Display.ClusterData, soldier.isEnemy, soldier.groupIndex, fsm.Display);
-
-        Vector3 pt = soldier.NowWorldCamera.WorldToScreenPoint(soldier.Head.position);
-        Vector3 ff = UICamera.currentCamera.ScreenToWorldPoint(pt);
-        soldier.BloodBar.position = ff;
+        base.DoBeforeEntering(fsm);
+        fsm.Display.ClusterData.ContinueMove();
+    }
+    public override void DoBeforeLeaving(SoldierFSMSystem fsm)
+    {
+        base.DoBeforeLeaving(fsm);
+        fsm.IsCanRun = false;
     }
 
     public override void Action(SoldierFSMSystem fsm)

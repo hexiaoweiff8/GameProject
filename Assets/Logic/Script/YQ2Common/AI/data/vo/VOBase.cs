@@ -277,7 +277,11 @@ public class VOBase
     public float CurrentHP
     {
         get { return _currentHP; }
-        set { _currentHP = value; }
+        set
+        {
+            _currentHP = value;
+            _currentHP = Mathf.Max(0,Mathf.Min(_currentHP, TotalHp));
+        }
     }
 
     /// <summary>
@@ -308,8 +312,8 @@ public class VOBase
         Name = data.Name;
         ArmyID = data.ArmyID;
         ArmyType = data.ArmyType;
-        CurrentHP = data.HP;
         TotalHp = data.HP;
+        CurrentHP = TotalHp;
         Armor = data.Armor;
         AntiArmor = data.AntiArmor;
         AntiCrit = data.AntiCrit;

@@ -8,7 +8,8 @@ public class XingjinTrigger : SoldierFSMTrigger
 {
     public override bool CheckTrigger(SoldierFSMSystem fsm)
     {
-        return fsm.IsCanRun;
+        //Debug.Log("当前血量--------------------------------------" + fsm.Display.ClusterData.MemberData.CurrentHP);
+        return (fsm.IsCanRun || fsm.TargetIsLoseEfficacy) && (fsm.Display.ClusterData.MemberData.CurrentHP>0);
     }
 
     public override void Init()

@@ -42,10 +42,10 @@ public class TargetList<T> where T : IGraphicsHolder//IGraphical<Rectangle>
     /// </summary>
     private MapInfo<T> mapinfo = null;
 
-    /// <summary>
-    /// 删除列表
-    /// </summary>
-    private IList<T> removeList = new List<T>(); 
+    ///// <summary>
+    ///// 删除列表
+    ///// </summary>
+    //private IList<T> removeList = new List<T>(); 
 
     /// <summary>
     /// 单位格子宽度
@@ -119,6 +119,7 @@ public class TargetList<T> where T : IGraphicsHolder//IGraphical<Rectangle>
     /// </summary>
     public void RebuildQuadTree()
     {
+        // TODO 没有位移的单位不进行重新拆入
         quadTree.Clear();
         quadTree.Insert(list);
     }

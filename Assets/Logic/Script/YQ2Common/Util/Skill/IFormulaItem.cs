@@ -75,7 +75,7 @@ public abstract class AbstractFormulaItem : IFormulaItem
     /// 0: 不等待该节点执行完毕
     /// 1: 等待该节点执行完毕后再继续执行之后的节点
     /// </summary>
-    public int FormulaType { get; private set; }
+    public int FormulaType { get; protected set; }
 
     /// <summary>
     /// 下一节点

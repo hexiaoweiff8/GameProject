@@ -384,17 +384,14 @@ public class WndManage
                     m_wndInstances.Add(wndName + subID, new Wnd(uipanel, uibaffle, wInfo));
                     if (aInfo.isWithBg)//再加一个gameobject的原因是如果做动画底板需要层级高于预制，底板会压在预制上
                     {
-                        //TODODO 图集放到了Resources目录
-                        UIWidget spr = NGUITools.AddSprite(uipanel, Resources.Load("ui_fightAtlas", typeof(UIAtlas)) as UIAtlas, "radar_bg");
-                        spr.name = "baffleWithBg";
-                        UIStretch stretch = spr.gameObject.AddComponent<UIStretch>();
+                        //TODODO 图片放到了Resources目录
+                        UITexture ut = NGUITools.AddWidget<UITexture>(uipanel, -99);
+                        Texture texure = Resources.Load<Texture>("zanting_jiashenceng");
+                        ut.mainTexture = texure;
+                        UIStretch stretch = ut.gameObject.AddComponent<UIStretch>();
                         stretch.style = UIStretch.Style.Both;
                         // set relative size bigger
                         stretch.relativeSize = new Vector2(3, 3);
-                        // set a lower depth
-                        spr.depth = -99;
-                        // set alpha
-                        spr.alpha = 0.6f;
                     }
                 }
 

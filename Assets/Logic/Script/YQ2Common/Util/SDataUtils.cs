@@ -32,16 +32,10 @@ public class SDataUtils
                     SData_armycardbase_c.Single.setData(table1, table2);
                 }
                 break;
-            case "soldier":
+            case "array_c":
                 {
-                    SData_soldier_data.AutoInstance();
-                    SData_soldier_data.Single.setData(table1, table2);
-                }
-                break;
-            case "zhenxing":
-                {
-                    SData_zhenxing_data.AutoInstance();
-                    SData_zhenxing_data.Single.setData(table1, table2);
+                    SData_array_c.AutoInstance();
+                    SData_array_c.Single.setData(table1, table2);
                 }
                 break;
             case "soldierRender":
@@ -49,6 +43,12 @@ public class SDataUtils
                     SData_soldierRender_data.AutoInstance();
                     SData_soldierRender_data.Single.setData(table1, table2);
                 }
+                break;
+            case "kezhi_c":
+            {
+                SData_kezhi_c.AutoInstance();
+                SData_kezhi_c.Single.setData(table1, table2);
+            }
                 break;
         }
     }

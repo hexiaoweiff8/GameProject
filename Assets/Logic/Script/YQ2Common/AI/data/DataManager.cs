@@ -168,8 +168,10 @@ public class DataManager : MonoEX.Singleton<DataManager>
         {
             _enemySoldiersDict.Add(soldier.ObjID.ID, soldier);
         }
-        var display = DP_FightPrefabManage.InstantiateAvatar(param);
-        
+        //var display = DP_FightPrefabManage.InstantiateAvatar(param);
+        //通过对象池创建角色
+        var display = DisplayerManager.Single.CreateAvatar(soldier.Name,param);
+
         var mfa = display.GetComponent<MFAModelRender>();
         mfa.ObjId = soldier.ObjID;
 
@@ -192,34 +194,24 @@ public class DataManager : MonoEX.Singleton<DataManager>
         return null;
     }
 
-    private void DeleteMySoldier(int id)
+    private void DeleteSoldier(ObjectID obj)
     {
-        try
+        switch (obj.ObjType)
         {
-            _mySoldiersDict.Remove(id);
+            case ObjectID.ObjectType.MySoldier:
+                _mySoldiersDict.Remove(obj.ID);
+                break;
+            case ObjectID.ObjectType.EnemySoldier:
+                _enemySoldiersDict.Remove(obj.ID);
+                break;
         }
-        catch
-        {
-            throw new Exception(String.Format("我方士兵列表中不存在这个id {0}", id));
-        }
+        DisplayerManager.Single.DeleteElement(obj);
     }
 
     public FightVO GetEnemySoldier(int id)
     {
         if (_enemySoldiersDict.ContainsKey(id)) return _enemySoldiersDict[id];
         return null;
-    }
-
-    private void DeleteEnemySoldier(int id)
-    {
-        try
-        {
-            _enemySoldiersDict.Remove(id);
-        }
-        catch
-        {
-            throw new Exception(String.Format("敌方士兵列表中不存在这个id {0}", id));
-        }
     }
 
     private void CreateMyTank(TankVO tank)
@@ -363,10 +355,10 @@ public class DataManager : MonoEX.Singleton<DataManager>
                 DeleteEnemyJidi(ObjID.ID);
                 break;
             case ObjectID.ObjectType.MySoldier:
-                DeleteMySoldier(ObjID.ID);
+                DeleteSoldier(ObjID);
                 break;
             case ObjectID.ObjectType.EnemySoldier:
-                DeleteEnemySoldier(ObjID.ID);
+                DeleteSoldier(ObjID);
                 break;
             case ObjectID.ObjectType.MyTank:
                 DeleteMyTank(ObjID.ID);

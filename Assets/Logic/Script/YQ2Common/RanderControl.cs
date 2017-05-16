@@ -1,34 +1,39 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using DG.Tweening;
 
 public class RanderControl : MonoBehaviour
 {
-    public Transform BloodBar;
+    public BloodBar bloodBarCom;
+    [HideInInspector]
+    public Transform bloodBar;
+    [HideInInspector]
     public Camera NowWorldCamera;
+    [HideInInspector]
     public Transform Head;
+    [HideInInspector]
     public bool isEnemy = false;
+    [HideInInspector]
     public bool isSetShader = false;
+    [HideInInspector]
     public int groupIndex;
-    private UISprite BloodBarSprite;
+    //static readonly GameObject ui_fightUgo = ;
     /// <summary>
     /// 显示对象动画控制
     /// </summary>
+    [HideInInspector]
     public MFAModelRender ModelRander;
 
+    private DisplayOwner data;
     private SoldierFSMControl _control;
-    //private float Fomat;
     void Start()
     {
         NowWorldCamera = GameObject.Find("/PTZCamera/SceneryCamera").GetComponent<Camera>();
         Head = transform.Find("head");
-        //Fomat = Vector3.Distance(Head.position, nowWorldCamera.transform.position);
-        BloodBar = GameObjectExtension.InstantiateFromPacket("ui_fightU", "blood.prefab", GameObject.Find("ui_fightU")).transform;
-        BloodBar.localScale = Vector3.zero;
-        BloodBarSprite = BloodBar.GetComponent<UISprite>();
+        bloodBar = GameObjectExtension.InstantiateFromPacket("ui_fightU", "blood.prefab", GameObject.Find("ui_fightU")).transform;
+        bloodBar.localScale = Vector3.zero;
+        bloodBarCom = bloodBar.gameObject.AddComponent<BloodBar>();
         ModelRander = gameObject.GetComponent<MFAModelRender>();
+        data = DisplayerManager.Single.GetElementById(ModelRander.ObjId);
+
 
         // 数据来源非正常方式, 抽出
         //启动士兵的状态控制
@@ -36,8 +41,8 @@ public class RanderControl : MonoBehaviour
         _control = new SoldierFSMControl();
         displayOwner.RanderControl = this;
         _control.StartFSM(displayOwner);
+        //SetBloodBarValue();
     }
-
 
 
     private void OnWillRenderObject()
@@ -50,22 +55,24 @@ public class RanderControl : MonoBehaviour
     }
     void Update()
     {
-        //transform.Translate(0, 0, 10 * Time.deltaTime);
-
-        ////float newFomat = Fomat / Vector3.Distance(Head.position, nowWorldCamera.transform.position);
         Vector3 pt = NowWorldCamera.WorldToScreenPoint(Head.position);
         Vector3 ff = UICamera.currentCamera.ScreenToWorldPoint(pt);
-        //ff.z = 0;
-        BloodBar.position = ff;
+        bloodBar.position = ff;
         _control.UpdateFSM();
-        //blood.localScale = Vector3.one * newFomat;
-
-
+    }
+    /// <summary>
+    /// 销毁状态机
+    /// </summary>
+    public void DestoryFSM()
+    {
+        _control.Destory();
+        _control = null;
     }
 
-    public void setBloodBarSpritefillAmount(float value)
+    public void SetBloodBarValue()
     {
-        BloodBarSprite.fillAmount = value;
+        var value = data.ClusterData.MemberData.CurrentHP / data.ClusterData.MemberData.TotalHp;
+        bloodBarCom.SetBloodBarValue(value);
     }
 
     ///// <summary>
