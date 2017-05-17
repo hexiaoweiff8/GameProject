@@ -9,7 +9,12 @@ using UnityEngine;
 /// <typeparam name="T">数据类型</typeparam>
 public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
 {
-    
+
+
+    /// <summary>
+    /// 根节点
+    /// </summary>
+    public QuadTree<T> root { get; private set; }
 
     /// <summary>
     /// 当前节点最大单元数量
@@ -20,7 +25,7 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
     /// <summary>
     /// 最大树深度
     /// </summary>
-    private int maxLevel = 10;
+    private int maxLevel = 4;
 
     /// <summary>
     /// 当前四叉树所在等级
@@ -30,7 +35,7 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
     /// <summary>
     /// 对象列表
     /// </summary>
-    private IList<T> itemsList;
+    private List<T> itemsList;
 
     /// <summary>
     /// 当前四叉树节点编辑
@@ -50,7 +55,13 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
     /// <summary>
     /// 矩形缓存
     /// </summary>
-    private Queue<ICollisionGraphics> rectCache = null; 
+    private Queue<ICollisionGraphics> rectCache = null;
+
+    /// <summary>
+    /// 缓存上次所有节点的位置
+    /// </summary>
+    private Dictionary<T, Vector2> cachePosition;
+
 
     /// <summary>
     /// 初始化四叉树
@@ -58,7 +69,8 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
     /// <param name="level">当前四叉树所在位置</param>
     /// <param name="rect">当前四叉树的位置与宽度大小</param>
     /// <param name="parentQueue">父级引用cache</param>
-    public QuadTree(int level, RectGraphics rect, Queue<QuadTree<T>> parentNodeCache = null, Queue<ICollisionGraphics> parentRectCache = null)
+    /// <param name="isRoot">是否为根节点</param>
+    public QuadTree(int level, RectGraphics rect, Queue<QuadTree<T>> parentNodeCache = null, Queue<ICollisionGraphics> parentRectCache = null, bool isRoot = true)
     {
         this.level = level;
         itemsList = new List<T>();
@@ -66,6 +78,11 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
         nodes = new QuadTree<T>[4];
         nodeCache = parentNodeCache ?? new Queue<QuadTree<T>>();
         rectCache = parentRectCache ?? new Queue<ICollisionGraphics>();
+        if (isRoot)
+        {
+            root = this;
+            cachePosition = new Dictionary<T, Vector2>();
+        }
     }
 
 
@@ -82,8 +99,7 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
         //var midPointX = this.rect.Postion.x;// + this.rect.Width/2;
         //var midPointY = this.rect.Postion.y;// + this.rect.Height/2;
         
-        // TODO 判断如果当前图形跨子节点, 则不放入子节点
-        // TODO 判断如果当前图形边框超出子节点则不放入其中
+        // 判断如果当前图形边框超出子节点则不放入其中
         var collisionSubNodeCount = 0;
         if (nodes != null && item != null)
         {
@@ -107,17 +123,7 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
                 var node = nodes[tmpResult];
                 var nodeRect = node.GetRectangle();
                 var rect = item.GetExternalRect();
-                if (rect.Width > nodeRect.Width 
-                    || rect.Height > nodeRect.Height
-                    || rect.Width * 0.5f + rect.Postion.x > nodeRect.Width * 0.5f + nodeRect.Postion.x
-                    || rect.Height * 0.5f + rect.Postion.y > nodeRect.Height * 0.5f + nodeRect.Postion.y
-                    || -rect.Width * 0.5f + rect.Postion.x < -nodeRect.Width * 0.5f + nodeRect.Postion.x
-                    || -rect.Height * 0.5f + rect.Postion.y < -nodeRect.Height * 0.5f + nodeRect.Postion.y)
-                {
-                    //
-                    //Debug.Log("出框");
-                }
-                else
+                if (IsInner(item, nodeRect))
                 {
                     result = tmpResult;
                 }
@@ -185,6 +191,7 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
             for (var i = 0; i < itemsList.Count; i++)
             {
                 var tmpItem = itemsList[i];
+                // TODO 这种方式在插入失败时会一直调用造成性能问题
                 if (InsertToSubNode(tmpItem, nodes))
                 {
                     // 从当前列表中删除该节点
@@ -285,7 +292,6 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
         return rect;
     }
 
-
     /// <summary>
     /// 获得子树列表
     /// </summary>
@@ -303,7 +309,6 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
     {
         return itemsList;
     }
-
     
     /// <summary>
     /// 清除四叉树
@@ -328,6 +333,119 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
         }
     }
 
+
+    /// <summary>
+    /// 判断单位是否完全在当前节点的矩形内
+    /// </summary>
+    /// <param name="item">被检测单位</param>
+    /// <param name="testRect">检测矩形</param>
+    /// <returns>被检测单位是否在当前几点的范围内</returns>
+    public bool IsInner(ICollisionGraphics item, RectGraphics testRect)
+    {
+        if (item == null)
+        {
+            return false;
+        }
+        // 获得图形的外接矩形
+        var itemExternalRect = item.GetExternalRect();
+        // 判断是否在范围内
+        var itemExternalRectHalfWidth = itemExternalRect.Width*0.5f;
+        var nodeRectHalfWidth = testRect.Width * 0.5f;
+        var itemExternalRectHalfHeight = itemExternalRect.Height*0.5f;
+        var nodeRectHalfHeight = testRect.Height * 0.5f;
+        // 是否在范围内
+        return itemExternalRect.Postion.x + itemExternalRectHalfWidth <= testRect.Postion.x + nodeRectHalfWidth
+            && itemExternalRect.Postion.x - itemExternalRectHalfWidth >= testRect.Postion.x - nodeRectHalfWidth
+            && itemExternalRect.Postion.y + itemExternalRectHalfHeight <= testRect.Postion.y + nodeRectHalfHeight
+            && itemExternalRect.Postion.y - itemExternalRectHalfHeight >= testRect.Postion.y - nodeRectHalfHeight;
+    }
+
+
+    /// <summary>
+    /// 刷新四叉树
+    /// 将有位置变动的单位放到其应在的子树中
+    /// </summary>
+    public void Refresh()
+    {
+        // 缓存上次所有单位位置, 如果位置发生变化并且没有在上次叶子节点上则重新插入
+        // 检查子节点
+        if (nodes != null && nodes[0] != null)
+        {
+            for (var i = 0; i < nodes.Length; i++)
+            {
+                nodes[i].Refresh();
+            }
+        }
+        // 缓存列表
+        var cacheList = new List<T>();
+
+        // 检查当前节点的位置是否变动
+        for (var i = 0; i < itemsList.Count; i++)
+        {
+            var item = itemsList[i];
+            if (root.cachePosition.ContainsKey(item))
+            {
+                var position = root.cachePosition[item];
+                if (position != item.MyCollisionGraphics.Postion && !IsInner(item.MyCollisionGraphics, rect))
+                {
+                    // 重新插入缓存列表等待重新插入列表, 从当前列表删除
+                    cacheList.Add(item);
+                    itemsList.RemoveAt(i);
+                    i--;
+                    // 重新缓存位置
+                    root.cachePosition[item] = item.MyCollisionGraphics.Postion;
+                }
+            }
+            else
+            {
+                // 插入新数据
+                root.cachePosition.Add(item, item.MyCollisionGraphics.Postion);
+            }
+        }
+        // 将缓存列表插入
+        root.Insert(cacheList);
+        // 清空缓存列表
+        //cacheList.Clear();
+        // 整理四叉树结构
+        ReBuild();
+    }
+
+
+    /// <summary>
+    /// 整理四叉树结构
+    /// </summary>
+    public void ReBuild()
+    {
+        // 从叶子节点上一层开始检查, 如果数量不够分裂的, 合并子树
+        if (nodes != null && nodes[0] != null)
+        {
+            // 统计数量
+            var itemCount = 0;
+
+            for (var i = 0; i < nodes.Length; i++)
+            {
+                nodes[i].ReBuild();
+                itemCount += nodes[i].itemsList.Count;
+            }
+            itemCount += itemsList.Count;
+            // 如果数量不足以分裂子节点则合并回收
+            if (itemCount < maxItemCount)
+            {
+                // 合并子节点
+                for (var i = 0; i < nodes.Length; i++)
+                {
+                    var node = nodes[i];
+                    itemsList.AddRange(node.itemsList);
+                    // 删除引用
+                    node.Clear();
+                    nodes[i] = null;
+                }
+            }
+        }
+        // 叶子节点不作操作, 从叶子节点上一级开始操作
+    }
+
+
     // --------------------------------私有方法---------------------------------
 
 
@@ -351,7 +469,8 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
             }
             else
             {
-                node = new QuadTree<T>(subLevel, subRect, nodeCache);
+                node = new QuadTree<T>(subLevel, subRect, nodeCache, isRoot: false);
+                node.root = root;
             }
 
             nodes[i] = node;
@@ -401,15 +520,15 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
                 subY = parentRect.Postion.y + halfHeight;
                 break;
             case 1:
-                subX = parentRect.Postion.x + halfHeight;
+                subX = parentRect.Postion.x + halfWidth;
                 subY = parentRect.Postion.y - halfHeight;
                 break;
             case 2:
-                subX = parentRect.Postion.x - halfHeight;
+                subX = parentRect.Postion.x - halfWidth;
                 subY = parentRect.Postion.y - halfHeight;
                 break;
             case 3:
-                subX = parentRect.Postion.x - halfHeight;
+                subX = parentRect.Postion.x - halfWidth;
                 subY = parentRect.Postion.y + halfHeight;
                 break;
         }

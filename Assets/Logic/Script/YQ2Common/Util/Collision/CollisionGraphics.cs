@@ -141,28 +141,34 @@ public abstract class CollisionGraphics : ICollisionGraphics
 
         if (circleGraphics != null && rectGraphics != null)
         {
-            var axisArray = new[]
-            {
-                rectGraphics.HorizonalAxis,
-                rectGraphics.VerticalAxis,
-            };
 
             var positionOffset = circleGraphics.Postion - rectGraphics.Postion;
-            for (var i = 0; i < axisArray.Length; i++)
+            var axis = rectGraphics.HorizonalAxis;
+            var dot = Math.Abs(Vector2.Dot(axis, positionOffset));
+            // 映射对角线到四个轴上进行对比
+            var projection1 = Math.Abs(Vector2.Dot(axis, rectGraphics.Diagonal1)) * 0.5f;
+            var projection2 = Math.Abs(Vector2.Dot(axis, rectGraphics.Diagonal2)) * 0.5f;
+            var projection3 = circleGraphics.Radius;
+
+            projection1 = projection1 > projection2 ? projection1 : projection2;
+
+            if (projection1 + projection3 <= dot)
             {
-                var axis = axisArray[i];
-                var dot = Math.Abs(Vector2.Dot(axis, positionOffset));
-                // 映射对角线到四个轴上进行对比
-                var projection1 = Math.Abs(Vector2.Dot(axis, rectGraphics.Diagonal1)) * 0.5f;
-                var projection2 = Math.Abs(Vector2.Dot(axis, rectGraphics.Diagonal2)) * 0.5f;
-                var projection3 = circleGraphics.Radius;
+                return false;
+            }
 
-                projection1 = projection1 > projection2 ? projection1 : projection2;
+            axis = rectGraphics.VerticalAxis;
+            dot = Math.Abs(Vector2.Dot(axis, positionOffset));
+            // 映射对角线到四个轴上进行对比
+            projection1 = Math.Abs(Vector2.Dot(axis, rectGraphics.Diagonal1)) * 0.5f;
+            projection2 = Math.Abs(Vector2.Dot(axis, rectGraphics.Diagonal2)) * 0.5f;
+            projection3 = circleGraphics.Radius;
 
-                if (projection1 + projection3 <= dot)
-                {
-                    return false;
-                }
+            projection1 = projection1 > projection2 ? projection1 : projection2;
+
+            if (projection1 + projection3 <= dot)
+            {
+                return false;
             }
 
             return true;

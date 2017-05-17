@@ -120,8 +120,9 @@ public class TargetList<T> where T : IGraphicsHolder//IGraphical<Rectangle>
     public void RebuildQuadTree()
     {
         // TODO 没有位移的单位不进行重新拆入
-        quadTree.Clear();
-        quadTree.Insert(list);
+        // quadTree.Clear();
+        // quadTree.Insert(list);
+        quadTree.Refresh();
     }
 
 
