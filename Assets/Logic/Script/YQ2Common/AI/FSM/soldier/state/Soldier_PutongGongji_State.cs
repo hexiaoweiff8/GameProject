@@ -48,7 +48,7 @@ public class Soldier_PutongGongji_State : SoldierFSMState
         {
             return;
         }
-        if (_bulletCount < 0)
+        if (_bulletCount <= 0)
         {
             Globals.Instance.StartCoroutine(_waitFor(() =>
             {

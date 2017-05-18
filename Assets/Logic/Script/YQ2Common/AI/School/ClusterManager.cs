@@ -516,6 +516,7 @@ public class ClusterManager : ILoopItem
                     var departSpeed = closeMember.PhysicsInfo.SpeedDirection - member.PhysicsInfo.SpeedDirection;
                     
                     // TODO 定最终拥挤方向
+                    // TODO 排斥力未做
                     // 基础排斥力
                     if (diffPosition.magnitude < minDistance)
                     {
@@ -554,14 +555,15 @@ public class ClusterManager : ILoopItem
                     {
                         partForCloseMember *= departSpeed.magnitude / partForCloseMember.magnitude;
                     }
-                    member.PhysicsInfo.SpeedDirection += partForMember;
+                    // TODO 这个力和某个力冲突导致移动缓慢
+                    //member.PhysicsInfo.SpeedDirection += partForMember;
                     closeMember.PhysicsInfo.SpeedDirection -= partForCloseMember;
                     // 加入最大速度限制, 防止溢出
                     member.PhysicsInfo.SpeedDirection *= GetUpTopSpeed(member.PhysicsInfo.SpeedDirection.magnitude);
                     closeMember.PhysicsInfo.SpeedDirection *= GetUpTopSpeed(closeMember.PhysicsInfo.SpeedDirection.magnitude);
                     // 加入已对比列表
                     areadyCollisionList.Add(compereId1, true);
-                    //Debug.DrawLine(member.Position, partForMember + member.Position, Color.green);
+                    Debug.DrawLine(member.Position, partForMember + member.Position, Color.green);
                 }
             }
         }

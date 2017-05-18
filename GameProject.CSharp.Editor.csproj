@@ -312,7 +312,6 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\ToLua\Editor\ToLuaTree.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Lua\pack_script\pk_script\_tmp.txt" />
     <None Include="Assets\PersistentData\pack_script\pk_script\_tmp.txt" />
     <None Include="Assets\QKLibs\Asset_DOTween\DOTween\DOTween.XML" />
     <None Include="Assets\QKLibs\Asset_DOTween\DOTween\DOTween43.xml" />

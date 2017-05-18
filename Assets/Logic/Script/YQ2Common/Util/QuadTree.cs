@@ -68,7 +68,8 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
     /// </summary>
     /// <param name="level">当前四叉树所在位置</param>
     /// <param name="rect">当前四叉树的位置与宽度大小</param>
-    /// <param name="parentQueue">父级引用cache</param>
+    /// <param name="parentNodeCache">节点cache队列</param>
+    /// <param name="parentRectCache">图形cache队列</param>
     /// <param name="isRoot">是否为根节点</param>
     public QuadTree(int level, RectGraphics rect, Queue<QuadTree<T>> parentNodeCache = null, Queue<ICollisionGraphics> parentRectCache = null, bool isRoot = true)
     {
@@ -386,14 +387,14 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
             if (root.cachePosition.ContainsKey(item))
             {
                 var position = root.cachePosition[item];
-                if (position != item.MyCollisionGraphics.Postion && !IsInner(item.MyCollisionGraphics, rect))
+                if (!position.Equals(item.MyCollisionGraphics.Postion) && !IsInner(item.MyCollisionGraphics, rect))
                 {
+                    // 重新缓存位置
+                    root.cachePosition[item] = item.MyCollisionGraphics.Postion;
                     // 重新插入缓存列表等待重新插入列表, 从当前列表删除
                     cacheList.Add(item);
                     itemsList.RemoveAt(i);
                     i--;
-                    // 重新缓存位置
-                    root.cachePosition[item] = item.MyCollisionGraphics.Postion;
                 }
             }
             else
@@ -402,12 +403,15 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
                 root.cachePosition.Add(item, item.MyCollisionGraphics.Postion);
             }
         }
-        // 将缓存列表插入
-        root.Insert(cacheList);
-        // 清空缓存列表
-        //cacheList.Clear();
-        // 整理四叉树结构
-        ReBuild();
+        if (cacheList.Count > 0)
+        {
+            // 将缓存列表插入
+            root.Insert(cacheList);
+            // 清空缓存列表
+            //cacheList.Clear();
+            // 整理四叉树结构
+            ReBuild();
+        }
     }
 
 
@@ -421,15 +425,18 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
         {
             // 统计数量
             var itemCount = 0;
-
+            var isSecondLevel = true;
             for (var i = 0; i < nodes.Length; i++)
             {
-                nodes[i].ReBuild();
-                itemCount += nodes[i].itemsList.Count;
+                var node = nodes[i];
+                node.ReBuild();
+                itemCount += node.itemsList.Count;
+                // 判断子集是否包含子集
+                isSecondLevel &= node.nodes[0] == null;
             }
             itemCount += itemsList.Count;
             // 如果数量不足以分裂子节点则合并回收
-            if (itemCount < maxItemCount)
+            if (itemCount < maxItemCount && isSecondLevel)
             {
                 // 合并子节点
                 for (var i = 0; i < nodes.Length; i++)

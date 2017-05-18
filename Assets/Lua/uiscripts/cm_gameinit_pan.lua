@@ -16,6 +16,7 @@ WNDTYPE = {
     Prefight = "ui_prefight",
     ui_fight = "ui_fightU",
     ui_pause = "ui_pauseU",
+    ui_quitGame = "ui_quitGame",
     quiteEnsure_ui = "ui_quiteensure",
     ui_equip = "ui_equip",
     ui_chongzhu = "ui_chongzhu",
@@ -33,6 +34,7 @@ gameinit.wndlist = {
     {name = WNDTYPE.Login, cm = "uiscripts/wndtz_login"},
     {name = WNDTYPE.ui_fight, cm = "uiscripts/ui_fight"},
     {name = WNDTYPE.ui_pause, cm = "uiscripts/ui_pause"},
+    {name = WNDTYPE.ui_quitGame, cm = "uiscripts/ui_quitGame"},
     {name = WNDTYPE.quiteEnsure_ui, cm = "uiscripts/ui_pause"},
     {name = WNDTYPE.Prefight, cm = "uiscripts/wnd_prefight"},
     {name = WNDTYPE.ui_equip, cm = "uiscripts/ui_equip"},
@@ -233,12 +235,12 @@ function gameinit:GameStart()
     SDataUtils.setData("soldierRender", sdata_soldierRender_data.mData.head, sdata_soldierRender_data.mData.body)
     SDataUtils.setData("kezhi_c", sdata_kezhi_data.mData.head, sdata_kezhi_data.mData.body)
 end
---贯穿整个游戏生命周期
-function gameinit:Update()
-    if Input.GetKeyDown(UnityEngine.KeyCode.Escape) then
-        lgyPrint("EscapeEscapeEscapeEscapeEscape")
-    end
-end
+-- --贯穿整个游戏生命周期
+-- function gameinit:Update()
+--     if Input.GetKeyDown(UnityEngine.KeyCode.Escape) then
+--         lgyPrint("EscapeEscapeEscapeEscapeEscape")
+--     end
+-- end
 GameInit = gameinit.new()
 GameInit:GameStart()
 return gameinit.new

@@ -5,6 +5,7 @@ local data ={
 		["ui_healthadvice"]={"ui_healthadvice","ui_healthadvice",1,2,0,2,1,0},
 		["ui_fightU"]={"ui_fightU","ui_fightU;commonU;heroU;core;gongjianbing;qingzhoujun;changqiangbing;ma1;ma5;sunluban;zhangxingcai;zhenji1;lingtong;usasoldier;xiahoudun",10000,0,0,2,1,0},
 		["ui_pauseU"]={"ui_pauseU","ui_pauseU",10000,3,0,4,3,1},
+		["ui_quitGame"]={"ui_quitGame","ui_quitGame",10000,3,0,4,3,0},
 		["ui_quiteensure"]={"ui_quiteensure","ui_quiteensure",10000,3,0,4,2,0},
 		["ui_login"]={"ui_login","ui_login",10000,2,0,2,1,0},
 		["ui_prefight"]={"ui_prefight","ui_prefight;core",10000,2,0,7,1,0},
