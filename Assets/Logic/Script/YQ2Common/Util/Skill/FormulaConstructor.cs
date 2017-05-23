@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
@@ -41,8 +42,9 @@ public static class FormulaConstructor
         {
             // 技能ID
             var skillId = 0;
-            // 大括号标记
-            var braket = false;
+            // 数据括号
+            var dataBraket = false;
+            // 当前行为栈层级
             var stackLevel = 0;
             // 创建临时堆栈, 存储不同层级的行为链
             var stack = new Stack<IFormulaItem>();
@@ -54,13 +56,13 @@ public static class FormulaConstructor
             for (var i = 0; i < infoLines.Length; i++)
             {
                 var line = infoLines[i];
+                // 消除空格
+                line = line.Trim();
                 // 跳过空行
                 if (string.IsNullOrEmpty(line))
                 {
                     continue;
                 }
-                // 消除空格
-                line = line.Trim();
                 // 跳过注释行
                 if (line.StartsWith("//"))
                 {
@@ -87,8 +89,8 @@ public static class FormulaConstructor
                     // 读取技能ID
                     var strSkillId = line.Substring(start + 1, length);
                     skillId = Convert.ToInt32(strSkillId);
-                    //// 创建新技能
-                    //skillInfo = new SkillInfo(skillId);
+                    // 创建新技能
+                    skillInfo = new SkillInfo(skillId);
                 }
                 else if (line.StartsWith("{"))
                 {
@@ -112,8 +114,19 @@ public static class FormulaConstructor
                         tmpItem = prvLevelItem;
                     }
                 }
-                else
+                else if (line.StartsWith("["))
                 {
+                    // 数据开始
+                    dataBraket = true;
+                }
+                else if (line.StartsWith("]"))
+                {
+                    // 数据结束
+                    dataBraket = true;
+                }
+                else if (stackLevel > 0)
+                {
+                    // 解析行为脚本
                     // 解析内容
                     if (stackLevel > 0)
                     {
@@ -153,21 +166,31 @@ public static class FormulaConstructor
                             tmpItem = tmpItem.After(pauseItem);
                         }
                         tmpItem = tmpItem.After(item);
-                        //skillInfo.AddFormulaItem(pauseItem);
-
-                        //skillInfo.AddFormulaItem(item);
                     }
                     else
                     {
                         Debug.Log("泄漏! 泄漏内容:" + line);
                     }
                 }
+                else if(dataBraket)
+                {
+                    // 解析数据
+                    if (skillInfo == null)
+                    {
+                        throw new Exception("技能ID未指定.技能类为空");
+                    }
+                    // 解析数据脚本
+                    var dataArray = line.Split(',');
+                    var dataList = dataArray.Select(Convert.ToSingle).ToList();
+                    skillInfo.DataList.Add(dataList);
+                }
+
+
             }
             if (tmpItem != null)
             {
                 // 获得行为链生成器的head
                 tmpItem = tmpItem.GetFirst();
-                skillInfo = new SkillInfo(skillId);
                 skillInfo.AddFormulaItem(tmpItem);
             }
         }
@@ -224,14 +247,21 @@ public static class FormulaConstructor
     /*
      SkillNum(10000)
      {
+      
         PointToPoint(1,key,0,1,10,1,1),     // 需要等待其结束, 特效key(对应key,或特效path), 释放位置, 命中位置, 速度10, 飞行轨迹类型
         Point(0,key,1,0,3),                // 不需要等待其结束, 特效key(对应key,或特效path), 释放位置, 播放速度, 持续3秒
         CollisionDetection(1, 1, 10, 0, 10001)
         {
-            Skill(1, 10002, 1)
+            Calculate(1,0,%0)
         }
      }
      
+     [
+        // 数据
+        1, 100
+        2, 200
+      
+     ]
      */
     // -----------------特效-------------------- 
     // PointToPoint 点对点特效        参数 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),命中位置(0放技能方, 1目标方),速度,飞行轨迹,缩放(三位)
@@ -257,7 +287,7 @@ public static class FormulaConstructor
     // Buff buff                      参数 是否等待完成,buffID
 
     // -----------------结算--------------------
-    // Calculate 结算                 参数 是否等待完成,伤害或治疗(0,1),技能编号
+    // Calculate 结算                 参数 是否等待完成,伤害或治疗(0,1),伤害/治疗值
 
     // -----------------技能--------------------
     // Skill 释放技能                 参数 是否等待完成,技能编号
@@ -277,6 +307,11 @@ public class SkillInfo
     /// 技能ID
     /// </summary>
     public int SkillNum { get; private set; }
+
+    /// <summary>
+    /// 保存技能等级数据列表
+    /// </summary>
+    public List<List<float>> DataList = new List<List<float>>(); 
 
     /// <summary>
     /// 技能行为单元
@@ -331,6 +366,8 @@ public class SkillInfo
         }
         // 循环构建行为链构造器
         var tmpItem = formulaItem;
+        // 数据列表放入packer中
+        paramsPacker.DataList = DataList;
         while (tmpItem != null)
         {
             if (result != null)

@@ -98,6 +98,7 @@ public class TargetList<T> where T : IGraphicsHolder//IGraphical<Rectangle>
             return;
         }
         list.Remove(t);
+        // TODO 目前使用重构建方式解决四叉树删除单位, 有更好方案后替换
         RebuildQuadTree();
     }
 
@@ -119,9 +120,13 @@ public class TargetList<T> where T : IGraphicsHolder//IGraphical<Rectangle>
     /// </summary>
     public void RebuildQuadTree()
     {
-        // TODO 没有位移的单位不进行重新拆入
-        // quadTree.Clear();
-        // quadTree.Insert(list);
+        quadTree.Clear();
+        quadTree.Insert(list);
+    }
+
+
+    public void Refresh()
+    {
         quadTree.Refresh();
     }
 
@@ -139,12 +144,15 @@ public class TargetList<T> where T : IGraphicsHolder//IGraphical<Rectangle>
     /// </summary>
     public void Clear()
     {
-        list.Clear();
-        quadTree.Clear();
-        if (mapinfo != null)
+        if (list != null)
         {
-            mapinfo = null;
+            list.Clear();
         }
+        if (quadTree != null)
+        {
+            quadTree.Clear();
+        }
+        mapinfo = null;
     }
 
 }

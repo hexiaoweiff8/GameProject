@@ -207,6 +207,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\AStar\LoadMap.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\AStar\MapInfo.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\BehindInfo.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\AI\CD\CDTimer.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\DP_Actor.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\DP_Keys.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\DP_TimeLine.cs" />
@@ -247,6 +248,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\IMove.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\ObjectBase.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\ObjectID.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\vo\BulletVO.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\vo\FightVO.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\vo\HuojianbingVO.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\vo\JidiVO.cs" />
@@ -1040,8 +1042,10 @@
     <None Include="Assets\Resources\sdata_template.txt" />
     <None Include="Assets\StreamingAssets\Android\files.txt" />
     <None Include="Assets\StreamingAssets\Android\lua\pack_script\pk_script\_tmp.txt" />
-    <None Include="Assets\StreamingAssets\SkillScript1000.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript1001.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1002.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript1003.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript1004.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
 </Project>

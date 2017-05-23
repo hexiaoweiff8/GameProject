@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 
 /// <summary>
@@ -6,6 +7,15 @@
 /// </summary>
 public class FormulaParamsPacker
 {
+    /// <summary>
+    /// 被释放技能等级
+    /// </summary>
+    public uint SkillLevel { get; set; }
+
+    /// <summary>
+    /// 数据list
+    /// </summary>
+    public List<List<float>> DataList { get; set; } 
 
     /// <summary>
     /// 初始位置

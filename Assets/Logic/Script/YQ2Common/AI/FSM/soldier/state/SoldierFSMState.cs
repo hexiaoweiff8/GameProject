@@ -100,6 +100,7 @@ public abstract class SoldierFSMState
     {
         for (int i = 0; i < _fsmTrriggerList.Count; i++)
         {
+            // TODO 多个Trigger同事触发会保持最后一个的状态
             if (_fsmTrriggerList[i].CheckTrigger(fsm))
             {
                 var state = SoldierFSMFactory.GetStateIDByTrigger(_fsmTrriggerList[i].triggerId);
@@ -108,6 +109,7 @@ public abstract class SoldierFSMState
             }
         }
     }
+
     /// <summary>
     /// 删除对应id的触发器 
     /// </summary>

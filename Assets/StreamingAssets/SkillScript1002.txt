@@ -1,6 +1,8 @@
 SkillNum(1002)
+
 {
-	PointToPoint(1, res/prefab, 0, 1, 10, 0, 1,1,1);
-	PointToObj(, , , , );
-	PointToPoint(, , , , , , );
+        
+PointToObj(1,test/TrailPrj,10,0,10,1,10),
+Point(1,test/ExplordScope,1,0,3,10,1,10),
+
 }

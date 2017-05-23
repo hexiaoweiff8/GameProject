@@ -43,11 +43,11 @@ public class Soldier_PutongGongji_State : SoldierFSMState
 
     private void fire(SoldierFSMSystem fsm)
     {
-        _bulletCount --;
         if (null == fsm.EnemyTarget || null == fsm.EnemyTarget.ClusterData)
         {
             return;
         }
+        // 无子弹reload不攻击
         if (_bulletCount <= 0)
         {
             Globals.Instance.StartCoroutine(_waitFor(() =>
@@ -58,41 +58,52 @@ public class Soldier_PutongGongji_State : SoldierFSMState
             _fireTimer.Pause();
             return;
         }
+        // 当前单位到目标方向
         Vector3 dir = fsm.EnemyTarget.ClusterData.Position - fsm.Display.ClusterData.Position;
         dir = dir.normalized;
 
+        // TODO 创建子弹 加载子弹模型
         var bullet = GameObject.CreatePrimitive(PrimitiveType.Cube);
         bullet.transform.localScale = new Vector3(1, 1, 1);
         // Effect层
         bullet.layer = 12;
 
+        // 创建弹道
         var ballistic = BallisticFactory.Single.CreateBallistic(bullet, fsm.Display.ClusterData.Position, dir,
                         fsm.EnemyTarget.ClusterData.Position,
                         200f, 3, trajectoryType: TrajectoryAlgorithmType.Line);
 
-
+        // 子弹到达触发
         ballistic.Complete = (a, b) =>
         {
+            // 删除子弹
             GameObject.Destroy(a.gameObject);
+            // 判断是否命中
             var isMiss = HurtResult.AdjustIsMiss(fsm.Display, fsm.EnemyTarget);
             if (!isMiss)
             {
+                // 计算伤害
                 var hurt = HurtResult.GetHurt(fsm.Display, fsm.EnemyTarget);
                 if (null != fsm.EnemyTarget &&
                     null != fsm.EnemyTarget.ClusterData &&
                     null != fsm.EnemyTarget.RanderControl)
                 {
+                    // 扣血
                     fsm.EnemyTarget.ClusterData.MemberData.CurrentHP -= hurt;
+                    // 刷新血条
                     fsm.EnemyTarget.RanderControl.SetBloodBarValue();
                 }
             }
             else
             {
-                //播放miss特效
+                // TODO 播放miss特效
 
             }
 
         };
+
+        // 开火后子弹数量-1
+        _bulletCount--;
     }
 
     private IEnumerator _waitFor(Action waitEnd)
@@ -117,6 +128,7 @@ public class Soldier_PutongGongji_State : SoldierFSMState
             }
         }
     }
+
     /// <summary>
     /// 判断目标是否还在范围内 两种情况会脱离范围 跑出视野 或者血为0
     /// </summary>

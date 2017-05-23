@@ -62,6 +62,11 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
     /// </summary>
     private Dictionary<T, Vector2> cachePosition;
 
+    ///// <summary>
+    ///// 保存每个单位对应到子节点位置
+    ///// </summary>
+    //private Dictionary<T, long> itemMap; 
+
 
     /// <summary>
     /// 初始化四叉树
@@ -83,6 +88,7 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
         {
             root = this;
             cachePosition = new Dictionary<T, Vector2>();
+            //itemMap = new Dictionary<T, long>();
         }
     }
 
@@ -214,6 +220,31 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
             Insert(item);
         }
     }
+
+    ///// <summary>
+    ///// 删除单位
+    ///// </summary>
+    ///// <param name="t">被删除单位</param>
+    //public void Remove(T t)
+    //{
+    //    if (t == null)
+    //    {
+    //        return;
+    //    }
+    //    // 列表中不存在单位
+    //    if (!root.itemMap.ContainsKey(t))
+    //    {
+    //        return;
+    //    }
+    //    // 获取四叉树中子节点位置
+    //    QuadTree<T> node = this;
+    //    var pos = itemMap[t];
+    //    long nowPos = 0;
+    //    while ((nowPos = pos % 8) < 4)
+    //    {
+            
+    //    }
+    //}
 
     /// <summary>
     /// 返回传入对象可能会有碰撞的对向列表

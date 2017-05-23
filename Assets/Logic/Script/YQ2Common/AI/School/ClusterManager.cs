@@ -124,7 +124,7 @@ public class ClusterManager : ILoopItem
         if (targetList != null)
         {
             // 刷新四叉树
-            targetList.RebuildQuadTree();
+            targetList.Refresh();
             // 刷新地图对应位置
             targetList.RebulidMapInfo();
             // 单位移动
@@ -243,8 +243,14 @@ public class ClusterManager : ILoopItem
             group.CleanGroup();
         }
 
-        GroupList.Clear();
-        targetList.List.Clear();
+        if (GroupList != null)
+        {
+            GroupList.Clear();
+        }
+        if (targetList != null)
+        {
+            targetList.Clear();
+        }
     }
 
     /// <summary>
@@ -496,14 +502,16 @@ public class ClusterManager : ILoopItem
             // 计算周围人员的位置, 相对位置的倒数相加, 并且不往来时方向移动
             var diffPosition = member.Position - closeMember.Position;
             pressureReleaseDir -= diffPosition;
-            // 判断两对象是否以计算过, 如果计算过不再计算
+            // 判断两对象是否已计算过, 如果计算过不再计算
             var compereId1 = member.Id + closeMember.Id << 32;
             var compereId2 = closeMember.Id + member.Id << 32;
             if (!areadyCollisionList.ContainsKey(compereId1) &&
                 !areadyCollisionList.ContainsKey(compereId2))
             {
-                var closeRect = closeMember.MyCollisionGraphics;
-                if (graphics.CheckCollision(closeRect))
+                // 获取附近单位的图形
+                var closeGraphics = closeMember.MyCollisionGraphics;
+                // 检测当前单位是否与其有碰撞
+                if (graphics.CheckCollision(closeGraphics))
                 {
                     // 如果碰撞来自前方, 则增加
                     if (Vector3.Angle(targetDir, -diffPosition) < 90)
@@ -520,6 +528,7 @@ public class ClusterManager : ILoopItem
                     // 基础排斥力
                     if (diffPosition.magnitude < minDistance)
                     {
+                        // TODO 排除力有时无效
                         // 计算不可移动方向
                         var diffPosNor = diffPosition.normalized;
                         collisionThoughDir += diffPosNor * (minDistance - diffPosition.magnitude) * CollisionThrough * Time.deltaTime;
@@ -528,6 +537,11 @@ public class ClusterManager : ILoopItem
                             // 如果目标不能移动则
                             collisionCouldNotThoughDir += diffPosNor;
                             collisionCouldNotThoughCount++;
+                        }
+                        else
+                        {
+                            // 可移动附近单位也移动
+                            closeMember.Position -= diffPosNor * Time.deltaTime;
                         }
                     }
 
@@ -545,11 +559,11 @@ public class ClusterManager : ILoopItem
                     departSpeed *= 0.5f;
 
                     // 当前对象的弹出角度为镜面弹射角度
-                    var partForMember = -outDir * departSpeed.magnitude/qualityRate;
-                    var partForCloseMember = departSpeed*qualityRate;
+                    var partForMember = -outDir * departSpeed.magnitude / qualityRate;
+                    var partForCloseMember = departSpeed * qualityRate;
                     if (partForMember.magnitude > departSpeed.magnitude)
                     {
-                        partForMember *= departSpeed.magnitude/partForMember.magnitude;
+                        partForMember *= departSpeed.magnitude / partForMember.magnitude;
                     }
                     if (partForCloseMember.magnitude > departSpeed.magnitude)
                     {
@@ -574,14 +588,14 @@ public class ClusterManager : ILoopItem
             // 排除掉移动向量中不可移动方向的移动量
             // 计算当前移动方向与不可移动的反方向是否角度小于90
             // 如果小于90则无问题, 如果大于90则将与超过的角度部分抹掉
-            var angleCollisionThoughDir = Vector3.Angle(collisionThoughDir, collisionCouldNotThoughDir);
-            if (angleCollisionThoughDir > 90)
-            {
-                angleCollisionThoughDir -= 90;
-                var subDirLength = (float)Math.Cos(angleCollisionThoughDir)*collisionThoughDir.magnitude;
-                // 求不能前进的反方向的垂直向量
-                collisionThoughDir = Vector3.Cross(collisionCouldNotThoughDir, Vector3.up).normalized * subDirLength;
-            }
+            //var angleCollisionThoughDir = Vector3.Angle(collisionThoughDir, collisionCouldNotThoughDir);
+            //if (angleCollisionThoughDir > 90)
+            //{
+            //    angleCollisionThoughDir -= 90;
+            //    var subDirLength = (float)Math.Cos(angleCollisionThoughDir)*collisionThoughDir.magnitude;
+            //    // 求不能前进的反方向的垂直向量
+            //    collisionThoughDir = Vector3.Cross(collisionCouldNotThoughDir, Vector3.up).normalized * subDirLength;
+            //}
             member.Position += collisionThoughDir;
         }
 
@@ -589,13 +603,15 @@ public class ClusterManager : ILoopItem
         if (collisionCount > 1)
         {
             // TODO 引力方向是附近的空格子
+            // TODO 躲避力始终朝向同一方向, 导致群聚旋转
+            // TODO 重写绕障功能
             // 获取周围的格子
             //var aroundNodes = targetList.MapInfo.GetAroundPos(member, 2);
             // 给予横向拉扯力
             // 求聚合位置向量的垂直向量
             var transverseDir = Vector3.Cross(pressureReleaseDir, Vector3.up);
             // 随机左右
-            member.PhysicsInfo.SpeedDirection += transverseDir*member.PhysicsInfo.MaxSpeed;// * (new Random((int)DateTime.Now.Ticks).Next(10) > 5 ? -1 : 1);
+            member.PhysicsInfo.SpeedDirection += transverseDir * member.PhysicsInfo.MaxSpeed;// * (new Random((int)DateTime.Now.Ticks).Next(10) > 5 ? -1 : 1);
         }
     }
 

@@ -2,11 +2,14 @@
 using System.Collections;
 
 public class SoldierFSMControl{
+
     private SoldierFSMSystem fsm;//内置一个fsm
+
     /// <summary>
     /// 标记状态机是否唤醒的 如果宿主在对象池中需要把它置为休眠
     /// </summary>
     private bool _iSAwake = false;
+
     /// <summary>
     /// 进入休眠状态
     /// </summary>
@@ -31,6 +34,7 @@ public class SoldierFSMControl{
 
         ConfigureState();
     }
+
     /// <summary>
     /// 配置状态 持续扩展
     /// </summary>

@@ -6,6 +6,8 @@ public class JinengGongjiTrigger : SoldierFSMTrigger
 {
     public override bool CheckTrigger(SoldierFSMSystem fsm)
     {
+        // 当前单位技能释放判断
+
         return fsm.IsCanInJinenggongji;
     }
 

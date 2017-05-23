@@ -40,6 +40,12 @@ public class HurtResult
 
     }
 
+    /// <summary>
+    /// 判断是否命中
+    /// </summary>
+    /// <param name="active">攻击方</param>
+    /// <param name="target">被攻击方</param>
+    /// <returns>是否命中</returns>
     public static bool AdjustIsMiss(DisplayOwner active, DisplayOwner target)
     {
         /**
@@ -80,7 +86,12 @@ public class HurtResult
         return isMiss;
     }
 
-
+    /// <summary>
+    /// 判断是否暴击
+    /// </summary>
+    /// <param name="active">攻击方</param>
+    /// <param name="target">被攻击方</param>
+    /// <returns></returns>
     public static float AdjustIsBaoji(DisplayOwner active, DisplayOwner target)
     {
         var gongjiBaoji = active.ClusterData.MemberData.Crit;
@@ -98,6 +109,12 @@ public class HurtResult
         return ran.RangeI(0, 1000) <= chazhi*1000 ? (beforeFight + inFight) : 1;
     }
 
+    /// <summary>
+    /// 判断是否穿甲
+    /// </summary>
+    /// <param name="active">攻击方</param>
+    /// <param name="target">被攻击方</param>
+    /// <returns></returns>
     public static float AdjustJianshang(DisplayOwner active, DisplayOwner target)
     {
         /**
@@ -142,6 +159,7 @@ public class HurtResult
         return (fangyu + Mathf.Max(0, zhuangjia - chuanjia))/
                           (fangyu + Mathf.Max(0, zhuangjia - chuanjia) + 2000);
     }
+
     /// <summary>
     /// 判断攻守防是否满足克制关系
     /// </summary>

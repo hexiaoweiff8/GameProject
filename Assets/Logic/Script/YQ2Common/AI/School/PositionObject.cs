@@ -99,7 +99,18 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
     /// </summary>
     public Vector3 Position
     {
-        get { return this.transform.position; }
+        get
+        {
+            try
+            {
+                return this.transform.position;
+            }
+            catch
+            {
+                int i = 0;
+            }
+            return Vector3.zero;
+        }
         set
         {
             this.transform.position = value;

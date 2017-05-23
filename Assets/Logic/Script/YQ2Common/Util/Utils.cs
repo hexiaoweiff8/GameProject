@@ -507,12 +507,32 @@ public class Utils
     {
         string result = null;
 
-        StreamReader sr;
-        var fi = new FileInfo(path);
-        if (fi.Exists)
+        if (path != null)
         {
-            sr = new StreamReader(fi.OpenRead());
-            result = sr.ReadToEnd();
+            StreamReader sr;
+            var fi = new FileInfo(path);
+            result = LoadFileInfo(fi);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 读取文件
+    /// </summary>
+    /// <param name="fi">文件信息类</param>
+    /// <returns>文件内容, 如果文件不存在则返回null</returns>
+    public static string LoadFileInfo(FileInfo fi)
+    {
+        string result = null;
+        if (fi != null)
+        {
+            StreamReader sr;
+            if (fi.Exists)
+            {
+                sr = new StreamReader(fi.OpenRead());
+                result = sr.ReadToEnd();
+            }
         }
 
         return result;

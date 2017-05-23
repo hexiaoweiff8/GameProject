@@ -89,33 +89,6 @@ public class Ballistic : MonoBehaviour , IBallistic
     /// </summary>
     private bool isPause = false;
 
-
-    void Start()
-    {
-        //Action move = () =>
-        //{
-        //    // TODO 放入Looper中运行
-        //    if (!isPause && BallisticArriveTarget != null && notComplete)
-        //    {
-        //        // 移动
-        //        if (Move != null)
-        //        {
-        //            Move(this, BallisticArriveTarget);
-        //        }
-        //        // 到达目标
-        //        if (BallisticArriveTarget.IsArrivedTarget(this))
-        //        {
-        //            notComplete = false;
-        //            Complete(this, BallisticArriveTarget);
-        //        }
-        //    }
-        //};
-        //Looper
-    }
-
-
-
-
     void Update()
     {
         // TODO 放入Looper中运行

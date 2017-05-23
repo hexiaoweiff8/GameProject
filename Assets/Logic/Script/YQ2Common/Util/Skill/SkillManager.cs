@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 /// <summary>
@@ -38,6 +39,55 @@ public class SkillManager
     /// 技能字典
     /// </summary>
     public IDictionary<int, SkillInfo> SkillInfoDic = new Dictionary<int, SkillInfo>();
+
+
+    // TODO 注册事件
+
+
+    // -------------------------------技能加载----------------------------------
+
+
+    /// <summary>
+    /// 加载技能
+    /// TODO 需要判断当前运行状态, 并添加包加载方式
+    /// </summary>
+    /// <param name="skillId">技能ID 必须为>0的整数</param>
+    /// <returns>技能信息</returns>
+    public SkillInfo LoadSkillInfo(int skillId)
+    {
+        SkillInfo result = null;
+
+        // 验证技能ID的有效性
+        if (skillId > 0)
+        {
+            // 检查缓存
+            if (SkillInfoDic.ContainsKey(skillId))
+            {
+                result = SkillInfoDic[skillId];
+            }
+            else
+            {
+                // 检测文件是否存在
+                var file = new FileInfo(Application.streamingAssetsPath + Path.PathSeparator + "SkillScript" + skillId);
+                if (file.Exists)
+                {
+                    // 加载文件内容
+                    var skillTxt = Utils.LoadFileInfo(file);
+                    if (!string.IsNullOrEmpty(skillTxt))
+                    {
+                        result = FormulaConstructor.Constructor(skillTxt);
+                        // 将其放入缓存
+                        SkillInfoDic.Add(skillId, result);
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+
+    // -------------------------------技能执行----------------------------------
 
 
     /// <summary>
@@ -155,10 +205,10 @@ public class SkillManager
                     }
                 }
                 topNode = topNode.NextFormula;
-                if (topNode == null)
-                {
-                    //Debug.Log("结束了");
-                }
+                //if (topNode == null)
+                //{
+                //    //Debug.Log("结束了");
+                //}
             } while (topNode != null);
         }
     }
