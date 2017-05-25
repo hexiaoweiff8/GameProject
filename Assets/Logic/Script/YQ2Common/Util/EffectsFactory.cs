@@ -332,13 +332,14 @@ public class PointToPointEffect : EffectBehaviorAbstract
                        speed, 1,false, trajectoryType: flyType);
 
         // 运行完成
-        ballistic.Complete = (a, b) =>
+        ballistic.OnComplete = (a, b) =>
         {
             if (completeCallback != null)
             {
                 completeCallback();
             }
-            Destroy();
+            a.Kill();
+            //Destroy();
         };
     }
 
@@ -360,7 +361,7 @@ public class PointToPointEffect : EffectBehaviorAbstract
     {
         if (ballistic != null)
         {
-            ballistic.AntiPause();
+            ballistic.Start();
         }
     }
 
@@ -475,13 +476,14 @@ public class PointToTargetEffect : EffectBehaviorAbstract
         // 创建弹道
         ballistic = BallisticFactory.Single.CreateBallistic(effectObject, position, targetObj.transform.position - position, targetObj, speed, 1, trajectoryType: flyType);
         // 运行完成
-        ballistic.Complete = (a, b) =>
+        ballistic.OnComplete = (a, b) =>
         {
             if (completeCallback != null)
             {
                 completeCallback();
             }
-            Destroy();
+            a.Kill();
+            //Destroy();
         };
     }
 
@@ -503,7 +505,7 @@ public class PointToTargetEffect : EffectBehaviorAbstract
     {
         if (ballistic != null)
         {
-            ballistic.AntiPause();
+            ballistic.Start();
         }
     }
 

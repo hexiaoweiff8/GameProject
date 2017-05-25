@@ -99,9 +99,10 @@ public class TestBallistic : MonoBehaviour {
                         FirePower, 3, HasGravity, Gravity, trajectoryType: TrajectoryAlgorithmType.Sine); //ballisticItem.AddComponent<Ballistic>();
                     //ballistic.Direction = FireDirection * FirePower;
                     //ballistic.BallisticArriveTarget = new BallisticArriveTargetForPosition(new Vector3(20, 0, 20));
-                    ballistic.Complete = (a, b) =>
+                    ballistic.OnComplete = (a, b) =>
                     {
-                        Destroy(a.gameObject);
+                        a.Kill();
+                        //Destroy(a.gameObject);
                         //Debug.Log("end");
                     };
                     //ballistic.Speed = FirePower;

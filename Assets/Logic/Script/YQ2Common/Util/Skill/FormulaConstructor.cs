@@ -272,6 +272,7 @@ public static class FormulaConstructor
         else if (line.StartsWith("Trigger"))
         {
             // 触发事件
+
         }
         else
         {

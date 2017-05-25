@@ -75,7 +75,12 @@ public class Ballistic : MonoBehaviour , IBallistic
     /// <summary>
     /// 击中回调
     /// </summary>
-    public Action<Ballistic, BallisticArriveTarget> Complete;
+    public Action<Ballistic, BallisticArriveTarget> OnComplete;
+
+    /// <summary>
+    /// 销毁回调
+    /// </summary>
+    public Action<Ballistic, BallisticArriveTarget> OnKill;
 
     // ---------------------------私有属性------------------------------
 
@@ -87,7 +92,7 @@ public class Ballistic : MonoBehaviour , IBallistic
     /// <summary>
     /// 是否暂停
     /// </summary>
-    private bool isPause = false;
+    private bool isPause = true;
 
     void Update()
     {
@@ -103,7 +108,7 @@ public class Ballistic : MonoBehaviour , IBallistic
             if (BallisticArriveTarget.IsArrivedTarget(this))
             {
                 notComplete = false;
-                Complete(this, BallisticArriveTarget);
+                OnComplete(this, BallisticArriveTarget);
             }
         }
     }
@@ -119,9 +124,25 @@ public class Ballistic : MonoBehaviour , IBallistic
     /// <summary>
     /// 继续
     /// </summary>
-    public void AntiPause()
+    public void Start()
     {
         isPause = false;
+    }
+
+    /// <summary>
+    /// 销毁
+    /// </summary>
+    public void Kill()
+    {
+        // 回收至对象池
+        if (OnKill != null)
+        {
+            OnKill(this, BallisticArriveTarget);
+        }
+        else
+        {
+            Destroy(this.gameObject);
+        }
     }
 }
 
@@ -137,5 +158,10 @@ public interface IBallistic
     /// <summary>
     /// 继续
     /// </summary>
-    void AntiPause();
+    void Start();
+
+    /// <summary>
+    /// 销毁
+    /// </summary>
+    void Kill();
 }

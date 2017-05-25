@@ -274,6 +274,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\ItemSelecter.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Looper.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\QuadTree.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\ResourceLoader.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\SDataUtils.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\CollisionDetectionFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\FormulaConstructor.cs" />
@@ -768,9 +769,11 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UILabelWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIPanelEXWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIPanelWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIProgressBarWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIRectWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIRect_AnchorUpdateWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIScrollViewWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UISliderWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UISpriteWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UITextureWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UITweenerWrap.cs" />

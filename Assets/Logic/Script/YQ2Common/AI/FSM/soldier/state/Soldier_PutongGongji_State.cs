@@ -75,11 +75,17 @@ public class Soldier_PutongGongji_State : SoldierFSMState
                         fsm.EnemyTarget.ClusterData.Position,
                         200f, 3, trajectoryType: TrajectoryAlgorithmType.Line);
 
+        ballistic.OnKill = (ballistic1, target) =>
+        {
+            // 回收单位
+        };
+
         // 子弹到达触发
-        ballistic.Complete = (a, b) =>
+        ballistic.OnComplete = (a, b) =>
         {
             // 删除子弹
-            GameObject.Destroy(a.gameObject);
+            //GameObject.Destroy(a.gameObject);
+            a.Kill();
             // 判断是否命中
             var isMiss = HurtResult.AdjustIsMiss(fsm.Display, fsm.EnemyTarget);
             if (!isMiss)
@@ -103,6 +109,7 @@ public class Soldier_PutongGongji_State : SoldierFSMState
             }
 
         };
+        ballistic.Start();
 
         // 开火后子弹数量-1
         _bulletCount--;

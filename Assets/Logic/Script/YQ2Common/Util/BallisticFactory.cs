@@ -29,6 +29,8 @@ public class BallisticFactory
     /// </summary>
     private static BallisticFactory single = null;
 
+
+
     /// <summary>
     /// 创建弹道1
     /// 自由飞行, 使用最飞行距离限制

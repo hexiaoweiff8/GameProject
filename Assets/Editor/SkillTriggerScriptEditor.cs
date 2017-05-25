@@ -48,13 +48,7 @@ public class SkillTriggerScriptEditor : EditorWindow
         new List<string>(), 
         new List<string>(), 
         new List<string>(), 
-        //new List<string>() {"StartTime:", "Animation ID:"},
-        //new List<string>()
-        //{
-        //    "StartTime:", "ConstPhyDmg:", "PercentPhyDmg:", "ConstSprDmg:", "PercentSprDmg:", 
-        //"ConstRealDmg:", "PercentRealDmg:", "CertainHit", "CertainCrit"
-        //},
-        //是否等待完成, 滑动速度, 检测宽度, 检测总长度, 目标阵营(-1:都触发, 1: 己方, 2: 非己方)
+        // 类型标识:V3,Txt,Int,Float
         new List<string>() {"是否等待执行完(0否,1是):", "特效资源Key(或Path):", "释放位置(0放技能方, 1目标方):", "命中位置(0放技能方, 1目标方):", "速度:","飞行轨迹:","缩放(三位 1,1,1):"},
         new List<string>() {"是否等待执行完(0否,1是):", "特效资源Key(或Path):", "速度:","飞行轨迹:","缩放(三位 1,1,1):"},
         new List<string>() {"是否等待执行完(0否,1是):", "特效资源Key(或Path):", "速度:","持续时间:","缩放(三位 1,1,1):"},
@@ -127,7 +121,7 @@ public class SkillTriggerScriptEditor : EditorWindow
     /// <summary>
     /// 参数类型 1: 触发器 2: 数据
     /// </summary>
-    private int paramsType = 1;
+    private int _paramsType = 1;
 
     private TriggerType _triggerType = TriggerType.None;
     private string[] _params;
@@ -140,7 +134,7 @@ public class SkillTriggerScriptEditor : EditorWindow
         {
             instance = new SkillTriggerScriptEditor();
         }
-        instance.paramsType = 1;
+        instance._paramsType = 1;
         instance._triggerType = triigerType;
         instance._params = new string[paramTitles[(int)triigerType].Count];
 
@@ -164,7 +158,7 @@ public class SkillTriggerScriptEditor : EditorWindow
             instance = new SkillTriggerScriptEditor();
         }
 
-        instance.paramsType = 2;
+        instance._paramsType = 2;
         instance._dataType = dataType;
         instance._params = new string[dataParamTitles[(int)dataType].Count];
 
@@ -184,19 +178,22 @@ public class SkillTriggerScriptEditor : EditorWindow
     void OnGUI()
     {
         GUILayout.BeginVertical();
-        if (instance.paramsType == 1)
+        var typePos = 0;
+        List<String>[] titles = null;
+        if (instance._paramsType == 1)
         {
-            for (int i = 0; i < paramTitles[(int)_triggerType].Count; i++)
-            {
-                _params[i] = EditorGUILayout.TextField(paramTitles[(int)_triggerType][i], _params[i]);
-            }
+            typePos = (int) _triggerType;
+            titles = paramTitles;
         }
-        else if (instance.paramsType == 2)
+        else if (instance._paramsType == 2)
         {
-            for (int i = 0; i < dataParamTitles[(int)_dataType].Count; i++)
-            {
-                _params[i] = EditorGUILayout.TextField(dataParamTitles[(int)_dataType][i], _params[i]);
-            }
+            typePos = (int)_dataType;
+            titles = dataParamTitles;
+        }
+
+        for (int i = 0; i < titles[typePos].Count; i++)
+        {
+            _params[i] = EditorGUILayout.TextField(titles[typePos][i], _params[i]);
         }
         GUILayout.EndVertical();
 
@@ -204,11 +201,11 @@ public class SkillTriggerScriptEditor : EditorWindow
         GUI.color = Color.green;
         if (GUILayout.Button("Add"))
         {
-            if (instance.paramsType == 1)
+            if (instance._paramsType == 1)
             {
                 SkillScriptEditor.AddScriptContent(ConnectParams());
             }
-            else if (instance.paramsType == 2)
+            else if (instance._paramsType == 2)
             {
                 SkillScriptEditor.AddDataContent(ConnectParams());
             }
@@ -230,7 +227,7 @@ public class SkillTriggerScriptEditor : EditorWindow
     {
         string ret = String.Empty;
         var isLevelData = false;
-        if (instance.paramsType == 1)
+        if (instance._paramsType == 1)
         {
             switch (_triggerType)
             {
@@ -277,7 +274,7 @@ public class SkillTriggerScriptEditor : EditorWindow
                     return String.Empty;
             }
         }
-        else if (instance.paramsType == 2)
+        else if (instance._paramsType == 2)
         {
             switch (_dataType)
             {
