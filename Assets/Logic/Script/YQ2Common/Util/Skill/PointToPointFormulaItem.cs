@@ -38,9 +38,19 @@ public class PointToPointFormulaItem : AbstractFormulaItem
     private int receivePos = 1;
 
     /// <summary>
-    /// 缩放
+    /// X轴缩放
     /// </summary>
-    private float[] scale = new[] { 1f, 1f, 1f };
+    public float ScaleX { get; private set; }
+
+    /// <summary>
+    /// Y轴缩放
+    /// </summary>
+    public float ScaleY { get; private set; }
+
+    /// <summary>
+    /// Z轴缩放
+    /// </summary>
+    public float ScaleZ { get; private set; }
 
     /// <summary>
     /// 初始化
@@ -62,7 +72,9 @@ public class PointToPointFormulaItem : AbstractFormulaItem
         FlyType = flyType;
         if (scale != null)
         {
-            this.scale = scale;
+            ScaleX = scale[0];
+            ScaleY = scale[1];
+            ScaleZ = scale[2];
         }
     }
 
@@ -91,25 +103,28 @@ public class PointToPointFormulaItem : AbstractFormulaItem
             throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
         }
         // 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),命中位置(0放技能方, 1目标方),速度,飞行轨迹, 缩放
-        var formulaType = Convert.ToInt32(array[0]);
-        var effectKey = array[1];
-        var releasePos = Convert.ToInt32(array[2]);
-        var receivePos = Convert.ToInt32(array[3]);
-        var speed = Convert.ToSingle(array[4]);
-        var flyType = (TrajectoryAlgorithmType)Enum.Parse(typeof(TrajectoryAlgorithmType), array[5]);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
+        var effectKey = GetDataOrReplace<string>("EffectKey", array, 1, ReplaceDic);
+        var releasePosArg = GetDataOrReplace<int>("Speed", array, 2, ReplaceDic);
+        var receivePosArg = GetDataOrReplace<int>("Speed", array, 3, ReplaceDic);
+        var speed = GetDataOrReplace<float>("Speed", array, 4, ReplaceDic);
+        var flyType = GetDataOrReplace<TrajectoryAlgorithmType>("FlyType", array, 5, ReplaceDic);
 
-        float[] scale = new float[3];
-        scale[0] = Convert.ToSingle(array[6]);
-        scale[1] = Convert.ToSingle(array[7]);
-        scale[2] = Convert.ToSingle(array[8]);
+
+        var scaleX = GetDataOrReplace<float>("ScaleX", array, 6, ReplaceDic);
+        var scaleY = GetDataOrReplace<float>("ScaleY", array, 7, ReplaceDic);
+        var scaleZ = GetDataOrReplace<float>("ScaleZ", array, 8, ReplaceDic);
+
 
         FormulaType = formulaType;
         EffectKey = effectKey;
         Speed = speed;
-        this.releasePos = releasePos;
-        this.receivePos = receivePos;
+        this.releasePos = releasePosArg;
+        this.receivePos = receivePosArg;
         FlyType = flyType;
-        this.scale = scale;
+        ScaleX = scaleX;
+        ScaleY = scaleY;
+        ScaleZ = scaleZ;
     }
 
     /// <summary>
@@ -139,6 +154,9 @@ public class PointToPointFormulaItem : AbstractFormulaItem
             throw new Exception(errorMsg);
         }
 
+        // 替换替换符数据
+        ReplaceData(paramsPacker);
+
         // 数据本地化
         var myFormulaType = FormulaType;
         var myRelsPos = releasePos;
@@ -146,7 +164,9 @@ public class PointToPointFormulaItem : AbstractFormulaItem
         var myEffectKey = EffectKey;
         var mySpeed = Speed;
         var myFlyType = FlyType;
-        var myScale = scale;
+        var scaleX = ScaleX;
+        var scaleY = ScaleY;
+        var scaleZ = ScaleZ;
 
         IFormula result = new Formula((callback) =>
         {
@@ -155,7 +175,7 @@ public class PointToPointFormulaItem : AbstractFormulaItem
             var receivePosition = myRecvPos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
             // TODO 父级暂时没有
             EffectsFactory.Single.CreatePointToPointEffect(myEffectKey, null, releasePosition,
-                                receivePosition, new Vector3(myScale[0], myScale[1], myScale[2]), mySpeed, myFlyType, callback).Begin();
+                                receivePosition, new Vector3(scaleX, scaleY, scaleZ), mySpeed, myFlyType, callback).Begin();
         }, myFormulaType);
 
         return result;

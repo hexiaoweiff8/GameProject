@@ -134,6 +134,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Editor\SkillScriptEditor.cs" />
+    <Compile Include="Assets\Editor\SkillTriggerScriptEditor.cs" />
     <Compile Include="Assets\QKLibs\Asset_EasyTouch\EasyTouchBundle\EasyTouch\Plugins\Editor\EasyTouchInspector.cs" />
     <Compile Include="Assets\QKLibs\Asset_EasyTouch\EasyTouchBundle\EasyTouch\Plugins\Editor\EasyTouchMenu.cs" />
     <Compile Include="Assets\QKLibs\Asset_EasyTouch\EasyTouchBundle\EasyTouch\Plugins\Editor\EasyTouchTriggerInspector.cs" />
@@ -426,6 +428,7 @@
     <None Include="Assets\StreamingAssets\SkillScript1002.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1003.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1004.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript1005.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
 </Project>

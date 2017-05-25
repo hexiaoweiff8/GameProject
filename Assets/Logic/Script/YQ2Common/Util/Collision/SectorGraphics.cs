@@ -52,7 +52,7 @@ public class SectorGraphics : CollisionGraphics
     public override RectGraphics GetExternalRect()
     {
         var halfRadius = Radius * 0.5f;
-        var angle = Rotation * Math.PI / 180f;
+        var angle = Rotation * Utils.AngleToPi;
         // Debug.Log(Math.PI / 180f);
         var x = halfRadius * (float) Math.Sin(angle);
         var y = halfRadius * (float) Math.Cos(angle);

@@ -92,6 +92,7 @@ public class SocketClient
 
     private void OnRead(IAsyncResult asr)
     {
+        //TODO  加密解密
         int bytesRead = 0;
         try
         {

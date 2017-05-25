@@ -30,12 +30,21 @@ public class PointFormulaItem : AbstractFormulaItem
     /// </summary>
     public float DurTime { get; private set; }
 
-
+    /// <summary>
+    /// X轴缩放
+    /// </summary>
+    public float ScaleX { get; private set; }
 
     /// <summary>
-    /// 缩放
+    /// Y轴缩放
     /// </summary>
-    private float[] scale = new[] { 1f, 1f, 1f };
+    public float ScaleY { get; private set; }
+
+    /// <summary>
+    /// Z轴缩放
+    /// </summary>
+    public float ScaleZ { get; private set; }
+
 
     /// <summary>
     /// 初始化
@@ -53,9 +62,11 @@ public class PointFormulaItem : AbstractFormulaItem
         TargetPos = targetPos;
         Speed = speed;
         DurTime = durTime;
-        if (scale != null)
+        if (scale != null && scale.Length == 3)
         {
-            this.scale = scale;
+            ScaleX = scale[0];
+            ScaleY = scale[1];
+            ScaleZ = scale[2];
         }
     }
 
@@ -82,23 +93,25 @@ public class PointFormulaItem : AbstractFormulaItem
             throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
         }
         // 是否等待完成,特效Key,速度,持续时间
-        var formulaType = Convert.ToInt32(array[0]);
-        var effectKey = array[1];
-        var targetPos = Convert.ToInt32(array[2]);
-        var speed = Convert.ToSingle(array[3]);
-        var durTime = Convert.ToSingle(array[4]);
+        // 如果该项值是以%开头的则作为替换数据
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
+        var effectKey = GetDataOrReplace<string>("EffectKey", array, 1, ReplaceDic);
+        var targetPos = GetDataOrReplace<int>("TargetPos", array, 2, ReplaceDic);
+        var speed = GetDataOrReplace<float>("Speed", array, 3, ReplaceDic);
+        var durTime = GetDataOrReplace<float>("DurTime", array, 4, ReplaceDic);
 
-        float[] scale = new float[3];
-        scale[0] = Convert.ToSingle(array[5]);
-        scale[1] = Convert.ToSingle(array[6]);
-        scale[2] = Convert.ToSingle(array[7]);
+        var scaleX = GetDataOrReplace<float>("ScaleX", array, 5, ReplaceDic);
+        var scaleY = GetDataOrReplace<float>("ScaleY", array, 6, ReplaceDic);
+        var scaleZ = GetDataOrReplace<float>("ScaleZ", array, 7, ReplaceDic);
 
         FormulaType = formulaType;
         EffectKey = effectKey;
         TargetPos = targetPos;
         Speed = speed;
         DurTime = durTime;
-        this.scale = scale;
+        ScaleX = scaleX;
+        ScaleY = scaleY;
+        ScaleZ = scaleZ;
     }
 
 
@@ -124,20 +137,25 @@ public class PointFormulaItem : AbstractFormulaItem
             throw new Exception(errorMsg);
         }
 
+        // 替换替换符数据
+        ReplaceData(paramsPacker);
+
         // 数据本地化
         var myFormulaType = FormulaType;
         var myTargetPos = TargetPos;
         var myEffectKey = EffectKey;
         var myDurTime = DurTime;
         var mySpeed = Speed;
-        var myScale = scale;
+        var scaleX = ScaleX;
+        var scaleY = ScaleY;
+        var scaleZ = ScaleZ;
 
         IFormula result = new Formula((callback) =>
         {
             //Debug.Log("Point");
             var pos = myTargetPos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
             // 判断发射与接收位置
-            EffectsFactory.Single.CreatePointEffect(myEffectKey, null, pos, new Vector3(myScale[0], myScale[1], myScale[2]), myDurTime, mySpeed, callback).Begin();
+            EffectsFactory.Single.CreatePointEffect(myEffectKey, null, pos, new Vector3(scaleX, scaleY, scaleZ), myDurTime, mySpeed, callback).Begin();
         }, myFormulaType);
 
         return result;

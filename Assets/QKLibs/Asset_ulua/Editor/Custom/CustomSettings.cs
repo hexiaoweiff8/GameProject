@@ -203,6 +203,7 @@ public static class CustomSettings
         _GT(typeof (UILabel)),
         _GT(typeof (UIAtlas)),
         _GT(typeof (UISprite)),
+        _GT(typeof (UISlider)),
         _GT(typeof (UIGrid)),
         _GT(typeof (UITexture)),
         _GT(typeof (UIScrollView)),

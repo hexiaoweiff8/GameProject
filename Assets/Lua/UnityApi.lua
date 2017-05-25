@@ -12030,6 +12030,83 @@ function MakePixelPerfect() end
 ----Void UISprite:OnFill(BetterList`1 verts,BetterList`1 uvs,BetterList`1 cols)
 function OnFill() end 
 
+UISlider = {} 
+--*
+--[Comment]
+--consturctor for UISlider overrides:
+--*
+--UISlider.New()
+--*
+
+function UISlider.New() end
+--*
+--[Comment]
+-- property: Boolean UISlider.isColliderEnabled	get	
+isColliderEnabled = nil 
+--*
+--[Comment]
+-- property: Transform UISlider.cachedTransform	get	
+cachedTransform = nil 
+--*
+--[Comment]
+-- property: Camera UISlider.cachedCamera	get	
+cachedCamera = nil 
+--*
+--[Comment]
+-- property: UIWidget UISlider.foregroundWidget	get	set	
+foregroundWidget = nil 
+--*
+--[Comment]
+-- property: UIWidget UISlider.backgroundWidget	get	set	
+backgroundWidget = nil 
+--*
+--[Comment]
+-- property: FillDirection UISlider.fillDirection	get	set	
+fillDirection = nil 
+--*
+--[Comment]
+-- property: Single UISlider.value	get	set	
+value = nil 
+--*
+--[Comment]
+-- property: Single UISlider.alpha	get	set	
+alpha = nil 
+--*
+--[Comment]
+-- property: Boolean UISlider.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean UISlider.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean UISlider.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform UISlider.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject UISlider.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String UISlider.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String UISlider.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags UISlider.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void UISlider:OnPan(Vector2 delta)
+function OnPan() end 
+
 UIGrid = {} 
 --*
 --[Comment]
@@ -13985,6 +14062,9 @@ name = nil
 -- property: HideFlags RanderControl.hideFlags	get	set	
 hideFlags = nil 
 --*
+----Void RanderControl:DestoryFSM()
+function DestoryFSM() end 
+
 ----Void RanderControl:SetBloodBarValue()
 function SetBloodBarValue() end 
 
@@ -14468,6 +14548,9 @@ IsLoading = nil
 ----Void DP_Battlefield:SwapScene(Int32 sceneID,List`1 dyDependPacks,Action OnSwapDone)
 function SwapScene() end 
 
+----Void DP_Battlefield:LoadBase()
+function LoadBase() end 
+
 ----Void DP_Battlefield:CameraFocusFID(Boolean isLeft,Int32 fid)
 function CameraFocusFID() end 
 
@@ -14699,6 +14782,9 @@ function FightUnitFactory.New() end
 --*
 ----DisplayOwner FightUnitFactory.CreateUnit(Int32 unitType,CreateActorParam otherParam)
 function FightUnitFactory.CreateUnit() end 
+
+----Void FightUnitFactory.DeleteUnit(VOBase obj)
+function FightUnitFactory.DeleteUnit() end 
 
 SDataUtils = {} 
 --*

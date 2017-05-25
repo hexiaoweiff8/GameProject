@@ -152,6 +152,12 @@ public class Utils
     public static readonly float ApproachKZero = -0.00001f;
 
 
+    public const float AngleToPi = 0.0174532925199433f;
+
+
+    public const float PiToAngle = 57.2957795130823f;
+
+
     /// <summary>
     /// 计时器tick
     /// </summary>
@@ -435,7 +441,7 @@ public class Utils
     /// <returns>水平检测线标量</returns>
     public static Vector2 GetHorizonalTestLine(float rotation)
     {
-        var angle = rotation * Math.PI / 360;
+        var angle = rotation * AngleToPi;
         return new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle));
     }
 
@@ -447,7 +453,7 @@ public class Utils
     /// <returns>垂直检测线标量</returns>
     public static Vector2 GetVerticalTestLine(float rotation, float radius = 1f)
     {
-        var angle = rotation * Math.PI / 360;
+        var angle = rotation * AngleToPi;
         return new Vector2(-(float)Math.Sin(angle) * radius, (float)Math.Cos(angle) * radius);
     }
 
@@ -509,7 +515,6 @@ public class Utils
 
         if (path != null)
         {
-            StreamReader sr;
             var fi = new FileInfo(path);
             result = LoadFileInfo(fi);
         }
@@ -532,6 +537,7 @@ public class Utils
             {
                 sr = new StreamReader(fi.OpenRead());
                 result = sr.ReadToEnd();
+                sr.Close();
             }
         }
 
@@ -1071,7 +1077,7 @@ public class FollowAndAroundTarget : MoveTarget
         // x = x_center + Math.Sin(2 * Math.PI / 360) * r, 
         // y = y_center + Math.Cos(2 * Math.PI / 360) * r
         // 的公式加上速度计算当前位置
-        var radian = (2 * Math.PI / 360) * RotateSpeed * _counter;
+        var radian = (2 * Utils.AngleToPi) * RotateSpeed * _counter;
         var pointX = targetPos.x + Math.Sin(radian) * Radius * (IsPositive ? 1 : -1);
         var pointY = targetPos.z + Math.Cos(radian) * Radius * (IsPositive ? 1 : -1);
 
@@ -1091,9 +1097,9 @@ public class FollowAndAroundTarget : MoveTarget
         // 求与当前运行轨迹圆的切线向量
         var tangent = Vector3.Cross(
             new Vector3(
-                (float)Math.Sin((RotateSpeed * _counter + 180) * Math.PI / 180),
+                (float)Math.Sin((RotateSpeed * _counter + 180) * Utils.AngleToPi),
                 0,
-                (float)Math.Cos((RotateSpeed * _counter + 180) * Math.PI / 180)),
+                (float)Math.Cos((RotateSpeed * _counter + 180) * Utils.AngleToPi)),
             Vector3.down);
         // 相对X轴旋转
         var xRotate = Quaternion.AngleAxis(angle: (float)(90 - Math.Atan(d: Radius / YOffset) / Math.PI * 180), axis: tangent);

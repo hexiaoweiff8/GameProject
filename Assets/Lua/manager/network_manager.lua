@@ -33,7 +33,7 @@ function network_manager.on_socket_data(key, data)
         if header.errno == 0 then --错误码为0
             Event.Brocast(tostring(header.msgId), header.body)
         else
-            Event.Brocast("errno"..tostring(header.msgId))
+            Event.Brocast("errno"..tostring(header.msgId),header.errno)
         end
     end
 end

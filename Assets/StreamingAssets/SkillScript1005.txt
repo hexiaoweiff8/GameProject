@@ -1,0 +1,9 @@
+SkillNum(1005)
+{
+	Point(, , , , );
+	SlideCollisionDetection(, , , , , );
+}
+[
+	1, 1, 1, , , , , , , 
+	CDTime();
+]

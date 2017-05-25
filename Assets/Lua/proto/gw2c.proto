@@ -9,18 +9,22 @@ message SelectRole {
 
 message EquipLvlup {
     required  Equip  equip          =1;
+    required  Currency currency     =2;
 }
 
 message EquipLock {
     required  Equip  equip          =1;
+    required  Currency currency     =2;
 }
 
 message EquipRepair {
     required  Equip  equip          =1;
+    required  Currency currency     =2;
 }
 
 message EquipRemake {
     required  Equip  equip          =1;
+    required  Currency currency     =2;
 }
 
 message EquipConfirmRemake {
@@ -29,30 +33,56 @@ message EquipConfirmRemake {
 
 message CardFeed {
     required  Card  card            =1;
+    required  Currency currency     =2;
 }
 
 message CardStarup {
     required  Card  card            =1;
+    required  Currency currency     =2;
 }
 
 message CardCarryup {
     required  Card  card            =1;
+    required  Currency currency     =2;
 }
 
 message CardRankup {
     required  Card  card            =1;
+    required  Currency currency     =2;
 }
 
 message CardTakeMedal {
     required  Card  card            =1;
+    required  Currency currency     =2;
 }
 
 message SkillLevelup {
     required  Card  card            =1;
+    required  Currency currency     =2;
 }
 
 message SkillReset {
     required  Card  card            =1;
+    required  Currency currency     =2;
+}
+
+message PublicNote {
+    required  string  msg           =1;
+}
+
+message SciLvlup {
+    required  Sci  sci              =1;
+    required  Currency currency     =2;
+}
+
+message SciSpeed {
+    required  Sci  sci              =1;
+    required  Currency currency     =2;
+}
+
+message CardUnionLvlup {
+    required  Card  card            =1;
+    required  Currency currency     =2;
 }
 
 

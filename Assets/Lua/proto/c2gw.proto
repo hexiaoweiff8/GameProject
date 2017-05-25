@@ -3,11 +3,13 @@ syntax = "proto2";
 
 message LoginGame {
     required string token       =1;
+    required int32  hostId      =2;
 }
 
 
 message RegisterRole {
     required string userName    =1;
+    optional int32  hostId      =2;
 }
 
 
@@ -76,6 +78,21 @@ message SkillLevelup {
 message SkillReset {
     required int32 cardId       =1;
     required int32 cost         =2;
+}
+
+
+message SciLvlup {
+    required int32 sciId        =1;
+}
+
+
+message SciSpeed {
+    required int32 sciId        =1;
+}
+
+message CardUnionLvlup {
+    required int32 cardId       =1;
+    required int32 unionId      =2;
 }
 
 

@@ -8,14 +8,19 @@ using UnityEngine;
 public class FormulaParamsPacker
 {
     /// <summary>
+    /// 技能编号
+    /// </summary>
+    public int SkillNum { get; set; }
+
+    /// <summary>
     /// 被释放技能等级
     /// </summary>
-    public uint SkillLevel { get; set; }
+    public int SkillLevel { get; set; }
 
     /// <summary>
     /// 数据list
     /// </summary>
-    public List<List<float>> DataList { get; set; } 
+    public List<List<string>> DataList { get; set; } 
 
     /// <summary>
     /// 初始位置

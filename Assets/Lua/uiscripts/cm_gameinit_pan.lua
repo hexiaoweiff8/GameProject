@@ -41,7 +41,7 @@ gameinit.wndlist = {
     {name = WNDTYPE.ui_chongzhu, cm = "uiscripts/ui_chongzhu"},
     {name = WNDTYPE.ui_keji_jiasu, cm = "uiscripts/ui_keji_jiasu"},
     {name = WNDTYPE.ui_kejitree, cm = "uiscripts/ui_kejitree"},
-    {name = WNDTYPE.Cardyc, cm = "uiscripts/wnd_cardyc"},
+    {name = WNDTYPE.Cardyc, cm = "uiscripts/wnd_cardyc_controller"},
 }
 _all_Reg_Wnd_list = {}
 --- <summary>
@@ -226,6 +226,7 @@ function gameinit:GameStart()
     sdata_armycarduselimitcost_data = luacsv.new(require("pk_tabs/armycarduselimitcost_c"))
     --技能表
     sdata_skill_data = luacsv.new(require("pk_tabs/skill_c"))
+	--克制关系表
     sdata_kezhi_data = luacsv.new(require("pk_tabs/kezhi_c"))
     
     

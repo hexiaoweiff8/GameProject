@@ -37,7 +37,7 @@ public class RectGraphics : CollisionGraphics
             VerticalAxis = Utils.GetVerticalTestLine(rotation);
 
             // 求对角线
-            var angle = rotation * Math.PI / 360;
+            var angle = rotation * Utils.AngleToPi;
             var cos = (float)Math.Cos(angle);
             var sin = (float)Math.Sin(angle);
             Diagonal1 = new Vector2(Width * cos - Height * sin, Width * sin + Height * cos);

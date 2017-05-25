@@ -8,6 +8,7 @@ public class DP_BattlefieldWrap
 	{
 		L.BeginClass(typeof(DP_Battlefield), typeof(MonoEX.SingletonAuto<DP_Battlefield>));
 		L.RegFunction("SwapScene", SwapScene);
+		L.RegFunction("LoadBase", LoadBase);
 		L.RegFunction("CameraFocusFID", CameraFocusFID);
 		L.RegFunction("CameraFocusActorID", CameraFocusActorID);
 		L.RegFunction("SetFightSpeed", SetFightSpeed);
@@ -66,6 +67,22 @@ public class DP_BattlefieldWrap
 			}
 
 			obj.SwapScene(arg0, arg1, arg2);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int LoadBase(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			DP_Battlefield obj = (DP_Battlefield)ToLua.CheckObject(L, 1, typeof(DP_Battlefield));
+			obj.LoadBase();
 			return 0;
 		}
 		catch(Exception e)

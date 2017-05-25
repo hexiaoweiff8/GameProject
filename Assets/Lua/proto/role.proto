@@ -10,18 +10,6 @@ message Currency{
 };
 
 
-message Team{
-    required int32 id			=1;
-    required int32 lv			=2;
-};
-
-
-message Skill{
-    required int32 id			=1;
-    required int32 lv			=2;
-};
-
-
 message Card{
     required int32 id			=1;
     required int32 exp			=2;
@@ -30,8 +18,9 @@ message Card{
     required int32 rlv			=5;
     required int32 num			=6;
     repeated int32 slot			=7;
-    repeated Team team			=8;
-    repeated Skill skill		=9;
+    repeated int32 team			=8;
+    repeated int32 skill		=9;
+    required int32 lv           =10;
 };
 
 
@@ -67,6 +56,18 @@ message Equip{
 };
 
 
+message OpFields{
+    optional int32 equipId		=1;
+};
+
+
+message Sci{
+    required int32 id           =1;
+    required int32 lv           =2;
+    required int32 due          =3;
+};
+
+
 message Role{
     required int32 uId			=1;
     required int32 hostId		=2;
@@ -74,8 +75,12 @@ message Role{
     required string userName	=4;
     required int32 exp			=5;
     required int32 vipexp		=6;
-    required Currency currency  =7;
-    repeated Card card          =8;
-    repeated Item item          =9;
-    repeated Equip equip        =10;
+    required int32 lv           =7;
+    required int32 vip          =8;
+    required Currency currency  =9;
+    repeated Card card          =10;
+    repeated Item item          =11;
+    repeated Equip equip        =12;
+    optional OpFields opFields  =13;
+    repeated Sci sci            =14;
 }

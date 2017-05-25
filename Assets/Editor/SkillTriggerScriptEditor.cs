@@ -6,7 +6,11 @@ using UnityEditor;
 public class SkillTriggerScriptEditor : EditorWindow
 {
     private static SkillTriggerScriptEditor instance = null;
-    public enum TriigerType
+
+    /// <summary>
+    /// 技能事件类型
+    /// </summary>
+    public enum TriggerType
     {
         None,
         // 子级功能左右括号
@@ -23,8 +27,22 @@ public class SkillTriggerScriptEditor : EditorWindow
         Buff,
         Calculate,
         Move,
-
     }
+
+    /// <summary>
+    /// 技能数据类型
+    /// </summary>
+    public enum DataType
+    {
+        LevelData,  // 技能等级数据
+        CDTime,     // 技能CD时间
+        CDGroup,    // 技能CD组
+        ReleaseTime // 技能可释放次数
+    }
+
+    /// <summary>
+    /// 事件参数列表
+    /// </summary>
     private static List<string>[] paramTitles = new List<string>[]
     {
         new List<string>(), 
@@ -47,6 +65,17 @@ public class SkillTriggerScriptEditor : EditorWindow
         new List<string>() {"是否等待执行完(0否,1是):", "技能数据 ID:"},
         new List<string>() {"是否等待执行完(0否,1是):", "移动速度:", "是否瞬移(0/1 如果为1速度无效):"},
     };
+
+    /// <summary>
+    /// 数据参数列表
+    /// </summary>
+    private static List<string>[] dataParamTitles = new List<string>[]
+    {
+        new List<string>(){"data0","data1","data2","data3","data4","data5","data6","data7","data8","data9",},
+        new List<string>(){"cdTime"},
+        new List<string>(){"cdGroup",},
+        new List<string>(){"ReleaseTime",},
+    }; 
 
 
     /*
@@ -95,21 +124,52 @@ public class SkillTriggerScriptEditor : EditorWindow
      * 
      */
 
-    private TriigerType _triigerType = TriigerType.None;
+    /// <summary>
+    /// 参数类型 1: 触发器 2: 数据
+    /// </summary>
+    private int paramsType = 1;
+
+    private TriggerType _triggerType = TriggerType.None;
     private string[] _params;
 
-    public static void ShowSkillTriggerScriptWindow(TriigerType triigerType, Rect pos)
+    private DataType _dataType = DataType.LevelData;
+
+    public static void ShowSkillTriggerScriptWindow(TriggerType triigerType, Rect pos)
+    {
+        if (instance == null)
+        {
+            instance = new SkillTriggerScriptEditor();
+        }
+        instance.paramsType = 1;
+        instance._triggerType = triigerType;
+        instance._params = new string[paramTitles[(int)triigerType].Count];
+
+        float width = 500;
+        float height = 20 * (paramTitles[(int)triigerType].Count + 1);
+        float left = pos.center.x - width / 2;
+        float top = pos.center.y - height / 2;
+        instance.position = new Rect(left, top, width, height);
+        instance.ShowPopup();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="dataType"></param>
+    /// <param name="pos"></param>
+    public static void ShowSkillDataScriptWindow(DataType dataType, Rect pos)
     {
         if (instance == null)
         {
             instance = new SkillTriggerScriptEditor();
         }
 
-        instance._triigerType = triigerType;
-        instance._params = new string[paramTitles[(int)triigerType].Count];
+        instance.paramsType = 2;
+        instance._dataType = dataType;
+        instance._params = new string[dataParamTitles[(int)dataType].Count];
 
         float width = 500;
-        float height = 20 * (paramTitles[(int)triigerType].Count + 1);
+        float height = 20 * (dataParamTitles[(int)dataType].Count + 1);
         float left = pos.center.x - width / 2;
         float top = pos.center.y - height / 2;
         instance.position = new Rect(left, top, width, height);
@@ -124,9 +184,19 @@ public class SkillTriggerScriptEditor : EditorWindow
     void OnGUI()
     {
         GUILayout.BeginVertical();
-        for (int i = 0; i < paramTitles[(int)_triigerType].Count; i++)
+        if (instance.paramsType == 1)
         {
-            _params[i] = EditorGUILayout.TextField(paramTitles[(int)_triigerType][i], _params[i]);
+            for (int i = 0; i < paramTitles[(int)_triggerType].Count; i++)
+            {
+                _params[i] = EditorGUILayout.TextField(paramTitles[(int)_triggerType][i], _params[i]);
+            }
+        }
+        else if (instance.paramsType == 2)
+        {
+            for (int i = 0; i < dataParamTitles[(int)_dataType].Count; i++)
+            {
+                _params[i] = EditorGUILayout.TextField(dataParamTitles[(int)_dataType][i], _params[i]);
+            }
         }
         GUILayout.EndVertical();
 
@@ -134,7 +204,14 @@ public class SkillTriggerScriptEditor : EditorWindow
         GUI.color = Color.green;
         if (GUILayout.Button("Add"))
         {
-            SkillScriptEditor.AddContent(ConnectParams());
+            if (instance.paramsType == 1)
+            {
+                SkillScriptEditor.AddScriptContent(ConnectParams());
+            }
+            else if (instance.paramsType == 2)
+            {
+                SkillScriptEditor.AddDataContent(ConnectParams());
+            }
             this.Close();
         }
 
@@ -152,54 +229,85 @@ public class SkillTriggerScriptEditor : EditorWindow
     string ConnectParams()
     {
         string ret = String.Empty;
-        switch (_triigerType)
+        var isLevelData = false;
+        if (instance.paramsType == 1)
         {
-            //case TriigerType.PlayAnimation:
-            //    ret += "PlayAnimation";
-            //    break;
-            //case TriigerType.SingleDamage:
-            //    ret += "SingleDamage";
-            //    break;
-            case TriigerType.LeftBracket:
-                ret += "{";
-                break;
-            case TriigerType.RightBracket:
-                ret += "}";
-                break;
-            case TriigerType.PointToPoint:
-                ret += "PointToPoint";
-                break;
-            case TriigerType.PointToObj:
-                ret += "PointToObj";
-                break;
-            case TriigerType.Point:
-                ret += "Point";
-                break;
-            case TriigerType.CollisionDetection:
-                ret += "CollisionDetection";
-                break;
-            case TriigerType.SlideCollisionDetection:
-                ret += "SlideCollisionDetection";
-                break;
-            case TriigerType.Audio:
-                ret += "Audio";
-                break;
-            case TriigerType.Buff:
-                ret += "Buff";
-                break;
-            case TriigerType.Calculate:
-                ret += "Calculate";
-                break;
-            case TriigerType.Move:
-                ret += "Move";
-                break;
-            default:
-                return String.Empty;
+            switch (_triggerType)
+            {
+                //case TriigerType.PlayAnimation:
+                //    ret += "PlayAnimation";
+                //    break;
+                //case TriigerType.SingleDamage:
+                //    ret += "SingleDamage";
+                //    break;
+                case TriggerType.LeftBracket:
+                    ret += "{";
+                    break;
+                case TriggerType.RightBracket:
+                    ret += "}";
+                    break;
+                case TriggerType.PointToPoint:
+                    ret += "PointToPoint";
+                    break;
+                case TriggerType.PointToObj:
+                    ret += "PointToObj";
+                    break;
+                case TriggerType.Point:
+                    ret += "Point";
+                    break;
+                case TriggerType.CollisionDetection:
+                    ret += "CollisionDetection";
+                    break;
+                case TriggerType.SlideCollisionDetection:
+                    ret += "SlideCollisionDetection";
+                    break;
+                case TriggerType.Audio:
+                    ret += "Audio";
+                    break;
+                case TriggerType.Buff:
+                    ret += "Buff";
+                    break;
+                case TriggerType.Calculate:
+                    ret += "Calculate";
+                    break;
+                case TriggerType.Move:
+                    ret += "Move";
+                    break;
+                default:
+                    return String.Empty;
+            }
+        }
+        else if (instance.paramsType == 2)
+        {
+            switch (_dataType)
+            {
+                //case TriigerType.PlayAnimation:
+                //    ret += "PlayAnimation";
+                //    break;
+                //case TriigerType.SingleDamage:
+                //    ret += "SingleDamage";
+                //    break;
+                case DataType.LevelData:
+                    ret += "";
+                    isLevelData = true;
+                    break;
+                case DataType.CDTime:
+                    ret += "CDTime";
+                    break;
+                case DataType.CDGroup:
+                    ret += "CDGroup";
+                    break;
+                case DataType.ReleaseTime:
+                    ret += "ReleaseTime";
+                    break;
+                default:
+                    return String.Empty;
+            }
         }
         // 拼合参数数据
         if (_params.Length > 0)
         {
-            ret += "(";
+            ret += isLevelData ? "" : "(";
             for (int i = 0; i < _params.Length; i++)
             {
                 string str = _params[i];
@@ -207,7 +315,7 @@ public class SkillTriggerScriptEditor : EditorWindow
                 if (i != _params.Length - 1)
                     ret += ", ";
             }
-            ret += ");";
+            ret += isLevelData ? "" : ");";
         }
         return ret;
     }

@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 
 /// <summary>
 /// 行为链单元构造器接口
@@ -90,7 +91,12 @@ public abstract class AbstractFormulaItem : IFormulaItem
     /// <summary>
     /// 子行为链
     /// </summary>
-    protected IFormulaItem subFormulaItem { get; set; }
+    protected IFormulaItem SubFormulaItem { get; set; }
+
+    /// <summary>
+    /// 被替换列表
+    /// </summary>
+    protected Dictionary<string, string> ReplaceDic = new Dictionary<string, string>();  
 
     /// <summary>
     /// 是否包含下一节点
@@ -155,7 +161,7 @@ public abstract class AbstractFormulaItem : IFormulaItem
     /// <returns>子集行为链Head</returns>
     public IFormulaItem GetSubIFormulaItem()
     {
-        return subFormulaItem;
+        return SubFormulaItem;
     }
 
     /// <summary>
@@ -169,14 +175,155 @@ public abstract class AbstractFormulaItem : IFormulaItem
         {
             throw new Exception("行为节点为空");
         }
-        if (subFormulaItem == null)
+        if (SubFormulaItem == null)
         {
-            subFormulaItem = formulaItem;
+            SubFormulaItem = formulaItem;
         }
         else
         {
-            subFormulaItem.After(formulaItem);
+            SubFormulaItem.After(formulaItem);
         }
         return formulaItem;
     }
+
+
+    /// <summary>
+    /// 获得数据或替换
+    /// </summary>
+    /// <param name="name">数据名称</param>
+    /// <param name="array">数据列表</param>
+    /// <param name="pos">当前数据位置</param>
+    /// <param name="replaceDic">替换列表(如果数据需要替换会放入该列表, 否则返回数据不放入列表)</param>
+    /// <returns>转换后数据</returns>
+    protected T GetDataOrReplace<T>(string name, string[] array, int pos, Dictionary<string, string> replaceDic)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            throw new Exception("字段名为空.");
+        }
+        if (array == null || array.Length == 0)
+        {
+            throw new Exception("数据为空.");
+        }
+        if (pos < 0)
+        {
+            throw new Exception("数据位置非法pos:" + pos);
+        }
+        if (replaceDic == null)
+        {
+            throw new Exception("替换列表为空.");
+        }
+
+        var resultType = -1;
+
+        T result = default(T);
+        var typeName = typeof (T).Name;
+        if (result is int)
+        {
+            resultType = 1;
+        }
+        if (result is float)
+        {
+            resultType = 2;
+        }
+        if (typeName.Equals("String"))
+        {
+            resultType = 3;
+        }
+        if (result is Enum)
+        {
+            resultType = 4;
+        }
+        var item = array[pos];
+        if (item.StartsWith("%"))
+        {
+            var replacePos = Convert.ToInt32(item.Trim().Replace("%", ""));
+            if (replacePos < 0)
+            {
+                throw new Exception("");
+            }
+            ReplaceDic.Add(name, resultType + "," + replacePos);
+        }
+        else
+        {
+            switch (resultType)
+            {
+                case 1:
+                    // int
+                    result = (T)Convert.ChangeType(item, typeof(T));
+                    break;
+                case 2:
+                    // float
+                    result = (T)Convert.ChangeType(item, typeof(T));
+                    break;
+                case 3:
+                    // string
+                    result = (T)(object)item;
+                    break;
+                case 4:
+                    // enum
+                    result = (T)Enum.Parse(typeof(T), item);
+                    break;
+            }
+        }
+
+
+        return result;
+    }
+
+    /// <summary>
+    /// 将属性替换为对应数据
+    /// </summary>
+    /// <param name="paramsPacker">数据packer</param>
+    protected void ReplaceData(FormulaParamsPacker paramsPacker)
+    {
+        if (paramsPacker == null)
+        {
+            throw new Exception("数据Packer为空.");
+        }
+        var type = this.GetType();
+
+        // 遍历替换列表 如果存在数据则替换对应数据
+        if (ReplaceDic.Count > 0)
+        {
+            foreach (var item in ReplaceDic)
+            {
+                var propertyName = item.Key;
+                var value = item.Value.Split(',');
+                var itemType = Convert.ToInt32(value[0]);
+                var pos = Convert.ToInt32(value[1]);
+                // 获取当前等级-1(从0开始)的数据
+                // 如果当前等级小于1则赋予1
+                var skillLevel = paramsPacker.SkillLevel - 1;
+                if (skillLevel < 0) skillLevel = 0;
+                var dataRow = paramsPacker.DataList[skillLevel];
+                var property = type.GetProperty(propertyName);
+                if (property == null)
+                {
+                    throw new Exception("属性不存在:" + propertyName);
+                }
+                switch (itemType)
+                {
+                    case 1:
+                        // int
+                        property.SetValue(this, Convert.ToInt32(dataRow[pos]), null);
+                        break;
+                    case 2:
+                        // float
+                        property.SetValue(this, Convert.ToSingle(dataRow[pos]), null);
+                        break;
+                    case 3:
+                        // string
+                        property.SetValue(this, dataRow[pos], null);
+                        break;
+                    case 4:
+                        // 枚举
+                        property.SetValue(this, Convert.ToInt32(dataRow[pos]), null);
+                        break;
+                }
+            }
+        }
+    }
+
+
 }

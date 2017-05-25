@@ -21,7 +21,7 @@ function class_wnd_login:OnShowDone()
         -- SendPB_10007(equipP.allEqList[1][1].EquipUniID, 5)
         -- SendPB_10008(equipP.allEqList[1][1].EquipUniID, 5, 3)
 				
-			-- --jyp cardyc测试
+			--jyp cardyc测试
 	        -- SendPB_10001()
             -- ui_manager:ShowWB(WNDTYPE.Cardyc)
         end
@@ -29,14 +29,15 @@ function class_wnd_login:OnShowDone()
 end
 
 require "proto/role_pb"
-require "proto/gwc_pb"
-require "proto/cgw_pb"
+require "proto/gw2c_pb"
+require "proto/c2gw_pb"
 require "proto/header_pb"
 -- 测试发送PBLUA--
 function SendPB_10001()
-    local cgw = cgw_pb.LoginGame()
-    cgw.token = 'token'
-    local msg1 = cgw:SerializeToString()
+    local c2gw = c2gw_pb.LoginGame()
+    c2gw.token = 'token'
+    c2gw.hostId = 101
+    local msg1 = c2gw:SerializeToString()
     createSendPBHeader(10001, msg1)
 end
 function MSGID_10001(body)
@@ -51,61 +52,61 @@ end
 
 
 function MSGID_10002(body)
-    local gwc = gwc_pb.SelectRole()
-    gwc:ParseFromString(body);
-    getCardData(gwc)
-    print("item:".. #gwc.user.item)
-    lgyPrint('uId==>' .. gwc.user.uId);
-    lgyPrint('hostId==>' .. gwc.user.hostId);
-    lgyPrint('rId==>' .. gwc.user.rId);
-    lgyPrint('userName==>' .. gwc.user.userName);
-    lgyPrint('exp==>' .. gwc.user.exp);
-    lgyPrint('vipexp==>' .. gwc.user.vipexp);
-    for k, v in ipairs(gwc.user.currency) do
-        lgyPrint('gwc.user.currency.gold==>' .. v.gold);
+    local gw2c = gw2c_pb.SelectRole()
+    gw2c:ParseFromString(body);
+    getCardData(gw2c)
+    print("item:".. #gw2c.user.item)
+    lgyPrint('uId==>' .. gw2c.user.uId);
+    lgyPrint('hostId==>' .. gw2c.user.hostId);
+    lgyPrint('rId==>' .. gw2c.user.rId);
+    lgyPrint('userName==>' .. gw2c.user.userName);
+    lgyPrint('exp==>' .. gw2c.user.exp);
+    lgyPrint('vipexp==>' .. gw2c.user.vipexp);
+    for k, v in ipairs(gw2c.user.currency) do
+        lgyPrint('gw2c.user.currency.gold==>' .. v.gold);
     end
-    for k, v in ipairs(gwc.user.card) do
-        lgyPrint('gwc.user.equip.id==>' .. v.id);
+    for k, v in ipairs(gw2c.user.card) do
+        lgyPrint('gw2c.user.equip.id==>' .. v.id);
     end
-    lgyPrint('uId==>' .. gwc.user.uId);
-    lgyPrint('hostId==>' .. gwc.user.hostId);
-    lgyPrint('rId==>' .. gwc.user.rId);
-    lgyPrint('userName==>' .. gwc.user.userName);
-    lgyPrint('exp==>' .. gwc.user.exp);
-    lgyPrint('vipexp==>' .. gwc.user.vipexp);
-    lgyPrint('gwc.user.currency.gold==>' .. gwc.user.currency.gold);
-    for k, v in ipairs(gwc.user.card) do
-        lgyPrint('gwc.user.card.id==>' .. v.id);
+    lgyPrint('uId==>' .. gw2c.user.uId);
+    lgyPrint('hostId==>' .. gw2c.user.hostId);
+    lgyPrint('rId==>' .. gw2c.user.rId);
+    lgyPrint('userName==>' .. gw2c.user.userName);
+    lgyPrint('exp==>' .. gw2c.user.exp);
+    lgyPrint('vipexp==>' .. gw2c.user.vipexp);
+    lgyPrint('gw2c.user.currency.gold==>' .. gw2c.user.currency.gold);
+    for k, v in ipairs(gw2c.user.card) do
+        lgyPrint('gw2c.user.card.id==>' .. v.id);
     end
-    for k, v in ipairs(gwc.user.item) do
-        lgyPrint('gwc.user.item.id==>' .. v.id);
+    for k, v in ipairs(gw2c.user.item) do
+        lgyPrint('gw2c.user.item.id==>' .. v.id);
     end
     local type
     --装备数据
-    for k, v in ipairs(gwc.user.equip) do
-        lgyPrint('gwc.user.equip.id==>' .. v.id);
-        lgyPrint('gwc.user.equip.eid==>' .. v.eid);
-        lgyPrint('gwc.user.equip.lv==>' .. v.lv);
-        lgyPrint('gwc.user.equip.rarity==>' .. v.rarity);
-        lgyPrint('gwc.user.equip.fst_attr==>' .. v.fst_attr);
+    for k, v in ipairs(gw2c.user.equip) do
+        lgyPrint('gw2c.user.equip.id==>' .. v.id);
+        lgyPrint('gw2c.user.equip.eid==>' .. v.eid);
+        lgyPrint('gw2c.user.equip.lv==>' .. v.lv);
+        lgyPrint('gw2c.user.equip.rarity==>' .. v.rarity);
+        lgyPrint('gw2c.user.equip.fst_attr==>' .. v.fst_attr);
         
         local tempTB1 = {}
         for k, v in ipairs(v.sndAttr) do
-            lgyPrint('gwc.user.equip.sndAttr.id==>' .. v.id);
-            lgyPrint('gwc.user.equip.sndAttr.val==>' .. v.val);
-            lgyPrint('gwc.user.equip.sndAttr.isRemake==>' .. v.isRemake);
+            lgyPrint('gw2c.user.equip.sndAttr.id==>' .. v.id);
+            lgyPrint('gw2c.user.equip.sndAttr.val==>' .. v.val);
+            lgyPrint('gw2c.user.equip.sndAttr.isRemake==>' .. v.isRemake);
             
             local tempTB2 = {}
             for k, v in ipairs(v.remake) do
-                lgyPrint('gwc.user.equip.sndAttr.remake.id==>' .. v.id);
-                lgyPrint('gwc.user.equip.sndAttr.remake.val==>' .. v.val);
+                lgyPrint('gw2c.user.equip.sndAttr.remake.id==>' .. v.id);
+                lgyPrint('gw2c.user.equip.sndAttr.remake.val==>' .. v.val);
                 tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
             end
             
             tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
         end
-        lgyPrint('gwc.user.equip.isLock==>' .. v.isLock);
-        lgyPrint('gwc.user.equip.isBad==>' .. v.isBad);
+        lgyPrint('gw2c.user.equip.isLock==>' .. v.isLock);
+        lgyPrint('gw2c.user.equip.isBad==>' .. v.isBad);
         
         type = sdata_equip_data:GetV(sdata_equip_data.I_EquipType, v.eid)
         --TODODO v.rarity + 1
@@ -113,16 +114,16 @@ function MSGID_10002(body)
     end
 end
 
-function getCardData(gwc)
+function getCardData(gw2c)
 	print("=================getCardData=============")
-	local user = gwc.user
+	local user = gw2c.user
     print( string.format("User==> uid:%d, hostid:%d, rid:%d, username:%s, exp:%d, vipexp:%d, itemTblNum:%d",user.uId, user.hostId, user.rId, user.userName, user.exp, user.vipexp, #user.item) )
     --UserRole:initialize(uid,hostId,rId,userName,exp,vipexp)
-    userRoleTbl = UserRole(user.uId, user.hostId, user.rId, user.userName, user.exp, user.vipexp, user.item)
+    userRoleTbl = UserRole(user.uId, user.hostId, user.rId, user.userName, user.exp, user.vipexp, user.lv, user.vip, user.item)
 
 
-    --lgyPrint("tbl:".. #gwc.user.currency )
-    local currency = gwc.user.currency
+    --lgyPrint("tbl:".. #gw2c.user.currency )
+    local currency = gw2c.user.currency
     --金币 -钻石 -技能点 -经验池 -兵牌 -体力
     local diamondNum = 0  --currency.diamond (花钱充，花钱赠，免费送的和)
     for i,v in ipairs(currency.diamond) do
@@ -132,76 +133,114 @@ function getCardData(gwc)
     --currencyTbl[#currencyTbl+1]
     currencyTbl = Currency(currency.gold, diamondNum, currency.skillPt, currency.expPool, currency.coin, currency.tili)
 
-    print("cardTbl:" .. #gwc.user.card)
-    for k, v in ipairs(gwc.user.card) do
+    print("cardTbl:" .. #gw2c.user.card)
+    for k, v in ipairs(gw2c.user.card) do
         --卡牌ID -经验 -星级 -兵员等级 -军阶等级 -数量
-    	print( string.format("card==> id:%d, exp:%d, star:%d, slv:%d, rlv:%d, num:%d",v.id, v.exp, v.star, v.slv, v.rlv, v.num) )
+    	print( string.format("card==> id:%d, exp:%d, star:%d, slv:%d, rlv:%d, num:%d",v.id, v.exp, v.star, v.slv, v.rlv, v.num,v.lv) )
         print( string.format("teamNum:%d, skillNum:%d, slotNum:%d", #v.team, #v.skill,  #v.slot) )
 		--for k, v in ipairs(v.slot) do --slot
 	        --print(k,v)
 	    --end	
-	    for k, v in ipairs(v.team) do--xt
-	        lgyPrint('gwc.user.team.id==>' .. v.id);
-	        lgyPrint('gwc.user.team.lv==>' .. v.lv);
-	    end
-
-	    for k, v in ipairs(v.skill) do--skill
-	        lgyPrint('gwc.user.skill.id==>' .. v.id);
-	        lgyPrint('gwc.user.skill.lv==>' .. v.lv);
-	    end
-		cardTbl[k] = Card(v.id, v.exp, v.star, v.slv, v.rlv, v.num, v.slot, v.skill, v.team)
-		--print("id:" .. cardTbl[k]["id"])
+        print(v.skill[1])
+		cardTbl[k] = Card(v.id, v.exp, v.star, v.slv, v.rlv, v.num, v.slot, v.skill, v.team,v.lv)
+		-- print("id:" .. cardTbl[k]["id"])
     end
 end
 
-function changeCardData(gwc, msgId)
+function changeCardData(gw2c, msgId)
 	print("changeCardData================msgId:"..msgId)
-	if msgId == 10009 then
+	if msgId == 10009 then--升级
 		print("10009....")
-		--currencyTbl["expPool"] = gwc.user.currency.expPool 
-		--print("exp:" .. currencyTbl["expPool"])--
-		print("exp:" .. gwc.card.exp)
-	    cardTbl[k]["exp"] = gwc.card.exp
-	    lgyPrint('10009:card.exp==>' .. gwc.card.exp)--卡牌等级
-	elseif msgId == 10010 then
-    	lgyPrint('10010:card.id==>' .. gwc.card.id)--卡牌ID
-    	lgyPrint('10010:card.star==>' .. gwc.card.slv)--星级
-    	cardTbl[k]["star"] = gwc.card.star
-    elseif msgId == 10011 then	
-    	lgyPrint('10011:card.id==>' .. gwc.card.id)--卡牌ID
-    	lgyPrint('10011:card.slv==>' .. gwc.card.slv)--兵员等级
-    	cardTbl[k]["slv"] = gwc.card.slv
-	elseif msgId == 10012 then
-		--金币
-		--currencyTbl["gold"] = gwc.user.currency.gold --服务器只返回了卡信息,货币信息变化没返回
-		--军阶
-    	cardTbl[k]["rlv"] =gwc.card.rlv
-    elseif msgId == 10013 then
-    	userRoleTbl["item"] = gwc.user.item
-    	cardTbl[k]["slot"] = gwc.card.slot
-    	--for k, v in ipairs(gwc.user.card) do
-			--cardTbl[k]["slot"] = v.slot
-			--for k, v in ipairs(cardTbl[k]["slot"]) do--xt
-		        --print(k,v)
-		   -- end	
-    	--end
+        for k, v in ipairs(cardTbl) do
+            if v.id == gw2c.card.id then 
+                v.exp = gw2c.card.exp
+                v.lv  = gw2c.card.lv
+            end
+        end
+        currencyTbl["expPool"] = gw2c.currency.expPool
+        wnd_cardyc_controller:upLevel_refresh()
+        
+    elseif msgId == 10010 then--升星
+        print(string.format("change data starLv=%d",gw2c.card.star))
+        print(string.format("change data cardID=%d",gw2c.card.id))
+        for k, v in ipairs(cardTbl) do
+            if v.id == gw2c.card.id then
+                v.star = gw2c.card.star
+                v.num = gw2c.card.num
+                v.skill = gw2c.card.skill
+            end
+        end
+        currencyTbl["coin"] = gw2c.currency.coin
+        wnd_cardyc_controller:upStar_refresh()
+
+    elseif msgId == 10011 then	--兵员升级
+        print(string.format("change data sLv=%d",gw2c.card.slv))
+        print(string.format("change data cardID=%d",gw2c.card.id))
+        for k, v in ipairs(cardTbl) do
+            if v.id == gw2c.card.id then
+                v.slv = gw2c.card.slv
+            end
+        end
+        currencyTbl["coin"] = gw2c.currency.coin
+        wnd_cardyc_controller:upSoldier_refresh()
+
+	elseif msgId == 10012 then--进阶
+        for k,v in pairs(cardTbl) do
+            if v.id == gw2c.card.id then
+                v.rlv = gw2c.card.rlv
+                v.slot = gw2c.card.slot
+            end
+        end
+        currencyTbl["gold"] = gw2c.currency.gold
+        wnd_cardyc_controller:upQuality_refresh()
+
+    elseif msgId == 10013 then--装备
+        for k,v in pairs(cardTbl) do
+            if v.id == gw2c.card.id then
+                v.slot = gw2c.card.slot
+            end
+        end
+        userRoleTbl["item"] = gw2c.user.item
+        wnd_cardyc_controller:epuip_refresh()
+
     elseif msgId == 10014 then
-    	--for k,v in pairs(gwc.card.skill) do
-		   -- lgyPrint('MSGID_10014.skill.id==>' .. v.id);
-		   -- lgyPrint('MSGID_10014.skill.lv==>' .. v.lv);
-    	--end
-    	cardTbl[k]["skill"] = gwc.card.skill
-    elseif msgId == 10015 then
-    	lgyPrint('MSGID_10015.skill.id==>' .. gwc.user.currency.skillPt);
-	    Currency["skillpt"] = gwc.user.currency.skillPt
+        for k,v in pairs(cardTbl) do
+            --根据当前卡片的ID获取卡牌信息,后期要改
+            if v.id == gw2c.card.id then
+                v.skill = gw2c.card.skill
+            end
+        end
+        currencyTbl["skillpt"] = gw2c.currency.skillPt
+        wnd_cardyc_controller:upSkill_refresh()
+        
+    elseif msgId == 10015 then--技能重置
+	    CurrencyTbl["skillpt"] = gw2c.currency.skillPt
+	    CurrencyTbl["diamond"] = gw2c.currency.diamond
+        wnd_cardyc_controller:skillReset_refresh()
+
+    elseif msgId == 10018 then--技能重置
+        for k,v in pairs(cardTbl) do
+            --根据当前卡片的ID获取卡牌信息,后期要改
+            if v.id == gw2c.card.id then
+                v.team = gw2c.card.team
+                print(#gw2c.card.team)
+            end
+        end
+	    currencyTbl["coin"] = gw2c.currency.coin
+        print(#gw2c.currency.coin)
+        currencyTbl["gold"] = gw2c.currency.gold
+        print(#gw2c.currency.gold)
+        wnd_cardyc_controller:upSynergy_refresh()
     end
 end
+
+
 
 
 function SendPB_10003()
-    local cgw = cgw_pb.RegisterRole()
-    cgw.userName = 'lgy'
-    local msg1 = cgw:SerializeToString()
+    local c2gw = c2gw_pb.RegisterRole()
+    c2gw.userName = 'lgy'
+    local msg1 = c2gw:SerializeToString()
     createSendPBHeader(10003, msg1)
 end
 
@@ -210,17 +249,17 @@ end
 
 -- 测试发送PBLUA--
 function SendPB_10004(id)
-    -- local gwc = gwc_pb.EquipLvlup()
-    -- gwc.equip.id = v.EquipUniID
-    -- gwc.equip.eid = v.EquipID
-    -- gwc.equip.lv = v.QiangHuaLevel
-    -- gwc.equip.rarity = v.EquipQuality
-    -- gwc.equip.fst_attr = v.MainEffectID
-    -- gwc.equip.isLock = v.IsLock
-    -- gwc.equip.isBad = v.IsBad
+    -- local gw2c = gw2c_pb.EquipLvlup()
+    -- gw2c.equip.id = v.EquipUniID
+    -- gw2c.equip.eid = v.EquipID
+    -- gw2c.equip.lv = v.QiangHuaLevel
+    -- gw2c.equip.rarity = v.EquipQuality
+    -- gw2c.equip.fst_attr = v.MainEffectID
+    -- gw2c.equip.isLock = v.IsLock
+    -- gw2c.equip.isBad = v.IsBad
     -- if v.ViceEffect then
     --     for k, v in ipairs(v.ViceEffect) do
-    --         local sndAttr = gwc.equip.sndAttr:add()
+    --         local sndAttr = gw2c.equip.sndAttr:add()
     --         sndAttr.id = v.ShuXingID
     --         sndAttr.val = v.ShuXingNum
     --         sndAttr.isRemake = v.IsChongZhu
@@ -233,64 +272,64 @@ function SendPB_10004(id)
     --         end
     --     end
     -- end
-    -- local msg1 = gwc:SerializeToString()
-    local cgw = cgw_pb.EquipLvlup()
-    cgw.equipId = id
-    local msg1 = cgw:SerializeToString()
+    -- local msg1 = gw2c:SerializeToString()
+    local c2gw = c2gw_pb.EquipLvlup()
+    c2gw.equipId = id
+    local msg1 = c2gw:SerializeToString()
     ----------------------------------------------------------------
-    -- local gwc = gwc_pb.EquipLvlup()
-    -- gwc:ParseFromString(msg1);
+    -- local gw2c = gw2c_pb.EquipLvlup()
+    -- gw2c:ParseFromString(msg1);
     -- --装备数据
-    -- local v = gwc.equip
-    -- lgyPrint('gwc.equip.id==>' .. v.id);
-    -- lgyPrint('gwc.equip.eid==>' .. v.eid);
-    -- lgyPrint('gwc.equip.lv==>' .. v.lv);
-    -- lgyPrint('gwc.equip.rarity==>' .. v.rarity);
-    -- lgyPrint('gwc.equip.fst_attr==>' .. v.fst_attr);
+    -- local v = gw2c.equip
+    -- lgyPrint('gw2c.equip.id==>' .. v.id);
+    -- lgyPrint('gw2c.equip.eid==>' .. v.eid);
+    -- lgyPrint('gw2c.equip.lv==>' .. v.lv);
+    -- lgyPrint('gw2c.equip.rarity==>' .. v.rarity);
+    -- lgyPrint('gw2c.equip.fst_attr==>' .. v.fst_attr);
     -- local tempTB1 = {}
     -- for k, v in ipairs(v.sndAttr) do
-    --     lgyPrint('gwc.equip.sndAttr.id==>' .. v.id);
-    --     lgyPrint('gwc.equip.sndAttr.val==>' .. v.val);
-    --     lgyPrint('gwc.equip.sndAttr.isRemake==>' .. v.isRemake);
+    --     lgyPrint('gw2c.equip.sndAttr.id==>' .. v.id);
+    --     lgyPrint('gw2c.equip.sndAttr.val==>' .. v.val);
+    --     lgyPrint('gw2c.equip.sndAttr.isRemake==>' .. v.isRemake);
     --     local tempTB2 = {}
     --     for k, v in ipairs(v.remake) do
-    --         lgyPrint('gwc.equip.sndAttr.remake.id==>' .. v.id);
-    --         lgyPrint('gwc.equip.sndAttr.remake.val==>' .. v.val);
+    --         lgyPrint('gw2c.equip.sndAttr.remake.id==>' .. v.id);
+    --         lgyPrint('gw2c.equip.sndAttr.remake.val==>' .. v.val);
     --         tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
     --     end
     --     tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
     -- end
-    -- lgyPrint('gwc.equip.isLock==>' .. v.isLock);
-    -- lgyPrint('gwc.equip.isBad==>' .. v.isBad);
+    -- lgyPrint('gw2c.equip.isLock==>' .. v.isLock);
+    -- lgyPrint('gw2c.equip.isBad==>' .. v.isBad);
     ----------------------------------------------------------------
     createSendPBHeader(10004, msg1)
 end
 
 function MSGID_10004(body)
-    local gwc = gwc_pb.EquipLvlup()
-    gwc:ParseFromString(body);
+    local gw2c = gw2c_pb.EquipLvlup()
+    gw2c:ParseFromString(body);
     --装备数据
-    local v = gwc.equip
-    lgyPrint('gwc.equip.id==>' .. v.id);
-    lgyPrint('gwc.equip.eid==>' .. v.eid);
-    lgyPrint('gwc.equip.lv==>' .. v.lv);
-    lgyPrint('gwc.equip.rarity==>' .. v.rarity);
-    lgyPrint('gwc.equip.fst_attr==>' .. v.fst_attr);
+    local v = gw2c.equip
+    lgyPrint('gw2c.equip.id==>' .. v.id);
+    lgyPrint('gw2c.equip.eid==>' .. v.eid);
+    lgyPrint('gw2c.equip.lv==>' .. v.lv);
+    lgyPrint('gw2c.equip.rarity==>' .. v.rarity);
+    lgyPrint('gw2c.equip.fst_attr==>' .. v.fst_attr);
     local tempTB1 = {}
     for k, v in ipairs(v.sndAttr) do
-        lgyPrint('gwc.equip.sndAttr.id==>' .. v.id);
-        lgyPrint('gwc.equip.sndAttr.val==>' .. v.val);
-        lgyPrint('gwc.equip.sndAttr.isRemake==>' .. v.isRemake);
+        lgyPrint('gw2c.equip.sndAttr.id==>' .. v.id);
+        lgyPrint('gw2c.equip.sndAttr.val==>' .. v.val);
+        lgyPrint('gw2c.equip.sndAttr.isRemake==>' .. v.isRemake);
         local tempTB2 = {}
         for k, v in ipairs(v.remake) do
-            lgyPrint('gwc.equip.sndAttr.remake.id==>' .. v.id);
-            lgyPrint('gwc.equip.sndAttr.remake.val==>' .. v.val);
+            lgyPrint('gw2c.equip.sndAttr.remake.id==>' .. v.id);
+            lgyPrint('gw2c.equip.sndAttr.remake.val==>' .. v.val);
             tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
         end
         tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
     end
-    lgyPrint('gwc.equip.isLock==>' .. v.isLock);
-    lgyPrint('gwc.equip.isBad==>' .. v.isBad);
+    lgyPrint('gw2c.equip.isLock==>' .. v.isLock);
+    lgyPrint('gw2c.equip.isBad==>' .. v.isBad);
     
     local value = equipM(v.id, v.eid, v.lv, v.rarity + 1, v.isBad, v.isLock, v.fst_attr, tempTB1)
     local index, index2 = equipP.getIndexByID(v.id)
@@ -304,38 +343,38 @@ end
 -- 测试发送PBLUA--
 function SendPB_10005(id, isLock)
     lgyPrint('isLock==>' .. isLock);
-    local cgw = cgw_pb.EquipLock()
-    cgw.equipId = id
-    cgw.isLock = isLock
-    local msg1 = cgw:SerializeToString()
+    local c2gw = c2gw_pb.EquipLock()
+    c2gw.equipId = id
+    c2gw.isLock = isLock
+    local msg1 = c2gw:SerializeToString()
     createSendPBHeader(10005, msg1)
 end
 
 function MSGID_10005(body)
-    local gwc = gwc_pb.EquipLock()
-    gwc:ParseFromString(body);
+    local gw2c = gw2c_pb.EquipLock()
+    gw2c:ParseFromString(body);
     --装备数据
-    local v = gwc.equip
-    lgyPrint('gwc.equip.id==>' .. v.id);
-    lgyPrint('gwc.equip.eid==>' .. v.eid);
-    lgyPrint('gwc.equip.lv==>' .. v.lv);
-    lgyPrint('gwc.equip.rarity==>' .. v.rarity);
-    lgyPrint('gwc.equip.fst_attr==>' .. v.fst_attr);
+    local v = gw2c.equip
+    lgyPrint('gw2c.equip.id==>' .. v.id);
+    lgyPrint('gw2c.equip.eid==>' .. v.eid);
+    lgyPrint('gw2c.equip.lv==>' .. v.lv);
+    lgyPrint('gw2c.equip.rarity==>' .. v.rarity);
+    lgyPrint('gw2c.equip.fst_attr==>' .. v.fst_attr);
     local tempTB1 = {}
     for k, v in ipairs(v.sndAttr) do
-        lgyPrint('gwc.equip.sndAttr.id==>' .. v.id);
-        lgyPrint('gwc.equip.sndAttr.val==>' .. v.val);
-        lgyPrint('gwc.equip.sndAttr.isRemake==>' .. v.isRemake);
+        lgyPrint('gw2c.equip.sndAttr.id==>' .. v.id);
+        lgyPrint('gw2c.equip.sndAttr.val==>' .. v.val);
+        lgyPrint('gw2c.equip.sndAttr.isRemake==>' .. v.isRemake);
         local tempTB2 = {}
         for k, v in ipairs(v.remake) do
-            lgyPrint('gwc.equip.sndAttr.remake.id==>' .. v.id);
-            lgyPrint('gwc.equip.sndAttr.remake.val==>' .. v.val);
+            lgyPrint('gw2c.equip.sndAttr.remake.id==>' .. v.id);
+            lgyPrint('gw2c.equip.sndAttr.remake.val==>' .. v.val);
             tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
         end
         tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
     end
-    lgyPrint('gwc.equip.isLock==>' .. v.isLock);
-    lgyPrint('gwc.equip.isBad==>' .. v.isBad);
+    lgyPrint('gw2c.equip.isLock==>' .. v.isLock);
+    lgyPrint('gw2c.equip.isBad==>' .. v.isBad);
     
     local value = equipM(v.id, v.eid, v.lv, v.rarity + 1, v.isBad, v.isLock, v.fst_attr, tempTB1)
     local index, index2 = equipP.getIndexByID(v.id)
@@ -348,36 +387,36 @@ end
 
 -- 测试发送PBLUA--
 function SendPB_10006(id)
-    local cgw = cgw_pb.EquipRepair()
-    cgw.equipId = id
-    local msg1 = cgw:SerializeToString()
+    local c2gw = c2gw_pb.EquipRepair()
+    c2gw.equipId = id
+    local msg1 = c2gw:SerializeToString()
     createSendPBHeader(10006, msg1)
 end
 function MSGID_10006(body)
-    local gwc = gwc_pb.EquipRepair()
-    gwc:ParseFromString(body);
+    local gw2c = gw2c_pb.EquipRepair()
+    gw2c:ParseFromString(body);
     --装备数据
-    local v = gwc.equip
-    lgyPrint('gwc.equip.id==>' .. v.id);
-    lgyPrint('gwc.equip.eid==>' .. v.eid);
-    lgyPrint('gwc.equip.lv==>' .. v.lv);
-    lgyPrint('gwc.equip.rarity==>' .. v.rarity);
-    lgyPrint('gwc.equip.fst_attr==>' .. v.fst_attr);
+    local v = gw2c.equip
+    lgyPrint('gw2c.equip.id==>' .. v.id);
+    lgyPrint('gw2c.equip.eid==>' .. v.eid);
+    lgyPrint('gw2c.equip.lv==>' .. v.lv);
+    lgyPrint('gw2c.equip.rarity==>' .. v.rarity);
+    lgyPrint('gw2c.equip.fst_attr==>' .. v.fst_attr);
     local tempTB1 = {}
     for k, v in ipairs(v.sndAttr) do
-        lgyPrint('gwc.equip.sndAttr.id==>' .. v.id);
-        lgyPrint('gwc.equip.sndAttr.val==>' .. v.val);
-        lgyPrint('gwc.equip.sndAttr.isRemake==>' .. v.isRemake);
+        lgyPrint('gw2c.equip.sndAttr.id==>' .. v.id);
+        lgyPrint('gw2c.equip.sndAttr.val==>' .. v.val);
+        lgyPrint('gw2c.equip.sndAttr.isRemake==>' .. v.isRemake);
         local tempTB2 = {}
         for k, v in ipairs(v.remake) do
-            lgyPrint('gwc.equip.sndAttr.remake.id==>' .. v.id);
-            lgyPrint('gwc.equip.sndAttr.remake.val==>' .. v.val);
+            lgyPrint('gw2c.equip.sndAttr.remake.id==>' .. v.id);
+            lgyPrint('gw2c.equip.sndAttr.remake.val==>' .. v.val);
             tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
         end
         tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
     end
-    lgyPrint('gwc.equip.isLock==>' .. v.isLock);
-    lgyPrint('gwc.equip.isBad==>' .. v.isBad);
+    lgyPrint('gw2c.equip.isLock==>' .. v.isLock);
+    lgyPrint('gw2c.equip.isBad==>' .. v.isBad);
     
     local value = equipM(v.id, v.eid, v.lv, v.rarity + 1, v.isBad, v.isLock, v.fst_attr, tempTB1)
     local index, index2 = equipP.getIndexByID(v.id)
@@ -390,38 +429,38 @@ end
 
 -- 测试发送PBLUA--
 function SendPB_10007(id, viceId)
-    local cgw = cgw_pb.EquipRemake()
-    cgw.equipId = id
-    cgw.viceId = viceId
-    local msg1 = cgw:SerializeToString()
+    local c2gw = c2gw_pb.EquipRemake()
+    c2gw.equipId = id
+    c2gw.viceId = viceId
+    local msg1 = c2gw:SerializeToString()
     createSendPBHeader(10007, msg1)
 end
 function MSGID_10007(body)
     lgyPrint('MSGID_10007');
-    local gwc = gwc_pb.EquipRemake()
-    gwc:ParseFromString(body);
+    local gw2c = gw2c_pb.EquipRemake()
+    gw2c:ParseFromString(body);
     --装备数据
-    local v = gwc.equip
-    lgyPrint('gwc.equip.id==>' .. v.id);
-    lgyPrint('gwc.equip.eid==>' .. v.eid);
-    lgyPrint('gwc.equip.lv==>' .. v.lv);
-    lgyPrint('gwc.equip.rarity==>' .. v.rarity);
-    lgyPrint('gwc.equip.fst_attr==>' .. v.fst_attr);
+    local v = gw2c.equip
+    lgyPrint('gw2c.equip.id==>' .. v.id);
+    lgyPrint('gw2c.equip.eid==>' .. v.eid);
+    lgyPrint('gw2c.equip.lv==>' .. v.lv);
+    lgyPrint('gw2c.equip.rarity==>' .. v.rarity);
+    lgyPrint('gw2c.equip.fst_attr==>' .. v.fst_attr);
     local tempTB1 = {}
     for k, v in ipairs(v.sndAttr) do
-        lgyPrint('gwc.equip.sndAttr.id==>' .. v.id);
-        lgyPrint('gwc.equip.sndAttr.val==>' .. v.val);
-        lgyPrint('gwc.equip.sndAttr.isRemake==>' .. v.isRemake);
+        lgyPrint('gw2c.equip.sndAttr.id==>' .. v.id);
+        lgyPrint('gw2c.equip.sndAttr.val==>' .. v.val);
+        lgyPrint('gw2c.equip.sndAttr.isRemake==>' .. v.isRemake);
         local tempTB2 = {}
         for k, v in ipairs(v.remake) do
-            lgyPrint('gwc.equip.sndAttr.remake.id==>' .. v.id);
-            lgyPrint('gwc.equip.sndAttr.remake.val==>' .. v.val);
+            lgyPrint('gw2c.equip.sndAttr.remake.id==>' .. v.id);
+            lgyPrint('gw2c.equip.sndAttr.remake.val==>' .. v.val);
             tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
         end
         tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
     end
-    lgyPrint('gwc.equip.isLock==>' .. v.isLock);
-    lgyPrint('gwc.equip.isBad==>' .. v.isBad);
+    lgyPrint('gw2c.equip.isLock==>' .. v.isLock);
+    lgyPrint('gw2c.equip.isBad==>' .. v.isBad);
     
     local value = equipM(v.id, v.eid, v.lv, v.rarity + 1, v.isBad, v.isLock, v.fst_attr, tempTB1)
     local index, index2 = equipP.getIndexByID(v.id)
@@ -434,39 +473,39 @@ end
 
 -- 测试发送PBLUA--
 function SendPB_10008(id, viceId, indexId)
-    local cgw = cgw_pb.EquipConfirmRemake()
-    cgw.equipId = id
-    cgw.viceId = viceId
-    cgw.indexId = indexId
-    local msg1 = cgw:SerializeToString()
+    local c2gw = c2gw_pb.EquipConfirmRemake()
+    c2gw.equipId = id
+    c2gw.viceId = viceId
+    c2gw.indexId = indexId
+    local msg1 = c2gw:SerializeToString()
     createSendPBHeader(10008, msg1)
 end
 
 function MSGID_10008(body)
-    local gwc = gwc_pb.EquipConfirmRemake()
-    gwc:ParseFromString(body);
+    local gw2c = gw2c_pb.EquipConfirmRemake()
+    gw2c:ParseFromString(body);
     --装备数据
-    local v = gwc.equip
-    lgyPrint('gwc.equip.id==>' .. v.id);
-    lgyPrint('gwc.equip.eid==>' .. v.eid);
-    lgyPrint('gwc.equip.lv==>' .. v.lv);
-    lgyPrint('gwc.equip.rarity==>' .. v.rarity);
-    lgyPrint('gwc.equip.fst_attr==>' .. v.fst_attr);
+    local v = gw2c.equip
+    lgyPrint('gw2c.equip.id==>' .. v.id);
+    lgyPrint('gw2c.equip.eid==>' .. v.eid);
+    lgyPrint('gw2c.equip.lv==>' .. v.lv);
+    lgyPrint('gw2c.equip.rarity==>' .. v.rarity);
+    lgyPrint('gw2c.equip.fst_attr==>' .. v.fst_attr);
     local tempTB1 = {}
     for k, v in ipairs(v.sndAttr) do
-        lgyPrint('gwc.equip.sndAttr.id==>' .. v.id);
-        lgyPrint('gwc.equip.sndAttr.val==>' .. v.val);
-        lgyPrint('gwc.equip.sndAttr.isRemake==>' .. v.isRemake);
+        lgyPrint('gw2c.equip.sndAttr.id==>' .. v.id);
+        lgyPrint('gw2c.equip.sndAttr.val==>' .. v.val);
+        lgyPrint('gw2c.equip.sndAttr.isRemake==>' .. v.isRemake);
         local tempTB2 = {}
         for k, v in ipairs(v.remake) do
-            lgyPrint('gwc.equip.sndAttr.remake.id==>' .. v.id);
-            lgyPrint('gwc.equip.sndAttr.remake.val==>' .. v.val);
+            lgyPrint('gw2c.equip.sndAttr.remake.id==>' .. v.id);
+            lgyPrint('gw2c.equip.sndAttr.remake.val==>' .. v.val);
             tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
         end
         tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
     end
-    lgyPrint('gwc.equip.isLock==>' .. v.isLock);
-    lgyPrint('gwc.equip.isBad==>' .. v.isBad);
+    lgyPrint('gw2c.equip.isLock==>' .. v.isLock);
+    lgyPrint('gw2c.equip.isBad==>' .. v.isBad);
     
     local value = equipM(v.id, v.eid, v.lv, v.rarity + 1, v.isBad, v.isLock, v.fst_attr, tempTB1)
     local index, index2 = equipP.getIndexByID(v.id)
@@ -480,116 +519,131 @@ end
 --卡牌升经验
 function SendPB_10009(id,lv)
 	print("SendPB_10009")
-	local cgw = cgw_pb.CardFeed()
-    cgw.cardId	 = id
-    cgw.lvs	 = lv
-    local msg = cgw:SerializeToString()
+	local c2gw = c2gw_pb.CardFeed()
+    c2gw.cardId	 = id
+    c2gw.lvs	 = lv
+    local msg = c2gw:SerializeToString()
     createSendPBHeader(10009, msg)
 end
 
 function MSGID_10009(body)
 	print("MSGID_10009..")
-	local gwc = gwc_pb.CardFeed()
-    gwc:ParseFromString(body)
+	local gw2c = gw2c_pb.CardFeed()
+    gw2c:ParseFromString(body)
     print(string.len(body))
-    changeCardData(gwc, 10009)
+    changeCardData(gw2c, 10009)
 end
 
 --卡牌升星
 function SendPB_10010(id)
-	local cgw = cgw_pb.CardStarup()
-    cgw.cardId	 = id
-    local msg = cgw:SerializeToString()
+	local c2gw = c2gw_pb.CardStarup()
+    c2gw.cardId	 = id
+    local msg = c2gw:SerializeToString()
     createSendPBHeader(10010, msg)
 end
 
 function MSGID_10010(body)
 	print("MSGID_10010..")
-	local gwc = gwc_pb.CardStarup()
-    gwc:ParseFromString(body)
-    changeCardData(gwc,10010)
+	local gw2c = gw2c_pb.CardStarup()
+    gw2c:ParseFromString(body)
+    changeCardData(gw2c,10010)
 end
 
 --卡牌携带等级
 function SendPB_10011(id)
-	local cgw = cgw_pb.CardCarryup()
-    cgw.cardId	 = id
-    local msg = cgw:SerializeToString()
+	local c2gw = c2gw_pb.CardCarryup()
+    c2gw.cardId	 = id
+    local msg = c2gw:SerializeToString()
     createSendPBHeader(10011, msg)
 end
 
 function MSGID_10011(body)
 	print("MSGID_10011..")
-	local gwc = gwc_pb.CardCarryup()
-    gwc:ParseFromString(body)
-    changeCardData(gwc, 10011)
+	local gw2c = gw2c_pb.CardCarryup()
+    gw2c:ParseFromString(body)
+    changeCardData(gw2c, 10011)
 end
 
 --卡牌军阶
 function SendPB_10012(id)
-	local cgw = cgw_pb.CardRankup()
-    cgw.cardId	 = id
-    local msg = cgw:SerializeToString()
+	local c2gw = c2gw_pb.CardRankup()
+    c2gw.cardId	 = id
+    local msg = c2gw:SerializeToString()
     createSendPBHeader(10012, msg)
 end
 
 function MSGID_10012(body)
 	print("MSGID_10012..")
-	local gwc = gwc_pb.CardRankup()
-    gwc:ParseFromString(body)
-   	changeCardData(gwc, 10012)
+	local gw2c = gw2c_pb.CardRankup()
+    gw2c:ParseFromString(body)
+   	changeCardData(gw2c, 10012)
 end
 
 --卡牌激活军功章槽位
 function SendPB_10013(id,slotId)
 	print("SendPB_10013..")
-	local cgw = cgw_pb.CardTakeMedal()
-    cgw.cardId	 = id
-    cgw.slotId = slotId	
-    local msg = cgw:SerializeToString()
+	local c2gw = c2gw_pb.CardTakeMedal()
+    c2gw.cardId	 = id
+    c2gw.slotId = slotId	
+    local msg = c2gw:SerializeToString()
     createSendPBHeader(10013, msg)
 end
 
 function MSGID_10013(body)
 	print("MSGID_10013..")
-	local gwc = gwc_pb.CardTakeMedal()
-    gwc:ParseFromString(body)
-    changeCardData(gwc, 10013)
+	local gw2c = gw2c_pb.CardTakeMedal()
+    gw2c:ParseFromString(body)
+    changeCardData(gw2c, 10013)
 end
 
 --卡牌技能升级
 function SendPB_10014(id,skillid)
-	local cgw = cgw_pb.SkillLevelup()
-    cgw.cardId	 = id
-    cgw.skillId	 = skillid
-    local msg = cgw:SerializeToString()
+	local c2gw = c2gw_pb.SkillLevelup()
+    c2gw.cardId	 = id
+    c2gw.skillId	 = skillid
+    local msg = c2gw:SerializeToString()
     createSendPBHeader(10014, msg)
 end
 
 function MSGID_10014(body)
 	print("MSGID_10014..")
-	local gwc = gwc_pb.SkillLevelup()
-    gwc:ParseFromString(body)
-    changeCardData(gwc, 10014)
+	local gw2c = gw2c_pb.SkillLevelup()
+    gw2c:ParseFromString(body)
+    changeCardData(gw2c, 10014)
 end
 
 --卡牌技能点重置
 function SendPB_10015(id,cost)
-	local cgw = cgw_pb.SkillReset()
-    cgw.cardId	 = id
-    cgw.cost	 = cost
-    local msg = cgw:SerializeToString()
+	local c2gw = c2gw_pb.SkillReset()
+    c2gw.cardId	 = id
+    c2gw.cost	 = cost
+    local msg = c2gw:SerializeToString()
     createSendPBHeader(10015, msg)
 end
 
 function MSGID_10015(body)
 	print("MSGID_10015..")
-	local gwc = gwc_pb.SkillReset()
-    gwc:ParseFromString(body)
-	changeCardData(gwc, 10015)
+	local gw2c = gw2c_pb.SkillReset()
+    gw2c:ParseFromString(body)
+	changeCardData(gw2c, 10015)
 end
 
 
+
+function SendPB_10018(cardId,synergyId)
+    print("SendPB_10018..")
+    local c2gw = c2gw_pb.CardUnionLvlup()
+    c2gw.cardId	= cardId
+    c2gw.unionId = synergyId
+    local msg = c2gw:SerializeToString()
+    createSendPBHeader(10018, msg)
+end
+function MSGID_10018(body)
+	print("MSGID_10018..")
+	local gw2c = gw2c_pb.CardUnionLvlup()
+    gw2c:ParseFromString(body)
+	changeCardData(gw2c, 10018)
+end
 
 -- 测试发送PBLUA--
 function createSendPBHeader(msgId, body)
@@ -625,6 +679,7 @@ function class_wnd_login:OnAddHandler()
     Event.AddListener("10013", MSGID_10013)
     Event.AddListener("10014", MSGID_10014)
     Event.AddListener("10015", MSGID_10015)
+    Event.AddListener("10018", MSGID_10018)
     -- Event.AddListener("errno10001", ERRNO_10001)
 end
 

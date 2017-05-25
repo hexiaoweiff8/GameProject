@@ -12,10 +12,12 @@ public class FightUnitFactory {
         switch (unitType)
         {
             case (int)ObjectID.ObjectType.MyJiDi:
-                vo = null;
+                vo = new JiDiVO();
+                vo.ObjID = new ObjectID(ObjectID.ObjectType.MyJiDi);
                 break;
             case (int)ObjectID.ObjectType.EnemyJiDi:
-                vo = null;
+                vo = new JiDiVO();
+                vo.ObjID = new ObjectID(ObjectID.ObjectType.EnemyJiDi);
                 break;
             case (int)ObjectID.ObjectType.MySoldier:
                 vo = new FightVO();

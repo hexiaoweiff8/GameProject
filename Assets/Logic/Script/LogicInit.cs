@@ -226,7 +226,7 @@ public class LogicInit
         DP_CameraTrackObjectManage.AutoInstance();
 
         //初始化AI线程
-        new AI_Thread();
+        //new AI_Thread();
 
         //初始化场景中需要用到的界面元素
         //new wnd_scene();

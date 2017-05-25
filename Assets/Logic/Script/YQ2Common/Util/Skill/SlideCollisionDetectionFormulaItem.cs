@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Assertions.Comparers;
 using Util;
 
 public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
@@ -73,11 +74,12 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
             throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
         }
 
-        var formulaType = Convert.ToInt32(array[0]);
-        var speed = Convert.ToSingle(array[1]);
-        var width = Convert.ToSingle(array[2]);
-        var length = Convert.ToSingle(array[3]);
-        var targetCamps = (TargetCampsType)Enum.Parse(typeof(TargetCampsType), array[4]);
+        // 如果该项值是以%开头的则作为替换数据
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
+        var speed = GetDataOrReplace<float>("Speed", array, 1, ReplaceDic);
+        var width = GetDataOrReplace<float>("Width", array, 2, ReplaceDic);
+        var length = GetDataOrReplace<float>("Length", array, 3, ReplaceDic);
+        var targetCamps = GetDataOrReplace<TargetCampsType>("TargetCamps", array, 4, ReplaceDic);
 
 
         FormulaType = formulaType;
@@ -98,6 +100,9 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
         {
             throw new Exception("滑动碰撞检测的速度不能小于等于0");
         }
+
+        // 替换数据
+        ReplaceData(paramsPacker);
 
         // 数据本地化
         var mySpeed = Speed;
@@ -145,13 +150,14 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
                         paramsPacker.TargetMaxCount);
 
                     // 执行子技能
-                    if (tmpPackerList != null && tmpPackerList.Count > 0 && subFormulaItem != null)
+                    if (tmpPackerList != null && tmpPackerList.Count > 0 && SubFormulaItem != null)
                     {
                         // 排除不可选择目标
                         for (var i = 0; i < tmpPackerList.Count; i++)
                         {
                             var nowPacker = tmpPackerList[i];
-                            if (!TargetSelecter.CouldSelectTarget(nowPacker.ReceiverMenber.ClusterData.MemberData, selecterData))
+                            if (!TargetSelecter.CouldSelectTarget(nowPacker.ReceiverMenber.ClusterData.MemberData,
+                                    selecterData))
                             {
                                 tmpPackerList.RemoveAt(i);
                                 i--;
@@ -191,10 +197,12 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
 
                         foreach (var packer in tmpPackerList)
                         {
-                            var subSkill = new SkillInfo(-1);
-                            subSkill.AddFormulaItem(subFormulaItem);
+                            var subSkill = new SkillInfo(packer.SkillNum);
+                            subSkill.DataList = paramsPacker.DataList;
+                            FormulaParamsPackerFactroy.Single.CopyPackerData(paramsPacker, packer);
+                            subSkill.AddFormulaItem(SubFormulaItem);
                             subSkill.GetFormula(packer);
-                            SkillManager.Single.DoShillInfo(subSkill, packer);
+                            SkillManager.Single.DoShillInfo(subSkill, packer, true);
                         }
                     }
                     

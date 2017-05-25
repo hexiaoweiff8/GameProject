@@ -128,65 +128,50 @@ public static class FormulaConstructor
                 {
                     // 解析行为脚本
                     // 解析内容
-                    if (stackLevel > 0)
+                    // TODO 判断Formula的stack等级是否与当前stack等级一直? 不一致则新建将其加入上一级formula的子集
+                    // 参数列表内容
+                    var start = line.IndexOf("(", StringComparison.Ordinal);
+                    var end = line.IndexOf(")", StringComparison.Ordinal);
+
+                    if (start < 0 || end < 0)
                     {
-                        // TODO 判断Formula的stack等级是否与当前stack等级一直? 不一致则新建将其加入上一级formula的子集
-                        // 参数列表内容
-                        var start = line.IndexOf("(", StringComparison.Ordinal);
-                        var end = line.IndexOf(")", StringComparison.Ordinal);
+                        throw new Exception("转换行为链失败: ()符号不完整, 行数:" + (i + 1));
+                    }
+                    // 编号长度
+                    var length = end - start - 1;
+                    if (length <= 0)
+                    {
+                        throw new Exception("转换行为链失败: ()顺序错误, 行数:" + (i + 1));
+                    }
 
-                        if (start < 0 || end < 0)
-                        {
-                            throw new Exception("转换行为链失败: ()符号不完整, 行数:" + (i + 1));
-                        }
-                        // 编号长度
-                        var length = end - start - 1;
-                        if (length <= 0)
-                        {
-                            throw new Exception("转换行为链失败: ()顺序错误, 行数:" + (i + 1));
-                        }
+                    // 行为类型
+                    var type = line.Substring(0, start);
+                    // 行为参数
+                    var args = line.Substring(start + 1, length);
+                    // 消除参数空格
+                    args = args.Replace(" ", "");
+                    // 使用参数+名称获取IFormula
+                    var item = GetFormula(type, args);
+                    // formula加入暂停item
+                    var pauseItem = GetFormula("Pause", "1");
 
-                        // 行为类型
-                        var type = line.Substring(0, start);
-                        // 行为参数
-                        var args = line.Substring(start + 1, length);
-                        // 消除参数空格
-                        args = args.Replace(" ", "");
-                        // 使用参数+名称获取IFormula
-                        var item = GetFormula(type, args);
-                        // formula加入暂停item
-                        var pauseItem = GetFormula("Pause", "1");
-
-                        if (tmpItem == null)
-                        {
-                            tmpItem = pauseItem;
-                        }
-                        else
-                        {
-                            tmpItem = tmpItem.After(pauseItem);
-                        }
-                        tmpItem = tmpItem.After(item);
+                    if (tmpItem == null)
+                    {
+                        tmpItem = pauseItem;
                     }
                     else
                     {
-                        Debug.Log("泄漏! 泄漏内容:" + line);
+                        tmpItem = tmpItem.After(pauseItem);
                     }
+                    tmpItem = tmpItem.After(item);
                 }
-                else if(dataBraket)
+                else if (dataBraket)
                 {
                     // 解析数据
-                    if (skillInfo == null)
-                    {
-                        throw new Exception("技能ID未指定.技能类为空");
-                    }
-                    // 解析数据脚本
-                    var dataArray = line.Split(',');
-                    var dataList = dataArray.Select(Convert.ToSingle).ToList();
-                    skillInfo.DataList.Add(dataList);
+                    TransData(skillInfo, line);
                 }
-
-
             }
+            // 技能行为
             if (tmpItem != null)
             {
                 // 获得行为链生成器的head
@@ -207,7 +192,7 @@ public static class FormulaConstructor
     /// <param name="targetPos">目标位置</param>
     /// TODO 封装施法者与目标对象
     /// <returns></returns>
-    public static IFormulaItem GetFormula(string type, string args)
+    private static IFormulaItem GetFormula(string type, string args)
     {
 
         IFormulaItem result = null;
@@ -243,11 +228,68 @@ public static class FormulaConstructor
         return result;
     }
 
+    /// <summary>
+    /// 解析数据
+    /// </summary>
+    /// <param name="skillInfo">技能类</param>
+    /// <param name="line">数据行</param>
+    private static void TransData(SkillInfo skillInfo, string line)
+    {
+
+        // 解析数据
+        if (skillInfo == null)
+        {
+            throw new Exception("技能ID未指定.技能类为空");
+        }
+        var start = line.IndexOf("(", StringComparison.Ordinal);
+        var end = line.IndexOf(")", StringComparison.Ordinal);
+        // 编号长度
+        var length = end - start - 1;
+        if (line.StartsWith("CDTime"))
+        {
+            if (start < 0 || end < 0)
+            {
+                throw new Exception("转换行为链失败: ()符号不完整" + line);
+            }
+            skillInfo.CDTime = Convert.ToSingle(line.Substring(start + 1, length));
+        }
+        else if (line.StartsWith("CDGroup"))
+        {
+            if (start < 0 || end < 0)
+            {
+                throw new Exception("转换行为链失败: ()符号不完整" + line);
+            }
+            skillInfo.CDGroup = Convert.ToInt32(line.Substring(start + 1, length));
+        }
+        else if (line.StartsWith("ReleaseTime"))
+        {
+            if (start < 0 || end < 0)
+            {
+                throw new Exception("转换行为链失败: ()符号不完整:" + line);
+            }
+            skillInfo.ReleaseTime = Convert.ToInt32(line.Substring(start + 1, length));
+        }
+        else if (line.StartsWith("Trigger"))
+        {
+            // 触发事件
+        }
+        else
+        {
+            // 解析数据脚本
+            var dataArray = line.Split(',');
+            var dataList = new List<string>();
+            foreach (var data in dataArray)
+            {
+                dataList.Add(data);
+            }
+            skillInfo.DataList.Add(dataList);
+        }
+    } 
+
     // 结构例子
     /*
      SkillNum(10000)
      {
-      
         PointToPoint(1,key,0,1,10,1,1),     // 需要等待其结束, 特效key(对应key,或特效path), 释放位置, 命中位置, 速度10, 飞行轨迹类型
         Point(0,key,1,0,3),                // 不需要等待其结束, 特效key(对应key,或特效path), 释放位置, 播放速度, 持续3秒
         CollisionDetection(1, 1, 10, 0, 10001)
@@ -255,8 +297,13 @@ public static class FormulaConstructor
             Calculate(1,0,%0)
         }
      }
-     
      [
+         // cd时间
+         CDTime(10)
+         // cd组ID(不一样的组ID不会共享同一个公共CD
+         CDGroup(1)
+         // 可释放次数
+         ReleaseTime(10)
         // 数据
         1, 100
         2, 200
@@ -311,7 +358,22 @@ public class SkillInfo
     /// <summary>
     /// 保存技能等级数据列表
     /// </summary>
-    public List<List<float>> DataList = new List<List<float>>(); 
+    public List<List<string>> DataList = new List<List<string>>();
+
+    /// <summary>
+    /// 技能CD时间
+    /// </summary>
+    public float CDTime { get; set; }
+
+    /// <summary>
+    /// 技能CD组ID(不同组ID不会公用一个公共CD)
+    /// </summary>
+    public int CDGroup { get; set; }
+
+    /// <summary>
+    /// 技能可释放次数
+    /// </summary>
+    public int ReleaseTime { get; set; }
 
     /// <summary>
     /// 技能行为单元
@@ -368,6 +430,8 @@ public class SkillInfo
         var tmpItem = formulaItem;
         // 数据列表放入packer中
         paramsPacker.DataList = DataList;
+        // 技能ID放入packer中
+        paramsPacker.SkillNum = SkillNum;
         while (tmpItem != null)
         {
             if (result != null)

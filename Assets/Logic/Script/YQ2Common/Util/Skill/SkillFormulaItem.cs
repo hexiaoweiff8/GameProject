@@ -47,8 +47,8 @@ public class SkillFormulaItem : AbstractFormulaItem
         }
         // 解析参数
         // 是否等待完成, 技能编号, 技能未接收方(0: 释放者, 1: 被释放者)
-        var formulaType = Convert.ToInt32(array[0]);
-        var skillNum = Convert.ToInt32(array[1]);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
+        var skillNum = GetDataOrReplace<int>("SkillNum", array, 1, ReplaceDic);
 
         FormulaType = formulaType;
         SkillNum = skillNum;
@@ -67,6 +67,9 @@ public class SkillFormulaItem : AbstractFormulaItem
         }
         // 对上一级选出的目标列表释放
         IFormula result = null;
+
+        // 替换替换符数据
+        ReplaceData(paramsPacker);
 
         // 数据本地化
         var myFormulaType = FormulaType;

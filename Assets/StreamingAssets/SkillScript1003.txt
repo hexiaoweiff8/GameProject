@@ -1,9 +1,7 @@
 SkillNum(1003)
-
 {
-        SlideCollisionDetection(1, 1, 10, 40, -1)
-        {
-            Point(1,test/ExplordScope,1,0,3,10,1,10),
-        }
-
+	PointToPoint(1, test/TrailPrj, 0, 1, %0, 1, %1,%2,%3);
 }
+[
+	10, 1, 1, 1, , , , , , 
+]

@@ -80,6 +80,19 @@ public class DP_Battlefield : MonoEX.SingletonAuto<DP_Battlefield>
     }
 
     /// <summary>
+    /// 根据用户等级 配置 以及当前副本 加载对应的基地
+    /// </summary>
+    public void LoadBase()
+    {
+        //TODO 临时创建基地的代码
+        CreateActorParam para1 = new CreateActorParam(5, false, 0, "lingtong", "lingtong", true, 1008001);
+        CreateActorParam para12 = new CreateActorParam(5, false, 0, "lingtong", "lingtong", true, 1008001);
+
+        FightUnitFactory.CreateUnit(1,para1);
+        FightUnitFactory.CreateUnit(2, para12);
+    }
+
+    /// <summary>
     /// 相机关注某英雄
     /// </summary>
     public void CameraFocusFID(bool isLeft, int fid)
@@ -140,7 +153,7 @@ public class DP_Battlefield : MonoEX.SingletonAuto<DP_Battlefield>
         lock (AI_Thread.Single.MutexLock)
         {
             DP_CameraTrackObjectManage.Single.Reset();
-            AI_Thread.Single.T_Reset();//ai线程清理
+//            AI_Thread.Single.T_Reset();//ai线程清理
             //wnd_fight.Single.Reset();
             DP_BattlefieldDraw.Single.Reset();
             AI_Single.Single.Battlefield.Reset();

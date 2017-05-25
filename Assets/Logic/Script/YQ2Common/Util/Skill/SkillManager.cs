@@ -110,14 +110,32 @@ public class SkillManager
     /// </summary>
     /// <param name="skillInfo">技能对象</param>
     /// <param name="packer">技能数据包</param>
-    public void DoShillInfo(SkillInfo skillInfo, FormulaParamsPacker packer)
+    /// <param name="isSubSkill">是否为子技能</param>
+    public void DoShillInfo(SkillInfo skillInfo, FormulaParamsPacker packer, bool isSubSkill = false)
     {
         if (skillInfo == null)
         {
             throw new Exception("方程式对象为空.");
         }
+        if (isSubSkill)
+        {
+            DoFormula(skillInfo.GetFormula(packer));
+        }
+        else
+        {
+            var objId = packer.ReleaseMember.ClusterData.MemberData.ObjID.ID;
+            var skillNum = skillInfo.SkillNum;
+            // 技能是否在CD
+            if (!CDTimer.Instance().IsInCD(objId, skillNum))
+            {
+                CDTimer.Instance().SetInCD(objId, skillNum, 1);
+                // 技能CDGroup
+                // 技能可释放次数-暂时不做
 
-        DoFormula(skillInfo.GetFormula(packer));
+                DoFormula(skillInfo.GetFormula(packer));
+            }
+            // 否则技能在CD中不能释放
+        }
     }
 
     /// <summary>
@@ -125,7 +143,8 @@ public class SkillManager
     /// </summary>
     /// <param name="skillNum">技能ID</param>
     /// <param name="packer">技能数据包</param>
-    public void DoSkillNum(int skillNum, FormulaParamsPacker packer)
+    /// <param name="isSubSkill">是否为子技能</param>
+    public void DoSkillNum(int skillNum, FormulaParamsPacker packer, bool isSubSkill = false)
     {
         if (!SkillInfoDic.ContainsKey(skillNum))
         {
@@ -133,7 +152,7 @@ public class SkillManager
         }
 
         var skillInfo = SkillInfoDic[skillNum];
-        DoShillInfo(skillInfo, packer);
+        DoShillInfo(skillInfo, packer, isSubSkill);
     }
 
     /// <summary>

@@ -216,6 +216,10 @@ public class FormulaParamsPackerFactroy
 
                 // 查询外层持有类
                 var targetDisplayOwner = DisplayerManager.Single.GetElementById(posObj.MemberData.ObjID);
+                if (targetDisplayOwner == null)
+                {
+                    int w = 0;
+                }
                 // 加入列表
                 result.Add(new FormulaParamsPacker()
                 {
@@ -227,6 +231,25 @@ public class FormulaParamsPackerFactroy
         }
 
         return result;
+    }
+
+
+    /// <summary>
+    /// 拷贝数据
+    /// </summary>
+    /// <param name="from">被拷贝单位</param>
+    /// <param name="to">目标单位</param>
+    public FormulaParamsPacker CopyPackerData(FormulaParamsPacker from, FormulaParamsPacker to)
+    {
+        if (from == null || to == null)
+        {
+            return null;
+        }
+        // 拷贝数据
+        to.DataList = from.DataList;
+        to.SkillLevel = from.SkillLevel;
+        to.SkillNum = from.SkillNum;
+        return to;
     }
 
 }

@@ -176,7 +176,7 @@ public class YQ2CameraCtrl : MonoBehaviour
         // x = x_center + Math.Sin(2 * Math.PI / 360) * r, 
         // y = y_center + Math.Cos(2 * Math.PI / 360) * r
         // 的公式加上速度计算当前位置
-        var radian = (2 * Math.PI / 360) * rotationSpeed * rotatingTime;
+        var radian = (2 * Utils.AngleToPi) * rotationSpeed * rotatingTime;
         var pointX = targetPos.x + Math.Sin(radian) * rotationRedius;
         var pointY = targetPos.z + Math.Cos(radian) * rotationRedius;
 
@@ -196,9 +196,9 @@ public class YQ2CameraCtrl : MonoBehaviour
         // 求与当前运行轨迹圆的切线向量
         var tangent = Vector3.Cross(
             new Vector3(
-                (float)Math.Sin((rotationSpeed * rotatingTime + 180) * Math.PI / 180),
+                (float)Math.Sin((rotationSpeed * rotatingTime + 180) * Utils.AngleToPi),
                 0,
-                (float)Math.Cos((rotationSpeed * rotatingTime + 180) * Math.PI / 180)),
+                (float)Math.Cos((rotationSpeed * rotatingTime + 180) * Utils.AngleToPi)),
             Vector3.down);
         // 相对X轴旋转
         var xRotate = Quaternion.AngleAxis(angle: (float)(90 - Math.Atan(d: rotationRedius / rotationYOffset) / Math.PI * 180), axis: tangent);

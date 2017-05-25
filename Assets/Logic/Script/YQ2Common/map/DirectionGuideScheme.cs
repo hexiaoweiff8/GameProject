@@ -153,7 +153,7 @@ public class DirectionGuideSchemeManage : MonoEX.Singleton<DirectionGuideSchemeM
                 DirectionGuideScheme newScheme = Schemes[(int)dType];
 
                 DirectionGuide n = new DirectionGuide();
-                n.radian = (float)angle * (float)Math.PI / 180f;
+                n.radian = angle * Utils.AngleToPi;
                 n.GuideGrids_eq = To(equal);
                 n.GuideGrids_gt = To(greater);
                 n.GuideGrids_ls = To(less); 

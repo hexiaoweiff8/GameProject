@@ -66,6 +66,7 @@ public static class DelegateFactory
 		dict.Add(typeof(UIWidget.OnPostFillCallback), UIWidget_OnPostFillCallback);
 		dict.Add(typeof(UIDrawCall.OnRenderCallback), UIDrawCall_OnRenderCallback);
 		dict.Add(typeof(UIWidget.HitCheck), UIWidget_HitCheck);
+		dict.Add(typeof(UIProgressBar.OnDragFinished), UIProgressBar_OnDragFinished);
 		dict.Add(typeof(UIGrid.OnReposition), UIGrid_OnReposition);
 		dict.Add(typeof(System.Comparison<UnityEngine.Transform>), System_Comparison_UnityEngine_Transform);
 		dict.Add(typeof(UIScrollView.OnDragNotification), UIScrollView_OnDragNotification);
@@ -2595,6 +2596,49 @@ public static class DelegateFactory
 		{
 			UIWidget_HitCheck_Event target = new UIWidget_HitCheck_Event(func, self);
 			UIWidget.HitCheck d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UIProgressBar_OnDragFinished_Event : LuaDelegate
+	{
+		public UIProgressBar_OnDragFinished_Event(LuaFunction func) : base(func) { }
+		public UIProgressBar_OnDragFinished_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call()
+		{
+			func.Call();
+		}
+
+		public void CallWithSelf()
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UIProgressBar_OnDragFinished(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UIProgressBar.OnDragFinished fn = delegate() { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UIProgressBar_OnDragFinished_Event target = new UIProgressBar_OnDragFinished_Event(func);
+			UIProgressBar.OnDragFinished d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UIProgressBar_OnDragFinished_Event target = new UIProgressBar_OnDragFinished_Event(func, self);
+			UIProgressBar.OnDragFinished d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}

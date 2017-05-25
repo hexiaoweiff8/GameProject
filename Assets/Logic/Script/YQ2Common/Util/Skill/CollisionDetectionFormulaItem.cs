@@ -29,9 +29,24 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
     public GraphicType ScopeType { get; private set; }
 
     /// <summary>
+    /// 参数1
+    /// </summary>
+    public float Arg1 { get; private set; }
+
+    /// <summary>
+    /// 参数2
+    /// </summary>
+    public float Arg2 { get; private set; }
+
+    /// <summary>
+    /// 参数3
+    /// </summary>
+    public float Arg3 { get; private set; }
+
+    /// <summary>
     /// 范围描述参数
     /// </summary>
-    public float[] ScopeParams { get; private set; }
+    //public float[] ScopeParams { get; private set; }
 
     ///// <summary>
     ///// 技能ID
@@ -54,7 +69,7 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
         ReceivePos = receivePos;
         TargetCamps = targetCamps;
         ScopeType = scopeType;
-        ScopeParams = scopeParams;
+        //ScopeParams = scopeParams;
         //SkillNum = skillNum;
     }
 
@@ -84,24 +99,32 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
         // 是否等待完成, 目标数量, 检测位置(0放技能方, 1目标方), 检测范围形状(0圆, 1方),
         // 目标阵营(-1:都触发, 0: 己方, 1: 非己方),
         // 范围大小(方 第一个宽, 第二个长, 第三个旋转角度, 圆的就取第一个值当半径, 扇形第一个半径, 第二个开口角度, 第三个旋转角度有更多的参数都放进来)
-        var formulaType = Convert.ToInt32(array[0]);
-        var targetCount = Convert.ToInt32(array[1]);
-        var receivePos = Convert.ToInt32(array[2]);
-        var scopeType = (GraphicType)Enum.Parse(typeof(GraphicType), array[3]);
-        var targetTypeCamps = (TargetCampsType)Enum.Parse(typeof(TargetCampsType), array[4]);
-        float[] scopeArgs = new float[array.Length - argsCount];
-        // 范围参数
-        for (var i = 0; i < array.Length - argsCount; i++)
-        {
-            scopeArgs[i] = Convert.ToSingle(array[i + argsCount]);
-        }
+        // 如果该项值是以%开头的则作为替换数据
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
+        var targetCount = GetDataOrReplace<int>("TargetCount", array, 1, ReplaceDic);
+        var receivePos = GetDataOrReplace<int>("ReceivePos", array, 2, ReplaceDic);
+        var scopeType = GetDataOrReplace<GraphicType>("ScopeType", array, 4, ReplaceDic);
+        var targetTypeCamps = GetDataOrReplace<TargetCampsType>("TargetCamps", array, 4, ReplaceDic);
+
+        //float[] scopeArgs = new float[3];
+
+        var arg1 = GetDataOrReplace<float>("Arg1", array, 5, ReplaceDic);
+        var arg2 = GetDataOrReplace<float>("Arg2", array, 6, ReplaceDic);
+        var arg3 = GetDataOrReplace<float>("Arg3", array, 7, ReplaceDic);
+        //// 范围参数
+        //for (var i = 0; i < array.Length - argsCount; i++)
+        //{
+        //    scopeArgs[i] = Convert.ToSingle(array[i + argsCount]);
+        //}
 
         FormulaType = formulaType;
         TargetCount = targetCount;
         ReceivePos = receivePos;
-        TargetCamps = targetTypeCamps;
         ScopeType = scopeType;
-        ScopeParams = scopeArgs;
+        TargetCamps = targetTypeCamps;
+        Arg1 = arg1;
+        Arg2 = arg2;
+        Arg3 = arg3;
     }
 
     /// <summary>
@@ -115,6 +138,9 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
             return null;
         }
         IFormula result = null;
+
+        // 替换替换符的数据
+        ReplaceData(paramsPacker);
 
         // 数据本地化
         var myReceivePos = ReceivePos;
@@ -130,17 +156,17 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
             {
                 case GraphicType.Circle:
                     // 圆形
-                    graphics = new CircleGraphics(pos, ScopeParams[0]);
+                    graphics = new CircleGraphics(pos, Arg1);
                     break;
 
                 case GraphicType.Rect:
                     // 矩形
-                    graphics = new RectGraphics(pos, ScopeParams[0], ScopeParams[1], ScopeParams[2]);
+                    graphics = new RectGraphics(pos, Arg1, Arg2, Arg3);
                     break;
 
                 case GraphicType.Sector:
                     // 扇形
-                    graphics = new SectorGraphics(pos, ScopeParams[2], ScopeParams[0], ScopeParams[1]);
+                    graphics = new SectorGraphics(pos, Arg3, Arg1, Arg2);
                     break;
             }
 
@@ -163,12 +189,14 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
                 foreach (var packer in packerList)
                 {
                     // 执行子行为链
-                    if (subFormulaItem != null)
+                    if (SubFormulaItem != null)
                     {
-                        var subSkill = new SkillInfo(-1);
-                        subSkill.AddFormulaItem(subFormulaItem);
+                        var subSkill = new SkillInfo(packer.SkillNum);
+                        subSkill.DataList = packer.DataList;
+                        FormulaParamsPackerFactroy.Single.CopyPackerData(paramsPacker, packer);
+                        subSkill.AddFormulaItem(SubFormulaItem);
                         subSkill.GetFormula(packer);
-                        SkillManager.Single.DoShillInfo(subSkill, packer);
+                        SkillManager.Single.DoShillInfo(subSkill, packer, true);
                     }
                 }
             }

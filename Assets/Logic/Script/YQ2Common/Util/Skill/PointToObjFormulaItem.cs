@@ -24,11 +24,20 @@ public class PointToObjFormulaItem : AbstractFormulaItem
     /// </summary>
     public TrajectoryAlgorithmType FlyType { get; private set; }
 
+    /// <summary>
+    /// X轴缩放
+    /// </summary>
+    public float ScaleX { get; private set; }
 
     /// <summary>
-    /// 缩放
+    /// Y轴缩放
     /// </summary>
-    private float[] scale = new[] { 1f, 1f, 1f };
+    public float ScaleY { get; private set; }
+
+    /// <summary>
+    /// Z轴缩放
+    /// </summary>
+    public float ScaleZ { get; private set; }
 
     /// <summary>
     /// 初始化行为链生成器
@@ -46,7 +55,9 @@ public class PointToObjFormulaItem : AbstractFormulaItem
         FlyType = flyType;
         if (scale != null)
         {
-            this.scale = scale;
+            ScaleX = scale[0];
+            ScaleY = scale[1];
+            ScaleZ = scale[2];
         }
     }
 
@@ -73,21 +84,23 @@ public class PointToObjFormulaItem : AbstractFormulaItem
             throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
         }
         // 是否等待完成,特效Key,速度,飞行轨迹
-        var formulaType = Convert.ToInt32(array[0]);
-        var effectKey = array[1];
-        var speed = Convert.ToSingle(array[2]);
-        var flyType = (TrajectoryAlgorithmType)Enum.Parse(typeof(TrajectoryAlgorithmType), array[3]);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
+        var effectKey = GetDataOrReplace<string>("EffectKey", array, 1, ReplaceDic);
+        var speed = GetDataOrReplace<float>("Speed", array, 2, ReplaceDic);
+        var flyType = GetDataOrReplace<TrajectoryAlgorithmType>("FlyType", array, 3, ReplaceDic);
 
-        float[] scale = new float[3];
-        scale[0] = Convert.ToSingle(array[4]);
-        scale[1] = Convert.ToSingle(array[5]);
-        scale[2] = Convert.ToSingle(array[6]);
+        var scaleX = GetDataOrReplace<float>("ScaleX", array, 4, ReplaceDic);
+        var scaleY = GetDataOrReplace<float>("ScaleY", array, 5, ReplaceDic);
+        var scaleZ = GetDataOrReplace<float>("ScaleZ", array, 6, ReplaceDic);
+
 
         FormulaType = formulaType;
         EffectKey = effectKey;
         Speed = speed;
         FlyType = flyType;
-        this.scale = scale;
+        ScaleX = scaleX;
+        ScaleY = scaleY;
+        ScaleZ = scaleZ;
     }
 
 
@@ -122,19 +135,24 @@ public class PointToObjFormulaItem : AbstractFormulaItem
             throw new Exception(errorMsg);
         }
 
+        // 替换替换符数据
+        ReplaceData(paramsPacker);
+
         // 数据本地化
         var myFormulaType = FormulaType;
         var myEffectKey = EffectKey;
         var mySpeed = Speed;
         var myFlyType = FlyType;
-        var myScale = scale;
+        var scaleX = ScaleX;
+        var scaleY = ScaleY;
+        var scaleZ = ScaleZ;
 
         IFormula result = new Formula((callback) =>
         {
             // 判断发射与接收位置
             // TODO 父级暂时没有
             EffectsFactory.Single.CreatePointToObjEffect(myEffectKey, null, paramsPacker.StartPos,
-                                paramsPacker.ReceiverMenber.GameObj, new Vector3(myScale[0], myScale[1], myScale[2]), mySpeed, myFlyType, callback).Begin();
+                                paramsPacker.ReceiverMenber.GameObj, new Vector3(scaleX, scaleY, scaleZ), mySpeed, myFlyType, callback).Begin();
         }, myFormulaType);
 
         return result;

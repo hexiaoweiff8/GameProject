@@ -98,8 +98,6 @@
     <Compile Include="Assets\AStarSchoolBehaviour\AstarTest.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\MapEditor.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\Move.cs" />
-    <Compile Include="Assets\AStarSchoolBehaviour\Script\SkillScriptEditor.cs" />
-    <Compile Include="Assets\AStarSchoolBehaviour\Script\SkillTriggerScriptEditor.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestBallistic.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestCollision.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestEffectFactory.cs" />
@@ -1046,6 +1044,7 @@
     <None Include="Assets\StreamingAssets\SkillScript1002.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1003.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1004.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript1005.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
 </Project>

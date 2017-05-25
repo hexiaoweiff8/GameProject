@@ -8,6 +8,7 @@ public class FightUnitFactoryWrap
 	{
 		L.BeginClass(typeof(FightUnitFactory), typeof(System.Object));
 		L.RegFunction("CreateUnit", CreateUnit);
+		L.RegFunction("DeleteUnit", DeleteUnit);
 		L.RegFunction("New", _CreateFightUnitFactory);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.EndClass();
@@ -48,6 +49,22 @@ public class FightUnitFactoryWrap
 			DisplayOwner o = FightUnitFactory.CreateUnit(arg0, arg1);
 			ToLua.PushObject(L, o);
 			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int DeleteUnit(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			VOBase arg0 = (VOBase)ToLua.CheckObject(L, 1, typeof(VOBase));
+			FightUnitFactory.DeleteUnit(arg0);
+			return 0;
 		}
 		catch(Exception e)
 		{

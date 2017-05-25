@@ -33,12 +33,14 @@ public class Soldier_PutongGongji_State : SoldierFSMState
 
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
+        _fireTick = fsm.Display.ClusterData.MemberData.AttackRate1;
         _fireTimer = new Timer(_fireTick,true);
         _fireTimer.OnCompleteCallback(() => { fire(fsm); }).Start();
 
         _bulletCount = fsm.Display.ClusterData.MemberData.Clipsize1;
         _bulletMax = fsm.Display.ClusterData.MemberData.Clipsize1;
         _reloadTime = fsm.Display.ClusterData.MemberData.ReloadTime1;
+        
     }
 
     private void fire(SoldierFSMSystem fsm)

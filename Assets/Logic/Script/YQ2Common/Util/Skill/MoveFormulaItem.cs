@@ -58,9 +58,10 @@ public class MoveFormulaItem : AbstractFormulaItem
             throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
         }
 
-        var formulaType = Convert.ToInt32(array[0]);
-        var speed = Convert.ToSingle(array[1]);
-        var isBlink = Convert.ToInt32(array[2]);
+        // 如果该项值是以%开头的则作为替换数据
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
+        var speed = GetDataOrReplace<float>("Speed", array, 1, ReplaceDic);
+        var isBlink = GetDataOrReplace<int>("IsBlink", array, 2, ReplaceDic);
 
         FormulaType = formulaType;
         Speed = speed;
@@ -78,6 +79,9 @@ public class MoveFormulaItem : AbstractFormulaItem
         {
             return null;
         }
+
+        // 替换替换符数据
+        ReplaceData(paramsPacker);
         // 数据本地化
         var myCheckTime = CheckTime;
         var mySpeed = Speed;
