@@ -28,6 +28,12 @@ public class SoldierFSMFactory
             case SoldierTriggerID.PutongGongji:
                 var putongToXingjin = new XingjinTrigger();
                 _fsmTrriggerList.Add(putongToXingjin);
+                var putongToZhunbeizhandou = new ZhunbeizhandouTrigger();
+                _fsmTrriggerList.Add(putongToZhunbeizhandou);
+                break;
+            case SoldierTriggerID.JinengGongji:
+                var jinengToXingjin = new XingjinTrigger();
+                _fsmTrriggerList.Add(jinengToXingjin);
                 break;
         }
         //除死亡状态以外的任何状态都可以切死亡

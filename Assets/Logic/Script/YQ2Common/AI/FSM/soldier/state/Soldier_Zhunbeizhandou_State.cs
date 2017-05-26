@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public class Soldier_Zhunbeizhandou_State : SoldierFSMState
 {
@@ -17,8 +18,17 @@ public class Soldier_Zhunbeizhandou_State : SoldierFSMState
         var myself = fsm.Display.RanderControl;
         myself.ModelRander.SetClip("run".GetHashCode());
         fsm.Display.ClusterData.Stop();
-        
-        fsm.IsCanInPutonggongji = true;
+
+
+        // 状态切换路由
+        if (fsm.EnemyTarget != null && fsm.Skill == null)
+        {
+            fsm.IsCanInPutonggongji = true;
+        }
+        else if(fsm.Skill != null)
+        {
+            fsm.IsCanInJinenggongji = true;
+        }
     }
 
     public override void Action(SoldierFSMSystem fsm)

@@ -424,6 +424,7 @@
     <None Include="Assets\Resources\sdata_template.txt" />
     <None Include="Assets\StreamingAssets\Android\files.txt" />
     <None Include="Assets\StreamingAssets\Android\lua\pack_script\pk_script\_tmp.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript10001.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1001.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1002.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1003.txt" />

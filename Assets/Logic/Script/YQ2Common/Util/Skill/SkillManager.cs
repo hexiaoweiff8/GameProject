@@ -68,7 +68,7 @@ public class SkillManager
             else
             {
                 // 检测文件是否存在
-                var file = new FileInfo(Application.streamingAssetsPath + Path.PathSeparator + "SkillScript" + skillId);
+                var file = new FileInfo(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "SkillScript" + skillId + ".txt");
                 if (file.Exists)
                 {
                     // 加载文件内容

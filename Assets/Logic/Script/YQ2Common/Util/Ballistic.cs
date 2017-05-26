@@ -139,10 +139,6 @@ public class Ballistic : MonoBehaviour , IBallistic
         {
             OnKill(this, BallisticArriveTarget);
         }
-        else
-        {
-            Destroy(this.gameObject);
-        }
     }
 }
 

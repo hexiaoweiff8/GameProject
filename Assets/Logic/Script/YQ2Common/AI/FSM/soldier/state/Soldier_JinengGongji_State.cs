@@ -18,21 +18,26 @@ public class Soldier_JinengGongji_State : SoldierFSMState
         // fsm 中带技能ID
         if (!skillIsEnd)
         {
-            var skillInfo = fsm.Display.ClusterData.MemberData.Skill1;
-            // 检测释放技能
-            // 检测范围内单位
-            // 筛选单位
-            // 对目标单位(或目标点)开始释放技能
-            // 数据中拿出技能编号,调用技能编号对应技能脚本
-            // 
-            // 技能释放完毕, 置状态下一帧切回行进行进状态(或者准备攻击状态)
-
+            SkillManager.Single.DoShillInfo(fsm.Skill, new FormulaParamsPacker()
+            {
+                DataList = fsm.Skill.DataList,
+                // TODO 技能等级, 最大目标数量
+                SkillLevel = 1,
+                SkillNum = fsm.Skill.SkillNum,
+                ReceiverMenber = fsm.EnemyTarget,
+                ReleaseMember = fsm.Display,
+                StartPos = fsm.Display.ClusterData.gameObject.transform.position,
+                TargetPos = fsm.EnemyTarget.ClusterData.gameObject.transform.position
+            });
+            skillIsEnd = true;
+            fsm.Skill = null;
         }
         else
         {
-            // 切换状态到准备攻击
+            // 切换状态到行进状态
             fsm.IsCanInJinenggongji = false;
-            // 技能cd设置IsCanInIjnenggongji = true;
+            fsm.TargetIsLoseEfficacy = true;
+            fsm.EnemyTarget = null;
         }
     }
 }

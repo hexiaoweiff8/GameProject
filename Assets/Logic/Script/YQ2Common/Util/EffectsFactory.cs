@@ -44,11 +44,11 @@ public class EffectsFactory
     /// <param name="speed"></param>
     /// <param name="completeCallback">完成回调</param>
     /// <returns>特效对象</returns>
-    public EffectBehaviorAbstract CreatePointEffect(string effectKey, Transform parent, Vector3 position, Vector3 scale, float durTime, float speed, Action completeCallback = null)
+    public EffectBehaviorAbstract CreatePointEffect(string effectKey, Transform parent, Vector3 position, Vector3 scale, float durTime, float speed, Action completeCallback = null, int effectLayer = 0)
     {
         EffectBehaviorAbstract result = null;
 
-        result = new PointEffect(effectKey, parent, position, scale, durTime, speed, completeCallback);
+        result = new PointEffect(effectKey, parent, position, scale, durTime, speed, completeCallback, effectLayer);
 
         return result;
     }
@@ -58,11 +58,11 @@ public class EffectsFactory
     /// 特效会从start按照速度与轨迹飞到end点
     /// </summary>
     /// <returns>特效对象</returns>
-    public EffectBehaviorAbstract CreatePointToPointEffect(string effectKey, Transform parent, Vector3 position, Vector3 to, Vector3 scale, float speed, TrajectoryAlgorithmType flytype = TrajectoryAlgorithmType.Line, Action completeCallback = null)
+    public EffectBehaviorAbstract CreatePointToPointEffect(string effectKey, Transform parent, Vector3 position, Vector3 to, Vector3 scale, float speed, TrajectoryAlgorithmType flytype = TrajectoryAlgorithmType.Line, Action completeCallback = null, int effectLayer = 0)
     {
         EffectBehaviorAbstract result = null;
 
-        result = new PointToPointEffect(effectKey, parent, position, to, scale, speed, flytype, completeCallback);
+        result = new PointToPointEffect(effectKey, parent, position, to, scale, speed, flytype, completeCallback, effectLayer);
 
         return result;
     }
@@ -73,11 +73,11 @@ public class EffectsFactory
     /// 特效会从start按照速度与轨迹飞到目标对象位置
     /// </summary>
     /// <returns>特效对象</returns>
-    public EffectBehaviorAbstract CreatePointToObjEffect(string effectKey, Transform parent, Vector3 position, GameObject targetObj, Vector3 scale, float speed, TrajectoryAlgorithmType flytype = TrajectoryAlgorithmType.Line, Action completeCallback = null)
+    public EffectBehaviorAbstract CreatePointToObjEffect(string effectKey, Transform parent, Vector3 position, GameObject targetObj, Vector3 scale, float speed, TrajectoryAlgorithmType flytype = TrajectoryAlgorithmType.Line, Action completeCallback = null, int effectLayer = 0)
     {
         EffectBehaviorAbstract result = null;
 
-        result = new PointToTargetEffect(effectKey, parent, position, targetObj, scale, speed, flytype, completeCallback);
+        result = new PointToTargetEffect(effectKey, parent, position, targetObj, scale, speed, flytype, completeCallback , effectLayer);
 
         return result;
     }
@@ -146,6 +146,11 @@ public class PointEffect : EffectBehaviorAbstract
     private Action completeCallback;
 
     /// <summary>
+    /// 显示层级
+    /// </summary>
+    private int layer = 0;
+
+    /// <summary>
     /// 创建点特效
     /// </summary>
     /// <param name="effectKey">特效key, 可以使路径, 或者AB包中对应的key</param>
@@ -155,7 +160,7 @@ public class PointEffect : EffectBehaviorAbstract
     /// <param name="durTime"></param>
     /// <param name="speed">TODO 特效播放速度</param>
     /// <param name="completeCallback">结束回调</param>
-    public PointEffect(string effectKey, Transform parent, Vector3 position, Vector3 scale, float durTime, float speed, Action completeCallback = null)
+    public PointEffect(string effectKey, Transform parent, Vector3 position, Vector3 scale, float durTime, float speed, Action completeCallback = null, int effectLayer = 0)
     {
         this.effectKey = effectKey;
         this.parent = parent;
@@ -164,6 +169,7 @@ public class PointEffect : EffectBehaviorAbstract
         this.durTime = durTime;
         this.speed = speed;
         this.completeCallback = completeCallback;
+        this.layer = effectLayer;
     }
 
     /// <summary>
@@ -172,16 +178,17 @@ public class PointEffect : EffectBehaviorAbstract
     public override void Begin()
     {
         // 加载特效预设
-        effectObject = EffectsLoader.Single.Load(effectKey);
+        effectObject = PoolLoader.Instance().Load(effectKey);
         if (effectObject == null)
         {
             throw new Exception("特效为空, 加载失败.");
         }
-        effectObject = Instantiate(effectObject);
+        //effectObject = Instantiate(effectObject);
         // 设置数据
         effectObject.transform.parent = parent;
         effectObject.transform.localScale = scale;
         effectObject.transform.position = position;
+        effectObject.layer = layer;
         // TODO 特效播放速度
         // 特效持续时间
         new Timer(durTime).OnCompleteCallback(() =>
@@ -190,7 +197,9 @@ public class PointEffect : EffectBehaviorAbstract
             {
                 completeCallback();
             }
-            Destroy();
+            // 回收对象
+            PoolLoader.Instance().CircleBack(effectKey, effectObject);
+            //Destroy();
         }).Start();
     }
 
@@ -286,6 +295,11 @@ public class PointToPointEffect : EffectBehaviorAbstract
     private TrajectoryAlgorithmType flyType = TrajectoryAlgorithmType.Line;
 
     /// <summary>
+    /// 显示层级
+    /// </summary>
+    private int layer = 0;
+
+    /// <summary>
     /// 点对点特效
     /// TODO 加入路径
     /// </summary>
@@ -296,7 +310,7 @@ public class PointToPointEffect : EffectBehaviorAbstract
     /// <param name="scale">缩放</param>
     /// <param name="speed">速度</param>
     /// <param name="completeCallback">完成回调</param>
-    public PointToPointEffect(string effectKey, Transform parent, Vector3 from, Vector3 to, Vector3 scale, float speed, TrajectoryAlgorithmType flyType, Action completeCallback = null)
+    public PointToPointEffect(string effectKey, Transform parent, Vector3 from, Vector3 to, Vector3 scale, float speed, TrajectoryAlgorithmType flyType, Action completeCallback = null, int effectLayer = 0)
     {
         this.effectKey = effectKey;
         this.parent = parent;
@@ -306,6 +320,7 @@ public class PointToPointEffect : EffectBehaviorAbstract
         this.speed = speed;
         this.flyType = flyType;
         this.completeCallback = completeCallback;
+        this.layer = effectLayer;
     }
 
 
@@ -315,21 +330,29 @@ public class PointToPointEffect : EffectBehaviorAbstract
     public override void Begin()
     {
         // 加载特效预设
-        effectObject = EffectsLoader.Single.Load(effectKey);
+        effectObject = PoolLoader.Instance().Load(effectKey);
         if (effectObject == null)
         {
             throw new Exception("特效为空, 加载失败.");
         }
-        effectObject = Instantiate(effectObject);
+        //effectObject = Instantiate(effectObject);
         // 设置数据
         effectObject.transform.parent = parent;
         effectObject.transform.localScale = scale;
         effectObject.transform.position = position;
+        effectObject.layer = layer;
         // 开始移动
         // 创建弹道
         ballistic = BallisticFactory.Single.CreateBallistic(effectObject, position, to - position,
                        to,
                        speed, 1,false, trajectoryType: flyType);
+
+        ballistic.OnKill = (ballistic1, target) =>
+        {
+            effectObject.RemoveComponents(typeof(Ballistic));
+            // 回收单位
+            PoolLoader.Instance().CircleBack(effectKey, effectObject);
+        };
 
         // 运行完成
         ballistic.OnComplete = (a, b) =>
@@ -433,6 +456,11 @@ public class PointToTargetEffect : EffectBehaviorAbstract
     private TrajectoryAlgorithmType flyType = TrajectoryAlgorithmType.Line;
 
     /// <summary>
+    /// 显示层级
+    /// </summary>
+    private int layer = 0;
+
+    /// <summary>
     /// 点对点特效
     /// TODO 加入路径
     /// </summary>
@@ -443,7 +471,7 @@ public class PointToTargetEffect : EffectBehaviorAbstract
     /// <param name="scale">缩放</param>
     /// <param name="speed">速度</param>
     /// <param name="completeCallback">完成回调</param>
-    public PointToTargetEffect(string effectKey, Transform parent, Vector3 from, GameObject targetObj, Vector3 scale, float speed, TrajectoryAlgorithmType flyType = TrajectoryAlgorithmType.Line, Action completeCallback = null)
+    public PointToTargetEffect(string effectKey, Transform parent, Vector3 from, GameObject targetObj, Vector3 scale, float speed, TrajectoryAlgorithmType flyType = TrajectoryAlgorithmType.Line, Action completeCallback = null, int effectLayer = 0)
     {
         this.effectKey = effectKey;
         this.parent = parent;
@@ -453,6 +481,7 @@ public class PointToTargetEffect : EffectBehaviorAbstract
         this.speed = speed;
         this.flyType = flyType;
         this.completeCallback = completeCallback;
+        this.layer = effectLayer;
     }
 
 
@@ -462,19 +491,26 @@ public class PointToTargetEffect : EffectBehaviorAbstract
     public override void Begin()
     {
         // 加载特效预设
-        effectObject = EffectsLoader.Single.Load(effectKey);
+        effectObject = PoolLoader.Instance().Load(effectKey);
         if (effectObject == null)
         {
             throw new Exception("特效为空, 加载失败.");
         }
-        effectObject = Instantiate(effectObject);
+        //effectObject = Instantiate(effectObject);
         // 设置数据
         effectObject.transform.parent = parent;
         effectObject.transform.localScale = scale;
         effectObject.transform.position = position;
+        effectObject.layer = layer;
         // 开始移动
         // 创建弹道
         ballistic = BallisticFactory.Single.CreateBallistic(effectObject, position, targetObj.transform.position - position, targetObj, speed, 1, trajectoryType: flyType);
+
+        ballistic.OnKill = (ballistic1, target) =>
+        {
+            effectObject.RemoveComponents(typeof(Ballistic));
+            PoolLoader.Instance().CircleBack(effectKey, effectObject);
+        };
         // 运行完成
         ballistic.OnComplete = (a, b) =>
         {
@@ -562,47 +598,6 @@ public class ScopeEffect : EffectBehaviorAbstract
     }
 }
 
-
-
-/// <summary>
-/// 特效加载器
-/// </summary>
-public class EffectsLoader : IResourcesLoader
-{
-    /// <summary>
-    /// 单例
-    /// </summary>
-    public static EffectsLoader Single
-    {
-        get
-        {
-            if (single == null)
-            {
-                single = new EffectsLoader();
-            }
-            return single;
-        }
-    }
-
-    /// <summary>
-    /// 单例对象
-    /// </summary>
-    private static EffectsLoader single = null;
-
-    /// <summary>
-    /// 加载特效
-    /// </summary>
-    /// <param name="key">特效路径</param>
-    /// <returns>特效对象</returns>
-    public GameObject Load(string key)
-    {
-        GameObject result = null;
-
-        result = (GameObject)Resources.Load(key);
-
-        return result;
-    }
-}
 
 
 // ----------------------------------抽象对象-----------------------------------------

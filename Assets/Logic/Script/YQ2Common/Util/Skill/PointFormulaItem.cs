@@ -86,7 +86,7 @@ public class PointFormulaItem : AbstractFormulaItem
         {
             throw new Exception("数据列表为空");
         }
-        var argsCount = 8;
+        var argsCount = 7;
         // 解析参数
         if (array.Length < argsCount)
         {
@@ -97,17 +97,17 @@ public class PointFormulaItem : AbstractFormulaItem
         var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
         var effectKey = GetDataOrReplace<string>("EffectKey", array, 1, ReplaceDic);
         var targetPos = GetDataOrReplace<int>("TargetPos", array, 2, ReplaceDic);
-        var speed = GetDataOrReplace<float>("Speed", array, 3, ReplaceDic);
-        var durTime = GetDataOrReplace<float>("DurTime", array, 4, ReplaceDic);
+        //var speed = GetDataOrReplace<float>("Speed", array, 3, ReplaceDic);
+        var durTime = GetDataOrReplace<float>("DurTime", array, 3, ReplaceDic);
 
-        var scaleX = GetDataOrReplace<float>("ScaleX", array, 5, ReplaceDic);
-        var scaleY = GetDataOrReplace<float>("ScaleY", array, 6, ReplaceDic);
-        var scaleZ = GetDataOrReplace<float>("ScaleZ", array, 7, ReplaceDic);
+        var scaleX = GetDataOrReplace<float>("ScaleX", array, 4, ReplaceDic);
+        var scaleY = GetDataOrReplace<float>("ScaleY", array, 5, ReplaceDic);
+        var scaleZ = GetDataOrReplace<float>("ScaleZ", array, 6, ReplaceDic);
 
         FormulaType = formulaType;
         EffectKey = effectKey;
         TargetPos = targetPos;
-        Speed = speed;
+        //Speed = speed;
         DurTime = durTime;
         ScaleX = scaleX;
         ScaleY = scaleY;

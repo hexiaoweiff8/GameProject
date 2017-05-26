@@ -10,6 +10,7 @@ TABLE_INDEX={
     SOLDIER =3,
     SYNERGY =4
 }
+local CurrentTabIndex = TABLE_INDEX.INFORMATION
 local TestID = 1001 
 function wnd_cardyc_controller:OnShowDone()
     --初始化view
@@ -20,7 +21,6 @@ function wnd_cardyc_controller:OnShowDone()
     self:init_leftCard_Data()
     self:init_rightBody()
     self:init_redDot()
-    self.currentTab = TABLE_INDEX.INFORMATION
     self:init_tabPanel()
 end
 
@@ -74,13 +74,15 @@ function wnd_cardyc_controller:init_rightBody()
 end
 --根据当前显示的界面刷新右侧
 function wnd_cardyc_controller:refresh_RightBody()
-    if self.currentTab == TABLE_INDEX.INFORMATION then
+    print("refresh rightbody!!!!!!")
+    print(CurrentTabIndex)
+    if CurrentTabIndex == TABLE_INDEX.INFORMATION then
         self:information_Body()
-    elseif self.currentTab == TABLE_INDEX.SKILL then
+    elseif CurrentTabIndex == TABLE_INDEX.SKILL then
         self:skill_Body()
-    elseif self.currentTab == TABLE_INDEX.SOLDIER then
+    elseif CurrentTabIndex == TABLE_INDEX.SOLDIER then
         self:soldier_Body()
-    elseif self.currentTab == TABLE_INDEX.SYNERGY then
+    elseif CurrentTabIndex == TABLE_INDEX.SYNERGY then
         self:synergy_Body()
     end
 end
@@ -145,12 +147,12 @@ end
 function wnd_cardyc_controller:init_tabPanel()
     self.tabBtn = {view.btn_information,view.btn_skill,view.btn_soldier,view.btn_synergy}
     self.tabPanel = {view.informationBody_Panel,view.skillPanel,view.soldierPanel,view.synergyPanel}
-    self.tabPanel[self.currentTab]:SetActive(true)
-    self.tabBtn[self.currentTab].transform:Find("lightSp").gameObject:SetActive(true)
+    self.tabPanel[CurrentTabIndex]:SetActive(true)
+    self.tabBtn[CurrentTabIndex].transform:Find("lightSp").gameObject:SetActive(true)
     for i=1,#self.tabBtn do
         self.tabBtn[i].transform:Find("lab"):GetComponent("UILabel").text = data:getString(20019+i)
         UIEventListener.Get(self.tabBtn[i]).onPress = function(sender)
-            if self.currentTab == i then
+            if CurrentTabIndex == i then
                 return
             else
                 self:showTabPanel(i)
@@ -160,29 +162,29 @@ function wnd_cardyc_controller:init_tabPanel()
 end
 
 function wnd_cardyc_controller:showTabPanel(tableIndex)
-    if self.currentTab == tableIndex then 
+    if CurrentTabIndex == tableIndex then 
         return
     end
     self.tabPanel[tableIndex]:SetActive(true)
     self.tabBtn[tableIndex].transform:Find("lightSp").gameObject:SetActive(true)
-    self.tabPanel[self.currentTab]:SetActive(false)
-    self.tabBtn[self.currentTab].transform:Find("lightSp").gameObject:SetActive(false)
-    self.currentTab=tableIndex
+    self.tabPanel[CurrentTabIndex]:SetActive(false)
+    self.tabBtn[CurrentTabIndex].transform:Find("lightSp").gameObject:SetActive(false)
+    CurrentTabIndex = tableIndex
     self:refresh_RightBody()
 end
 
 -----------------------------------升星部分---------------------------------
+local isInitUpStarLayer = false
+local isInitUpStarSLayer = false
 --显示升星界面
 function wnd_cardyc_controller:show_UpStar_Layer()
-    --self.isInitSUpLayer = false
-     if not self.isInitUpStarLayer then
+     if not isInitUpStarLayer then
         view:init_UpStarPanel()
         view.upStarPanel.name = "upStarPanel"
         view.upStarPanel:SetActive(false)
         self:create_CardHead(view.upStarPanel,"upStarP_Before_cardhead",Vector3(-262,0,0))
         self:create_CardHead(view.upStarPanel,"upStarP_After_cardhead",Vector3(-7,0,0))
-        self.isInitUpStarLayer = true
-        self.isInitUpStarSLayer = false
+        isInitUpStarLayer = true
      end
     self:refresh_CardHead(view.upStarP_Before_cardhead,data.cardInfo.starLv)
     self:refresh_CardHead(view.upStarP_After_cardhead,data:GetNextStarLv())
@@ -242,19 +244,9 @@ function wnd_cardyc_controller:upStarPanel_btnUpStar_CallBack()
     if not data:isCan_UpStar() then 
         return 
     end
-    print("升星+1")
     --发送请求升星
     --提升星级扣道具，升星成功
     SendPB_10010(data.cardInfo.cardId)
-    -- for k,v in pairs(cardTbl) do
-    --     --根据当前卡片的ID获取卡牌信息,后期要改
-    --     if v.id == TestID then
-    --         v.star = v.star + 1
-    --         v.num = v.num - data:getUpStarNeedFragment()
-    --     end
-    -- end
-    -- currencyTbl["coin"] = currencyTbl["coin"] - data:getUpStarNeedCoin()
-
     
 end
 
@@ -271,13 +263,13 @@ end
 
 --显示升星成功后的界面，属性提升。。
 function wnd_cardyc_controller:show_UpStar_Success()
-    if not self.isInitUpStarSLayer then
+    if not isInitUpStarSLayer then
         view:init_UpStar_SuccessPanel()
         view.upStarSuccessPanel.transform.name = "upStarSuccess"
         self:create_CardHead(view.upStarSuccessPanel,"upStarSP_Before_cardhead",Vector3(-190,55,0))
         self:create_CardHead(view.upStarSuccessPanel,"upStarSP_After_cardhead",Vector3(190,55,0))
         view.upStarSuccessPanel:SetActive(false)
-        self.isInitUpStarSLayer = true
+        isInitUpStarSLayer = true
     end
     self:refresh_CardHead(view.upStarSP_Before_cardhead,data.cardInfo.starLv-1)
     self:refresh_CardHead(view.upStarSP_After_cardhead,data.cardInfo.starLv)
@@ -303,15 +295,16 @@ function wnd_cardyc_controller:show_UpStar_Success()
 end
 
 ---------------------------------------升级部分---------------------
+local isInitUpLvLayer = false
 --点击主界面升级按钮
 function wnd_cardyc_controller:show_UpLevel_Layer()
-    if not self.isInitUpLvLayer then--初始化升级界面
+    if not isInitUpLvLayer then--初始化升级界面
         --初始化升级界面的控件
         view:init_Uplevel_Panel()
         view.upLevelPanel.name = "upLevelPanel"
         self:create_CardHead(view.upLevelPanel,"upLevelP_cardhead",Vector3(-186,48,0),20)
         view.upLevelPanel:SetActive(false)
-        self.isInitUpLvLayer = true
+        isInitUpLvLayer = true
     end
     --为按钮添加监听
     UIEventListener.Get(view.btn_upLevelOne).onPress = function(btn_upLevelOne, args)
@@ -348,14 +341,6 @@ function wnd_cardyc_controller:upLevelOne_CallBack()
         return
     end
     SendPB_10009(data.cardInfo.cardId, 1)
-
-    -- for k,v in pairs(cardTbl) do
-    --     --根据当前卡片的ID获取卡牌信息,后期要改
-    --     if v.id == TestID then
-    --         v.lv=v.lv+1
-    --     end
-    -- end
-    -- currencyTbl["expPool"] = currencyTbl["expPool"]-data:getCardNeedExp()
     
 end
 
@@ -364,21 +349,13 @@ function wnd_cardyc_controller:upLevelTen_CallBack()
     if not data:isCan_UpLevel() then
         return
     end
-    -- SendPB_10009(data.cardInfo.cardId, 10)
-
-    -- for k,v in pairs(cardTbl) do
-    --     --根据当前卡片的ID获取卡牌信息,后期要改
-    --     if v.id == TestID then
-    --         v.lv=v.lv+10
-    --     end
-    -- end
-    -- currencyTbl["expPool"] = currencyTbl["expPool"]-data:getCardNeedExp()
-
+    SendPB_10009(data.cardInfo.cardId, 10)
 end
 
 --点击升级后刷新界面，在wndtz_login.lua中服务器返回数据后调用
 function wnd_cardyc_controller:upLevel_refresh(  )
     -- body
+
     data:getDatas(TestID)
     self:refresh_UpLevel_Layar()
     self:init_leftCard_Data()
@@ -387,6 +364,10 @@ function wnd_cardyc_controller:upLevel_refresh(  )
 end
 
 -------------------------------------------卡牌信息以及卡牌进阶部分-----
+local isInitMedalItemLayer = false
+local isInitGainLayer  = false
+local isSlotInit = false
+local isInitAmSLayer = false
 --初始化卡片信息和进阶部分界面
 function wnd_cardyc_controller:information_Body()
     
@@ -399,6 +380,7 @@ function wnd_cardyc_controller:init_InformationPanel()
 end
 --初始化卡牌进阶部分
 function wnd_cardyc_controller:init_upQualityPanel()
+    print("init_quality")
     -- 判断卡牌的阶品否已达最大
     if data.cardInfo.qualityLv == data.Const.MAX_QUALITY_LV then
         print("已达最大阶品！！！！")
@@ -407,13 +389,11 @@ function wnd_cardyc_controller:init_upQualityPanel()
     else 
         view.upQuality_Panel:SetActive(true)
         view.maxUpQuality_Panel:SetActive(false)
-        self.isInitMedalItemLayer = false
-        self.initGainLayer  = false
         --根据插槽状态的数量初始化插槽
         for i=1,#data.cardInfo.slotState do
             local name = string.format("itemHead_%d",i)
             local v3 = Vector3(-150+(i-1)*100, 40 ,0)
-            if not self.isSlotInit then
+            if not isSlotInit then
                 self:create_itemHead(view.upQuality_Panel,name,v3)           
             end
             self:refresh_itemHead(view[name],i)
@@ -423,7 +403,7 @@ function wnd_cardyc_controller:init_upQualityPanel()
                 end
             end
         end
-        self.isSlotInit = true
+        isSlotInit = true
 
 
         --判断插槽是否全部激活
@@ -466,7 +446,7 @@ end
 --显示晋升成功界面
 function wnd_cardyc_controller:show_upQuality_SuccessPanel()
     --如果是第一次显示，对该界面进行初始化
-    if not self.isInitAmSLayer then
+    if not isInitAmSLayer then
         view:init_UpQuality_SuccessPanel()
         view.upQuality_SuccessP.name = "upQualitySuccess"
         view.upQuality_SuccessP:SetActive(false)
@@ -477,7 +457,7 @@ function wnd_cardyc_controller:show_upQuality_SuccessPanel()
                 view.upQuality_SuccessP:SetActive(false) 
             end
         end
-        self.isInitAmSLayer = true
+        isInitAmSLayer = true
     end
     --根据当前星级刷新卡牌的头像
     self:refresh_CardHead(view.upQualitySP_Before_cardhead,data.cardInfo.starLv)
@@ -495,11 +475,11 @@ end
 function wnd_cardyc_controller:showItemInfoPanel(index)
 
     --初始化军功章内容界面
-    if not self.isInitMedalItemLayer then
+    if not isInitMedalItemLayer then
         view:init_itemInfoPanel()
         view.itemInfoPanel.name = "medalItemPanel"
         view.itemInfoPanel:SetActive(false)
-        self.isInitMedalItemLayer = true
+        isInitMedalItemLayer = true
     end
     view.itemInfoP_itemNameLab.transform:GetComponent("UILabel").text = data:getCardQualityInfo("CardEquip"..index,data.cardInfo.cardId,data.cardInfo.qualityLv)
    --[[
@@ -554,16 +534,15 @@ end
 --获得方式界面
 function wnd_cardyc_controller:GainWayLayer()
     view.itemInfoPanel:SetActive(false)
-    if not self.initGainLayer then
+    if not isInitGainLayer then
         view:init_gainWayPanel()
         view.gainWayPanel.name = "gainWayPanel"
         view.gainWayPanel:SetActive(false)
-        self.initGainLayer = true
+        isInitGainLayer = true
     end
     --返回
     UIEventListener.Get(view.gainWayP_btn_back).onPress = function(gainWayP_btn_back, args)
         if args then
-            print("返回")
             view.gainWayPanel:SetActive(false)
         end
     end
@@ -589,7 +568,6 @@ function wnd_cardyc_controller:upQuality_refresh()
 end
 --点击一键装备按钮  
 function wnd_cardyc_controller:equipAllCallBack()
-    print("一键装备！！！！")
     for i=1,#data.cardInfo.slotState do
         if data.cardInfo.slotState[i] == data.EquipState.Enable_Enough and (data.upQualityNeedItems[i].num <= data.upQualityHaveItems[i].num) then
             SendPB_10013(data.cardInfo.cardId, i-1)
@@ -602,9 +580,10 @@ function wnd_cardyc_controller:equipCallBack(index)
 end
 --装备成功后刷新界面
 function wnd_cardyc_controller:epuip_refresh()
-    self:getDatas(TestID)
+    data:getDatas(TestID)
     view.itemInfoPanel:SetActive(false)
     self:init_upQualityPanel()
+    self:init_redDot()
 end
 
 
@@ -613,13 +592,16 @@ end
 --[[
                                  技能部分
 ]]
-wnd_cardyc_controller.upSkillIndex = 0 --保存升级的技能的index
+local UpSkillIndex = 0 --保存升级的技能的index
+local isInitSUpLayer = false
+local isfiveSIinit = false
+local isInitSptReset = false
 --技能tab界面
 function wnd_cardyc_controller:skill_Body()
+    print("skill_body!!!!!!")
     --初始化技能点
     view.skillP_pointLab.transform:GetComponent("UILabel").text = data.userInfo.totalSkPt
     --监听重置技能点按钮
-    self.isInitSptReset = false
     UIEventListener.Get(view.skillP_btnResetPoint).onPress = function(skillP_btnResetPoint, args)
         if args then
             self:show_SkillPoint_Reset_Panel()
@@ -631,18 +613,17 @@ function wnd_cardyc_controller:skill_Body()
     for i=1,5 do
         local position = Vector3(data.skill_position_Table[i].x, data.skill_position_Table[i].y, data.skill_position_Table[i].z)
         local name = string.format("skillFrame_%d",i)
-        if not self.isfiveSIinit then
+        if not isfiveSIinit then
             self:create_SkillItem(view.skillPanel,name,position,1.3) --技能框
-            self.isInitSUpLayer = false
         end
         self:refresh_skillFrame(view[name],i)
     end
-    self.isfiveSIinit = true
+    isfiveSIinit = true
 end
 --显示技能详细信息界面
 function wnd_cardyc_controller:show_SkillItem_UpPanel(index)
     --第一次进入本界面，初始化
-    if not self.isInitSUpLayer then
+    if not isInitSUpLayer then
         view:init_skillInfoPanel()
         view.skillInfoPanel.name = "skillItemUpLayer"
         local position = Vector3(-210,60,0)
@@ -653,7 +634,7 @@ function wnd_cardyc_controller:show_SkillItem_UpPanel(index)
                 view.skillInfoPanel:SetActive(false)
             end
         end
-        self.isInitSUpLayer = true
+        isInitSUpLayer = true
     end
     self:refresh_SkillInfo_Layer(index)--初始化/刷新界面内容
     view.skillInfoPanel:SetActive(true)
@@ -698,26 +679,28 @@ function wnd_cardyc_controller:skillItem_Up_CallBack(index)
     if not data:isCan_UpSkill(index) then 
         return 
     end 
-    self.upSkillIndex = index
-    self:upSkill_refresh()
+    UpSkillIndex = index
+    SendPB_10014(data.cardInfo.cardId,index-1)
 end
 --根据升级技能的index对界面进行刷新
 function wnd_cardyc_controller:upSkill_refresh()
+    print("skill refresh")
     data:getDatas(TestID)
+    print(UpSkillIndex)
     self:refresh_RightBody()
-    self:refresh_skillFrame(view["skillInfoP_skillFrame"],self.upSkillIndex)
-    self:refresh_SkillInfo_Layer(self.upSkillIndex)
+    self:refresh_skillFrame(view["skillInfoP_skillFrame"],UpSkillIndex)
+    self:refresh_SkillInfo_Layer(UpSkillIndex)
     self:init_redDot()
 end
 --显示重置技能点界面
 function wnd_cardyc_controller:show_SkillPoint_Reset_Panel()
     print("技能点重置,,,")
-    if not self.isInitSptReset then
+    if not isInitSptReset then
         view:init_skillPointResetPanels(  )
         view.sPtRPanel.name = "sPtReset"
         self:create_CardHead(view.sPtRPanel,"resetSPt_cardhead",Vector3(-199,40,0))
         view.sPtRPanel:SetActive(false)
-        self.isInitSptReset = true
+        isInitSptReset = true
     end
     view.sPtRP_titleL.transform:GetComponent("UILabel").text = data:getString(20029)        --描述
     view.sPtRP_desL.transform:GetComponent("UILabel").text = string.format(data:getString(20030),data:getCardInfo("Name",data.cardInfo.cardId))                 --返回按钮添加监听
@@ -743,19 +726,19 @@ function wnd_cardyc_controller:show_SkillPoint_Reset_Panel()
 end
 --普通重置
 function wnd_cardyc_controller:normal_Reset_CallBack()
-    print("normal_Reset_CallBack")
     --已解锁的技能等级变为1级，返还升级所用的技能卡数目的80%加至总技能卡中
-    SendPB_10015(self.cardId, 100)
+    SendPB_10015(data.cardInfo.cardId, 100)
 end
 --完美重置
 function wnd_cardyc_controller:perfect_Reset_CallBack()
-    print("perResetCallBAck")--100%
-    SendPB_10015(self.cardId, 300)
+    SendPB_10015(data.cardInfo.cardId, 300)
 end
 --重置技能成功后对界面进行刷新
 function wnd_cardyc_controller:skillReset_refresh()
     data:getDatas(TestID)
+    view.sPtRPanel:SetActive(false)
     self:refresh_RightBody()
+    self:init_redDot()
 end
 
 
@@ -763,10 +746,11 @@ end
     兵员部分
 ]]
 --初始化兵员界面
+local isInitAcFrame = false
 function wnd_cardyc_controller:soldier_Body()
 
     --初始化兵员界面
-    if not self.isInitAcFrame then
+    if not isInitAcFrame then
         local position = Vector3(0,136,0)
         self:create_CardHead(view.soldierPanel,"upSoldier_cardhead",position,4)
         UIEventListener.Get(view.soldierP_btnUpSoldier).onPress = function(soldierP_btnUpSoldier, args)
@@ -774,7 +758,7 @@ function wnd_cardyc_controller:soldier_Body()
             self:soldier_Up_CallBack()
             end
         end
-        self.isInitAcFrame = true
+        isInitAcFrame = true
     end
 
     --初始化卡牌头型
@@ -824,16 +808,18 @@ end
 --[[
     协同部分
 ]]
-wnd_cardyc_controller.upSynergyIndex = 0
+local UpSynergyIndex = 0
+local isAttrItemInit = false
+local isInitxtLayer = false
 --刷新协同部分
 function wnd_cardyc_controller:synergy_Body()
 
-    if not self.isAttrItemInit then 
+    if not isAttrItemInit then 
         for i=1 ,#data.cardInfo.synergyLvTbl do
             local name = string.format("synergyItem_%d",i)
             self:create_synergyItem(view.synergyPanel,name,i)
         end
-        self.isAttrItemInit = true
+        isAttrItemInit = true
     end
 
     --刷新协同选项
@@ -883,11 +869,11 @@ end
 function wnd_cardyc_controller:synergyItem_onClicked(index)
 
      --初始化协同升级界面
-    if not self.isInitxtLayer then
+    if not isInitxtLayer then
         view:init_upSynergyPanel()
         view.upSynergyP.name = "xtPanel"
         self:create_CardHead(view.upSynergyP,"upSynergy_cardhead",Vector3(-220,20,0))
-        self.isInitxtLayer = true
+        isInitxtLayer = true
         UIEventListener.Get(view.upSynergyP_btnBack).onPress = function(upSynergyP_btnBack, args)
             if args then
                 view.upSynergyP:SetActive(false)
@@ -940,12 +926,17 @@ function wnd_cardyc_controller:synergyItem_onClicked(index)
     --获取拥有的材料数量
     local haveCoinNum = data.userInfo.badgeNum
     local haveGoldNum = data.userInfo.goldNum
+    
+    print("--------------------------------")
+    print(needCoinNum,haveCoinNum)
+    print(needGoldNum,haveGoldNum)
+    
     local coinNumColor = "FF2121" 
     local goldNumColor = "FF2121" 
     if haveCoinNum >= needCoinNum then 
         coinNumColor = "21FF21"
     end
-    if needGoldNum >= needGoldNum then
+    if haveGoldNum >= needGoldNum then
         goldNumColor = "21FF21"
     end
     view.upSynergyP_coinHaveNumL.transform:GetComponent("UILabel").text = string.format("([%s]%s%d[-])", coinNumColor,data:getString(20028), data.userInfo.badgeNum) 
@@ -959,9 +950,9 @@ function wnd_cardyc_controller:upSynergyP_btnOk_onClicked(index)
     if not data:isCan_UpSynergy(index) then
         return 
     end
-    self.upSynergyIndex = index
+    UpSynergyIndex = index
     --向服务器发送升级协同数据
-    SendPB_10018(data.cardInfo.cardId,data.synergyIDTbl[index])
+    SendPB_10018(data.cardInfo.cardId,index-1)
     
 end
 
@@ -971,7 +962,7 @@ function wnd_cardyc_controller:upSynergy_refresh()
     data:getDatas(TestID)
     self:refresh_RightBody()
     --刷新协同升级界面
-    self:synergyItem_onClicked(self.upSynergyIndex)
+    self:synergyItem_onClicked(UpSynergyIndex)
     self:init_redDot()
 end
 
@@ -1045,7 +1036,6 @@ function wnd_cardyc_controller:refresh_itemHead(itemHead,index)
     end
 end
 
-
 function wnd_cardyc_controller:create_SkillItem(parent,name,position,scale) --技能框
     depthNum=parent.transform:GetComponent("UIWidget").depth
     view:init_skillItem(parent,name)
@@ -1103,7 +1093,7 @@ function wnd_cardyc_controller:create_CardHead(parent,name,Vector3)
     --初始化卡牌名称以及显示信息
     view[name].cardhead.transform.name = name
     view[name].cardhead.transform.localPosition = Vector3
-    view[name].cardhead_lv_Lab.transform:GetComponent("UILabel").text = self.cardlv
+    view[name].cardhead_lv_Lab.transform:GetComponent("UILabel").text = data.cardInfo.cardLv
     for i=1 , data.Const.MAX_STAR_LV do
         view[name].cardhead_starPanel.transform:Find("star_"..i).gameObject:GetComponent("UISprite").depth=depthNum+3
     end

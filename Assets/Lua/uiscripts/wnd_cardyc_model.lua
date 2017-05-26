@@ -59,17 +59,8 @@ function wnd_cardyc_model:getDatas(TestID)
         self.userInfo.expPool = currencyTbl["expPool"]--经验池
         self.userInfo.badgeNum = currencyTbl["coin"] --兵牌
         self.userInfo.tili = currencyTbl["tili"] --体力
-
         self.userInfo.useRoleExp = userRoleTbl["exp"]
         self.userInfo.itemList = userRoleTbl["item"]         --背包
-        self.cardInfo.itemList={}
-        for i = 1, 4 do
-            local team={
-                id = 10001,
-                num = 1
-            }
-            table.insert(self.userInfo.itemList, team)
-        end
         self.userInfo.userRoleLv= userRoleTbl["lv"]
         self.userInfo.userRoleLv= 20
         for k,v in pairs(cardTbl) do--根据当前卡片的ID获取卡牌信息,后期要改
@@ -83,11 +74,10 @@ function wnd_cardyc_model:getDatas(TestID)
                 self.cardInfo.cardFragment = v.num
                 self.cardInfo.slotState = v.slot
                 self.cardInfo.skill_Lv_Table = v.skill
-                self.cardInfo.synergyLvTbl = v.team--协同表
-                self.cardInfo.synergyLvTbl={}
-                for i = 1, 4 do
-                    self.cardInfo.synergyLvTbl[i] = 0
+                for i = 1, #v.skill do
+                    print(string.format("skill_%d::::::::%d",i,v.skill[i]))
                 end
+                self.cardInfo.synergyLvTbl = v.team--协同表
             end
         end
     end
@@ -155,22 +145,34 @@ end
 --初始化进阶  所需的物品  以及  已有的物品
 function wnd_cardyc_model:init_upQualityItems()
     -- body
-    local uid = tonumber(string.format("%d%.2d",self.cardInfo.cardId,self.cardInfo.qualityLv))--通过卡牌id和军阶等级联合获取
+    if self.cardInfo.qualityLv >= self.Const.MAX_QUALITY_LV then
+        return
+    end
+    -- self.cardInfo.slotState = {2,2,2,2}
+    local uid = tonumber(string.format("%d%.2d",self.cardInfo.cardId,self.cardInfo.qualityLv+1))--通过卡牌id和军阶等级联合获取
     for i=1,#self.cardInfo.slotState do
-        local item={}
-        item.name = sdata_armycardquality_data:GetFieldV("CardEquip"..i,uid)
-        item.id = sdata_armycardquality_data:GetFieldV("ItemID"..i,uid)
-        item.num = sdata_armycardquality_data:GetFieldV("Num"..i,uid)
-        self.upQualityNeedItems[i] = item
-        self.upQualityHaveItems[i] = item
-        self.upQualityHaveItems[i].num = 0
         
+        local needItem={}
+        needItem.name = sdata_armycardquality_data:GetFieldV("CardEquip"..i,uid)
+        needItem.id = sdata_armycardquality_data:GetFieldV("ItemID"..i,uid)
+        needItem.num = sdata_armycardquality_data:GetFieldV("Num"..i,uid)
+        self.upQualityNeedItems[i] = needItem
+
+        local haveItem={}
+        haveItem.name = needItem.name
+        haveItem.id = needItem.id
+        haveItem.num = 0
         for _,v in pairs(self.userInfo.itemList) do
-            if v.id == item.id then 
-                self.upQualityHaveItems[i].num = v.num
+            if v.id == needItem.id then 
+                haveItem.num = v.num
             end
         end
-
+        self.upQualityHaveItems[i] = haveItem
+        if self.cardInfo.slotState[i] == self.EquipState.Enable_NotEnough then 
+            if self.upQualityHaveItems[i].num >= self.upQualityNeedItems[i].num then 
+                self.cardInfo.slotState[i] = self.EquipState.Enable_Enough
+            end
+        end
     end
 end
 --根据卡牌的阶品获取卡牌的限制等级
@@ -422,20 +424,17 @@ function wnd_cardyc_model:init_synergyStateTbl()
                 table.insert( self.synergyStateTbl, self.SynergyState.unactive )
             end
         end
-        print(string.format("synergyState:::::%d",self.synergyStateTbl[i]))
     end 
 end
 function wnd_cardyc_model:init_synergyIDTbl()
-    for i = 1,#self.cardInfo.synergyLvTbl do 
-        -- self.synergyIDTbl[i] = self:getSynergyItemInfo(string.format("RequireCardID",index),i)
-        self.synergyIDTbl[i] = 1000 + i
+    for i = 1,#self.cardInfo.synergyLvTbl do
+        self.synergyIDTbl[i] = 1001
     end 
 end 
 function wnd_cardyc_model:isCan_UpSynergy(index)
 
     local isCardCan = false
     for k,v in ipairs(cardTbl) do 
-        print(self.synergyIDTbl[index] , v.id)
         if self.synergyIDTbl[index] == v.id then 
             if v.star < self:getSynergyItemInfo("RequireCardStar",index) then 
                 print("协同---卡牌星级不足！！！")
@@ -456,22 +455,22 @@ function wnd_cardyc_model:isCan_UpSynergy(index)
         print("协同---卡牌不存在！！！")
         return false
     end 
-    -- body
-    print(self.cardInfo.synergyLvTbl[index])
     if self.cardInfo.synergyLvTbl[index] >= self.Const.MAX_SYNERGY_LV then
         print("协同---已达最大等级")
         return false
     end
     --兵牌
-    local needgold = self:getUpSynergyCostInfo("Gold",self:getNextSynergylevel(self.cardInfo.synergyLvTbl[index],self.Const.MAX_SYNERGY_LV))
-    if self.userInfo.badgeNum < needgold then
-        print("协同---兵牌不够..")
+    local needCoin = self:getUpSynergyCostInfo("Coin",self:getNextSynergylevel(self.cardInfo.synergyLvTbl[index],self.Const.MAX_SYNERGY_LV))
+    if self.userInfo.badgeNum < needCoin then
+        print("协同---不够..")
         return false 
     end
     
     --金币
-    local needCoin = self:getUpSynergyCostInfo("Coin",self:getNextSynergylevel(self.cardInfo.synergyLvTbl[index],self.Const.MAX_SYNERGY_LV))
-    if self.userInfo.goldNum < needCoin then
+    local needgold = self:getUpSynergyCostInfo("Gold",self:getNextSynergylevel(self.cardInfo.synergyLvTbl[index],self.Const.MAX_SYNERGY_LV))
+    print(needgold,self.userInfo.goldNum)
+
+    if self.userInfo.goldNum < needgold then
         print("协同---金币不够..")
         return false
     end
@@ -516,6 +515,14 @@ function wnd_cardyc_model:getString( ... )
     return sdata_UILiteral:GetV(sdata_UILiteral.I_Literal, ...)
 end
 
+function wnd_cardyc_model:getCardArmyType(cardId)
+    return cardId / 1000
+end
+
+
+function wnd_cardyc_model:getKeZhiInfo(property,ArmyType)
+
+end
 
 
 return wnd_cardyc_model

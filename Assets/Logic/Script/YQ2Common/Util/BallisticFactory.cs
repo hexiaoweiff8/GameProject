@@ -245,7 +245,7 @@ public class BallisticArriveTargetForPosition : BallisticArriveTarget
         {
             // 判断位置+半径是否到达目标
             var nowDir = (TargetPosition - ball.Position);
-            if (nowDir.magnitude <= ball.Radius)
+            if (nowDir.magnitude <= ball.Speed * Time.deltaTime)
             {
                 result = true;
             }
@@ -302,7 +302,7 @@ public class BallisticArriveTargetForObj : BallisticArriveTarget
             }
             else
             {
-                if ((ball.Position - LasttimePos).magnitude <= ball.Radius)
+                if ((ball.Position - LasttimePos).magnitude <= ball.Speed * Time.deltaTime)
                 {
                     result = true;
                 }

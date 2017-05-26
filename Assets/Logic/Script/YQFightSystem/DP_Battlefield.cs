@@ -150,8 +150,8 @@ public class DP_Battlefield : MonoEX.SingletonAuto<DP_Battlefield>
     /// </summary>
     public void Reset()
     {
-        lock (AI_Thread.Single.MutexLock)
-        {
+        //lock (AI_Thread.Single.MutexLock)
+        //{
             DP_CameraTrackObjectManage.Single.Reset();
 //            AI_Thread.Single.T_Reset();//ai线程清理
             //wnd_fight.Single.Reset();
@@ -160,7 +160,7 @@ public class DP_Battlefield : MonoEX.SingletonAuto<DP_Battlefield>
             MFAModelManage.Single.Clean();//清缓存的模型和材质
             ClusterManager.Single.ClearAll();
             m_CameraTouchCount = 0;
-        }
+        //}
 
         if (!m_BindCameraCtrlOK)
         {

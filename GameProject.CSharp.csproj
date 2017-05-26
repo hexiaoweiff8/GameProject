@@ -273,6 +273,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\EffectsFactory.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\ItemSelecter.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Looper.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\PoolLoader.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\QuadTree.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\ResourceLoader.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\SDataUtils.cs" />
@@ -1043,6 +1044,7 @@
     <None Include="Assets\Resources\sdata_template.txt" />
     <None Include="Assets\StreamingAssets\Android\files.txt" />
     <None Include="Assets\StreamingAssets\Android\lua\pack_script\pk_script\_tmp.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript10001.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1001.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1002.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1003.txt" />

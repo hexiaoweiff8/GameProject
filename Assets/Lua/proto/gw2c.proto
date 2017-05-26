@@ -52,8 +52,8 @@ message CardRankup {
 }
 
 message CardTakeMedal {
-    required  Card  card            =1;
-    required  Currency currency     =2;
+    required  Card card             =1;
+    repeated  Item item             =2;
 }
 
 message SkillLevelup {

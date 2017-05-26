@@ -303,7 +303,6 @@ public class WndManage
 
             if (aInfo.needVisible != WShowType.hide && aInfo.needVisible != WShowType.destroy)
             {
-
                 //从最近隐藏记录中清除
                 if (m_wndLastHideTime.ContainsKey(wndName + subID))
                     m_wndLastHideTime.Remove(wndName + subID);
@@ -490,7 +489,7 @@ public class WndManage
         WndManage.Single.DestroyHideWnds();
 
         //清理战场
-        DP_Battlefield.Single.Reset();
+        //DP_Battlefield.Single.Reset();
 
         //卸掉场景
         DP_Battlefield.Single.SwapScene(0, null, null);
@@ -502,19 +501,11 @@ public class WndManage
         //装载资源包
         List<string> dyPacks = AI_Single.Single.Battlefield.GeneratePackList();
 
-        ////显示战斗界面(初始化所有控件，并没有真正显示出来)
-        //wnd_fight.Single.Show(1); //Wnd.DefaultDuration
-        //wnd_scene.Single.Show(1);
-
-        //while (
-        //    !wnd_fight.Single.IsInitd || //等待鹰眼图初始化完毕
-        //    !wnd_scene.Single.IsInitd //等待场景中的界面初始化完成
-        //    ) yield return null;
-
 
         //装载场景
         bool loadDone = false;
         DP_Battlefield.Single.SwapScene(param.sceneID, dyPacks, () => loadDone = true);
+        DP_Battlefield.Single.LoadBase();
         while (!loadDone) yield return null; //等待场景装载完成
 
 
