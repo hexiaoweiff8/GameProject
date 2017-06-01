@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -85,6 +86,39 @@ public class SkillManager
 
         return result;
     }
+
+    /// <summary>
+    /// 加载技能列表
+    /// </summary>
+    /// <param name="skillIdList">技能ID列表</param>
+    /// <returns>技能信息列表</returns>
+    public IList<SkillInfo> LoadSkillInfoList(IList<int> skillIdList)
+    {
+        List<SkillInfo> result = null;
+        if (skillIdList != null && skillIdList.Count > 0)
+        {
+            result = new List<SkillInfo>();
+            foreach (var skillId in skillIdList)
+            {
+                var skillInfo = LoadSkillInfo(skillId);
+                if (skillInfo != null)
+                {
+                    result.Add(skillInfo);
+                }
+            }
+            // 根据CD时间排序
+            result.Sort((a, b) =>
+            {
+                if (a.CDTime > b.CDTime)
+                {
+                    return 1;
+                }
+                return -1;
+            });
+        }
+
+        return result;
+    } 
 
 
     // -------------------------------技能执行----------------------------------
@@ -174,6 +208,28 @@ public class SkillManager
 
         // 将技能加入字典中
         SkillInfoDic.Add(skillInfo.SkillNum, skillInfo);
+    }
+
+    /// <summary>
+    /// 检查并执行符合条件的技能
+    /// </summary>
+    /// <param name="skillsList">被检查列表</param>
+    /// <param name="releaseOwner">技能释放单位</param>
+    /// <param name="receiveOwner">技能被释放单位</param>
+    /// <param name="type1">第一级技能触发类型</param>
+    /// <param name="type2">第二级技能触发类型</param>
+    public void CheckAndDoSkillInfo(IList<SkillInfo> skillsList, 
+        DisplayOwner releaseOwner, 
+        DisplayOwner receiveOwner, 
+        SkillTriggerLevel1 type1, 
+        SkillTriggerLevel2 type2)
+    {
+        // 如果攻击时触发
+        foreach (var skill in skillsList.Where(skill => skill != null && skill.TriggerLevel1 == type1 && skill.TriggerLevel2 == type2))
+        {
+            // 触发技能
+            DoShillInfo(skill, FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(skill, releaseOwner, receiveOwner));
+        }
     }
 
     /// <summary>

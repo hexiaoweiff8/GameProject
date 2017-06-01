@@ -89,6 +89,15 @@ public class DataManager : MonoEX.Singleton<DataManager>
                 var soldierid = otherParam.SoldierID;
                 var config = SData_armybase_c.Single.GetDataOfID(soldierid);
                 mysoldier.SetSoldierData(config);
+                // 加载并设置技能
+                mysoldier.SkillInfoList = SkillManager.Single.LoadSkillInfoList(new List<int>()
+                {
+                    mysoldier.Skill1,
+                    mysoldier.Skill2,
+                    mysoldier.Skill3,
+                    mysoldier.Skill4,
+                    mysoldier.Skill5,
+                });
                 result = CreateSoldier(mysoldier, otherParam);
                 break;
             case ObjectID.ObjectType.EnemySoldier:
@@ -97,7 +106,16 @@ public class DataManager : MonoEX.Singleton<DataManager>
                 var enemyId = otherParam.SoldierID;
                 var enemyConfig = SData_armybase_c.Single.GetDataOfID(enemyId);
                 enemysoldier.SetSoldierData(enemyConfig);
-                result = CreateSoldier(enemysoldier,otherParam);
+                // 加载并设置技能
+                enemysoldier.SkillInfoList = SkillManager.Single.LoadSkillInfoList(new List<int>()
+                {
+                    enemysoldier.Skill1,
+                    enemysoldier.Skill2,
+                    enemysoldier.Skill3,
+                    enemysoldier.Skill4,
+                    enemysoldier.Skill5,
+                });
+                result = CreateSoldier(enemysoldier, otherParam);
                 break;
             case ObjectID.ObjectType.MyTank:
                 var mytank = value as TankVO;

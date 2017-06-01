@@ -74,11 +74,37 @@ public class SoldierFSMControl{
         fsm.Destory();
     }
 
-    public void UpdateFSM()//作为驱动源
+    public void UpdateFSM() //作为驱动源
     {
         if (_iSAwake) return;
         fsm.CurrentState.CheckTrigger(fsm);
         fsm.CurrentState.Action(fsm);
+        CheckBeAttack();
+    }
+
+    /// <summary>
+    /// 检测被击
+    /// </summary>
+    private void CheckBeAttack()
+    {
+        var fightVO = fsm.Display.ClusterData.MemberData as FightVO;
+        if (fightVO != null && fightVO.SkillInfoList != null)
+        {
+            // 检测是否被击
+            if (fightVO.BeAttack)
+            {
+                // 检查并执行列表
+                SkillManager.Single.CheckAndDoSkillInfo(fightVO.SkillInfoList, fsm.Display, fsm.EnemyTarget,
+                    SkillTriggerLevel1.Fight, SkillTriggerLevel2.BeAttack);
+                // 检测致死攻击
+                if (fightVO.CurrentHP < Utils.ApproachZero)
+                {
+                    SkillManager.Single.CheckAndDoSkillInfo(fightVO.SkillInfoList, fsm.Display, fsm.EnemyTarget,
+                       SkillTriggerLevel1.Fight, SkillTriggerLevel2.FatalHit);
+                }
+            }
+            fsm.Display.ClusterData.MemberData.BeAttack = false;
+        }
     }
 
 }

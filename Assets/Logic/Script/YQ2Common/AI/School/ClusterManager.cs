@@ -42,12 +42,12 @@ public class ClusterManager : ILoopItem
     /// <summary>
     /// 碰撞拥挤权重
     /// </summary>
-    public float CollisionWeight = 1f;
+    public float CollisionWeight = 5f;
 
     ///// <summary>
     ///// 碰撞挤开系数
     ///// </summary>
-    public float CollisionThrough = 5f;
+    public float CollisionThrough = 7f;
 
     /// <summary>
     /// 摩擦力系数
@@ -332,7 +332,7 @@ public class ClusterManager : ILoopItem
         {
             return;
         }
-
+        // 单位状态切换
         ChangeMemberState(member);
         // 当前单位到目标的方向
         Vector3 targetDir = member.TargetPos - member.Position;
@@ -386,7 +386,7 @@ public class ClusterManager : ILoopItem
         var speed = member.PhysicsInfo.SpeedDirection.magnitude;
         if (speed > member.PhysicsInfo.MaxSpeed)
         {
-            member.PhysicsInfo.SpeedDirection *= member.PhysicsInfo.MaxSpeed/speed;
+            member.PhysicsInfo.SpeedDirection *= member.PhysicsInfo.MaxSpeed / speed;
         }
     }
 
@@ -406,7 +406,7 @@ public class ClusterManager : ILoopItem
         {
             var grivity = member.TargetPos - member.Position;
             // 当前单位到目标的方向
-            //Vector3 targetDir = member.TargetPos - member.Position;
+            Vector3 targetDir = member.TargetPos - member.Position;
             
             // 遍历同队成员计算方向与速度
             //for (var j = 0; j < member.Group.MemberList.Count; j++)
@@ -423,7 +423,7 @@ public class ClusterManager : ILoopItem
             //    {
             //        // 在跟随区间
             //        var minDistance = member.Diameter + member.Diameter;
-            //        var maxDistance = member.MaxDistance + member.Diameter;
+            //        var maxDistance = minDistance;
             //        if (teammateOffset.magnitude > minDistance && teammateOffset.magnitude < maxDistance)
             //        {
             //            // 向前方队友位置偏移
@@ -439,23 +439,13 @@ public class ClusterManager : ILoopItem
 
             //grivity = grivity.normalized + targetDir.normalized;
 
-            //member.Momentum = member.PhysicsInfo.Momentum;
-            //if (member.PhysicsInfo.Momentum < 0)
-            //{
-            //    member.PhysicsInfo.Momentum = 0;
-            //    member.PhysicsInfo.Speed = 0;
-            //}
-            //else
-            //{
-            //    member.PhysicsInfo.Speed = member.PhysicsInfo.MaxSpeed;
-            //}
             // TODO 走向队友附近的槽, 并且前方有障碍则绕开, 绕开不太好做啊.
             // 绘制目标
             //Debug.DrawLine(member.Position, grivity + member.Position, Color.green);
             // 操作动量, 产生前进动量, 这个动量不会超过引力方向最大速度
 
             //Debug.DrawLine(member.Position , member.Position + grivity.normalized * member.PhysicsInfo.MaxSpeed * CollisionWeight, Color.yellow);
-            // TODO 速度不稳定问题
+            // 速度不稳定问题
             member.PhysicsInfo.SpeedDirection += grivity.normalized * member.PhysicsInfo.MaxSpeed * CollisionWeight * Time.deltaTime;
 
             // 加入最大速度限制, 防止溢出

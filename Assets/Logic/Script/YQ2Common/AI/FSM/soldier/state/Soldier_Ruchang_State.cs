@@ -36,9 +36,23 @@ public class Soldier_Ruchang_State : SoldierFSMState
             DeployTime = DataManager.Single.GetMySoldier(fsm.Display.MFAModelRender.ObjId.ID).DeployTime;
         }
 
+
+        var fightVO = fsm.Display.ClusterData.MemberData as FightVO;
+        // 入场检测技能
+        if (fightVO != null && fightVO.SkillInfoList != null)
+        {
+            SkillManager.Single.CheckAndDoSkillInfo(fightVO.SkillInfoList, fsm.Display, fsm.EnemyTarget, SkillTriggerLevel1.Fight, SkillTriggerLevel2.Enter);
+        }
+
         Globals.Instance.StartCoroutine(_waitFor(DeployTime, () =>
         {
             fsm.IsCanRun = true;
+
+            // 入场结束检测技能
+            if (fightVO != null && fightVO.SkillInfoList != null)
+            {
+                SkillManager.Single.CheckAndDoSkillInfo(fightVO.SkillInfoList, fsm.Display, fsm.EnemyTarget, SkillTriggerLevel1.Fight, SkillTriggerLevel2.EnterEnd);
+            }
         }));
     }
 

@@ -2,6 +2,9 @@
 using System.Collections;
 using Util;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+
 public class Soldier_PutongGongji_State : SoldierFSMState
 {
     /// <summary>
@@ -60,8 +63,13 @@ public class Soldier_PutongGongji_State : SoldierFSMState
             return;
         }
 
-        // TODO 攻击时检测技能
-
+        var fightVO = fsm.Display.ClusterData.MemberData as FightVO;
+        // 攻击时检测技能
+        if (fightVO != null && fightVO.SkillInfoList != null)
+        {
+            // 检查并执行列表
+            SkillManager.Single.CheckAndDoSkillInfo(fightVO.SkillInfoList, fsm.Display, fsm.EnemyTarget, SkillTriggerLevel1.Fight, SkillTriggerLevel2.Attack);
+        }
 
         var ballistic = EffectsFactory.Single.CreatePointToPointEffect("test/TrailPrj", null,
             fsm.Display.ClusterData.Position, fsm.EnemyTarget.ClusterData.Position, new Vector3(1, 1, 1), 200, TrajectoryAlgorithmType.Line,
@@ -82,8 +90,11 @@ public class Soldier_PutongGongji_State : SoldierFSMState
                         // 刷新血条
                         fsm.EnemyTarget.RanderControl.SetBloodBarValue();
                     }
-                    // TODO 命中时检测机能
-
+                    // 命中时检测技能
+                    if (fightVO != null && fightVO.SkillInfoList != null)
+                    {
+                        SkillManager.Single.CheckAndDoSkillInfo(fightVO.SkillInfoList, fsm.Display, fsm.EnemyTarget, SkillTriggerLevel1.Fight, SkillTriggerLevel2.Hit);
+                    }
                 }
                 else
                 {

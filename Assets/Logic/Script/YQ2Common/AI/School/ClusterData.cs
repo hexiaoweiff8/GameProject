@@ -171,6 +171,43 @@ public class ClusterData: PositionObject
     /// </summary>
     private bool couldObstruct = true;
 
+    /// <summary>
+    /// 目标路径栈
+    /// </summary>
+    private Stack<Vector3> targetQueue = new Stack<Vector3>();
+
+    /// <summary>
+    /// 压入新位置, 并将该位置设置为当前目标点
+    /// </summary>
+    /// <param name="target">新目标点</param>
+    public void PushTarget(Vector3 target)
+    {
+        targetPos = target;
+        targetQueue.Push(target);
+    }
+
+    /// <summary>
+    /// 弹出栈顶目标位置
+    /// </summary>
+    /// <returns>下一目标点</returns>
+    public Vector3 PopTarget()
+    {
+        if (targetQueue.Count > 0)
+        {
+            targetPos = targetQueue.Pop();
+        }
+
+        return targetPos;
+    }
+    
+    /// <summary>
+    /// 清空目标点栈
+    /// </summary>
+    public void ClearTarget()
+    {
+        targetQueue.Clear();
+    }
+
     public void Destory() {
         // 销毁时从列表中消除当前队员
         Group.MemberList.Remove(this);

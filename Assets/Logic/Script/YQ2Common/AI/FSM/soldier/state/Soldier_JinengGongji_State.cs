@@ -15,8 +15,8 @@ public class Soldier_JinengGongji_State : SoldierFSMState
     }
     public override void Action(SoldierFSMSystem fsm)
     {
-        // fsm 中带技能ID
-        if (fsm.IsCanInJinenggongji)
+        // fsm 中带技能
+        if (fsm.IsCanInJinenggongji && fsm.EnemyTarget.ClusterData != null && fsm.EnemyTarget.GameObj != null)
         {
             SkillManager.Single.DoShillInfo(fsm.Skill, new FormulaParamsPacker()
             {

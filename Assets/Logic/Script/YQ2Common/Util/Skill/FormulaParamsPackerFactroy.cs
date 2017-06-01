@@ -95,6 +95,31 @@ public class FormulaParamsPackerFactroy
     }
 
     /// <summary>
+    /// 创建技能数据包装类
+    /// 对象对对象方式
+    /// </summary>
+    /// <param name="skill">技能对象</param>
+    /// <param name="startObj">起始对象</param>
+    /// <param name="targetObj">目标对象</param>
+    /// <returns>数据包装类</returns>
+    public FormulaParamsPacker GetFormulaParamsPacker(SkillInfo skill, DisplayOwner startObj, DisplayOwner targetObj)
+    {
+        var result = new FormulaParamsPacker()
+        {
+            DataList = skill.DataList,
+            // TODO 技能等级, 最大目标数量
+            SkillLevel = 1,
+            SkillNum = skill.SkillNum,
+            ReceiverMenber = startObj,
+            ReleaseMember = targetObj,
+            StartPos = startObj.ClusterData.gameObject.transform.position,
+            TargetPos = targetObj.ClusterData.gameObject.transform.position
+        };
+
+        return result;
+    }
+
+    /// <summary>
     /// 获取图形范围内的单位数据包列表
     /// </summary>
     /// <param name="graphics">图形类</param>

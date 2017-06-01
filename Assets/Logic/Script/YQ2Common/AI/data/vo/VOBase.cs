@@ -138,7 +138,12 @@ public class VOBase
     /// <summary>
     /// 技能5
     /// </summary>
-    public int Skill5; 
+    public int Skill5;
+
+    /// <summary>
+    /// 是否被攻击
+    /// </summary>
+    public bool BeAttack = false;
 
 
     /// <summary>
@@ -279,6 +284,11 @@ public class VOBase
         get { return _currentHP; }
         set
         {
+            // 被击状态
+            if (value < _currentHP)
+            {
+                BeAttack = true;
+            }
             _currentHP = value;
             _currentHP = Mathf.Max(0,Mathf.Min(_currentHP, TotalHp));
         }
