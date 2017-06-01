@@ -25,7 +25,10 @@ public class PauseFormulaItem : AbstractFormulaItem
     /// 初始化
     /// </summary>
     /// <param name="array">数据数组</param>
-    public PauseFormulaItem(string[] array) { }
+    public PauseFormulaItem(string[] array)
+    {
+        FormulaType = 1;
+    }
 
     /// <summary>
     /// 获取行为节点

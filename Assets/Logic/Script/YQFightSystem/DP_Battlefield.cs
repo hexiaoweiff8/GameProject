@@ -84,12 +84,14 @@ public class DP_Battlefield : MonoEX.SingletonAuto<DP_Battlefield>
     /// </summary>
     public void LoadBase()
     {
-        //TODO 临时创建基地的代码
-        CreateActorParam para1 = new CreateActorParam(5, false, 0, "lingtong", "lingtong", true, 1008001);
-        CreateActorParam para12 = new CreateActorParam(5, false, 0, "lingtong", "lingtong", true, 1008001);
 
-        FightUnitFactory.CreateUnit(1,para1);
-        FightUnitFactory.CreateUnit(2, para12);
+        // TODO 创建左右基地的代码
+        // 不同等级基地不同模型
+        var rightBase = new CreateActorParam(5, false, 0, "lingtong", "lingtong", true, 1008001);
+        var leftBase = new CreateActorParam(5, false, 0, "lingtong", "lingtong", true, 1008001);
+
+        FightUnitFactory.CreateUnit(1, leftBase);
+        FightUnitFactory.CreateUnit(2, rightBase);
     }
 
     /// <summary>

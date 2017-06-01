@@ -85,6 +85,12 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
             case ObjectID.ObjectType.EnemySoldier:
                 _allEnemyDisPlayDict.Add(objId.ID, owner);
                 break;
+            case ObjectID.ObjectType.MyJiDi:
+                _allMyDisPlayDict.Add(objId.ID, owner);
+                break;
+            case ObjectID.ObjectType.EnemyJiDi:
+                _allEnemyDisPlayDict.Add(objId.ID, owner);
+                break;
         }
     }
 

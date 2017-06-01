@@ -20,7 +20,7 @@ public class FormulaParamsPacker
     /// <summary>
     /// 数据list
     /// </summary>
-    public List<List<string>> DataList { get; set; } 
+    public List<List<string>> DataList { get; set; }
 
     /// <summary>
     /// 初始位置

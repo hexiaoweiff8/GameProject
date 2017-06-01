@@ -67,7 +67,7 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger{
             var triggerType = type%100;
             type /= 1000;
             var skillType = type%10;
-            // 判断技能是否适合当前情况释放
+            // TODO 判断技能是否适合当前情况释放
             // 主动技能并且是范围内有其他单位触发
             if (skillType == 1 && triggerType == 1 || skillNum == 10001)
             {
@@ -104,6 +104,7 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger{
             System.Random ran = new System.Random();
             var target = res[ran.Next(0, res.Count)];
             fsm.EnemyTarget = target;
+            fsm.TargetIsLoseEfficacy = false;
         }
 
         return result;

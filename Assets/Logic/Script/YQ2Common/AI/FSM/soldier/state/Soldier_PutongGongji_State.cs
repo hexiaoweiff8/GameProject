@@ -40,7 +40,6 @@ public class Soldier_PutongGongji_State : SoldierFSMState
         _bulletCount = fsm.Display.ClusterData.MemberData.Clipsize1;
         _bulletMax = fsm.Display.ClusterData.MemberData.Clipsize1;
         _reloadTime = fsm.Display.ClusterData.MemberData.ReloadTime1;
-        
     }
 
     private void fire(SoldierFSMSystem fsm)
@@ -61,6 +60,9 @@ public class Soldier_PutongGongji_State : SoldierFSMState
             return;
         }
 
+        // TODO 攻击时检测技能
+
+
         var ballistic = EffectsFactory.Single.CreatePointToPointEffect("test/TrailPrj", null,
             fsm.Display.ClusterData.Position, fsm.EnemyTarget.ClusterData.Position, new Vector3(1, 1, 1), 200, TrajectoryAlgorithmType.Line,
             () =>
@@ -80,6 +82,8 @@ public class Soldier_PutongGongji_State : SoldierFSMState
                         // 刷新血条
                         fsm.EnemyTarget.RanderControl.SetBloodBarValue();
                     }
+                    // TODO 命中时检测机能
+
                 }
                 else
                 {
@@ -109,10 +113,13 @@ public class Soldier_PutongGongji_State : SoldierFSMState
     {
         if (!_stateIsLose)
         {
+            // 范围内没有敌人
             if (AdjustTargetIsInRange(fsm))
             {
                 fsm.TargetIsLoseEfficacy = true;
             }
+            // 有技能可放
+
         }
     }
 
@@ -128,7 +135,7 @@ public class Soldier_PutongGongji_State : SoldierFSMState
         }
         var targetPos = fsm.EnemyTarget.ClusterData.Position;
         var myPos = fsm.Display.ClusterData.Position;
-        var distance = AI_Math.V2Distance(targetPos.x, targetPos.z, myPos.x, myPos.z);
+        var distance = AI_Math.V2Distance(targetPos.x, targetPos.z, myPos.x, myPos.z) - fsm.EnemyTarget.ClusterData.Diameter * 0.5f - fsm.Display.ClusterData.Diameter * 0.5f;
         return (distance > fsm.Display.ClusterData.MemberData.SightRange) ||
                (fsm.EnemyTarget.ClusterData.MemberData.CurrentHP <= 0);
 

@@ -73,21 +73,12 @@ public static class FormulaConstructor
                 if (line.StartsWith("SkillNum"))
                 {
                     // 读取技能号
-                    var start = line.IndexOf("(", StringComparison.Ordinal);
-                    var end = line.IndexOf(")", StringComparison.Ordinal);
-                    if (start < 0 || end < 0)
-                    {
-                        throw new Exception("转换行为链失败: ()符号不完整, 行数:" + (i + 1));
-                    }
-                    // 编号长度
-                    var length = end - start - 1;
-                    if (length <= 0)
-                    {
-                        throw new Exception("转换行为链失败: ()顺序错误, 行数:" + (i + 1));
-                    }
+                    var pos = GetSmallBraketPos(line);
+                    var start = pos[0];
+                    var end = pos[1];
 
                     // 读取技能ID
-                    var strSkillId = line.Substring(start + 1, length);
+                    var strSkillId = line.Substring(start + 1, end - start - 1);
                     skillId = Convert.ToInt32(strSkillId);
                     // 创建新技能
                     skillInfo = new SkillInfo(skillId);
@@ -130,24 +121,14 @@ public static class FormulaConstructor
                     // 解析内容
                     // TODO 判断Formula的stack等级是否与当前stack等级一直? 不一致则新建将其加入上一级formula的子集
                     // 参数列表内容
-                    var start = line.IndexOf("(", StringComparison.Ordinal);
-                    var end = line.IndexOf(")", StringComparison.Ordinal);
-
-                    if (start < 0 || end < 0)
-                    {
-                        throw new Exception("转换行为链失败: ()符号不完整, 行数:" + (i + 1));
-                    }
-                    // 编号长度
-                    var length = end - start - 1;
-                    if (length <= 0)
-                    {
-                        throw new Exception("转换行为链失败: ()顺序错误, 行数:" + (i + 1));
-                    }
+                    var pos = GetSmallBraketPos(line);
+                    var start = pos[0];
+                    var end = pos[1];
 
                     // 行为类型
                     var type = line.Substring(0, start);
                     // 行为参数
-                    var args = line.Substring(start + 1, length);
+                    var args = line.Substring(start + 1, end - start - 1);
                     // 消除参数空格
                     args = args.Replace(" ", "");
                     // 使用参数+名称获取IFormula
@@ -155,14 +136,7 @@ public static class FormulaConstructor
                     // formula加入暂停item
                     var pauseItem = GetFormula("Pause", "1");
 
-                    if (tmpItem == null)
-                    {
-                        tmpItem = pauseItem;
-                    }
-                    else
-                    {
-                        tmpItem = tmpItem.After(pauseItem);
-                    }
+                    tmpItem = tmpItem == null ? pauseItem : tmpItem.After(pauseItem);
                     tmpItem = tmpItem.After(item);
                 }
                 else if (dataBraket)
@@ -241,10 +215,13 @@ public static class FormulaConstructor
         {
             throw new Exception("技能ID未指定.技能类为空");
         }
-        var start = line.IndexOf("(", StringComparison.Ordinal);
-        var end = line.IndexOf(")", StringComparison.Ordinal);
+
+        var pos = GetSmallBraketPos(line, false);
+        var start = pos[0];
+        var end = pos[1];
         // 编号长度
         var length = end - start - 1;
+
         if (line.StartsWith("CDTime"))
         {
             if (start < 0 || end < 0)
@@ -269,12 +246,28 @@ public static class FormulaConstructor
             }
             skillInfo.ReleaseTime = Convert.ToInt32(line.Substring(start + 1, length));
         }
-        else if (line.StartsWith("Trigger"))
-        {
-            // 触发事件
+        //else if (line.StartsWith("Trigger"))
+        //{
+        //    // 触发事件
 
+        //}
+        else if (line.StartsWith("TriggerLevel1"))
+        {
+            // 技能触发事件level1
+
+            var triggerType = (SkillTriggerLevel1)Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+
+            skillInfo.TriggerLevel1 = triggerType;
         }
-        else
+        else if (line.StartsWith("TriggerLevel2"))
+        {
+            // 技能触发事件level2
+
+            var triggerType = (SkillTriggerLevel2)Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+
+            skillInfo.TriggerLevel2 = triggerType;
+        }
+        else if (start < 0 && end < 0)
         {
             // 解析数据脚本
             var dataArray = line.Split(',');
@@ -285,7 +278,31 @@ public static class FormulaConstructor
             }
             skillInfo.DataList.Add(dataList);
         }
-    } 
+    }
+
+    /// <summary>
+    /// 获取一行数据中的小括号位置
+    /// </summary>
+    /// <param name="line"></param>
+    /// <returns></returns>
+    private static int[] GetSmallBraketPos(string line, bool vel = true)
+    {
+        var start = line.IndexOf("(", StringComparison.Ordinal);
+        var end = line.IndexOf(")", StringComparison.Ordinal);
+
+        if ((start < 0 || end < 0) && vel)
+        {
+            throw new Exception("转换行为链失败: ()符号不完整:" + line);
+        }
+        // 编号长度
+        var length = end - start - 1;
+        if (length <= 0 && vel)
+        {
+            throw new Exception("转换行为链失败: ()顺序错误:" + line);
+        }
+
+        return new[] {start, end};
+    }
 
     // 结构例子
     /*
@@ -299,6 +316,10 @@ public static class FormulaConstructor
         }
      }
      [
+         // 触发事件Level1
+         TriggerLevel1(1)
+         // 触发事件Level2
+         TriggerLevel2(1)
          // cd时间
          CDTime(10)
          // cd组ID(不一样的组ID不会共享同一个公共CD
@@ -314,7 +335,7 @@ public static class FormulaConstructor
     // -----------------特效-------------------- 
     // PointToPoint 点对点特效        参数 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),命中位置(0放技能方, 1目标方),速度,飞行轨迹,缩放(三位)
     // PointToObj 点对对象特效        参数 是否等待完成,特效Key,速度,飞行轨迹,缩放(三位)
-    // Point 点特效                   参数 是否等待完成,特效Key,速度,持续时间,缩放(三位)
+    // Point 点特效                   参数 是否等待完成,特效Key,检测位置(0放技能方, 1目标方),持续时间,缩放(三位)
     // Scope 范围特效                 参数 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),持续时间,范围半径
 
     // --------------目标选择方式---------------
@@ -360,6 +381,16 @@ public class SkillInfo
     /// 保存技能等级数据列表
     /// </summary>
     public List<List<string>> DataList = new List<List<string>>();
+
+    /// <summary>
+    /// 触发条件Level2
+    /// </summary>
+    public SkillTriggerLevel1 TriggerLevel1 { get; set; }
+
+    /// <summary>
+    /// 触发条件Level1
+    /// </summary>
+    public SkillTriggerLevel2 TriggerLevel2 { get; set; }
 
     /// <summary>
     /// 技能CD时间
@@ -454,4 +485,52 @@ public class SkillInfo
         }
         return result;
     }
+}
+
+/// <summary>
+/// 技能触发类型第一级
+/// </summary>
+public enum SkillTriggerLevel1
+{
+    None = 0,   // 无触发条件
+    Scope,      // 范围内触发
+    Health,     // 血量触发(血量低于或高于XX触发)
+    Fight,      // 战斗行为触发(攻击, 被攻击, 闪避...)
+    Time,       // 时间触发(保持某状态一定时间)
+    Buff,       // Buff触发(有正面Buff时或负面Buff时, 或指定Buff时触发)
+    All         // 范围全地图触发(地方下兵或某数量大于1时触发)
+
+}
+
+/// <summary>
+/// 技能触发类型第二级
+/// </summary>
+public enum SkillTriggerLevel2
+{
+    None = 0,               // 无触发条件
+    Enemy,                  // 有敌方单位
+    Friend,                 // 有友方单位
+    NotFullHealthFriend,    // 有不满血友方单位
+    FriendDeath,            // 有友方单位死亡
+    EnemyDeath,             // 有敌方单位死亡
+    EnemyHide,              // 有敌方隐形单位
+
+
+    HealthScope,            // 血量在一定范围内
+    Attack,                 // 攻击时
+    Hit,                    // 命中时
+    BeAttack,               // 被攻击时
+    Evasion,                // 闪避时
+    Enter,                  // 入场时
+    EnterEnd,               // 入场结束时
+    Death,                  // 死亡时
+    FatalHit,               // 受到致死攻击时
+
+    SafeTime,               // 安全XX时长时
+    ClearScope,             // 范围内XX时长无敌人时
+
+    BuffDown,               // XXBuff消失时
+    TakeBuffDie,            // 带XXBuff死亡时
+
+
 }

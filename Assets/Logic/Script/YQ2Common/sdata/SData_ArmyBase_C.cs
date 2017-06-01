@@ -46,6 +46,11 @@ public class SData_armybase_c : MonoEX.Singleton<SData_armybase_c>
 					case "CritDamage": dif.CritDamage = (float)(double)o22; break;
 					case "BulletType": dif.BulletType = (short)(double)o22; break;
 					case "BulletSpeed": dif.BulletSpeed = (float)(double)o22; break;
+					case "BulletMode": dif.BulletMode = (string)o22; break;
+					case "BulletPath": dif.BulletPath = (string)o22; break;
+					case "MuzzleFlash": dif.MuzzleFlash = (string)o22; break;
+					case "Ballistic": dif.Ballistic = (string)o22; break;
+					case "GetHit": dif.GetHit = (string)o22; break;
 					case "AttackType": dif.AttackType = (short)(double)o22; break;
 					case "MultiAimMax": dif.MultiAimMax = (short)(double)o22; break;
 					case "AttackRange": dif.AttackRange = (float)(double)o22; break;
@@ -155,11 +160,11 @@ public struct armybase_cInfo
 	 /// </summary>
 	public float MoveSpeed;
 	 /// <summary>
-	 ///闪避
+	 ///闪避率
 	 /// </summary>
 	public float Dodge;
 	 /// <summary>
-	 ///命中
+	 ///命中率
 	 /// </summary>
 	public float Hit;
 	 /// <summary>
@@ -171,7 +176,7 @@ public struct armybase_cInfo
 	 /// </summary>
 	public float Armor;
 	 /// <summary>
-	 ///防暴几率
+	 ///防暴率
 	 /// </summary>
 	public float AntiCrit;
 	 /// <summary>
@@ -190,6 +195,26 @@ public struct armybase_cInfo
 	 ///子弹速度
 	 /// </summary>
 	public float BulletSpeed;
+	 /// <summary>
+	 ///子弹模型
+	 /// </summary>
+	public string BulletMode;
+	 /// <summary>
+	 ///子弹轨迹
+	 /// </summary>
+	public string BulletPath;
+	 /// <summary>
+	 ///枪口火焰
+	 /// </summary>
+	public string MuzzleFlash;
+	 /// <summary>
+	 ///弹道特效
+	 /// </summary>
+	public string Ballistic;
+	 /// <summary>
+	 ///受击特效组
+	 /// </summary>
+	public string GetHit;
 	 /// <summary>
 	 ///攻击类型（单体/AOE）
 	 /// </summary>

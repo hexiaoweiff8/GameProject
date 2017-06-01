@@ -3,20 +3,20 @@ using System.Collections;
 
 public class Soldier_JinengGongji_State : SoldierFSMState
 {
-    /// <summary>
-    /// 技能是否释放完毕
-    /// </summary>
-    private bool skillIsEnd = false;
 
     public override void Init()
     {
         StateID = SoldierStateID.JinengGongji;
     }
 
+    public override void DoBeforeEntering(SoldierFSMSystem fsm)
+    {
+        Debug.Log("技能攻击");
+    }
     public override void Action(SoldierFSMSystem fsm)
     {
         // fsm 中带技能ID
-        if (!skillIsEnd)
+        if (fsm.IsCanInJinenggongji)
         {
             SkillManager.Single.DoShillInfo(fsm.Skill, new FormulaParamsPacker()
             {
@@ -29,15 +29,16 @@ public class Soldier_JinengGongji_State : SoldierFSMState
                 StartPos = fsm.Display.ClusterData.gameObject.transform.position,
                 TargetPos = fsm.EnemyTarget.ClusterData.gameObject.transform.position
             });
-            skillIsEnd = true;
-            fsm.Skill = null;
-        }
-        else
-        {
-            // 切换状态到行进状态
             fsm.IsCanInJinenggongji = false;
+            fsm.Skill = null;
+            // 切换状态到行进状态
             fsm.TargetIsLoseEfficacy = true;
             fsm.EnemyTarget = null;
         }
+    }
+
+    public override void DoBeforeLeaving(SoldierFSMSystem fsm)
+    {
+        Debug.Log("技能攻击结束");
     }
 }

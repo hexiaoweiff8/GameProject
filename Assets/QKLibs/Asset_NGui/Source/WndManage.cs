@@ -505,7 +505,7 @@ public class WndManage
         //装载场景
         bool loadDone = false;
         DP_Battlefield.Single.SwapScene(param.sceneID, dyPacks, () => loadDone = true);
-        DP_Battlefield.Single.LoadBase();
+        //DP_Battlefield.Single.LoadBase();
         while (!loadDone) yield return null; //等待场景装载完成
 
 

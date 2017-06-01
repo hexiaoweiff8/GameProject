@@ -12,7 +12,7 @@ public class Soldier_Daiji_State : SoldierFSMState {
 
     public override void Action(SoldierFSMSystem fsm)
     {
-        
+                
     }
 
 }

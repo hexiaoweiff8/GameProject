@@ -7,6 +7,8 @@ function Onfs()
 end
 function ui_fight:OnShowDone()
     math.newrandomseed()
+
+    DP_Battlefield.Single:LoadBase()
     local time_txt = self.transform:Find("time_bg/txt"):GetComponent("UILabel")
     --战斗计时器
     self.TimeTickerTb[1] = startTimer(5 * 60,
@@ -19,16 +21,15 @@ function ui_fight:OnShowDone()
         end)
     local myBloodBar = self.transform:Find("defence_widget1/bg/hp_fg"):GetComponent("UISprite")
     --    myBloodBar.fillAmount = 0.5
-    local localEnemypaiStr = "1001,1002,1003,1004,1005,1006,1007,1008,1009,1001,1002,1003,1004,1005,1006,1007,1008,1009"
+    local localEnemypaiStr = "101001,101002,101003,101004,101005,101006,101007,101008,101009,101001,101002,101003,101004,101005,101006,101007,101008,101009"
     --剩余敌人牌库
     self.enemyPaiKutb = string.splitToInt(localEnemypaiStr, ",")
     --打乱敌人牌库
     table.upset(self.enemyPaiKutb)
-    local localpaiStr = "1001,1002,1003,1004,1005,1006,1007,1008,1009,1001,1002,1003,1004,1005,1006,1007,1008,1009"
+    local localpaiStr = "101001,101002,101003,101004,101005,101006,101007,101008,101009,101001,101002,101003,101004,101005,101006,101007,101008,101009"
     -- -- localpaiStr = "1,2,3,4,5,6"
     --剩余牌库
     self.paiKutb = string.splitToInt(localpaiStr, ",")
-    
     --打乱牌库
     table.upset(self.paiKutb)
     --当前手牌库
@@ -55,6 +56,7 @@ function ui_fight:OnShowDone()
     --剩余兵力值
     self.sumLastBingLi = 0
     for i = 2, #self.paiKutb do
+        --print("test" .. self.paiKutb[i])
         self.sumLastBingLi = self.sumLastBingLi + sdata_armycardbase_data:GetFieldV("TrainCost", self.paiKutb[i])
     end
     --剩余兵力Label

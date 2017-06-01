@@ -66,15 +66,22 @@ public class DataManager : MonoEX.Singleton<DataManager>
 
     public DisplayOwner Create(VOBase value, CreateActorParam otherParam)
     {
+        DisplayOwner result = null;
         switch (value.ObjID.ObjType)
         {
             case ObjectID.ObjectType.MyJiDi:
                 var myJidi = value as JiDiVO;
-                CreateMyJidi(myJidi);
+                // TODO 需要根据等级获得对应数据
+                var myJidiConfig = SData_armybase_c.Single.GetDataOfID(220001001);
+                myJidi.SetSoldierData(myJidiConfig);
+                result = CreateMyJidi(myJidi);
                 break;
             case ObjectID.ObjectType.EnemyJiDi:
                 var enemyjidi = value as JiDiVO;
-                CreateEnemyJidi(enemyjidi);
+                // TODO 需要根据等级获得对应数据
+                var enemyJidiConfig = SData_armybase_c.Single.GetDataOfID(220001001);
+                enemyjidi.SetSoldierData(enemyJidiConfig);
+                result = CreateEnemyJidi(enemyjidi);
                 break;
             case ObjectID.ObjectType.MySoldier:
                 var mysoldier = value as FightVO;
@@ -82,7 +89,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
                 var soldierid = otherParam.SoldierID;
                 var config = SData_armybase_c.Single.GetDataOfID(soldierid);
                 mysoldier.SetSoldierData(config);
-                return CreateSoldier(mysoldier, otherParam);
+                result = CreateSoldier(mysoldier, otherParam);
                 break;
             case ObjectID.ObjectType.EnemySoldier:
                 var enemysoldier = value as FightVO;
@@ -90,7 +97,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
                 var enemyId = otherParam.SoldierID;
                 var enemyConfig = SData_armybase_c.Single.GetDataOfID(enemyId);
                 enemysoldier.SetSoldierData(enemyConfig);
-                return CreateSoldier(enemysoldier,otherParam);
+                result = CreateSoldier(enemysoldier,otherParam);
                 break;
             case ObjectID.ObjectType.MyTank:
                 var mytank = value as TankVO;
@@ -109,12 +116,41 @@ public class DataManager : MonoEX.Singleton<DataManager>
                 CreateEnemyObstacle(enemyobstacle);
                 break;
         }
-        return null;
+        return result;
     }
 
-    private void CreateMyJidi(JiDiVO myjidi)
+    private DisplayOwner CreateMyJidi(JiDiVO myjidi)
     {
-        _myJidiDict.Add(myjidi.ObjID.ID, myjidi);
+        DisplayOwner result = null;
+        if (myjidi != null)
+        {
+            _myJidiDict.Add(myjidi.ObjID.ID, myjidi);
+            // 创建基地模型
+            // 从AB包中加载
+            var myBase = GameObjectExtension.InstantiateFromPacket("jidi", "zhujidi_model", null);
+            var mesh = myBase.GetComponentInChildren<SkinnedMeshRenderer>();
+            mesh.material.mainTexture = PacketManage.Single.GetPacket("jidi").Load("zhujidi_b_texture") as Texture;
+            // TODO 设置角度与位置
+            myBase.transform.position = new Vector3(-140, -38, -20);
+            myBase.transform.Rotate(new Vector3(0, 90, 0));
+
+
+            var cluster = myBase.AddComponent<ClusterData>();
+            cluster.MemberData = myjidi;
+            cluster.GroupId = 999;
+            cluster.MemberData.MoveSpeed = -1;
+            cluster.Diameter = 40;
+            cluster.X = -140;
+            cluster.Y = -20;
+            cluster.Stop();
+            ClusterManager.Single.Add(cluster);
+
+            // 创建外层持有类
+            var displayOwner = new DisplayOwner(myBase, cluster, null, null);
+            DisplayerManager.Single.AddElement(myjidi.ObjID, displayOwner);
+        }
+
+        return result;
     }
 
     private JiDiVO getMyJidi(int id)
@@ -135,9 +171,37 @@ public class DataManager : MonoEX.Singleton<DataManager>
         }
     }
 
-    private void CreateEnemyJidi(JiDiVO enemyjidi)
+    private DisplayOwner CreateEnemyJidi(JiDiVO enemyjidi)
     {
-        _enemyJidiDict.Add(enemyjidi.ObjID.ID, enemyjidi);
+        DisplayOwner result = null;
+        if (enemyjidi != null)
+        {
+            _enemyJidiDict.Add(enemyjidi.ObjID.ID, enemyjidi);
+            // 创建基地模型
+            // 从AB包中加载
+            var enemyBase = GameObjectExtension.InstantiateFromPacket("jidi", "zhujidi_model", null);
+            var mesh = enemyBase.GetComponentInChildren<SkinnedMeshRenderer>();
+            mesh.material.mainTexture = PacketManage.Single.GetPacket("jidi").Load("zhujidi_r_texture") as Texture;
+            // TODO 设置角度与位置
+            enemyBase.transform.position = new Vector3(1330, -38, -20);
+            enemyBase.transform.Rotate(new Vector3(0, -90, 0));
+
+
+            var cluster = enemyBase.AddComponent<ClusterData>();
+            cluster.MemberData = enemyjidi;
+            cluster.MemberData.MoveSpeed = -1;
+            cluster.Diameter = 40;
+            cluster.GroupId = 999;
+            cluster.X = 1330;
+            cluster.Y = -20;
+            cluster.Stop();
+            ClusterManager.Single.Add(cluster);
+
+            // 创建外层持有类
+            var displayOwner = new DisplayOwner(enemyBase, cluster, null, null);
+            DisplayerManager.Single.AddElement(enemyjidi.ObjID, displayOwner);
+        }
+        return result;
     }
 
     private JiDiVO GetEnemyJidi(int id)

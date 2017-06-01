@@ -49,49 +49,56 @@ wnd_cardyc_model.cardInfo={
 
 
 --获取数据库信息
-function wnd_cardyc_model:getDatas(TestID)
+function wnd_cardyc_model:getDatas(cardIndex)
     print("================wnd_cardyc_model:getDatas============start===========")
-    if currencyTbl ~= nil and cardTbl ~= nil and userRoleTbl~=nil  then
-    
-        self.userInfo.goldNum = currencyTbl["gold"] --金币
-        self.userInfo.diamond = currencyTbl["diamond"] --钻石
-        self.userInfo.totalSkPt = currencyTbl["skillpt"] --技能点
-        self.userInfo.expPool = currencyTbl["expPool"]--经验池
-        self.userInfo.badgeNum = currencyTbl["coin"] --兵牌
-        self.userInfo.tili = currencyTbl["tili"] --体力
-        self.userInfo.useRoleExp = userRoleTbl["exp"]
-        self.userInfo.itemList = userRoleTbl["item"]         --背包
-        self.userInfo.userRoleLv= userRoleTbl["lv"]
-        self.userInfo.userRoleLv= 20
-        for k,v in pairs(cardTbl) do--根据当前卡片的ID获取卡牌信息,后期要改
-            if v.id == TestID then
-                self.cardInfo.cardId = v.id
-                self.cardInfo.cardLv = v.lv
-                self.cardInfo.cardExp  = v.exp
-                self.cardInfo.starLv = v.star
-                self.cardInfo.soldierLv = v.slv
-                self.cardInfo.qualityLv = v.rlv
-                self.cardInfo.cardFragment = v.num
-                self.cardInfo.slotState = v.slot
-                self.cardInfo.skill_Lv_Table = v.skill
-                for i = 1, #v.skill do
-                    print(string.format("skill_%d::::::::%d",i,v.skill[i]))
-                end
-                self.cardInfo.synergyLvTbl = v.team--协同表
-            end
-        end
-    end
+    if currencyTbl == nil or cardTbl == nil or userRoleTbl == nil  then
+        return false
+    end 
+    if not self:isHaveCard(cardIndex) then 
+        return false
+    end 
 
+    self.userInfo.goldNum = currencyTbl["gold"] --金币
+    self.userInfo.diamond = currencyTbl["diamond"] --钻石
+    self.userInfo.totalSkPt = currencyTbl["skillpt"] --技能点
+    self.userInfo.expPool = currencyTbl["expPool"]--经验池
+    self.userInfo.badgeNum = currencyTbl["coin"] --兵牌
+    self.userInfo.tili = currencyTbl["tili"] --体力
+    self.userInfo.useRoleExp = userRoleTbl["exp"]
+    self.userInfo.itemList = userRoleTbl["item"]         --背包
+    self.userInfo.userRoleLv= userRoleTbl["lv"]
+    self.userInfo.userRoleLv= 80
+
+    self.cardInfo.cardId =cardTbl[cardIndex].id
+    self.cardInfo.cardLv = cardTbl[cardIndex].lv
+    self.cardInfo.cardExp  = cardTbl[cardIndex].exp
+    self.cardInfo.starLv = cardTbl[cardIndex].star
+    self.cardInfo.soldierLv = cardTbl[cardIndex].slv
+    self.cardInfo.qualityLv = cardTbl[cardIndex].rlv
+    self.cardInfo.cardFragment = cardTbl[cardIndex].num
+    self.cardInfo.slotState = cardTbl[cardIndex].slot
+    self.cardInfo.skill_Lv_Table = cardTbl[cardIndex].skill
+    self.cardInfo.synergyLvTbl = cardTbl[cardIndex].team--协同表
+    print(cardTbl[cardIndex].team[1],cardTbl[cardIndex].team[2],cardTbl[cardIndex].team[3],cardTbl[cardIndex].team[4])
     self:init_upQualityItems()
     self:init_skillIDTable()
     
     self:init_synergyIDTbl()
     self:init_synergyStateTbl()
-    
     print("================wnd_cardyc_model:getDatas============end===========")
+    return true
+    
 end
-
-
+function wnd_cardyc_model:getCardNum()
+    return #cardTbl
+end
+function wnd_cardyc_model:isHaveCard(cardIndex)
+    -- body
+    if cardTbl[cardIndex] then 
+        return true
+    end
+    return false
+end
 
 --[[
     卡牌进阶部分
@@ -428,7 +435,7 @@ function wnd_cardyc_model:init_synergyStateTbl()
 end
 function wnd_cardyc_model:init_synergyIDTbl()
     for i = 1,#self.cardInfo.synergyLvTbl do
-        self.synergyIDTbl[i] = 1001
+        self.synergyIDTbl[i] = 1001+i
     end 
 end 
 function wnd_cardyc_model:isCan_UpSynergy(index)
@@ -502,13 +509,19 @@ end
 
 
 
-
-
-
 --获取卡牌的基础信息
 function wnd_cardyc_model:getCardInfo(property, cardId)
     return sdata_armycardbase_data:GetFieldV(property, cardId)
 end
+function wnd_cardyc_model:getCardByID(cardId)
+    for k,v in ipairs(cardTbl) do
+        if v.id == cardId then
+            return v
+        end
+    end
+    return nil
+end
+
 --获取字符串
 function wnd_cardyc_model:getString( ... )
     -- body

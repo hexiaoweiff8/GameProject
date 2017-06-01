@@ -1,7 +1,7 @@
 SkillNum(10001)
 {
-	PointToPoint(1, test/TrailPrj, 0, 1, 10, 1, 10,10,10);
-	Point(1, test/ExplordScope, 0, 2, 40,40,40);
+	PointToPoint(1, test/TrailPrj, 0, 1, 100, 1, 10,10,10);
+	Point(1, test/ExplordScope, 1, 2, 40,40,40);
 }
 [
 ]

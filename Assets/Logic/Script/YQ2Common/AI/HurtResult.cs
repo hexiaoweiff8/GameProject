@@ -82,7 +82,7 @@ public class HurtResult
             gongjiMingzhong*(1 + gongjiMingzhongAdd) - fangshouShanbi*(1 + fangshouShanbiAdd));
         var ran = new QKRandom((int)DateTime.Now.Ticks);
         var value = ran.RangeI(0, 1000);
-        bool isMiss = value <= mingzhongchazhi*1000;
+        bool isMiss = value >= mingzhongchazhi*1000;
         return isMiss;
     }
 

@@ -142,12 +142,15 @@ public class AstarTest : MonoBehaviour {
 {
         SlideCollisionDetection(1, 1, %0, 40, -1)
         {
-            Point(1,test/ExplordScope,1,0,%1,10,1,10),
+            //PointToObj(1,test/TrailPrj,10,0,10,1,10),
+            Point(1,test/ExplordScope,1,%1,10,1,10),
         }
 }
         // 数据
         [
-            100, 3
+            TriggerLevel1(1)
+            TriggerLevel2(1)
+            100, 5
         ]
 ";
         string formulaStr4 = @"SkillNum(1004)

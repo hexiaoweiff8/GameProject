@@ -131,6 +131,7 @@ function wnd_cardyc_view:init_synergyItem(parent,name)
     end
     self[name].synergyItem = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "itemPanel", parent).gameObject
     self[name].synergyItem_Sp = self[name].synergyItem.transform:Find("Sprite").gameObject
+    self[name].synergyItem_itemBg = self[name].synergyItem.transform:Find("bkSp").gameObject
     self[name].synergyItem_redDot = self[name].synergyItem.transform:Find("redDot").gameObject
     self[name].synergyItem_plusSp = self[name].synergyItem.transform:Find("plusSp").gameObject
     self[name].synergyItem_upSp = self[name].synergyItem.transform:Find("upSp").gameObject

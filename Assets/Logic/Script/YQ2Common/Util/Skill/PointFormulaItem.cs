@@ -92,7 +92,7 @@ public class PointFormulaItem : AbstractFormulaItem
         {
             throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
         }
-        // 是否等待完成,特效Key,速度,持续时间
+        // 是否等待完成,特效Key,目标位置,持续时间
         // 如果该项值是以%开头的则作为替换数据
         var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
         var effectKey = GetDataOrReplace<string>("EffectKey", array, 1, ReplaceDic);
@@ -149,13 +149,11 @@ public class PointFormulaItem : AbstractFormulaItem
         var scaleX = ScaleX;
         var scaleY = ScaleY;
         var scaleZ = ScaleZ;
-
         IFormula result = new Formula((callback) =>
         {
-            //Debug.Log("Point");
             var pos = myTargetPos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
             // 判断发射与接收位置
-            EffectsFactory.Single.CreatePointEffect(myEffectKey, null, pos, new Vector3(scaleX, scaleY, scaleZ), myDurTime, mySpeed, callback).Begin();
+            EffectsFactory.Single.CreatePointEffect(myEffectKey, null, pos, new Vector3(scaleX, scaleY, scaleZ), myDurTime, mySpeed, callback, 12).Begin();
         }, myFormulaType);
 
         return result;

@@ -25,6 +25,8 @@ public class LogicInit
         packs.Add("sc_main");
         packs.Add("uisound");
         packs.Add("scene_main");
+        // TODO 需要管理包加载
+        packs.Add("jidi");
 
 
 
