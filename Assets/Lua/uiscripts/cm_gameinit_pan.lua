@@ -9,6 +9,10 @@ require("uiscripts/cardycP")
 gameinit = classWC()
 -- 单例
 GameInit = nil
+
+--tips信息显示的内容
+tipsText = nil
+
 WNDTYPE = {
     None = "None",
     Login = "ui_login",
@@ -23,6 +27,7 @@ WNDTYPE = {
     ui_keji_jiasu = "ui_keji_jiasu",
     ui_kejitree = "ui_kejitree",
     Cardyc = "ui_cardyc",
+    ui_tips = "ui_tips"
 }
 UiDefine = luacsv.new(require("pk_tabs/UiDefine"))
 -- 登录窗体组件名列表
@@ -42,6 +47,7 @@ gameinit.wndlist = {
     {name = WNDTYPE.ui_keji_jiasu, cm = "uiscripts/ui_keji_jiasu"},
     {name = WNDTYPE.ui_kejitree, cm = "uiscripts/ui_kejitree"},
     {name = WNDTYPE.Cardyc, cm = "uiscripts/wnd_cardyc_controller"},
+    {name = WNDTYPE.ui_tips,cm = "uiscripts/ui_tips"}
 }
 _all_Reg_Wnd_list = {}
 --- <summary>

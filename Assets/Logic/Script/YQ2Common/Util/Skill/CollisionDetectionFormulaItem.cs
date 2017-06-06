@@ -146,6 +146,7 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
         var myReceivePos = ReceivePos;
         var myTargetCamps = TargetCamps;
         var selecterData = paramsPacker.ReleaseMember.ClusterData.MemberData;
+        var myFormulaType = FormulaType;
         result = new Formula((callback) =>
         {
             // 检测范围
@@ -203,7 +204,7 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
 
             // 执行完成, 回调
             callback();
-        });
+        }, myFormulaType);
        
 
         return result;

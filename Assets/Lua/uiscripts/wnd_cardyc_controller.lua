@@ -4,7 +4,7 @@ local view = require("uiscripts/wnd_cardyc_view")
 local data = require("uiscripts/wnd_cardyc_model")
 
 --显示界面
-TABLE_INDEX={
+local TABLE_INDEX={
     INFORMATION =1,
     SKILL =2,
     SOLDIER =3,
@@ -12,7 +12,6 @@ TABLE_INDEX={
 }
 local CurrentTabIndex = TABLE_INDEX.INFORMATION
 local CardIndex = 1
-local TestID = 1002 
 local TestAtlas
 function wnd_cardyc_controller:OnShowDone()
     --初始化view
@@ -21,9 +20,10 @@ function wnd_cardyc_controller:OnShowDone()
     TestAtlas = GameObjectExtension.InstantiateFromPacket("heroU", "hero1AtlasT", self.gameObject).transform:GetComponent("UIAtlas")
     --获取数据
     CardIndex = 1
-    self:showCard(CardIndex)
+    self:showCard()
 end
 
+--刷新卡牌用于切换卡牌
 function wnd_cardyc_controller:showCard()
 
     if not data:getDatas(CardIndex) then 
@@ -34,12 +34,12 @@ function wnd_cardyc_controller:showCard()
     self:init_redDot()
     self:init_tabPanel()
 end
-
+--初始化左侧界面
 function wnd_cardyc_controller:init_leftCard_Data()
     view.cardNameLab.transform:GetComponent("UILabel").text = data:getCardName_With_Quality(data.cardInfo.cardId, data.cardInfo.qualityLv)
     view.cardNameLab.transform:GetComponent("UILabel").color = data:getColor_With_Quality(data.cardInfo.qualityLv)
     view.cardLevelLab.transform:GetComponent("UILabel").text = string.format("Lv.%d",data.cardInfo.cardLv)
-    view.cardNum_Lab.transform:GetComponent("UILabel").text = string.format("已有 %d 张",data.cardInfo.cardFragment)
+    view.cardNum_Lab.transform:GetComponent("UILabel").text = string.format(data:getString(20702),data.cardInfo.cardFragment)
     view.trainCostLab.transform:GetComponent("UILabel").text = data:getCardInfo("TrainCost",data.cardInfo.cardId)
     --显示星级
     for i=1,data.Const.MAX_STAR_LV do
@@ -69,6 +69,10 @@ function wnd_cardyc_controller:init_leftCard_Data()
             if CardIndex > 1 then
                 CardIndex = CardIndex - 1
                 self:showCard()
+            else
+                --无更多卡牌
+                tipsText = data:getString(20701)
+                ui_manager:ShowWB(WNDTYPE.ui_tips)
             end
         end
     end
@@ -78,6 +82,10 @@ function wnd_cardyc_controller:init_leftCard_Data()
             if CardIndex < data:getCardNum() then
                 CardIndex = CardIndex + 1
                 self:showCard()
+            else
+                --无更多卡牌
+                tipsText = data:getString(20701)
+                ui_manager:ShowWB(WNDTYPE.ui_tips)
             end
         end
     end
@@ -104,22 +112,22 @@ function wnd_cardyc_controller:refresh_RightBody()
     end
 end
 
-
+--初始化红点提示
 function wnd_cardyc_controller:init_redDot()
     --判断是否可以升级，并显示小红点
     view.btn_upLevel_redDot:SetActive(false)
-    if data:isCan_UpLevel() then
+    if data:isCan_UpLevel() == 0 then
         view.btn_upLevel_redDot:SetActive(true)
     end
 
     --判断是否可以升星，并显示小红点
     view.btn_upStar_redDot:SetActive(false)
-    if data:isCan_UpStar() then
+    if data:isCan_UpStar() == 0 then
         view.btn_upStar_redDot:SetActive(true)
     end
 
     view.btn_soldier_redDot:SetActive(false)
-    if data:isCan_UpSoldier() then
+    if data:isCan_UpSoldier() == 0 then
         view.btn_soldier_redDot:SetActive(true)
     end
 
@@ -127,7 +135,7 @@ function wnd_cardyc_controller:init_redDot()
     for i = 1, 5 do
         local name = string.format("skillFrame_%d",i)
         view[name].skillItem_redDot:SetActive(false)
-        if data:isCan_UpSkill(i) then
+        if data:isCan_UpSkill(i) == 0 then
             view[name].skillItem_redDot:SetActive(true)
             view.btn_skill_redDot:SetActive(true)
         end
@@ -135,7 +143,7 @@ function wnd_cardyc_controller:init_redDot()
 
 
     view.btn_information_redDot:SetActive(false)
-    if data:isCan_UpQuality() then
+    if data:isCan_UpQuality() == 0 then
         view.btn_information_redDot:SetActive(true)
     end
 
@@ -147,7 +155,7 @@ function wnd_cardyc_controller:init_redDot()
         if data.synergyStateTbl[i] == data.SynergyState.unactive then
             view[name].synergyItem_redDot:SetActive(false)
         elseif data.synergyStateTbl[i] == data.SynergyState.activated then
-            if data:isCan_UpSynergy(i) then
+            if data:isCan_UpSynergy(i) == 0 then
                 view[name].synergyItem_redDot:SetActive(true)
                 view.btn_synergy_redDot:SetActive(true)
             end
@@ -177,7 +185,7 @@ function wnd_cardyc_controller:init_tabPanel()
         end
     end
 end
-
+--显示选择的tab
 function wnd_cardyc_controller:showTabPanel(tableIndex)
     if CurrentTabIndex == tableIndex then 
         return
@@ -191,8 +199,8 @@ function wnd_cardyc_controller:showTabPanel(tableIndex)
 end
 
 -----------------------------------升星部分---------------------------------
-local isInitUpStarLayer = false
-local isInitUpStarSLayer = false
+local isInitUpStarLayer = false --是否初始化升星界面
+local isInitUpStarSLayer = false --是否初始化升星成功界面
 --显示升星界面
 function wnd_cardyc_controller:show_UpStar_Layer()
      if not isInitUpStarLayer then
@@ -213,8 +221,8 @@ function wnd_cardyc_controller:show_UpStar_Layer()
         view.upStarP_skillP_NameLab:GetComponent("UILabel").text = data:getSkillInfo("Name",data.cardInfo.cardId,data.cardInfo.cardLv,data:GetNextStarLv()) --解锁技能名
         UIEventListener.Get(view.upStarP_skillP_NameLab).onPress = function(upStarP_skillP_NameLab, args)
             if args then
-                -- self:show_SkillItem_UpPanel(self.nextStarlv)
-                print("弹出技能介绍框....."..skillid ) --弹出技能介绍框
+                tipsText ="弹出技能介绍框....."
+                ui_manager:ShowWB(WNDTYPE.ui_tips)
             end
         end
     end
@@ -240,6 +248,16 @@ function wnd_cardyc_controller:show_UpStar_Layer()
     end
     view.upStarP_cardhavaNumL.transform:GetComponent("UILabel").text = lab2
 
+
+    --最大星级判断
+    if data.cardInfo.starLv >= data.Const.MAX_STAR_LV then
+        view.upStarP_btn_sx:SetActive(false)
+        view.upStarP_maxStarP:SetActive(true)
+    else 
+        view.upStarP_btn_sx:SetActive(true)
+        view.upStarP_maxStarP:SetActive(false)
+    end
+
     --为按钮添加监听
     UIEventListener.Get(view.upStarP_btn_back).onPress = function(upStarP_btn_back, args)
         if args then
@@ -259,15 +277,15 @@ end
 --点击升星界面的升星按钮
 function wnd_cardyc_controller:upStarPanel_btnUpStar_CallBack()
     
-    if not data:isCan_UpStar() then 
-        return 
+    if data:isCan_UpStar() ~= 0 then
+        ui_manager:ShowWB(WNDTYPE.ui_tips)
+        return
     end
     --发送请求升星
     --提升星级扣道具，升星成功
-    SendPB_10010(data.cardInfo.cardId)
-    
+    Message_Manager:SendPB_10010(data.cardInfo.cardId)
 end
-
+--升星成功后刷新
 function wnd_cardyc_controller:upStar_refresh()
     -- body
     if not data:getDatas(CardIndex) then 
@@ -281,7 +299,7 @@ function wnd_cardyc_controller:upStar_refresh()
     self:init_redDot()
 end
 
---显示升星成功后的界面，属性提升。。
+--显示升星成功后的界面，属性提升
 function wnd_cardyc_controller:show_UpStar_Success()
     if not isInitUpStarSLayer then
         view:init_UpStar_SuccessPanel()
@@ -316,7 +334,7 @@ function wnd_cardyc_controller:show_UpStar_Success()
 end
 
 ---------------------------------------升级部分---------------------
-local isInitUpLvLayer = false
+local isInitUpLvLayer = false  --是否初始化升级界面
 --点击主界面升级按钮
 function wnd_cardyc_controller:show_UpLevel_Layer()
     if not isInitUpLvLayer then--初始化升级界面
@@ -327,6 +345,16 @@ function wnd_cardyc_controller:show_UpLevel_Layer()
         view.upLevelPanel:SetActive(false)
         isInitUpLvLayer = true
     end
+
+    --最大等级判断
+    if data.cardInfo.cardLv >=data.Const.MAX_CARD_LV then 
+        view.btn_upLevelP:SetActive(false)
+        view.btn_maxLevelP:SetActive(true)
+    else
+        view.btn_upLevelP:SetActive(true)
+        view.btn_maxLevelP:SetActive(false)
+    end
+
     --为按钮添加监听
     UIEventListener.Get(view.btn_upLevelOne).onPress = function(btn_upLevelOne, args)
         if args then
@@ -359,19 +387,21 @@ end
 
 --点击升一级按钮
 function wnd_cardyc_controller:upLevelOne_CallBack()
-    if not data:isCan_UpLevel() then
+    if data:isCan_UpLevel() ~= 0 then
+        ui_manager:ShowWB(WNDTYPE.ui_tips)
         return
     end
-    SendPB_10009(data.cardInfo.cardId, 1)
+    Message_Manager:SendPB_10009(data.cardInfo.cardId, 1)
     
 end
 
 --点击升十级按钮
 function wnd_cardyc_controller:upLevelTen_CallBack()
-    if not data:isCan_UpLevel() then
+    if data:isCan_UpLevel() ~= 0 then
+        ui_manager:ShowWB(WNDTYPE.ui_tips)
         return
     end
-    SendPB_10009(data.cardInfo.cardId, 10)
+    Message_Manager:SendPB_10009(data.cardInfo.cardId, 10)
 end
 
 --点击升级后刷新界面，在wndtz_login.lua中服务器返回数据后调用
@@ -388,19 +418,40 @@ function wnd_cardyc_controller:upLevel_refresh(  )
 end
 
 -------------------------------------------卡牌信息以及卡牌进阶部分-----
-local isInitMedalItemLayer = false
-local isInitGainLayer  = false
-local isSlotInit = false
-local isInitAmSLayer = false
+
+local isInitMedalItemLayer = false  --是否初始化物品内容界面
+local isInitGainLayer  = false      --是否初始化获得方式界面
+local isSlotInit = false            --是否初始化物品插槽
+local isInitAmSLayer = false        --是否初始化晋升成功界面
 --初始化卡片信息和进阶部分界面
 function wnd_cardyc_controller:information_Body()
     
     self:init_InformationPanel()
+    self:init_suppressPanel()
     self:init_upQualityPanel()
 end
 --初始化卡牌信息部分
 function wnd_cardyc_controller:init_InformationPanel()
     -- view.infoP_liveL.transform:Find("UILabel").text = 88
+end
+
+function wnd_cardyc_controller:init_suppressPanel()
+
+    local currentType = data:getCardArmyType(data.cardInfo.cardId)
+    view.suppressP_armyName.transform:GetComponent("UILabel").text = currentType
+    if currentType == 1 then 
+        view.suppressP_beSupLab.transform:GetComponent("UILabel").text = "0%"
+        view.suppressP_SupLab.transform:GetComponent("UILabel").text = "0%"
+    else
+        local beSuppressType = data:getSuppressInfo("BeikezhiType",currentType)
+        local SuppressType = data:getSuppressInfo("KezhiType",currentType)
+        local SuppressNum = data:getSuppressInfo("KezhiAdd",currentType)
+        view.suppressP_beSupLab.transform:GetComponent("UILabel").text = string.format("%d%%",SuppressNum * 100)
+        view.suppressP_SupLab.transform:GetComponent("UILabel").text = string.format("%d%%",SuppressNum * 100)
+    end 
+
+
+
 end
 --初始化卡牌进阶部分
 function wnd_cardyc_controller:init_upQualityPanel()
@@ -575,11 +626,12 @@ end
 --点击晋阶按钮
 function wnd_cardyc_controller:upQualityBtn_onclick()
     --判断是否可以进阶
-    if not data:isCan_UpQuality() then
+    if data:isCan_UpQuality() ~= 0 then
+        ui_manager:ShowWB(WNDTYPE.ui_tips)
         return
     end
     --向服务器发送卡牌进阶消息消息
-    SendPB_10012(data.cardInfo.cardId)
+    Message_Manager:SendPB_10012(data.cardInfo.cardId)
 end
 --进阶成功后刷新界面
 function wnd_cardyc_controller:upQuality_refresh()
@@ -596,13 +648,14 @@ end
 function wnd_cardyc_controller:equipAllCallBack()
     for i=1,#data.cardInfo.slotState do
         if data.cardInfo.slotState[i] == data.EquipState.Enable_Enough and (data.upQualityNeedItems[i].num <= data.upQualityHaveItems[i].num) then
-            SendPB_10013(data.cardInfo.cardId, i-1)
+            Message_Manager:SendPB_10013(data.cardInfo.cardId, i-1)
         end
     end
 end
 --点击装备按钮
 function wnd_cardyc_controller:equipCallBack(index)
-    SendPB_10013(data.cardInfo.cardId, index-1)
+    print(data.cardInfo.cardId, index-1)
+    Message_Manager:SendPB_10013(data.cardInfo.cardId, index-1)
 end
 --装备成功后刷新界面
 function wnd_cardyc_controller:epuip_refresh()
@@ -620,10 +673,10 @@ end
 --[[
                                  技能部分
 ]]
-local UpSkillIndex = 0 --保存升级的技能的index
-local isInitSUpLayer = false
-local isfiveSIinit = false
-local isInitSptReset = false
+local UpSkillIndex = 0          --保存升级的技能的index
+local isInitSUpLayer = false    --是否初始化技能详细信息界面
+local isfiveSIinit = false      --是否初始化技能选项
+local isInitSptReset = false    --是否初始化技能重置界面
 --技能tab界面
 function wnd_cardyc_controller:skill_Body()
     print("skill_body!!!!!!")
@@ -694,21 +747,31 @@ function wnd_cardyc_controller:refresh_SkillInfo_Layer(index)
     end 
     --技能升级按钮显示
     view.skillInfoP_btn_unlock:SetActive(true)
-    view.skillInfoP_btn_upLv:SetActive(false) 
+    view.skillInfoP_btn_upLv:SetActive(false)
+    view.skillInfoP_maxSkillLv:SetActive(false)
     if index <= data.cardInfo.starLv then
         view.skillInfoP_btn_unlock:SetActive(false)
         view.skillInfoP_btn_upLv:SetActive(true)
     end
+    --判断是否达到最大技能等级
+    if data.cardInfo.skill_Lv_Table[index] >= data.Const.MAX_STAR_LV then 
+        view.skillInfoP_btn_unlock:SetActive(false)
+        view.skillInfoP_btn_upLv:SetActive(false) 
+        view.skillInfoP_maxSkillLv:SetActive(true)
+    end
+
+    
     
 end
 
 --点击技能升级按钮
 function wnd_cardyc_controller:skillItem_Up_CallBack(index)
-    if not data:isCan_UpSkill(index) then 
-        return 
-    end 
+    if data:isCan_UpSkill(index) ~= 0 then
+        ui_manager:ShowWB(WNDTYPE.ui_tips)
+        return
+    end
     UpSkillIndex = index
-    SendPB_10014(data.cardInfo.cardId,index-1)
+    Message_Manager:SendPB_10014(data.cardInfo.cardId,index-1)
 end
 --根据升级技能的index对界面进行刷新
 function wnd_cardyc_controller:upSkill_refresh()
@@ -756,11 +819,11 @@ end
 --普通重置
 function wnd_cardyc_controller:normal_Reset_CallBack()
     --已解锁的技能等级变为1级，返还升级所用的技能卡数目的80%加至总技能卡中
-    SendPB_10015(data.cardInfo.cardId, 100)
+    Message_Manager:SendPB_10015(data.cardInfo.cardId, 100)
 end
 --完美重置
 function wnd_cardyc_controller:perfect_Reset_CallBack()
-    SendPB_10015(data.cardInfo.cardId, 300)
+    Message_Manager:SendPB_10015(data.cardInfo.cardId, 300)
 end
 --重置技能成功后对界面进行刷新
 function wnd_cardyc_controller:skillReset_refresh()
@@ -777,7 +840,7 @@ end
     兵员部分
 ]]
 --初始化兵员界面
-local isInitAcFrame = false
+local isInitAcFrame = false  --是否初始化兵员界面的卡牌头像
 function wnd_cardyc_controller:soldier_Body()
 
     --初始化兵员界面
@@ -817,15 +880,26 @@ function wnd_cardyc_controller:soldier_Body()
     else
         view.soldierP_badgeHaveLab.transform:GetComponent("UILabel").color = Color(0/255,255/255,255/255,255/255)
     end
+
+
+    --判断是否达到最大兵员等级
+    if data.cardInfo.soldierLv >= data.Const.MAX_ARMY_LV then 
+        view.soldierP_btnUpSoldier:SetActive(false)
+        view.soldierP_maxSoldierP:SetActive(true)
+    else
+        view.soldierP_btnUpSoldier:SetActive(true)
+        view.soldierP_maxSoldierP:SetActive(false)
+    end
 end
 --点击兵员升级按钮
 function wnd_cardyc_controller:soldier_Up_CallBack()
     --判断是否可以刷新界面
-    if not data:isCan_UpSoldier() then
+    if data:isCan_UpSoldier() ~= 0 then
+        ui_manager:ShowWB(WNDTYPE.ui_tips)
         return
     end
     --发消息,提升等级,刷新界面
-    SendPB_10011(data.cardInfo.cardId)
+    Message_Manager:SendPB_10011(data.cardInfo.cardId)
     
     
 end
@@ -841,9 +915,9 @@ end
 --[[
     协同部分
 ]]
-local UpSynergyIndex = 0
-local isAttrItemInit = false
-local isInitxtLayer = false
+local UpSynergyIndex = 0    --保存所选中的协同选项
+local isAttrItemInit = false--是否初始化协同选项
+local isInitxtLayer = false --是否初始化协同详细信息界面
 --刷新协同部分
 function wnd_cardyc_controller:synergy_Body()
 
@@ -928,20 +1002,24 @@ function wnd_cardyc_controller:synergyItem_onClicked(index)
 
     --初始化协同卡牌的图标,显示相应的卡牌信息
     self:refresh_CardHead(view["upSynergy_cardhead"],data.synergyIDTbl[index])
-    --设置界面标题
-    if data.synergyStateTbl[index] == data.SynergyState.activated then --已激活
-         view.upSynergyP_title.transform:GetComponent("UILabel").text = data:getString(20035)
-         view.upSynergyP_btnOkL.transform:GetComponent("UILabel").text = data:getString(20002)
-         view.upSynergyP_btnOk:SetActive(true)
-    elseif data.synergyStateTbl[index] ==data.SynergyState.canActive then --可激活
-         view.upSynergyP_title.transform:GetComponent("UILabel").text = data:getString(20034)
-         view.upSynergyP_btnOkL.transform:GetComponent("UILabel").text = data:getString(20051)
-         view.upSynergyP_btnOk:SetActive(true)
-    elseif data.synergyStateTbl[index] ==data.SynergyState.unactive then --可激活
-         view.upSynergyP_title.transform:GetComponent("UILabel").text = data:getString(20034)
-         view.upSynergyP_btnOk:SetActive(false)
-         
+
+    --判断协同是否已经激活
+    if data.synergyStateTbl[index] == data.SynergyState.activated then 
+        view.upSynergyP_title.transform:GetComponent("UILabel").text = data:getString(20035)--[[20035"协同升级"]]
+         --判断是否达到最大等级，显示最大等级提示
+        if data.cardInfo.synergyLvTbl[index] >= data.Const.MAX_SYNERGY_LV then
+            view.upSynergyP_btnP:SetActive(false)
+            view.upSynergyP_maxSynergyP:SetActive(true)
+        else
+            view.upSynergyP_btnOkL.transform:GetComponent("UILabel").text = data:getString(20002)--[[20002"升级""]]
+        end
+    else --如果协同尚未激活,设置标题和按钮的内容，并显示激活按钮
+        view.upSynergyP_title.transform:GetComponent("UILabel").text = data:getString(20034)--[[20034"协同作战"]]
+        view.upSynergyP_btnOkL.transform:GetComponent("UILabel").text = data:getString(20051)--[[20051"激活"]]
+        view.upSynergyP_btnP:SetActive(true)
+        view.upSynergyP_maxSynergyP:SetActive(false)
     end
+
     --设置卡牌的名称
     view.upSynergyP_cardNameL.transform:GetComponent("UILabel").text = string.format(data:getString(20050),data:getCardInfo("Name",data.cardInfo.cardId),data:getCardInfo("Name",data.synergyIDTbl[index]))
 
@@ -960,11 +1038,6 @@ function wnd_cardyc_controller:synergyItem_onClicked(index)
     --获取拥有的材料数量
     local haveCoinNum = data.userInfo.badgeNum
     local haveGoldNum = data.userInfo.goldNum
-    
-    print("--------------------------------")
-    print(needCoinNum,haveCoinNum)
-    print(needGoldNum,haveGoldNum)
-    
     local coinNumColor = "FF2121" 
     local goldNumColor = "FF2121" 
     if haveCoinNum >= needCoinNum then 
@@ -981,15 +1054,16 @@ end
 --点击协同升级按钮
 function wnd_cardyc_controller:upSynergyP_btnOk_onClicked(index)
     --判断当前是否可以协同升级
-    if not data:isCan_UpSynergy(index) then
+    if data:isCan_UpSynergy(index) ~= 0 then
+        ui_manager:ShowWB(WNDTYPE.ui_tips)
         return 
     end
     UpSynergyIndex = index
     --向服务器发送升级协同数据
-    SendPB_10018(data.cardInfo.cardId,index-1)
+    Message_Manager:SendPB_10018(data.cardInfo.cardId,index-1)
     
 end
-
+--协同升级成功后刷新界面
 function wnd_cardyc_controller:upSynergy_refresh()
     print("upSynergy_refresh!!!")
     --获取数据
@@ -1004,7 +1078,7 @@ end
 
 
 
-
+--创建协同选项
 function wnd_cardyc_controller:create_synergyItem(parent,name,index)
     -- body
     view:init_synergyItem(view.synergyPanel,name)
@@ -1018,6 +1092,7 @@ function wnd_cardyc_controller:create_synergyItem(parent,name,index)
     end
 
 end
+--刷新协同选项
 function wnd_cardyc_controller:refresh_synergyItem(synergyItem,index)
     --c初始化协同选项
     --设置卡牌头像图片
@@ -1050,7 +1125,7 @@ function wnd_cardyc_controller:refresh_synergyItem(synergyItem,index)
 end
 
 
-
+--创建物品插槽
 function wnd_cardyc_controller:create_itemHead(parent,name,Vector3)
     view:init_itemHead(parent,name)
     local depthNum = parent.transform:GetComponent("UIWidget").depth
@@ -1063,7 +1138,7 @@ function wnd_cardyc_controller:create_itemHead(parent,name,Vector3)
     view[name].itemhead_numLab.transform:GetComponent("UILabel").depth = depthNum + 5
     view[name].itemhead_plusSp:SetActive(false)
 end
-
+--刷新物品插槽
 function wnd_cardyc_controller:refresh_itemHead(itemHead,index)
     itemHead.itemhead_numLab.transform:GetComponent("UILabel").text = string.format("%d/%d",data.upQualityHaveItems[index].num,data.upQualityNeedItems[index].num)    
     itemHead.itemhead_Sprite:SetActive(true)
@@ -1085,7 +1160,8 @@ function wnd_cardyc_controller:refresh_itemHead(itemHead,index)
     end
 end
 
-function wnd_cardyc_controller:create_SkillItem(parent,name,position,scale) --技能框
+--创建技能选项
+function wnd_cardyc_controller:create_SkillItem(parent,name,position,scale)
     depthNum=parent.transform:GetComponent("UIWidget").depth
     view:init_skillItem(parent,name)
     view[name].skillItem.name = name
@@ -1107,7 +1183,7 @@ function wnd_cardyc_controller:create_SkillItem(parent,name,position,scale) --�
     view[name].skillItem_bg:SetActive(true)
     view[name].skillItem_bklockSp:SetActive(false)
 end
-
+--刷新技能选项
 function wnd_cardyc_controller:refresh_skillFrame(skillItem,index)
     if skillItem.name ~= "skillInfoP_skillFrame" then
         UIEventListener.Get(skillItem.skillItem_imgSp).onPress = function(skillItem_imgSp, args)
@@ -1162,9 +1238,9 @@ end
     当showStarNum参数为nil时表示显示该卡牌的默认星级
 ]]
 function wnd_cardyc_controller:refresh_CardHead(cardHead,cardId,showStarNum)
-    -- if not cardHead then--如果卡牌头像不存在
-    --     return
-    -- end
+    if not cardHead then--如果卡牌头像不存在
+        return
+    end
     local card = nil
     local cardLv = 1
     local cardStarLv = 1

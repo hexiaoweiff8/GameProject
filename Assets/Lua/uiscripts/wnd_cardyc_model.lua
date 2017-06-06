@@ -1,4 +1,4 @@
-wnd_cardyc_model={}
+local wnd_cardyc_model={}
 
 
 
@@ -9,7 +9,7 @@ wnd_cardyc_model.Const={
     MAX_CARD_LV = 80,
     MAX_SKILL_LV = 16,
     MAX_ARMY_LV  = 8,
-    MAX_SYNERGY_LV = 17,
+    MAX_SYNERGY_LV = 1,
     SLOT_NUM=4
 }
 
@@ -54,7 +54,7 @@ function wnd_cardyc_model:getDatas(cardIndex)
     if currencyTbl == nil or cardTbl == nil or userRoleTbl == nil  then
         return false
     end 
-    if not self:isHaveCard(cardIndex) then 
+    if not self:isHaveCard(cardIndex) then
         return false
     end 
 
@@ -89,9 +89,15 @@ function wnd_cardyc_model:getDatas(cardIndex)
     return true
     
 end
+
+--[[
+    获取卡牌的基础信息
+    ]]
+--获取卡牌数量
 function wnd_cardyc_model:getCardNum()
     return #cardTbl
 end
+--判断是否有卡牌
 function wnd_cardyc_model:isHaveCard(cardIndex)
     -- body
     if cardTbl[cardIndex] then 
@@ -99,6 +105,43 @@ function wnd_cardyc_model:isHaveCard(cardIndex)
     end
     return false
 end
+--获取卡片信息
+function wnd_cardyc_model:getCardInfo(property, cardId)
+    return sdata_armycardbase_data:GetFieldV(property, cardId)
+end
+--获取卡牌对象
+function wnd_cardyc_model:getCardByID(cardId)
+    for k,v in ipairs(cardTbl) do
+        if v.id == cardId then
+            return v
+        end
+    end
+    return nil
+end
+
+
+--获取字符串
+function wnd_cardyc_model:getString( ... )
+    -- body
+    return sdata_UILiteral:GetV(sdata_UILiteral.I_Literal, ...)
+end
+
+
+
+--[[
+    兵种克制部分
+]]
+-- 获取卡牌兵种
+function wnd_cardyc_model:getCardArmyType(cardId)
+    return cardId % 101000
+end
+--获取克制信息
+function wnd_cardyc_model:getSuppressInfo(property,ArmyType)
+    return sdata_kezhi_data:GetFieldV(property, ArmyType)
+end
+--根据兵种类型获取兵种信息---兵种信息表不存在
+-- function wnd_cardyc_model:getArmyTypeInfo(property,ArmyType)
+-- end
 
 --[[
     卡牌进阶部分
@@ -120,23 +163,27 @@ function wnd_cardyc_model:isCan_UpQuality()
 
     if self.cardInfo.qualityLv == self.Const.MAX_QUALITY_LV then
         print("已达最大阶品！！！！")
-        return false
+        tipsText = self:getString(20101)
+        return tipsText
     end
     for i=1,#self.cardInfo.slotState do
         if self.cardInfo.slotState[i]==self.EquipState.Enable_NotEnough then
             print("材料不足！！！！！")--不满足：提示缺少材料
-            return false
+            tipsText = self:getString(20102)
+        return tipsText
         elseif self.cardInfo.slotState[i]==self.EquipState.Enable_Enough then
             print("尚未激活！！！！！")--不满足：提示尚未激活
-            return false
+            tipsText = self:getString(20103)
+        return tipsText
         end
     end
     local limitLv = self:getLimitLvFromQualityLv( self:GetNextQualityLv() )
     if self.cardInfo.cardLv < limitLv then
         print(string.format("晋阶需要%d级", limitLv))--不满足：提示晋阶需要xx级
-        return false
+        tipsText = string.format(self:getString(20104), limitLv)
+        return tipsText
     end
-    return true
+    return 0
 end
 --获取卡牌进阶的属性信息
 function wnd_cardyc_model:getCardQualityInfo( property ,cardId, qualityLv )
@@ -236,19 +283,23 @@ end
 function wnd_cardyc_model:isCan_UpLevel()
     if self.cardInfo == self.Const.MAX_CARD_LV then
         print("已达最大卡牌等级")
-        return false
+        tipsText = self:getString(20201)
+        return tipsText
     end
     if self.userInfo.expPool == 0 then
         print("可分配经验不足") 
-        return false
+        tipsText = self:getString(20202)
+        return tipsText
     end
     local needExp = self:getCardNeedExp() --升级下一级所需经验
     if self.cardInfo.cardLv >= self.userInfo.userRoleLv then
         print("卡牌等级不能超过角色等级，请先提升角色等级")
-        return false
+        tipsText = self:getString(20203)
+        return tipsText
     end
-    return true
+    return 0
 end
+--获取卡牌下一等级
 function wnd_cardyc_model:getCardNextLv()
     if self.cardInfo.cardLv then
         if self.cardInfo.cardLv < self.Const.MAX_CARD_LV then
@@ -257,6 +308,7 @@ function wnd_cardyc_model:getCardNextLv()
         return self.Const.MAX_CARD_LV
     end
 end
+--获取卡牌升级所需的经验值
 function wnd_cardyc_model:getCardNeedExp()
     return sdata_armycardexp_data:GetFieldV("CardExp",self:getCardNextLv())
 end
@@ -273,19 +325,22 @@ function wnd_cardyc_model:isCan_UpStar()
     --是否达到最大星级
     if self.cardInfo.starLv ==self.Const.MAX_STAR_LV then
         print("卡牌已达最大星级")
-        return false
+        tipsText = self:getString(20301)
+        return tipsText
     end
     --所需碎片是否足够
     if self:getUpStarNeedFragment() > self.cardInfo.cardFragment then
         print("卡牌升星所需碎片不足")
-        return false
+        tipsText = self:getString(20302)
+        return tipsText
     end
     --所需兵牌是否足够
     if self:getUpStarNeedCoin() > self.userInfo.badgeNum then
         print("卡牌升星所需兵牌不足")
-        return false
+        tipsText = self:getString(20303)
+        return tipsText
     end
-    return true
+    return 0
 end
 function wnd_cardyc_model:GetNextStarLv()
     if self.cardInfo.starLv  then
@@ -330,25 +385,29 @@ function wnd_cardyc_model:isCan_UpSkill(index)
     local lv =self.cardInfo.skill_Lv_Table[index]
     if lv >= self.Const.MAX_SKILL_LV then
         print("已达最大等级！！！")
-        return false
+        tipsText = self:getString(20401)
+        return tipsText
     end
     if index > self.cardInfo.starLv then
         print("请先提升卡牌星级")
-        return false
+        tipsText = string.format(self:getString(20402), index)
+        return tipsText
     end
       --a.    技能等级<卡牌军阶  --b.  升级所需技能点≤持有技能点
     --判断技能等级<卡牌军阶
-    if self:GetNextSkillLv(lv,self.Const.MAX_SKILL_LV) >= self.cardInfo.qualityLv then
+    if self:GetNextSkillLv(lv,self.Const.MAX_SKILL_LV) > self.cardInfo.qualityLv then
         print("请先提升卡牌军阶")
-        return false
+        tipsText = self:getString(20403)
+        return tipsText
     end
     --判断升级所需技能点≤持有技能点
     local skcost= self:getUpSkillNeedPoints(self:GetNextSkillLv(lv ,self.Const.MAX_SKILL_LV))--获取升级所需的技能点
     if skcost >= self.userInfo.totalSkPt then
         print("技能点数不足，请前往xxx获取")
-        return false
+        tipsText = self:getString(20404)
+        return tipsText
     end
-    return true 
+    return 0
 end
 --获取技能升级所需技能点
 function wnd_cardyc_model:getUpSkillNeedPoints(skillLv)
@@ -389,19 +448,22 @@ function wnd_cardyc_model:isCan_UpSoldier()
     --判断等级
     if self.cardInfo.soldierLv >= self.Const.MAX_ARMY_LV then
         print("兵员等级已达上限，不可提升")
-        return false 
+        tipsText = self:getString(20501)
+        return tipsText
     end
     --判断卡牌碎片是否足够
     if self:getUpSoldierNeedGoods("Card",self.cardInfo.soldierLv) > self.cardInfo.cardFragment then
         print("卡牌碎片不足")
-        return false 
+        tipsText = self:getString(20502)
+        return tipsText
     end
     --判断兵牌是否足够
     if self:getUpSoldierNeedGoods("Coin",self.cardInfo.soldierLv) > self.userInfo.badgeNum then
         print("兵牌碎片不足")
-        return false
+        tipsText = self:getString(20503)
+        return tipsText
     end
-    return true
+    return 0
 end
 function wnd_cardyc_model:getUpSoldierNeedGoods(property,soldierLv)
 
@@ -425,7 +487,7 @@ function wnd_cardyc_model:init_synergyStateTbl()
         if self.cardInfo.synergyLvTbl[i] > 0 then 
             table.insert( self.synergyStateTbl, self.SynergyState.activated )
         else 
-            if self:isCan_UpSynergy(i) then 
+            if self:isCan_UpSynergy(i) == 0 then 
                 table.insert( self.synergyStateTbl, self.SynergyState.canActive )
             else 
                 table.insert( self.synergyStateTbl, self.SynergyState.unactive )
@@ -435,7 +497,7 @@ function wnd_cardyc_model:init_synergyStateTbl()
 end
 function wnd_cardyc_model:init_synergyIDTbl()
     for i = 1,#self.cardInfo.synergyLvTbl do
-        self.synergyIDTbl[i] = 1001+i
+        self.synergyIDTbl[i] = 101001+i
     end 
 end 
 function wnd_cardyc_model:isCan_UpSynergy(index)
@@ -445,32 +507,38 @@ function wnd_cardyc_model:isCan_UpSynergy(index)
         if self.synergyIDTbl[index] == v.id then 
             if v.star < self:getSynergyItemInfo("RequireCardStar",index) then 
                 print("协同---卡牌星级不足！！！")
-                return false
+                tipsText = self:getString(20601)
+                return tipsText
             end
             if v.lv < self:getSynergyItemInfo("RequireCardLevel",index) then 
                 print("协同---卡牌等级不足！！！")
-                return false
+                tipsText = self:getString(20602)
+                return tipsText
             end
             if v.rlv < self:getSynergyItemInfo("RequireCardQuality",index) then 
                 print("协同---卡牌阶品不足！！！")
-                return false
+                tipsText = self:getString(20603)
+                return tipsText
             end
             isCardCan = true
         end 
     end
     if not isCardCan then 
         print("协同---卡牌不存在！！！")
-        return false
+        tipsText = self:getString(20604)
+        return tipsText
     end 
     if self.cardInfo.synergyLvTbl[index] >= self.Const.MAX_SYNERGY_LV then
         print("协同---已达最大等级")
-        return false
+        tipsText = self:getString(20605)
+        return tipsText
     end
     --兵牌
     local needCoin = self:getUpSynergyCostInfo("Coin",self:getNextSynergylevel(self.cardInfo.synergyLvTbl[index],self.Const.MAX_SYNERGY_LV))
     if self.userInfo.badgeNum < needCoin then
         print("协同---不够..")
-        return false 
+        tipsText = self:getString(20606)
+        return tipsText
     end
     
     --金币
@@ -479,16 +547,17 @@ function wnd_cardyc_model:isCan_UpSynergy(index)
 
     if self.userInfo.goldNum < needgold then
         print("协同---金币不够..")
-        return false
+        tipsText = self:getString(20607)
+        return tipsText
     end
     
-    --等级限制
-    if self.cardInfo.synergyLvTbl[index] >= self.cardInfo.cardLv then
-        print("协同---请先提升卡牌等级..")
-        return false 
-    end
+    -- --等级限制
+    -- if self.cardInfo.synergyLvTbl[index] >= self.cardInfo.cardLv then
+    --     print("协同---请先提升卡牌等级..")
+    --     return false 
+    -- end
 
-    return true 
+    return 0
 end
 function wnd_cardyc_model:getSynergyItemInfo(property,index)
     local uid = tonumber(string.format("%d%.2d",self.cardInfo.cardId,1))--通过卡牌id和协同等级联合获取协同ID
@@ -509,33 +578,7 @@ end
 
 
 
---获取卡牌的基础信息
-function wnd_cardyc_model:getCardInfo(property, cardId)
-    return sdata_armycardbase_data:GetFieldV(property, cardId)
-end
-function wnd_cardyc_model:getCardByID(cardId)
-    for k,v in ipairs(cardTbl) do
-        if v.id == cardId then
-            return v
-        end
-    end
-    return nil
-end
 
---获取字符串
-function wnd_cardyc_model:getString( ... )
-    -- body
-    return sdata_UILiteral:GetV(sdata_UILiteral.I_Literal, ...)
-end
-
-function wnd_cardyc_model:getCardArmyType(cardId)
-    return cardId / 1000
-end
-
-
-function wnd_cardyc_model:getKeZhiInfo(property,ArmyType)
-
-end
 
 
 return wnd_cardyc_model

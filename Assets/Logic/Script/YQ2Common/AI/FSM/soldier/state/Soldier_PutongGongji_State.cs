@@ -63,13 +63,15 @@ public class Soldier_PutongGongji_State : SoldierFSMState
             return;
         }
 
-        var fightVO = fsm.Display.ClusterData.MemberData as FightVO;
+        //var fightVO = fsm.Display.ClusterData.MemberData as FightVO;
         // 攻击时检测技能
-        if (fightVO != null && fightVO.SkillInfoList != null)
+        SkillManager.Single.SetSkillTriggerData(new SkillTriggerData()
         {
-            // 检查并执行列表
-            SkillManager.Single.CheckAndDoSkillInfo(fightVO.SkillInfoList, fsm.Display, fsm.EnemyTarget, SkillTriggerLevel1.Fight, SkillTriggerLevel2.Attack);
-        }
+            ReceiveMember = fsm.EnemyTarget,
+            ReleaseMember = fsm.Display,
+            TypeLevel1 = SkillTriggerLevel1.Fight,
+            TypeLevel2 = SkillTriggerLevel2.Attack
+        });
 
         var ballistic = EffectsFactory.Single.CreatePointToPointEffect("test/TrailPrj", null,
             fsm.Display.ClusterData.Position, fsm.EnemyTarget.ClusterData.Position, new Vector3(1, 1, 1), 200, TrajectoryAlgorithmType.Line,
@@ -85,21 +87,36 @@ public class Soldier_PutongGongji_State : SoldierFSMState
                         null != fsm.EnemyTarget.ClusterData &&
                         null != fsm.EnemyTarget.RanderControl)
                     {
-                        // 扣血
-                        fsm.EnemyTarget.ClusterData.MemberData.CurrentHP -= hurt;
-                        // 刷新血条
-                        fsm.EnemyTarget.RanderControl.SetBloodBarValue();
+                        // 记录被击触发 记录扣血 伤害结算时结算
+                        SkillManager.Single.SetSkillTriggerData(new SkillTriggerData()
+                        {
+                            HealthChangeValue = hurt,
+                            ReceiveMember = fsm.Display,
+                            ReleaseMember = fsm.EnemyTarget,
+                            TypeLevel1 = SkillTriggerLevel1.Fight,
+                            TypeLevel2 = SkillTriggerLevel2.BeAttack
+                        });
                     }
                     // 命中时检测技能
-                    if (fightVO != null && fightVO.SkillInfoList != null)
+                    SkillManager.Single.SetSkillTriggerData(new SkillTriggerData()
                     {
-                        SkillManager.Single.CheckAndDoSkillInfo(fightVO.SkillInfoList, fsm.Display, fsm.EnemyTarget, SkillTriggerLevel1.Fight, SkillTriggerLevel2.Hit);
-                    }
+                        ReceiveMember = fsm.EnemyTarget,
+                        ReleaseMember = fsm.Display,
+                        TypeLevel1 = SkillTriggerLevel1.Fight,
+                        TypeLevel2 = SkillTriggerLevel2.Hit
+                    });
                 }
                 else
                 {
                     // TODO 播放miss特效
-
+                    // 闪避时事件
+                    SkillManager.Single.SetSkillTriggerData(new SkillTriggerData()
+                    {
+                        ReceiveMember = fsm.Display,
+                        ReleaseMember = fsm.EnemyTarget,
+                        TypeLevel1 = SkillTriggerLevel1.Fight,
+                        TypeLevel2 = SkillTriggerLevel2.Dodge
+                    });
                 }
             }, 12);
         ballistic.Begin();
@@ -140,7 +157,7 @@ public class Soldier_PutongGongji_State : SoldierFSMState
     /// <returns></returns>
     private bool AdjustTargetIsInRange(SoldierFSMSystem fsm)
     {
-        if (null == fsm.EnemyTarget || null == fsm.EnemyTarget.ClusterData)
+        if (null == fsm.EnemyTarget || null == fsm.EnemyTarget.GameObj || null == fsm.EnemyTarget.ClusterData)
         {
             return true;
         }

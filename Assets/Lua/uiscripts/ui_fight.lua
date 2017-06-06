@@ -428,6 +428,7 @@ function ui_fight:isTouchedCard(tf)
 end
 
 local tempInt3 = 0
+local downTime = 0
 --敌人下兵逻辑
 function WANJIAXIABING(self)
     -- TODODO
@@ -468,6 +469,7 @@ function WANJIAXIABING(self)
             Object.Destroy(euc.gameObject)
         end)
         self.enemyNowFei = self.enemyNowFei - sdata_armycardbase_data:GetFieldV("TrainCost", tempID)
+        downTime = downTime + 1
     else --敌人费不够记录下次该出的牌和费
         self.nextEnemyCardID = tempID
         self.nextEnemyCardFei = sdata_armycardbase_data:GetFieldV("TrainCost", tempID)

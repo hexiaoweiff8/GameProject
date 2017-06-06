@@ -12,6 +12,7 @@ public class Soldier_Siwang_State : SoldierFSMState
     {
         base.DoBeforeEntering(fsm);
         fsm.Display.ClusterData.Stop();
+        ClusterManager.Single.Remove(fsm.Display.ClusterData);
         FightUnitFactory.DeleteUnit(fsm.Display.ClusterData.MemberData);
         // 释放死亡时技能
         var fightVo = fsm.Display.ClusterData.MemberData as FightVO;

@@ -1,13 +1,14 @@
-local data = require("uiscripts/wnd_cardyc_model")
-wnd_cardyc_view={}
-
+local wnd_cardyc_view={}
+local data
 local view 
 function wnd_cardyc_view:init_view(arg)
     view = arg
+    data = arg.data
 end
 
 function wnd_cardyc_view:getView()
 
+    
     --leftcardPanel
     self.leftPanel = view.transform:Find("left").gameObject
     self.btn_detail = self.leftPanel.transform:Find("card/Btn_details").gameObject
@@ -59,10 +60,14 @@ function wnd_cardyc_view:getView()
     -- local rangeLab = go:Find("range_Lab").gameObject --范围attacktype
 
     --兵种克制
-    self.KZPanel = self.information_Panel.transform:Find("armykzPanel").gameObject
-    self.KZP_TypeSp =  self.KZPanel.transform:Find("armyTypeSp").gameObject--兵种图
-    self.KZP_TypeL =  self.KZPanel.transform:Find("desArmyTypeSp").gameObject
-    self.KZP_TypeR =  self.KZPanel.transform:Find("addArmyTypeSp").gameObject
+    self.suppressPanel = self.information_Panel.transform:Find("suppressPanel").gameObject
+    self.suppressP_armyName =  self.suppressPanel.transform:Find("armyName").gameObject--兵种图
+    self.suppressP_currentTypeSp =  self.suppressPanel.transform:Find("currentTypeSp").gameObject--兵种图
+    self.suppressP_beSupSp =  self.suppressPanel.transform:Find("beSuppressSp").gameObject
+    self.suppressP_SupSp =  self.suppressPanel.transform:Find("suppressSp").gameObject
+    self.suppressP_beSupLab =  self.suppressPanel.transform:Find("beSuppressLab").gameObject
+    self.suppressP_SupLab =  self.suppressPanel.transform:Find("suppressLab").gameObject
+
 
     --进阶部分
     self.upQuality_Panel = self.informationBody_Panel.transform:Find("upQuality_panel").gameObject
@@ -96,6 +101,7 @@ function wnd_cardyc_view:getView()
     self.soldierP_badgeHaveLab = self.soldierPanel.transform:Find("numLab_2").gameObject
     self.soldierP_btnUpSoldier = self.soldierPanel.transform:Find("Btn_soldierUpLv").gameObject
     self.soldierP_btnUpSoldier_Lab=self.soldierPanel.transform:Find("Btn_soldierUpLv/lab").gameObject
+    self.soldierP_maxSoldierP = self.soldierPanel.transform:Find("maxSoldier").gameObject
     self.soldierP_btnUpSoldier_redDot=self.soldierPanel.transform:Find("Btn_soldierUpLv/redDot").gameObject
 
     --协同部分
@@ -108,8 +114,10 @@ end
 
 function wnd_cardyc_view:init_Uplevel_Panel()
     self.upLevelPanel = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "upLevelPanel",self.gameObject).gameObject
-    self.btn_upLevelOne = self.upLevelPanel.transform:Find("Btn_upLevelOne").gameObject
-    self.btn_upLevelTen = self.upLevelPanel.transform:Find("Btn_upLevelTen").gameObject
+    self.btn_upLevelP = self.upLevelPanel.transform:Find("Btn_upLevel").gameObject
+    self.btn_upLevelOne = self.upLevelPanel.transform:Find("Btn_upLevel/Btn_upLevelOne").gameObject
+    self.btn_upLevelTen = self.upLevelPanel.transform:Find("Btn_upLevel/Btn_upLevelTen").gameObject
+    self.btn_maxLevelP = self.upLevelPanel.transform:Find("maxLevel").gameObject
     self.btn_upLevelBack = self.upLevelPanel.transform:Find("Btn_backSp").gameObject
 
     self.expProBar = self.upLevelPanel.transform:Find("expProgressBar_Sp").gameObject
@@ -156,9 +164,12 @@ function wnd_cardyc_view:init_upSynergyPanel()
     self.upSynergyP_goldHaveNumL = self.upSynergyP.transform:Find("numLab_2").gameObject
 
     self.upSynergyP_btnBack = self.upSynergyP.transform:Find("Btn_backSp").gameObject
-    self.upSynergyP_btnOk = self.upSynergyP.transform:Find("btn_ok").gameObject
-    self.upSynergyP_btnOkL = self.upSynergyP.transform:Find("btn_ok/Label").gameObject
-    self.upSynergyP_btnCancle = self.upSynergyP.transform:Find("btn_cancle").gameObject
+    self.upSynergyP_btnP = self.upSynergyP.transform:Find("btn_upSynergy").gameObject
+    self.upSynergyP_btnOk = self.upSynergyP.transform:Find("btn_upSynergy/btn_ok").gameObject
+    self.upSynergyP_btnOkL = self.upSynergyP.transform:Find("btn_upSynergy/btn_ok/Label").gameObject
+    self.upSynergyP_btnCancle = self.upSynergyP.transform:Find("btn_upSynergy/btn_cancle").gameObject
+    self.upSynergyP_maxSynergyP = self.upSynergyP.transform:Find("maxSynergy").gameObject
+
 
 end
 
@@ -250,6 +261,7 @@ function wnd_cardyc_view:init_skillPointResetPanels()
     self.sPtRP_perResetCostL = self.sPtRPanel.transform:Find("Sprite/perCostNumLab")
     self.sPtRP_norResetB = self.sPtRPanel.transform:Find("Btn_comReset").gameObject
     self.sPtRP_perResetB = self.sPtRPanel.transform:Find("Btn_perReset").gameObject
+    
 
 end
 
@@ -264,6 +276,7 @@ function wnd_cardyc_view:init_skillInfoPanel()
     self.skillInfoP_btn_unlock_Label = self.skillInfoP_btn_unlock.transform:Find("unlock_Lab").gameObject
     self.skillInfoP_btn_upLv = self.skillInfoPanel.transform:Find("Btn_updateSp").gameObject
     self.skillInfoP_costLab = self.skillInfoP_btn_upLv.transform:Find("skillPtNum_Lab").gameObject--
+    self.skillInfoP_maxSkillLv = self.skillInfoPanel.transform:Find("maxSkillLv").gameObject
 end
 
 function wnd_cardyc_view:init_UpStarPanel()
@@ -284,6 +297,8 @@ function wnd_cardyc_view:init_UpStarPanel()
 
     self.upStarP_btn_back = self.upStarPanel.transform:Find("Btn_backSp").gameObject
     self.upStarP_btn_sx = self.upStarPanel.transform:Find("Btn_sx").gameObject
+
+    self.upStarP_maxStarP = self.upStarPanel.transform:Find("maxStar").gameObject
 end
 
 function wnd_cardyc_view:init_UpStar_SuccessPanel()
@@ -338,52 +353,5 @@ function wnd_cardyc_view:init_gainWayPanel()
     self.gainWayP_btn_back = self.gainWayPanel.transform:Find("Btn_backSp").gameObject 
 
 end
-
-function wnd_cardyc_view:init_cardycPanel()
-    -- view.bgFramePanel = view.transform:Find("bgframe"):GetComponent("UIWidget")
-    -- view.btn_back = view.transform:Find("bgframe/Btn_back").gameObject
-    
-    -- view.rightPanel = view.transform:Find("right"):GetComponent("UIWidget")
-    -- view.btnTabPanel = view.transform:Find("Btn_tab"):GetComponent("UIWidget")
-    
-    -- view.btn_information = view.btnTabPanel.transform:Find("Btn_information").gameObject
-    -- view.btn_skill = view.btnTabPanel.transform:Find("Btn_skill").gameObject
-    -- view.btn_soldier = view.btnTabPanel.transform:Find("Btn_soldier").gameObject
-    -- view.btn_synergy = view.btnTabPanel.transform:Find("Btn_synergy").gameObject
-    -- view.informationBody_Panel = view.rightPanel.transform:Find("information").gameObject
-    -- view.skillPanel = view.rightPanel.transform:Find("skill").gameObject
-    -- view.soldierPanel = view.rightPanel.transform:Find("soldier").gameObject
-    -- view.synergyPanel = view.rightPanel.transform:Find("synergy").gameObject
-
-
-    -- view.upStarPanel = nil  --升星界面
-    view.upLevelPanel = nil  --升级界面
-    -- view.skill_Information_Panel = nil --技能详细信息界面
-    -- view.sPtRPanel = nil --重置技能界面
-
-
-    view.isInitUpLvLayer = false
-    -- view.isInitUpStarLayer = false
-    -- view.isSlotInit = false
-    -- view.isfiveSIinit = false
-    -- view.isAttrItemInit = false
-    -- view.isInitCardHead = false
-    -- view.isInitxtLayer = false
-    -- view.isInitMedalItemLayer = false--
-    -- view.initGainLayer  = false--是否显示过获取方式界面    
-    -- view.isInitAmSLayer = false--晋阶成功界面
-    
-    -- view.children = {view.btn_information,view.btn_skill,view.btn_soldier,view.btn_synergy}
-    -- view.bodyNodes = {view.informationBody_Panel,view.skillPanel,view.soldierPanel,view.synergyPanel}
-    -- view.tabTable = {{view.btn_information, view.informationBody_Panel},
-    --                 {view.btn_skill, view.skillPanel},
-    --                 {view.btn_soldier, view.soldierPanel},
-    --                 {view.btn_synergy, view.synergyPanel}}
-    -- for i=1,#view.children do               --初始化tab按钮的文字显示
-    --     local tabLab =  view.children[i].transform:Find("lab").gameObject
-    --     tabLab.text = sdata_UILiteral:GetV(sdata_UILiteral.I_Literal, 20019+i) 
-    -- end
-    -- view.tabIndex = TABLE_INDEX.INFORMATION
-end 
 
 return wnd_cardyc_view

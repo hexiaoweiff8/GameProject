@@ -42,6 +42,31 @@ public class SkillManager
     public IDictionary<int, SkillInfo> SkillInfoDic = new Dictionary<int, SkillInfo>();
 
 
+    /// <summary>
+    /// 技能触发字典
+    /// </summary>
+    private static
+        IDictionary<ObjectID, IDictionary<SkillTriggerLevel1, IDictionary<SkillTriggerLevel2, List<SkillTriggerData>>>>
+        skillTriggerList =
+            new Dictionary
+                <ObjectID, IDictionary<SkillTriggerLevel1, IDictionary<SkillTriggerLevel2, List<SkillTriggerData>>>>();
+
+    ///// <summary>
+    ///// 攻击者列表[被攻击者ID, 攻击者列表]
+    ///// </summary>
+    //private static IDictionary<ObjectID, IList<DisplayOwner>> hitList = new Dictionary<ObjectID, IList<DisplayOwner>>();
+
+    ///// <summary>
+    ///// 伤害列表[被攻击者ID, 所受伤害]
+    ///// </summary>
+    //private static IDictionary<ObjectID, float> damageList = new Dictionary<ObjectID, float>();
+
+    ///// <summary>
+    ///// 闪避列表[被攻击者ID]
+    ///// </summary>
+    //private static HashSet<ObjectID> dodgeList = new HashSet<ObjectID>();
+
+
     // TODO 注册事件
 
 
@@ -69,7 +94,9 @@ public class SkillManager
             else
             {
                 // 检测文件是否存在
-                var file = new FileInfo(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "SkillScript" + skillId + ".txt");
+                var file =
+                    new FileInfo(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "SkillScript" + skillId +
+                                 ".txt");
                 if (file.Exists)
                 {
                     // 加载文件内容
@@ -118,7 +145,7 @@ public class SkillManager
         }
 
         return result;
-    } 
+    }
 
 
     // -------------------------------技能执行----------------------------------
@@ -218,17 +245,21 @@ public class SkillManager
     /// <param name="receiveOwner">技能被释放单位</param>
     /// <param name="type1">第一级技能触发类型</param>
     /// <param name="type2">第二级技能触发类型</param>
-    public void CheckAndDoSkillInfo(IList<SkillInfo> skillsList, 
-        DisplayOwner releaseOwner, 
-        DisplayOwner receiveOwner, 
-        SkillTriggerLevel1 type1, 
+    public void CheckAndDoSkillInfo(IList<SkillInfo> skillsList,
+        DisplayOwner releaseOwner,
+        DisplayOwner receiveOwner,
+        SkillTriggerLevel1 type1,
         SkillTriggerLevel2 type2)
     {
         // 如果攻击时触发
-        foreach (var skill in skillsList.Where(skill => skill != null && skill.TriggerLevel1 == type1 && skill.TriggerLevel2 == type2))
+        foreach (
+            var skill in
+                skillsList.Where(skill => skill != null && skill.TriggerLevel1 == type1 && skill.TriggerLevel2 == type2)
+            )
         {
             // 触发技能
-            DoShillInfo(skill, FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(skill, releaseOwner, receiveOwner));
+            DoShillInfo(skill,
+                FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(skill, releaseOwner, receiveOwner));
         }
     }
 
@@ -287,6 +318,327 @@ public class SkillManager
             } while (topNode != null);
         }
     }
+
+    // ------------------------------------技能事件检测-----------------------------------
+
+    /// <summary>
+    /// 添加事件数据
+    /// </summary>
+    /// <param name="triggerData">事件数据</param>
+    public void SetSkillTriggerData(SkillTriggerData triggerData)
+    {
+        if (triggerData == null || triggerData.ReleaseMember == null)
+        {
+            return;
+        }
+
+        var objId = triggerData.ReleaseMember.ClusterData.MemberData.ObjID;
+        if (!skillTriggerList.ContainsKey(objId))
+        {
+            skillTriggerList.Add(objId,
+                new Dictionary<SkillTriggerLevel1, IDictionary<SkillTriggerLevel2, List<SkillTriggerData>>>()
+                {
+                    {
+                        triggerData.TypeLevel1, new Dictionary<SkillTriggerLevel2, List<SkillTriggerData>>()
+                        {
+                            {triggerData.TypeLevel2, new List<SkillTriggerData>() {triggerData}}
+                        }
+                    }
+                });
+        }
+        else
+        {
+            var dicLevel1 = skillTriggerList[objId];
+            if (!dicLevel1.ContainsKey(triggerData.TypeLevel1))
+            {
+                dicLevel1.Add(triggerData.TypeLevel1, new Dictionary<SkillTriggerLevel2, List<SkillTriggerData>>()
+                {
+                    {triggerData.TypeLevel2, new List<SkillTriggerData>() {triggerData}}
+                });
+            }
+            else
+            {
+                var dicLevel2 = dicLevel1[triggerData.TypeLevel1];
+                if (!dicLevel2.ContainsKey(triggerData.TypeLevel2))
+                {
+                    dicLevel2.Add(triggerData.TypeLevel2, new List<SkillTriggerData>() {triggerData});
+                }
+                else
+                {
+                    var triggerDataList = dicLevel2[triggerData.TypeLevel2];
+                    triggerDataList.Add(triggerData);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 取出事件数据列表
+    /// </summary>
+    /// <param name="objId">被取单位ID</param>
+    /// <param name="type1">被取出类型Level1</param>
+    /// <param name="type2">被取出类型Level2</param>
+    /// <returns>如果有列表返回列表, 否则返回null</returns>
+    public List<SkillTriggerData> GetSkillTriggerDataList(ObjectID objId, SkillTriggerLevel1 type1,
+        SkillTriggerLevel2 type2)
+    {
+        if (skillTriggerList.ContainsKey(objId))
+        {
+            var dicLevel1 = skillTriggerList[objId];
+            if (dicLevel1.ContainsKey(type1))
+            {
+                var dicLevel2 = dicLevel1[type1];
+                if (dicLevel2.ContainsKey(type2))
+                {
+                    return dicLevel2[type2];
+                }
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 清空一个单位的Level1的Level2的事件列表
+    /// </summary>
+    /// <param name="objId">被清空单位ID</param>
+    /// <param name="typeLevel1">被清空类型Level1</param>
+    /// <param name="typeLevel2">被清空类型Level2</param>
+    public void ClearSkillTriggerData(ObjectID objId, SkillTriggerLevel1 typeLevel1, SkillTriggerLevel2 typeLevel2)
+    {
+        if (skillTriggerList.ContainsKey(objId))
+        {
+            var dicLevel1 = skillTriggerList[objId];
+            if (dicLevel1.ContainsKey(typeLevel1))
+            {
+                var dicLevel2 = dicLevel1[typeLevel1];
+                if (dicLevel2.ContainsKey(typeLevel2))
+                {
+                    dicLevel2[typeLevel2].Clear();
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 清空所有触发
+    /// </summary>
+    public void ClearAllSkillTriggerData()
+    {
+        skillTriggerList.Clear();
+    }
+
+    /// <summary>
+    /// 循环整体事件列表并执行each
+    /// </summary>
+    /// <param name="each">被执行单位处理</param>
+    /// <param name="isDelBeforeEnd">是否执行完毕后删除</param>
+    public void SetEachAction(Action<ObjectID, SkillTriggerLevel1, SkillTriggerLevel2, SkillTriggerData> each, bool isDelBeforeEnd = false)
+    {
+        if (each == null)
+        {
+            return;
+        }
+        foreach (var objKV in skillTriggerList)
+        {
+            var objId = objKV.Key;
+            foreach (var typeLevel1Dic in objKV.Value)
+            {
+                var typeLevel1 = typeLevel1Dic.Key;
+                foreach (var typeLevel2Dic in typeLevel1Dic.Value)
+                {
+                    var typeLevel2 = typeLevel2Dic.Key;
+                    foreach (var skillTrigger in typeLevel2Dic.Value)
+                    {
+                        each(objId, typeLevel1, typeLevel2, skillTrigger);
+                    }
+                    // 如果需要执行完毕后删除
+                    if (isDelBeforeEnd)
+                    {
+                        ClearSkillTriggerData(objId, typeLevel1, typeLevel2);
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 循环整体事件列表并执行each
+    /// </summary>
+    /// <param name="objId">单位ObjId</param>
+    /// <param name="each">被执行单位处理</param>
+    /// <param name="isDelBeforeEnd">是否执行完毕后删除</param>
+    public void SetEachAction(ObjectID objId, Action<SkillTriggerLevel1, SkillTriggerLevel2, SkillTriggerData> each, bool isDelBeforeEnd = false)
+    {
+        if (each == null || !skillTriggerList.ContainsKey(objId))
+        {
+            return;
+        }
+        // 保证线程数据安全
+        lock (skillTriggerList)
+        {
+            var objKV = skillTriggerList[objId];
+            foreach (var typeLevel1Dic in objKV)
+            {
+                var typeLevel1 = typeLevel1Dic.Key;
+                foreach (var typeLevel2Dic in typeLevel1Dic.Value)
+                {
+                    var typeLevel2 = typeLevel2Dic.Key;
+                    foreach (var skillTrigger in typeLevel2Dic.Value)
+                    {
+                        each(typeLevel1, typeLevel2, skillTrigger);
+                    }
+                    // 如果需要执行完毕后删除
+                    if (isDelBeforeEnd)
+                    {
+                        ClearSkillTriggerData(objId, typeLevel1, typeLevel2);
+                    }
+                }
+            }
+        }
+    }
+
+
+    ///// <summary>
+    ///// 设置伤害
+    ///// </summary>
+    ///// <param name="beHurtMember">被伤害单位</param>
+    ///// <param name="attackMember">攻击单位</param>
+    ///// <param name="hurt">造成的伤害</param>
+    //public  void SetDamage(DisplayOwner beHurtMember, DisplayOwner attackMember, float hurt)
+    //{
+    //    // 验证数据
+    //    if (beHurtMember == null || attackMember == null)
+    //    {
+    //        return;
+    //    }
+    //    var objId = beHurtMember.ClusterData.MemberData.ObjID;
+    //    // 保存攻击对象
+    //    if (!hitList.ContainsKey(objId))
+    //    {
+    //        hitList.Add(objId, new List<DisplayOwner>()
+    //        {
+    //            attackMember
+    //        });
+    //    }
+    //    else
+    //    {
+    //        hitList[objId].Add(attackMember);
+    //    }
+    //    // 保存伤害
+    //    if (!damageList.ContainsKey(objId))
+    //    {
+    //        damageList.Add(objId, hurt);
+    //    }
+    //    else
+    //    {
+    //        damageList[objId] += hurt;
+    //    }
+    //}
+
+    ///// <summary>
+    ///// 获得该单位所受伤害
+    ///// </summary>
+    ///// <param name="objId"></param>
+    ///// <returns></returns>
+    //public  float GetDemage(ObjectID objId)
+    //{
+    //    var result = 0f;
+
+    //    if (objId != null && damageList.ContainsKey(objId))
+    //    {
+    //        result = damageList[objId];
+    //    }
+
+    //    return result;
+    //}
+
+
+    //public  IList<DisplayOwner> GetAttackMemberList(ObjectID objId)
+    //{
+    //    IList<DisplayOwner> result = null;
+
+    //    if (objId != null && hitList.ContainsKey(objId))
+    //    {
+    //        result = hitList[objId];
+    //    }
+
+    //    return result;
+    //}
+
+    ///// <summary>
+    ///// 清空一个单位的伤害列表
+    ///// </summary>
+    ///// <param name="objId">被清空单位</param>
+    //public  void ClearOneDamageList(ObjectID objId)
+    //{
+    //    if (objId == null)
+    //    {
+    //        return;
+    //    }
+    //    if (hitList.ContainsKey(objId))
+    //    {
+    //        hitList[objId].Clear();
+    //    }
+    //    if (damageList.ContainsKey(objId))
+    //    {
+    //        damageList[objId] = 0f;
+    //    }
+    //}
+
+    ///// <summary>
+    ///// 清空所有单位的伤害列表
+    ///// </summary>
+    //public  void ClearAllDamageList()
+    //{
+    //    hitList.Clear();
+    //    damageList.Clear();
+    //}
+
+    ///// <summary>
+    ///// 设置闪避
+    ///// </summary>
+    ///// <param name="objId">闪避者ID</param>
+    //public  void SetDodge(ObjectID objId)
+    //{
+    //    if (objId == null)
+    //    {
+    //        return;
+    //    }
+    //    dodgeList.Add(objId);
+    //}
+
+    ///// <summary>
+    ///// 是否闪避
+    ///// </summary>
+    ///// <param name="objId">闪避者ID</param>
+    ///// <returns>是否闪避</returns>
+    //public  bool HasDodge(ObjectID objId)
+    //{
+    //    return dodgeList.Contains(objId);
+    //}
+
+    ///// <summary>
+    ///// 删除一个闪避单位
+    ///// </summary>
+    ///// <param name="objId">被删除ObjId</param>
+    //public  void ClearOneDodge(ObjectID objId)
+    //{
+    //    if (objId == null)
+    //    {
+    //        return;
+    //    }
+    //    dodgeList.Remove(objId);
+    //}
+
+    ///// <summary>
+    ///// 清空闪避列表
+    ///// </summary>
+    //public  void ClearAllDodge()
+    //{
+    //    dodgeList.Clear();
+    //}
+
+    // ------------------------------------技能事件检测-----------------------------------
 }
 
 
@@ -494,4 +846,41 @@ public interface IFormula
     /// </summary>
     /// <returns>链头单位</returns>
     IFormula GetFirst();
+}
+
+
+// -------------------------------技能触发数据类----------------------------------
+
+public class SkillTriggerData
+{
+    /// <summary>
+    /// 技能类列表
+    /// </summary>
+    //public List<SkillInfo> SkillInfoList { get; set; }
+
+    /// <summary>
+    /// 释放技能单位
+    /// </summary>
+    public DisplayOwner ReleaseMember { get; set; }
+
+    /// <summary>
+    /// 接受技能单位
+    /// </summary>
+    public DisplayOwner ReceiveMember { get; set; }
+
+    /// <summary>
+    /// 技能分类Level1
+    /// </summary>
+    public SkillTriggerLevel1 TypeLevel1 { get; set; }
+
+    /// <summary>
+    /// 技能分类Level2
+    /// </summary>
+    public SkillTriggerLevel2 TypeLevel2 { get; set; }
+
+    /// <summary>
+    /// 伤害量
+    /// </summary>
+    public float HealthChangeValue { get; set; }
+
 }

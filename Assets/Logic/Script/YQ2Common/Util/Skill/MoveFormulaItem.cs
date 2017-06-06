@@ -87,6 +87,7 @@ public class MoveFormulaItem : AbstractFormulaItem
         var mySpeed = Speed;
         var myIsBlink = IsBlink;
         var member = paramsPacker.ReleaseMember;
+        var myFormulaType = FormulaType;
         // 最大移动次数(防溢出)
         var moveTime = 300;
         if (member == null || member.GameObj == null || member.ClusterData == null)
@@ -134,7 +135,7 @@ public class MoveFormulaItem : AbstractFormulaItem
                 timer.OnCompleteCallback(completeCallback).Start();
             }
             callback();
-        });
+        }, myFormulaType);
 
         return result;
     }

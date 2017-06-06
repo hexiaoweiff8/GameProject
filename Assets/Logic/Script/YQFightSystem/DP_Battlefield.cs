@@ -36,6 +36,9 @@ public class DP_Battlefield : MonoEX.SingletonAuto<DP_Battlefield>
             m_CurrScene = -1;
         }
 
+        // 转换场景时清空被击列表
+        SkillManager.Single.ClearAllSkillTriggerData();
+
         // 验证sceneID有效性
         if (sceneID > 0)
         {
@@ -84,8 +87,6 @@ public class DP_Battlefield : MonoEX.SingletonAuto<DP_Battlefield>
     /// </summary>
     public void LoadBase()
     {
-
-        // TODO 创建左右基地的代码
         // 不同等级基地不同模型
         var rightBase = new CreateActorParam(5, false, 0, "lingtong", "lingtong", true, 1008001);
         var leftBase = new CreateActorParam(5, false, 0, "lingtong", "lingtong", true, 1008001);

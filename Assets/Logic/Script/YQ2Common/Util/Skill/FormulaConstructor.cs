@@ -364,6 +364,9 @@ public static class FormulaConstructor
     // -----------------位置--------------------
     // Move 位置移动                  参数 是否等待完成,移动速度,是否瞬移(0: 否, 1: 是(如果是瞬移则速度无效))
 
+    // -----------------条件选择----------------
+    // ---If 条件选择                    参数 是否等待完成,条件
+    // HealthScope 血量范围选择       参数 是否等待完成,血量下限(最小0), 血量上限(最大100)
 
 }
 
@@ -520,7 +523,8 @@ public enum SkillTriggerLevel2
     Attack,                 // 攻击时
     Hit,                    // 命中时
     BeAttack,               // 被攻击时
-    Evasion,                // 闪避时
+    BeCure,                 // 被治疗时
+    Dodge,                  // 闪避时
     Enter,                  // 入场时
     EnterEnd,               // 入场结束时
     Death,                  // 死亡时

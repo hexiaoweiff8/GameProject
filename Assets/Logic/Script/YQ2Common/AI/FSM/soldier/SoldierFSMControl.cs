@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class SoldierFSMControl{
 
@@ -79,32 +81,72 @@ public class SoldierFSMControl{
         if (_iSAwake) return;
         fsm.CurrentState.CheckTrigger(fsm);
         fsm.CurrentState.Action(fsm);
-        CheckBeAttack();
+        // 结算伤害
+        SettlementDamage();
+        // 检测被触发的事件是否有对应技能
+        CheckTrigger();
     }
 
     /// <summary>
-    /// 检测被击
+    /// 检测当前单位的触发事件
     /// </summary>
-    private void CheckBeAttack()
+    private void CheckTrigger()
+    {
+        var fightVo = fsm.Display.ClusterData.MemberData as FightVO;
+        if (fightVo != null && fightVo.SkillInfoList != null)
+        {
+            // 触发当前单位的所有事件
+            SkillManager.Single.SetEachAction(fightVo.ObjID, (type1, type2, trigger) =>
+            {
+                SkillManager.Single.CheckAndDoSkillInfo(fightVo.SkillInfoList, trigger.ReleaseMember,
+                    trigger.ReceiveMember,
+                    type1, type2);
+            }, true);
+        }
+    }
+
+    /// <summary>
+    /// 结算当前单位的血量
+    /// </summary>
+    private void SettlementDamage()
     {
         var fightVO = fsm.Display.ClusterData.MemberData as FightVO;
         if (fightVO != null && fightVO.SkillInfoList != null)
         {
+            var healthChangeValue = 0f;
+            // 获取被击列表
+            var attackList = SkillManager.Single.GetSkillTriggerDataList(fightVO.ObjID, SkillTriggerLevel1.Fight, SkillTriggerLevel2.BeAttack);
             // 检测是否被击
-            if (fightVO.BeAttack)
+            if (attackList != null && attackList.Count > 0)
             {
-                // 检查并执行列表
-                SkillManager.Single.CheckAndDoSkillInfo(fightVO.SkillInfoList, fsm.Display, fsm.EnemyTarget,
-                    SkillTriggerLevel1.Fight, SkillTriggerLevel2.BeAttack);
+                // 计算血量变动总和
+                healthChangeValue += attackList.Sum(attackMember => attackMember.HealthChangeValue);
+
+                // 如果单位死亡在抛出一个死亡事件
                 // 检测致死攻击
-                if (fightVO.CurrentHP < Utils.ApproachZero)
+                if (fightVO.CurrentHP - healthChangeValue < Utils.ApproachZero)
                 {
-                    SkillManager.Single.CheckAndDoSkillInfo(fightVO.SkillInfoList, fsm.Display, fsm.EnemyTarget,
-                       SkillTriggerLevel1.Fight, SkillTriggerLevel2.FatalHit);
+                    // 检测最后一个
+                    var lastHitMember = attackList[attackList.Count - 1];
+                    // 抛出致死攻击事件
+                    SkillManager.Single.SetSkillTriggerData(new SkillTriggerData()
+                    {
+                        HealthChangeValue = lastHitMember.HealthChangeValue,
+                        ReceiveMember = lastHitMember.ReceiveMember,
+                        ReleaseMember = lastHitMember.ReleaseMember,
+                        TypeLevel1 = SkillTriggerLevel1.Fight,
+                        TypeLevel2 = SkillTriggerLevel2.FatalHit
+                    });
                 }
+
+                // 结算血量变动
+                fsm.Display.ClusterData.MemberData.CurrentHP -= healthChangeValue;
+                // 刷新血条
+                fsm.Display.RanderControl.SetBloodBarValue();
             }
-            fsm.Display.ClusterData.MemberData.BeAttack = false;
+
         }
     }
+
 
 }

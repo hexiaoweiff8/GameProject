@@ -10,7 +10,7 @@ public class AstarTest : MonoBehaviour {
     /// <summary>
     /// 寻路X轴宽度
     /// </summary>
-    public int DiameterX = 4;
+    public int DiameterX = 4; 
 
     /// <summary>
     /// 寻路Y轴宽度

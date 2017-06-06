@@ -109,6 +109,7 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
         var myCheckTime = CheckTime;
         var myLength = Length;
         var myTargetCamps = TargetCamps;
+        var myFormulaType = FormulaType;
 
         var selecterData = paramsPacker.ReleaseMember.ClusterData.MemberData;
 
@@ -217,7 +218,7 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
 
             timer.OnCompleteCallback(completeCallback);
             timer.Start();
-        });
+        }, myFormulaType);
 
         return result;
     }

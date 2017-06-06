@@ -1,8 +1,20 @@
 local class = require("common/middleclass")
 local ui_equip = class("ui_equip", wnd_base)
 
-local pingzhiName = {"zhuangbei_zhuangbeikuang_baisepinzhi", "zhuangbei_zhuangbeikuang_chengsepinzhi", "zhuangbei_zhuangbeikuang_hongsepinzhi", "zhuangbei_zhuangbeikuang_hongsesunhuai", "zhuangbei_zhuangbeikuang_lansepinzhi", "zhuangbei_zhuangbeikuang_lvsepinzhi", "zhuangbei_zhuangbeikuang_zisepinzhi", "zhuangbei_zhuangbeikuang_weizhuangbei", }
-eqNameColor = {Color(54 / 255, 214 / 255, 255 / 255), Color(255 / 255, 139 / 255, 62 / 255), Color(210 / 255, 110 / 255, 110 / 255), Color(120 / 255, 220 / 255, 120 / 255), Color(130 / 255, 130 / 255, 230 / 255), Color(140 / 255, 140 / 255, 140 / 255)}
+local pingzhiName = {"zhuangbei_zhuangbeikuang_baisepinzhi", 
+						"zhuangbei_zhuangbeikuang_chengsepinzhi", 
+						"zhuangbei_zhuangbeikuang_hongsepinzhi", 
+						"zhuangbei_zhuangbeikuang_hongsesunhuai", 
+						"zhuangbei_zhuangbeikuang_lansepinzhi", 
+						"zhuangbei_zhuangbeikuang_lvsepinzhi", 
+						"zhuangbei_zhuangbeikuang_zisepinzhi", 
+						"zhuangbei_zhuangbeikuang_weizhuangbei", }
+eqNameColor = {Color(54 / 255, 214 / 255, 255 / 255), 
+				Color(255 / 255, 139 / 255, 62 / 255), 
+				Color(210 / 255, 110 / 255, 110 / 255), 
+				Color(120 / 255, 220 / 255, 120 / 255), 
+				Color(130 / 255, 130 / 255, 230 / 255), 
+				Color(140 / 255, 140 / 255, 140 / 255)}
 --左侧装备栏显示操作 0-99为删除 100-199为添加 200-299为修改
 local function ZUOCEZHUANGBEI(type, i, v)
     local self = ui_equip

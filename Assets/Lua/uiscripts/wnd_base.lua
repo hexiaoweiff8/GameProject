@@ -29,7 +29,7 @@ wnd_base_type =
         -- 新手指引上的比如跑马灯新闻
         ABOVE_TUTORIAL = 8,
     }
-
+	
 local wndDepth = {2, 10, 250, 500, 750, 1000, 1250, 1500}
 
 wnd_base = class("wnd_base")

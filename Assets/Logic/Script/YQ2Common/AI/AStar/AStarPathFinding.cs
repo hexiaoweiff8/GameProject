@@ -44,7 +44,7 @@ public class AStarPathFinding
 
         // 结束节点
         Node endNode = null;
-        //var now = Time.realtimeSinceStartup;
+        var now = Time.realtimeSinceStartup;
         // 行列数量
         var rowCount = map.Length;
         var colCount = map[0].Length;
@@ -215,7 +215,7 @@ public class AStarPathFinding
             completeCallback();
         }
 
-        //Debug.Log(string.Format("{0:#.##########}", Time.realtimeSinceStartup - now));
+        Debug.Log(string.Format("{0:#.##########}", Time.realtimeSinceStartup - now));
         // 返回路径, 如果路径数量为0 则没有可行路径
         return path;
     }
