@@ -24,6 +24,7 @@ public class ClusterManager : ILoopItem
 
 
     private static ClusterManager single = null;
+
     // -------------------------公有属性-------------------------------
     public Vector3 MovementPlanePosition;
 
@@ -47,7 +48,7 @@ public class ClusterManager : ILoopItem
     ///// <summary>
     ///// 碰撞挤开系数
     ///// </summary>
-    public float CollisionThrough = 7f;
+    public float CollisionThrough = 10f;
 
     /// <summary>
     /// 摩擦力系数
@@ -55,9 +56,14 @@ public class ClusterManager : ILoopItem
     public float Friction = 5;
 
     /// <summary>
-    /// 组列表(全局)
+    /// 单位格子宽度
     /// </summary>
-    public static List<ClusterGroup> GroupList = new List<ClusterGroup>();
+    public int UnitWidth = 1;
+
+    ///// <summary>
+    ///// 组列表(全局)
+    ///// </summary>
+    //public static List<ClusterGroup> GroupList = new List<ClusterGroup>();
 
 
     // -------------------------私有属性-------------------------------
@@ -78,10 +84,6 @@ public class ClusterManager : ILoopItem
     /// </summary>
     private Dictionary<long, bool> areadyCollisionList = new Dictionary<long, bool>();
 
-    /// <summary>
-    /// 单位格子宽度
-    /// </summary>
-    private int unitWidth = 1;
 
     /// <summary>
     /// 暂停标志
@@ -100,21 +102,6 @@ public class ClusterManager : ILoopItem
 
     // -----------------------------公有方法------------------------------
 
-
-    //public void Update()
-    //{
-    //    if (targetList != null)
-    //    {
-    //        // 刷新四叉树
-    //        targetList.RebuildQuadTree();
-    //        // 刷新地图对应位置
-    //        targetList.RebulidMapInfo();
-    //        // 单位移动
-    //        AllMemberMove(targetList.List);
-    //        // 绘制四叉树
-    //        DrawQuadTreeLine(targetList.QuadTree);
-    //    }
-    //}
 
     /// <summary>
     /// 单次循环
@@ -148,7 +135,7 @@ public class ClusterManager : ILoopItem
     /// </summary>
     public void OnDestroy()
     {
-        // 清空数据
+        // TODO 清空数据
         // 防止内存泄漏
     }
 
@@ -189,20 +176,20 @@ public class ClusterManager : ILoopItem
         targetList.MapInfo.AddMap(unitw, w, h, map);
         MovementHeight = h;
         MovementWidth = w;
-        unitWidth = unitw;
+        UnitWidth = unitw;
     }
 
     /// <summary>
     /// 清理现有对象
     /// </summary>
-    public static void ClearAllGroup()
-    {
-        foreach (var group in GroupList)
-        {
-            group.CleanGroup();
-        }
-        GroupList.Clear();
-    }
+    //public static void ClearAllGroup()
+    //{
+    //    foreach (var group in GroupList)
+    //    {
+    //        group.CleanGroup();
+    //    }
+    //    GroupList.Clear();
+    //}
 
     /// <summary>
     /// 暂停
@@ -238,38 +225,38 @@ public class ClusterManager : ILoopItem
     public void ClearAll()
     {
         // 清除已有所有单元
-        foreach (var group in GroupList)
-        {
-            group.CleanGroup();
-        }
+        //foreach (var group in GroupList)
+        //{
+        //    group.CleanGroup();
+        //}
 
-        if (GroupList != null)
-        {
-            GroupList.Clear();
-        }
+        //if (GroupList != null)
+        //{
+        //    GroupList.Clear();
+        //}
         if (targetList != null)
         {
             targetList.Clear();
         }
     }
 
-    /// <summary>
-    /// 根据ID查询group
-    /// </summary>
-    /// <param name="groupId">被查询groupId</param>
-    /// <returns>返回查询到的groupId 如果不存在则返回null</returns>
-    public ClusterGroup GetGroupById(int groupId)
-    {
-        for (var i = 0; i < GroupList.Count; i++)
-        {
-            var tmpGroup = GroupList[i];
-            if (tmpGroup.GroupId == groupId)
-            {
-                return tmpGroup;
-            }
-        }
-        return null;
-    }
+    ///// <summary>
+    ///// 根据ID查询group
+    ///// </summary>
+    ///// <param name="groupId">被查询groupId</param>
+    ///// <returns>返回查询到的groupId 如果不存在则返回null</returns>
+    //public ClusterGroup GetGroupById(int groupId)
+    //{
+    //    for (var i = 0; i < GroupList.Count; i++)
+    //    {
+    //        var tmpGroup = GroupList[i];
+    //        if (tmpGroup.GroupId == groupId)
+    //        {
+    //            return tmpGroup;
+    //        }
+    //    }
+    //    return null;
+    //}
 
     /// <summary>
     /// 获取图形范围内的单位
@@ -362,6 +349,7 @@ public class ClusterManager : ILoopItem
 
         // 转向
         member.Rotate = Vector3.up * rotate * member.RotateSpeed * Time.deltaTime;
+        
         // 前进
         Debug.DrawLine(member.Position, member.Position + member.PhysicsInfo.SpeedDirection, Color.white);
         member.Position += member.PhysicsInfo.SpeedDirection * Time.deltaTime;
@@ -388,54 +376,15 @@ public class ClusterManager : ILoopItem
         var result = Vector3.zero;
         
         // 同队伍聚合
-        if (member != null && member.Group != null)
+        if (member != null) // && member.Group != null
         {
             var grivity = member.TargetPos - member.Position;
-            // 当前单位到目标的方向
-            //Vector3 targetDir = member.TargetPos - member.Position;
-            
-            // 遍历同队成员计算方向与速度
-            //for (var j = 0; j < member.Group.MemberList.Count; j++)
-            //{
-            //    var teammate = member.Group.MemberList[j];
-            //    // 排除自己
-            //    if (member.Equals(teammate)) { continue; }
-            //    // 计算与队友位置差
-            //    var teammateOffset = teammate.Position - member.Position;
-            //    // 该向量与目标方向的夹角
-            //    var teammateAngleOffset = Vector3.Dot(teammateOffset.normalized, targetDir.normalized);
-            //    // 判断队友是否在当前单位前方一定角度内
-            //    if (teammateAngleOffset > cosForwardAngle)
-            //    {
-            //        // 在跟随区间
-            //        var minDistance = member.Diameter + member.Diameter;
-            //        var maxDistance = minDistance;
-            //        if (teammateOffset.magnitude > minDistance && teammateOffset.magnitude < maxDistance)
-            //        {
-            //            // 向前方队友位置偏移
-            //            grivity += teammateOffset.normalized * member.RotateWeight * (1 - teammateOffset.magnitude / minDistance);
-            //        }
-            //        else if (teammateOffset.magnitude <= minDistance)
-            //        {
-            //            // 前方90度内有人, 并且距离小于改单位设置的最小间距, 对该方向产生斥力
-            //            grivity -= teammateOffset.normalized * member.RotateWeight * (teammateOffset.magnitude / minDistance);
-            //        }
-            //    }
-            //}
-
-            //grivity = grivity.normalized + targetDir.normalized;
-
-            // TODO 走向队友附近的槽, 并且前方有障碍则绕开, 绕开不太好做啊.
-            // 绘制目标
-            //Debug.DrawLine(member.Position, grivity + member.Position, Color.green);
-            // 操作动量, 产生前进动量, 这个动量不会超过引力方向最大速度
-
-            //Debug.DrawLine(member.Position , member.Position + grivity.normalized * member.PhysicsInfo.MaxSpeed * CollisionWeight, Color.yellow);
+            // 如果当前方向与引力方向
             // 速度不稳定问题
-            member.PhysicsInfo.SpeedDirection += grivity.normalized * member.PhysicsInfo.MaxSpeed * CollisionWeight * Time.deltaTime;
+            member.PhysicsInfo.SpeedDirection = grivity.normalized * member.PhysicsInfo.MaxSpeed;
 
             // 加入最大速度限制, 防止溢出
-            member.PhysicsInfo.SpeedDirection *= GetUpTopSpeed(member.PhysicsInfo.SpeedDirection.magnitude);
+            //member.PhysicsInfo.SpeedDirection *= GetUpTopSpeed(member.PhysicsInfo.SpeedDirection.magnitude);
             result = grivity;
         }
 
@@ -614,8 +563,10 @@ public class ClusterManager : ILoopItem
         // 碰撞前进方向
         var collisionThoughDir = Vector3.zero;
         // 碰撞不能前进方向(不能移动的物体)
-        var collisionCouldNotThoughDir = Vector3.zero;
-        var collisionCouldNotThoughCount = 0;
+        //var collisionCouldNotThoughDir = Vector3.zero;
+        //var collisionCouldNotThoughCount = 0;
+        // 当前单位的体积*速度
+        var memberEnergy = member.PhysicsInfo.Quality * member.PhysicsInfo.MaxSpeed;
         for (var k = 0; closeMemberList != null && k < closeMemberList.Count; k++)
         {
             var closeMember = closeMemberList[k];
@@ -648,31 +599,29 @@ public class ClusterManager : ILoopItem
 
                     var departSpeed = closeMember.PhysicsInfo.SpeedDirection - member.PhysicsInfo.SpeedDirection;
 
-                    // TODO 定最终拥挤方向
-                    // TODO 排斥力未做
                     // 基础排斥力
                     if (diffPosition.magnitude < minDistance)
                     {
                         // TODO 排除力有时无效
                         // 计算不可移动方向
                         var diffPosNor = diffPosition.normalized;
-                        collisionThoughDir += diffPosNor * (minDistance - diffPosition.magnitude) * CollisionThrough * Time.deltaTime;
-                        if (!closeMember.CouldMove)
-                        {
-                            // 如果目标不能移动则
-                            collisionCouldNotThoughDir += diffPosNor;
-                            collisionCouldNotThoughCount++;
-                        }
-                        else
+                        // 对比速度与体积
+                        var closeMemberEnergy = closeMember.PhysicsInfo.MaxSpeed * closeMember.PhysicsInfo.Quality;
+
+                        collisionThoughDir += diffPosNor
+                            * (minDistance / diffPosition.magnitude)
+                            * CollisionThrough 
+                            * Utils.GetRange(0.1f, 5f, closeMemberEnergy / memberEnergy) 
+                            * Time.deltaTime;
+                        if (closeMember.CouldMove)
                         {
                             // 可移动附近单位也移动
-                            closeMember.Position -= diffPosNor * Time.deltaTime;
+                            closeMember.Position -= diffPosNor * Utils.GetRange(0.1f, 5f, memberEnergy / closeMemberEnergy * Time.deltaTime);
                         }
                     }
 
                     // 求出射角度, 出射角度*出射量
                     // 使用向量法线计算求出出射标准向量
-                    // TODO 角度有问题
                     var outDir =
                         ((member.PhysicsInfo.SpeedDirection +
                           Vector3.Dot(member.PhysicsInfo.SpeedDirection, diffPosition) * diffPosition) * 2 -
@@ -685,19 +634,6 @@ public class ClusterManager : ILoopItem
 
                     // 当前对象的弹出角度为镜面弹射角度
                     var partForMember = -outDir * departSpeed.magnitude / qualityRate;
-                    //var partForCloseMember = departSpeed * qualityRate;
-                    //if (partForMember.magnitude > departSpeed.magnitude)
-                    //{
-                    //    partForMember *= departSpeed.magnitude / partForMember.magnitude;
-                    //}
-                    //if (partForCloseMember.magnitude > departSpeed.magnitude)
-                    //{
-                    //    partForCloseMember *= departSpeed.magnitude / partForCloseMember.magnitude;
-                    //}
-                    // TODO 这个力和某个力冲突导致移动缓慢
-                    // TODO 直接移动目标
-                    //member.PhysicsInfo.SpeedDirection += partForMember;
-                    //closeMember.PhysicsInfo.SpeedDirection -= partForCloseMember;
 
                     // 加入最大速度限制, 防止溢出
                     member.PhysicsInfo.SpeedDirection *= GetUpTopSpeed(member.PhysicsInfo.SpeedDirection.magnitude);
@@ -709,37 +645,11 @@ public class ClusterManager : ILoopItem
             }
         }
 
-        // 物体移动, 并且不能超不可移动方向移动
+        // 碰撞移动
         if (collisionThoughDir != Vector3.zero)
         {
-            // 排除掉移动向量中不可移动方向的移动量
-            // 计算当前移动方向与不可移动的反方向是否角度小于90
-            // 如果小于90则无问题, 如果大于90则将与超过的角度部分抹掉
-            //var angleCollisionThoughDir = Vector3.Angle(collisionThoughDir, collisionCouldNotThoughDir);
-            //if (angleCollisionThoughDir > 90)
-            //{
-            //    angleCollisionThoughDir -= 90;
-            //    var subDirLength = (float)Math.Cos(angleCollisionThoughDir)*collisionThoughDir.magnitude;
-            //    // 求不能前进的反方向的垂直向量
-            //    collisionThoughDir = Vector3.Cross(collisionCouldNotThoughDir, Vector3.up).normalized * subDirLength;
-            //}
             member.Position += collisionThoughDir;
         }
-
-        // 判断是否需要躲避
-        //if (collisionCount > 1)
-        //{
-        //    // TODO 引力方向是附近的空格子
-        //    // TODO 躲避力始终朝向同一方向, 导致群聚旋转
-        //    // TODO 重写绕障功能
-        //    // 获取周围的格子
-        //    //var aroundNodes = targetList.MapInfo.GetAroundPos(member, 2);
-        //    // 给予横向拉扯力
-        //    // 求聚合位置向量的垂直向量
-        //    var transverseDir = Vector3.Cross(pressureReleaseDir, Vector3.up);
-        //    // 随机左右
-        //    member.PhysicsInfo.SpeedDirection += transverseDir * member.PhysicsInfo.MaxSpeed;// * (new Random((int)DateTime.Now.Ticks).Next(10) > 5 ? -1 : 1);
-        //}
     }
 
     /// <summary>
@@ -788,27 +698,31 @@ public class ClusterManager : ILoopItem
             }
         }
 
-        if ((member.Position - member.Group.Target).magnitude < member.Diameter)
+        if ((member.Position - member.TargetPos).magnitude < member.Diameter * UnitWidth)
         {
             if (member.State != SchoolItemState.Complete)
             {
-                // 单位状态修改为complete
-                member.State = SchoolItemState.Complete;
-                // 调用到达
-                if (member.Complete != null) { member.Complete(member.ItemObj); }
-                member.Group.CompleteMemberCount++;
+                //member.Group.CompleteMemberCount++;
+                // 将单位的下一位置pop出来 如果没有则
+                if (!member.PopTarget())
+                {
+                    // 单位状态修改为complete
+                    member.State = SchoolItemState.Complete;
+                    // 调用到达
+                    if (member.Complete != null) { member.Complete(member.ItemObj); }
+                }
             }
         }
 
         // 判断组队是否到达
-        if (!member.Group.IsComplete && member.Group.CompleteMemberCount * 100 / member.Group.MemberList.Count > member.Group.ProportionOfComplete)
-        {
-            if (member.Group.Complete != null)
-            {
-                member.Group.IsComplete = true;
-                member.Group.Complete(member.Group);
-            }
-        }
+        //if (!member.Group.IsComplete && member.Group.CompleteMemberCount * 100 / member.Group.MemberList.Count > member.Group.ProportionOfComplete)
+        //{
+        //    if (member.Group.Complete != null)
+        //    {
+        //        member.Group.IsComplete = true;
+        //        member.Group.Complete(member.Group);
+        //    }
+        //}
     }
 
 

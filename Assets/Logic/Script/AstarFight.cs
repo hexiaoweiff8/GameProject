@@ -620,7 +620,6 @@ public class AstarFight : MonoBehaviour
         maxX = (int)((X - LoadMap.MapPlane.transform.position.x) / UnitWidth + MapWidth / 2f);
     }
 
-
     /// <summary>
     /// 物体寻路
     /// </summary>
@@ -637,45 +636,20 @@ public class AstarFight : MonoBehaviour
         }
         //把物体当前世界坐标转换为格子坐标
         int[] a = Utils.PositionToNum(LoadMap.MapPlane.transform.position, go.transform.position, UnitWidth, MapWidth, MapHeight);
-        var path = AStarPathFinding.SearchRoad(mapInfoData, a[0], a[1], !isEnemy ? TargetX : 1, a[1], DiameterX, DiameterY, IsJumpPoint);
+        var path = AStarPathFinding.SearchRoad(mapInfoData, a[0], a[1], !isEnemy ? TargetX : 1, a[1], (int)data.Diameter, (int)data.Diameter + 1, IsJumpPoint);
 
 
         ClusterData clusterData = data;
-        //TODODO
-        clusterData.GroupId = groupIndex;
-        clusterData.PhysicsInfo.MaxSpeed = 30;
-        clusterData.RotateSpeed = 1;
+        clusterData.RotateSpeed = 10;
         clusterData.RotateWeight = 1;
-        clusterData.Diameter = 1 * UnitWidth;
+        clusterData.PhysicsInfo.MaxSpeed = clusterData.MemberData.MoveSpeed;
+        clusterData.Diameter *= ClusterManager.Single.UnitWidth;
+        clusterData.PushTargetList(Utils.NumToPostionByList(LoadMap.MapPlane.transform.position, path, UnitWidth, MapWidth, MapHeight));
         // 默认出事状态不行进
         clusterData.Stop();
-
-        //clusterData.transform.localPosition = new Vector3((tempInt % 3) * 2, 1, tempInt / 3 * 2) + Utils.NumToPosition(LoadMap.transform.position, new Vector2(a[0], a[1]), UnitWidth, MapWidth, MapHeight);
-
-        clusterData.Group.Target = Utils.NumToPosition(LoadMap.MapPlane.transform.position, new Vector2(path[path.Count - 1].X, path[path.Count - 1].Y), UnitWidth, MapWidth, MapHeight);
         ClusterManager.Single.Add(clusterData);
         // 外层对象持有ClusterData引用
         displayOwner.ClusterData = clusterData;
-
-        Action<ClusterGroup> lambdaComplete = thisGroup =>
-        {
-            //Debug.Log("GroupComplete:" + thisGroup.Target);
-            // 数据本地化
-            // 数据结束
-            if (path.Count == 0)
-            {
-                return;
-            }
-            path.RemoveAt(path.Count - 1);
-            if (path.Count == 0)
-            {
-                return;
-            }
-            var node = path[path.Count - 1];
-            thisGroup.Target = Utils.NumToPosition(LoadMap.MapPlane.transform.position, new Vector2(node.X, node.Y), UnitWidth, MapWidth, MapHeight);
-        };
-        clusterData.Group.ProportionOfComplete = 1;
-        clusterData.Group.Complete = lambdaComplete;
     }
 
     /// <summary>

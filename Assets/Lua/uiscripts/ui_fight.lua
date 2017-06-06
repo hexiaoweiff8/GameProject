@@ -5,6 +5,9 @@ local grayColor = Color(169 / 255, 169 / 255, 169 / 255, 1)
 function Onfs()
     ui_manager:ShowWB(WNDTYPE.ui_fight)
 end
+
+local isPress = false
+local selectedCardItem = nil
 function ui_fight:OnShowDone()
     math.newrandomseed()
 
@@ -428,7 +431,6 @@ function ui_fight:isTouchedCard(tf)
 end
 
 local tempInt3 = 0
-local downTime = 0
 --敌人下兵逻辑
 function WANJIAXIABING(self)
     -- TODODO
@@ -469,12 +471,12 @@ function WANJIAXIABING(self)
             Object.Destroy(euc.gameObject)
         end)
         self.enemyNowFei = self.enemyNowFei - sdata_armycardbase_data:GetFieldV("TrainCost", tempID)
-        downTime = downTime + 1
     else --敌人费不够记录下次该出的牌和费
         self.nextEnemyCardID = tempID
         self.nextEnemyCardFei = sdata_armycardbase_data:GetFieldV("TrainCost", tempID)
     end
 end
+
 --==============================--
 --desc:获取模型
 --time:2017-05-03 08:20:10
@@ -510,7 +512,8 @@ function ui_fight:getModel(id, index)
             sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_MeshPackName, ArmyID),
             sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_TexturePackName, ArmyID),
             sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_IsHero, ArmyID) == 1, tonumber(ArmyID .. "001"), id)
-        tempMod = FightUnitFactory.CreateUnit(index == 5 and 4 or 3, paramTab).GameObj.transform
+        selectedCardItem = FightUnitFactory.CreateUnit(index == 5 and 4 or 3, paramTab)
+        tempMod = selectedCardItem.GameObj.transform
         tempMod.gameObject:SetActive(true)
         tempMod.parent = go
         if index == 5 then --如果是敌方则阵型水平翻转
@@ -683,6 +686,7 @@ function ui_fight:doEvent(tf, var, isXiaBing)
         self:backCallback(tf, true)
         self:cardFront(tf, var)
     end
+    isPress = false
     return true
 end
 -- 卡牌前置
@@ -713,6 +717,16 @@ function ui_fight:backCallback(tf, b)
     if b then
         tf.localScale = Vector3.one
         Object.Destroy(table.remove(self.onPressArmytb, index).gameObject)
+        -- 删除创建对象
+        if isPress then
+            isPress = false
+            if selectedCardItem ~= nil then
+                FightUnitFactory.DeleteUnit(selectedCardItem.ClusterData.MemberData)
+                selectedCardItem = nil
+            end
+        else
+            isPress = true
+        end
     else
         self.groupIndex = self.groupIndex + 1
         --从父物体中移除（加入父物体是为了移动的时候只移动父物体）
@@ -724,6 +738,15 @@ function ui_fight:backCallback(tf, b)
         self.ctPosition = self.AstarFight:getNum(self.onPressArmytb[index].position)
         --删除父物体
         Object.Destroy(table.remove(self.onPressArmytb, index).gameObject)
+        if isPress then
+            isPress = false
+            if selectedCardItem ~= nil then
+                FightUnitFactory.DeleteUnit(selectedCardItem.ClusterData.MemberData)
+                selectedCardItem = nil
+            end
+        else
+            isPress = true
+        end
     end
 end
 function ui_fight:Update()

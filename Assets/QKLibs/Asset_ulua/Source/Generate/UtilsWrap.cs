@@ -9,6 +9,7 @@ public class UtilsWrap
 		L.BeginClass(typeof(Utils), typeof(System.Object));
 		L.RegFunction("PositionToNum", PositionToNum);
 		L.RegFunction("NumToPosition", NumToPosition);
+		L.RegFunction("NumToPostionByList", NumToPostionByList);
 		L.RegFunction("IsCoverage", IsCoverage);
 		L.RegFunction("DrawGraphics", DrawGraphics);
 		L.RegFunction("DrawRect", DrawRect);
@@ -23,6 +24,7 @@ public class UtilsWrap
 		L.RegFunction("CreateOrOpenFile", CreateOrOpenFile);
 		L.RegFunction("LoadFileInfo", LoadFileInfo);
 		L.RegFunction("GetTheta", GetTheta);
+		L.RegFunction("GetRange", GetRange);
 		L.RegFunction("GetTwoPointDistance2D", GetTwoPointDistance2D);
 		L.RegFunction("CopyArray", CopyArray);
 		L.RegFunction("MoveAndRotateObj", MoveAndRotateObj);
@@ -42,6 +44,8 @@ public class UtilsWrap
 		L.RegConstant("GeneralTypeSurface", 1);
 		L.RegConstant("GeneralTypeAir", 2);
 		L.RegConstant("GeneralTypeBuilding", 3);
+		L.RegConstant("AngleToPi", 0.0174532923847437);
+		L.RegConstant("PiToAngle", 57.2957801818848);
 		L.RegVar("RadianToAngle", get_RadianToAngle, null);
 		L.RegVar("AngleToRadian", get_AngleToRadian, null);
 		L.RegVar("HalfPI", get_HalfPI, null);
@@ -113,6 +117,27 @@ public class UtilsWrap
 			float arg4 = (float)LuaDLL.luaL_checknumber(L, 5);
 			UnityEngine.Vector3 o = Utils.NumToPosition(arg0, arg1, arg2, arg3, arg4);
 			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int NumToPostionByList(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 5);
+			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 1);
+			System.Collections.Generic.IList<Node> arg1 = (System.Collections.Generic.IList<Node>)ToLua.CheckObject(L, 2, typeof(System.Collections.Generic.IList<Node>));
+			float arg2 = (float)LuaDLL.luaL_checknumber(L, 3);
+			float arg3 = (float)LuaDLL.luaL_checknumber(L, 4);
+			float arg4 = (float)LuaDLL.luaL_checknumber(L, 5);
+			System.Collections.Generic.List<UnityEngine.Vector3> o = Utils.NumToPostionByList(arg0, arg1, arg2, arg3, arg4);
+			ToLua.PushObject(L, o);
 			return 1;
 		}
 		catch(Exception e)
@@ -350,11 +375,26 @@ public class UtilsWrap
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 1);
-			string arg0 = ToLua.CheckString(L, 1);
-			string o = Utils.LoadFileInfo(arg0);
-			LuaDLL.lua_pushstring(L, o);
-			return 1;
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(System.IO.FileInfo)))
+			{
+				System.IO.FileInfo arg0 = (System.IO.FileInfo)ToLua.ToObject(L, 1);
+				string o = Utils.LoadFileInfo(arg0);
+				LuaDLL.lua_pushstring(L, o);
+				return 1;
+			}
+			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(string)))
+			{
+				string arg0 = ToLua.ToString(L, 1);
+				string o = Utils.LoadFileInfo(arg0);
+				LuaDLL.lua_pushstring(L, o);
+				return 1;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: Utils.LoadFileInfo");
+			}
 		}
 		catch(Exception e)
 		{
@@ -373,6 +413,25 @@ public class UtilsWrap
 			float arg2 = (float)LuaDLL.luaL_checknumber(L, 3);
 			float arg3 = (float)LuaDLL.luaL_checknumber(L, 4);
 			float o = Utils.GetTheta(arg0, arg1, arg2, arg3);
+			LuaDLL.lua_pushnumber(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetRange(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			float arg0 = (float)LuaDLL.luaL_checknumber(L, 1);
+			float arg1 = (float)LuaDLL.luaL_checknumber(L, 2);
+			float arg2 = (float)LuaDLL.luaL_checknumber(L, 3);
+			float o = Utils.GetRange(arg0, arg1, arg2);
 			LuaDLL.lua_pushnumber(L, o);
 			return 1;
 		}

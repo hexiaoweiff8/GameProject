@@ -227,6 +227,29 @@ public class Utils
         return result;
     }
 
+    /// <summary>
+    /// 行列位置转换列表
+    /// </summary>
+    /// <param name="planePosOffset">地图底板位置偏移</param>
+    /// <param name="nodeList">map中的行列位置列表</param>
+    /// <param name="unitWidth">单位宽度</param>
+    /// <param name="mapWidth">地图宽度</param>
+    /// <param name="mapHight">地图高度</param>
+    /// <returns>转换后位置列表</returns>
+    public static List<Vector3> NumToPostionByList(Vector3 planePosOffset, IList<Node> nodeList, float unitWidth, float mapWidth, float mapHight)
+    {
+        List<Vector3> result = null;
+        if (nodeList != null && nodeList.Count > 0)
+        {
+            result = new List<Vector3>();
+            foreach (var node in nodeList)
+            {
+                result.Add(NumToPosition(planePosOffset, new Vector2(node.X, node.Y), unitWidth, mapWidth, mapHight));
+            }
+        }
+        return result;
+    }
+
 
     /// <summary>
     /// 判断点是否在区域内
@@ -582,6 +605,27 @@ public class Utils
         }
 
         return theta1;
+    }
+
+    /// <summary>
+    /// 获取范围值
+    /// </summary>
+    /// <param name="min">最小值</param>
+    /// <param name="max">最大值</param>
+    /// <param name="val">value值</param>
+    /// <returns>如果大于最大值返回最大值, 如果小于最小值返回最小值, 否则返回val</returns>
+    public static float GetRange(float min, float max, float val)
+    {
+        if (val > max)
+        {
+            return max;
+        }
+        if (val < min)
+        {
+            return min;
+        }
+
+        return val;
     }
 
     /// <summary>

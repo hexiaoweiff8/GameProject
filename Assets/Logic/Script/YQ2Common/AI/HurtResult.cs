@@ -1,12 +1,9 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 
 public class HurtResult
 {
-
-
     /// <summary>
     /// 普通战斗伤害结算
     /// </summary>
@@ -178,5 +175,4 @@ public class HurtResult
         }
         return 1.0f;
     }
-
 }

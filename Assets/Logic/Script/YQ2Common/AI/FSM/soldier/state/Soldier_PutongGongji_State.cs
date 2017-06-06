@@ -157,6 +157,7 @@ public class Soldier_PutongGongji_State : SoldierFSMState
     /// <returns></returns>
     private bool AdjustTargetIsInRange(SoldierFSMSystem fsm)
     {
+        // 验证单位是否有效
         if (null == fsm.EnemyTarget || null == fsm.EnemyTarget.GameObj || null == fsm.EnemyTarget.ClusterData)
         {
             return true;
@@ -166,6 +167,5 @@ public class Soldier_PutongGongji_State : SoldierFSMState
         var distance = AI_Math.V2Distance(targetPos.x, targetPos.z, myPos.x, myPos.z) - fsm.EnemyTarget.ClusterData.Diameter * 0.5f - fsm.Display.ClusterData.Diameter * 0.5f;
         return (distance > fsm.Display.ClusterData.MemberData.SightRange) ||
                (fsm.EnemyTarget.ClusterData.MemberData.CurrentHP <= 0);
-
     }
 }

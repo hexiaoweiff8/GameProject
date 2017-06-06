@@ -418,6 +418,7 @@ public class AstarTest : MonoBehaviour {
         foreach (var item in itemList)
         {
             Destroy(item);
+            Destroy(item.gameObject);
         }
         itemList.Clear();
         // 清除所有组
@@ -436,17 +437,18 @@ public class AstarTest : MonoBehaviour {
             {
                 AttackRange = 20,
                 SpaceSet = 3,
-                ObjID = objId
+                ObjID = objId,
+                MoveSpeed = 60
             };
-            school.GroupId = 1;
+            //school.GroupId = 1;
             // TODO 物理信息中一部分来自于数据
             school.PhysicsInfo.MaxSpeed = 10;
-            school.RotateSpeed = 1;
-            school.RotateWeight = 1;
+            school.RotateSpeed = 10;
             school.transform.localPosition = new Vector3((i % 3) * 2 + start.x, start.y, i / 3 * 2 + start.z);
             school.name = "item" + i;
             school.TargetPos = target;
-            school.Diameter = 3;
+            school.Diameter = (i) % 5 + 1;
+            school.PushTargetList(Utils.NumToPostionByList(LoadMap.transform.position, cloneList, UnitWidth, MapWidth, MapHeight));
             //school.Moveing = (a) => { Debug.Log(a.name + "Moving"); };
 
             //school.Wait = (a) => { Debug.Log(a.name + "Wait"); };
@@ -456,25 +458,25 @@ public class AstarTest : MonoBehaviour {
             DisplayerManager.Single.AddElement(objId, new DisplayOwner(schoolItem, school, null, null));
 
 
-            Action<ClusterGroup> lam = (thisGroup) =>
-            {
-                // Debug.Log("GroupComplete:" + thisGroup.Target);
-                // 数据本地化
-                // 数据结束
-                if (cloneList.Count == 0)
-                {
-                    return;
-                }
-                cloneList.RemoveAt(cloneList.Count - 1);
-                if (cloneList.Count == 0)
-                {
-                    return;
-                }
-                var node = cloneList[cloneList.Count - 1];
-                thisGroup.Target = Utils.NumToPosition(LoadMap.transform.position, new Vector2(node.X, node.Y), UnitWidth, MapWidth, MapHeight);
-            };
-            school.Group.ProportionOfComplete = 1;
-            school.Group.Complete = lam;
+            //Action<ClusterGroup> lam = (thisGroup) =>
+            //{
+            //    // Debug.Log("GroupComplete:" + thisGroup.Target);
+            //    // 数据本地化
+            //    // 数据结束
+            //    if (cloneList.Count == 0)
+            //    {
+            //        return;
+            //    }
+            //    cloneList.RemoveAt(cloneList.Count - 1);
+            //    if (cloneList.Count == 0)
+            //    {
+            //        return;
+            //    }
+            //    //var node = cloneList[cloneList.Count - 1];
+            //    //thisGroup.Target = Utils.NumToPosition(LoadMap.transform.position, new Vector2(node.X, node.Y), UnitWidth, MapWidth, MapHeight);
+            //};
+            //school.Group.ProportionOfComplete = 1;
+            //school.Group.Complete = lam;
         }
         // 设置搜寻单位
         scaner = school;
@@ -513,25 +515,25 @@ public class AstarTest : MonoBehaviour {
         //school.Group.Target = Utils.NumToPosition(LoadMap.transform.position, new Vector2(cloneList[cloneList.Count - 1].X, cloneList[cloneList.Count - 1].Y), UnitWidth, MapWidth, MapHeight); 
         
 
-        Action<ClusterGroup> lambdaComplete = (thisGroup) =>
-        {
-            // Debug.Log("GroupComplete:" + thisGroup.Target);
-            // 数据本地化
-            // 数据结束
-            if (cloneList.Count == 0)
-            {
-                return;
-            }
-            cloneList.RemoveAt(cloneList.Count - 1);
-            if (cloneList.Count == 0)
-            {
-                return;
-            }
-            var node = cloneList[cloneList.Count - 1];
-            thisGroup.Target = Utils.NumToPosition(LoadMap.transform.position, new Vector2(node.X, node.Y), UnitWidth, MapWidth, MapHeight);
-        };
-        school.Group.ProportionOfComplete = 1;
-        school.Group.Complete = lambdaComplete;
+        //Action<ClusterGroup> lambdaComplete = (thisGroup) =>
+        //{
+        //    // Debug.Log("GroupComplete:" + thisGroup.Target);
+        //    // 数据本地化
+        //    // 数据结束
+        //    if (cloneList.Count == 0)
+        //    {
+        //        return;
+        //    }
+        //    cloneList.RemoveAt(cloneList.Count - 1);
+        //    if (cloneList.Count == 0)
+        //    {
+        //        return;
+        //    }
+        //    var node = cloneList[cloneList.Count - 1];
+        //    thisGroup.Target = Utils.NumToPosition(LoadMap.transform.position, new Vector2(node.X, node.Y), UnitWidth, MapWidth, MapHeight);
+        //};
+        //school.Group.ProportionOfComplete = 1;
+        //school.Group.Complete = lambdaComplete;
     }
 
 

@@ -64,6 +64,8 @@ public static class LuaBinder
 		GameObjectExtensionWrap.Register(L);
 		SpinWithMouseWrap.Register(L);
 		DisplayOwnerWrap.Register(L);
+		PositionObjectWrap.Register(L);
+		VOBaseWrap.Register(L);
 		UIRectWrap.Register(L);
 		UIBasicSpriteWrap.Register(L);
 		UIProgressBarWrap.Register(L);

@@ -13,11 +13,9 @@ public class ClusterManagerWrap
 		L.RegFunction("Add", Add);
 		L.RegFunction("Remove", Remove);
 		L.RegFunction("Init", Init);
-		L.RegFunction("ClearAllGroup", ClearAllGroup);
 		L.RegFunction("Pause", Pause);
 		L.RegFunction("GoOn", GoOn);
 		L.RegFunction("ClearAll", ClearAll);
-		L.RegFunction("GetGroupById", GetGroupById);
 		L.RegFunction("GetPositionObjectListByGraphics", GetPositionObjectListByGraphics);
 		L.RegFunction("New", _CreateClusterManager);
 		L.RegFunction("__tostring", ToLua.op_ToString);
@@ -28,7 +26,7 @@ public class ClusterManagerWrap
 		L.RegVar("CollisionWeight", get_CollisionWeight, set_CollisionWeight);
 		L.RegVar("CollisionThrough", get_CollisionThrough, set_CollisionThrough);
 		L.RegVar("Friction", get_Friction, set_Friction);
-		L.RegVar("GroupList", get_GroupList, set_GroupList);
+		L.RegVar("UnitWidth", get_UnitWidth, set_UnitWidth);
 		L.RegVar("Single", get_Single, null);
 		L.EndClass();
 	}
@@ -163,21 +161,6 @@ public class ClusterManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int ClearAllGroup(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 0);
-			ClusterManager.ClearAllGroup();
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int Pause(IntPtr L)
 	{
 		try
@@ -218,24 +201,6 @@ public class ClusterManagerWrap
 			ClusterManager obj = (ClusterManager)ToLua.CheckObject(L, 1, typeof(ClusterManager));
 			obj.ClearAll();
 			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetGroupById(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 2);
-			ClusterManager obj = (ClusterManager)ToLua.CheckObject(L, 1, typeof(ClusterManager));
-			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
-			ClusterGroup o = obj.GetGroupById(arg0);
-			ToLua.PushObject(L, o);
-			return 1;
 		}
 		catch(Exception e)
 		{
@@ -395,16 +360,21 @@ public class ClusterManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_GroupList(IntPtr L)
+	static int get_UnitWidth(IntPtr L)
 	{
+		object o = null;
+
 		try
 		{
-			ToLua.PushObject(L, ClusterManager.GroupList);
+			o = ToLua.ToObject(L, 1);
+			ClusterManager obj = (ClusterManager)o;
+			int ret = obj.UnitWidth;
+			LuaDLL.lua_pushinteger(L, ret);
 			return 1;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index UnitWidth on a nil value" : e.Message);
 		}
 	}
 
@@ -556,17 +526,21 @@ public class ClusterManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_GroupList(IntPtr L)
+	static int set_UnitWidth(IntPtr L)
 	{
+		object o = null;
+
 		try
 		{
-			System.Collections.Generic.List<ClusterGroup> arg0 = (System.Collections.Generic.List<ClusterGroup>)ToLua.CheckObject(L, 2, typeof(System.Collections.Generic.List<ClusterGroup>));
-			ClusterManager.GroupList = arg0;
+			o = ToLua.ToObject(L, 1);
+			ClusterManager obj = (ClusterManager)o;
+			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+			obj.UnitWidth = arg0;
 			return 0;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index UnitWidth on a nil value" : e.Message);
 		}
 	}
 }

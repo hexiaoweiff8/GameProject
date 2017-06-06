@@ -14098,6 +14098,9 @@ function Utils.PositionToNum() end
 ----Vector3 Utils.NumToPosition(Vector3 planePosOffset,Vector2 num,Single unitWidth,Single mapWidth,Single mapHight)
 function Utils.NumToPosition() end 
 
+----List`1 Utils.NumToPostionByList(Vector3 planePosOffset,IList`1 nodeList,Single unitWidth,Single mapWidth,Single mapHight)
+function Utils.NumToPostionByList() end 
+
 ----Boolean Utils.IsCoverage(Single rectX1,Single rectY1,Single rectX2,Single rectY2,Single pointX,Single pointY)
 function Utils.IsCoverage() end 
 
@@ -14135,10 +14138,14 @@ function Utils.GetDistancePointToPoint() end
 function Utils.CreateOrOpenFile() end 
 
 ----String Utils.LoadFileInfo(String path)
+--String Utils.LoadFileInfo(FileInfo fi)
 function Utils.LoadFileInfo() end 
 
 ----Single Utils.GetTheta(Vector3 targetPos,Vector3 startPos,Single speed,Single gravity)
 function Utils.GetTheta() end 
+
+----Single Utils.GetRange(Single min,Single max,Single val)
+function Utils.GetRange() end 
 
 ----Single Utils.GetTwoPointDistance2D(Single x1,Single y1,Single x2,Single y2)
 function Utils.GetTwoPointDistance2D() end 
@@ -14595,9 +14602,6 @@ function Remove() end
 ----Void ClusterManager:Init(Single x,Single y,Int32 w,Int32 h,Int32 unitw,Int32[][] map)
 function Init() end 
 
-----Void ClusterManager.ClearAllGroup()
-function ClusterManager.ClearAllGroup() end 
-
 ----Void ClusterManager:Pause()
 function Pause() end 
 
@@ -14606,9 +14610,6 @@ function GoOn() end
 
 ----Void ClusterManager:ClearAll()
 function ClearAll() end 
-
-----ClusterGroup ClusterManager:GetGroupById(Int32 groupId)
-function GetGroupById() end 
 
 ----IList`1 ClusterManager:GetPositionObjectListByGraphics(ICollisionGraphics graphics)
 function GetPositionObjectListByGraphics() end 
@@ -14913,4 +14914,189 @@ function Destroy() end
 
 ----Void DisplayOwner:CleanData()
 function CleanData() end 
+
+PositionObject = {} 
+--*
+--[Comment]
+-- property: VOBase PositionObject.MemberData	get	set	
+MemberData = nil 
+--*
+--[Comment]
+-- property: ICollisionGraphics PositionObject.MyCollisionGraphics	get	set	
+MyCollisionGraphics = nil 
+--*
+--[Comment]
+-- property: Int64 PositionObject.Id	get	
+Id = nil 
+--*
+--[Comment]
+-- property: PhysicsInfo PositionObject.PhysicsInfo	get	
+PhysicsInfo = nil 
+--*
+--[Comment]
+-- property: Single PositionObject.Diameter	get	set	
+Diameter = nil 
+--*
+--[Comment]
+-- property: Vector3 PositionObject.Position	get	set	
+Position = nil 
+--*
+--[Comment]
+-- property: Single PositionObject.X	get	set	
+X = nil 
+--*
+--[Comment]
+-- property: Single PositionObject.Y	get	set	
+Y = nil 
+--*
+--[Comment]
+-- property: Vector3 PositionObject.Rotate	set	
+Rotate = nil 
+--*
+--[Comment]
+-- property: Vector3 PositionObject.Direction	get	set	
+Direction = nil 
+--*
+--[Comment]
+-- property: Vector3 PositionObject.DirectionRight	get	
+DirectionRight = nil 
+--*
+--[Comment]
+-- property: GameObject PositionObject.ItemObj	get	
+ItemObj = nil 
+--*
+--[Comment]
+-- property: Boolean PositionObject.CouldMove	get	
+CouldMove = nil 
+--*
+--[Comment]
+-- property: Boolean PositionObject.IsMoving	get	
+IsMoving = nil 
+--*
+--[Comment]
+-- property: Boolean PositionObject.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean PositionObject.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean PositionObject.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform PositionObject.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject PositionObject.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String PositionObject.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String PositionObject.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags PositionObject.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void PositionObject:Stop()
+function Stop() end 
+
+----Void PositionObject:ContinueMove()
+function ContinueMove() end 
+
+VOBase = {} 
+--*
+--[Comment]
+--consturctor for VOBase overrides:
+--*
+--VOBase.New()
+--*
+
+function VOBase.New() end
+--*
+--[Comment]
+-- property: Single VOBase.AntiArmor	get	set	
+AntiArmor = nil 
+--*
+--[Comment]
+-- property: String VOBase.ModelID	get	set	
+ModelID = nil 
+--*
+--[Comment]
+-- property: Single VOBase.MoveSpeed	get	set	
+MoveSpeed = nil 
+--*
+--[Comment]
+-- property: Single VOBase.AttackRange	get	set	
+AttackRange = nil 
+--*
+--[Comment]
+-- property: Single VOBase.Hit	get	set	
+Hit = nil 
+--*
+--[Comment]
+-- property: Single VOBase.Dodge	get	set	
+Dodge = nil 
+--*
+--[Comment]
+-- property: Single VOBase.Crit	get	set	
+Crit = nil 
+--*
+--[Comment]
+-- property: Single VOBase.AntiCrit	get	set	
+AntiCrit = nil 
+--*
+--[Comment]
+-- property: Single VOBase.Armor	get	set	
+Armor = nil 
+--*
+--[Comment]
+-- property: Int16 VOBase.ArmyType	get	set	
+ArmyType = nil 
+--*
+--[Comment]
+-- property: Int32 VOBase.ArmyID	get	set	
+ArmyID = nil 
+--*
+--[Comment]
+-- property: ObjectID VOBase.ObjID	get	set	
+ObjID = nil 
+--*
+--[Comment]
+-- property: String VOBase.Name	get	set	
+Name = nil 
+--*
+--[Comment]
+-- property: String VOBase.ZiYuanBaoMing	get	set	
+ZiYuanBaoMing = nil 
+--*
+--[Comment]
+-- property: Int32 VOBase.VOType	get	set	
+VOType = nil 
+--*
+--[Comment]
+-- property: Single VOBase.TotalHp	get	set	
+TotalHp = nil 
+--*
+--[Comment]
+-- property: Single VOBase.CurrentHP	get	set	
+CurrentHP = nil 
+--*
+--[Comment]
+-- property: Int32 VOBase.EntityID	get	set	
+EntityID = nil 
+--*
+--[Comment]
+-- property: Int32 VOBase.Camp	get	set	
+Camp = nil 
+--*
+----Void VOBase:SetSoldierData(armybase_cInfo data)
+function SetSoldierData() end 
 

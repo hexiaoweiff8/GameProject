@@ -149,13 +149,13 @@ public class DataManager : MonoEX.Singleton<DataManager>
             var mesh = myBase.GetComponentInChildren<SkinnedMeshRenderer>();
             mesh.material.mainTexture = PacketManage.Single.GetPacket("jidi").Load("zhujidi_b_texture") as Texture;
             // TODO 设置角度与位置
-            myBase.transform.position = new Vector3(-140, -38, -20);
+            myBase.transform.position = new Vector3(-140, -35, -20);
             myBase.transform.Rotate(new Vector3(0, 90, 0));
 
 
             var cluster = myBase.AddComponent<ClusterData>();
             cluster.MemberData = myjidi;
-            cluster.GroupId = 999;
+            //cluster.GroupId = 999;
             cluster.MemberData.MoveSpeed = -1;
             cluster.Diameter = 40;
             cluster.X = -140;
@@ -201,7 +201,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
             var mesh = enemyBase.GetComponentInChildren<SkinnedMeshRenderer>();
             mesh.material.mainTexture = PacketManage.Single.GetPacket("jidi").Load("zhujidi_r_texture") as Texture;
             // TODO 设置角度与位置
-            enemyBase.transform.position = new Vector3(1330, -38, -20);
+            enemyBase.transform.position = new Vector3(1330, -35, -20);
             enemyBase.transform.Rotate(new Vector3(0, -90, 0));
 
 
@@ -209,7 +209,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
             cluster.MemberData = enemyjidi;
             cluster.MemberData.MoveSpeed = -1;
             cluster.Diameter = 40;
-            cluster.GroupId = 999;
+            //cluster.GroupId = 999;
             cluster.X = 1330;
             cluster.Y = -20;
             cluster.Stop();

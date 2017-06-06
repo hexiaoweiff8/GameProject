@@ -52,10 +52,14 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
     public void PushPool(ObjectID objID, DisplayOwner obj)
     {
         var control = obj.GameObj.GetComponent<RanderControl>();
-        control.DestoryFSM();
-        control.bloodBarCom.DestorySelf();
-        control.gameObject.SetActive(false);
-        GameObject.Destroy(control);
+        // 回收未确认下兵的单位时randerControl为null
+        if (control != null)
+        {
+            control.DestoryFSM();
+            control.bloodBarCom.DestorySelf();
+            control.gameObject.SetActive(false);
+            GameObject.Destroy(control);
+        }
         var soldierType = obj.ClusterData.MemberData.Name;
         ClusterManager.Single.Remove(obj.ClusterData);
         if (!DisplayPool.ContainsKey(soldierType))

@@ -251,7 +251,9 @@ public static class CustomSettings
         _GT(typeof (GameObjectExtension)),
         _GT(typeof (LayerMask)),
         _GT(typeof (SpinWithMouse)),
-         _GT(typeof (DisplayOwner)),
+        _GT(typeof (DisplayOwner)),
+        _GT(typeof (PositionObject)),
+        _GT(typeof (VOBase)),
         
     };
 

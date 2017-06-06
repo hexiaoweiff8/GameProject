@@ -75,7 +75,7 @@ public class AStarPathFinding
         // 初始化开始节点
         openBHList.Push(new Node(startX, startY));
         // 如果搜索次数大于(w+h) * 4 则停止搜索
-        //var maxSearchCount = (rowCount + colCount) * 40;
+        var maxSearchCount = (rowCount + colCount) * 40;
 
         // 计算结束偏移
         endX = endX - diameterX;
@@ -117,18 +117,15 @@ public class AStarPathFinding
                     IsPassable(map, surroundPoint, currentPoint, diameterX, diameterY))
                 {
                     // 计算G值 上下左右为10, 四角为14
-                    g = currentPoint.G +
-                        (((currentPoint.X - surroundPoint.X)*(currentPoint.Y - surroundPoint.Y)) == 0 ? 10 : 14);
+                    g = currentPoint.G + (((currentPoint.X - surroundPoint.X)*(currentPoint.Y - surroundPoint.Y)) == 0 ? 10 : 14);
 
                     // 该点是否在开启列表中
                     var node = openBHList.OpenArray[surroundPoint.Y][surroundPoint.X];
                     if (node == null)
                     {
                         // 计算H值, 通过水平和垂直距离确定
-                        surroundPoint.H =
-                            (int)
-                                (Math.Sqrt(Math.Pow(endX - surroundPoint.X, 2) + Math.Pow(endY - surroundPoint.Y, 2)))*
-                            10; //Math.Abs(endX - surroundPoint.X)*10 + Math.Abs(endY - surroundPoint.Y)*10;//
+                        surroundPoint.H = (int)(Math.Sqrt(Math.Pow(endX - surroundPoint.X, 2) + Math.Pow(endY - surroundPoint.Y, 2))) * 10; 
+                                //Math.Abs(endX - surroundPoint.X)*10 + Math.Abs(endY - surroundPoint.Y)*10;//
                         surroundPoint.G = g;
                         surroundPoint.F = surroundPoint.H + surroundPoint.G;
                         surroundPoint.Parent = currentPoint;
@@ -154,11 +151,13 @@ public class AStarPathFinding
             }
 
             // 如果搜索次数大于(w+h) * 4 则停止搜索
-            //if (counter > maxSearchCount)
-            //{
-            //    //openList = null;
-            //    break;
-            //}
+            if (counter > maxSearchCount)
+            {
+                //openList = null;
+                Debug.Log("无可行路径");
+                // TODO 行进到最近能到的位置
+                break;
+            }
         } while (true);
         
         IList<Node> path = new List<Node>();
