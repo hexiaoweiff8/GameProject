@@ -191,6 +191,11 @@ public class Node : IComparable<Node>
     public int F = 0;
     public Node Parent = null;
 
+    /// <summary>
+    /// 周围节点
+    /// </summary>
+    public Node[] Surround = null;
+
     public override string ToString()
     {
         return string.Format("x:{0},y:{1},g:{2},h:{3},f:{4}", X, Y, G, H, F);

@@ -248,6 +248,30 @@ public class AstarTest : MonoBehaviour {
             }
         }
 
+        if (Input.GetMouseButtonDown(2))
+        {
+            // 获取地图上的点击点
+            var ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            Physics.Raycast(ray, out hit);
+            // 点击到底板
+            if (hit.collider != null && hit.collider.name.Equals(LoadMap.MapPlane.name))
+            {
+                var posOnMap = Utils.PositionToNum(LoadMap.MapPlane.transform.position, hit.point, UnitWidth, MapWidth, MapHeight);
+                // 加载文件内容
+                var mapInfoData = InitMapInfo();
+
+                
+                // 根据path放地标, 使用组队寻路跟随过去
+                StartCoroutine(AStarPathFinding.ISearchRoad(mapInfoData, lastTimeTargetX, lastTimeTargetY, posOnMap[0], posOnMap[1], DiameterX, DiameterY));
+
+                // 缓存上次目标点
+                lastTimeTargetX = posOnMap[0];
+                lastTimeTargetY = posOnMap[1];
+
+            }
+        }
+
         if (Input.GetMouseButton(0))
         {
             Utils.DrawGraphics(new RectGraphics(new Vector2(0,0), 10, 10, 90), Color.white);
@@ -289,6 +313,8 @@ public class AstarTest : MonoBehaviour {
             // 继续
             ClusterManager.Single.GoOn();
         }
+        // 绘制关闭列表
+        DrawCloseMap(AStarPathFinding.closePathMap);
     }
 
     /// <summary>
@@ -336,6 +362,27 @@ public class AstarTest : MonoBehaviour {
             yield return new WaitForEndOfFrame();
         }
         yield return null;
+    }
+
+
+    private void DrawCloseMap(int[][] closeTable)
+    {
+        if (closeTable != null)
+        {
+            for (int i = 0; i < closeTable.Length; i++)
+            {
+                var row = closeTable[i];
+                for (var j = 0; j < row.Length; j++)
+                {
+                    var cell = row[j];
+                    if (cell == Utils.Closed)
+                    {
+                        // 绘制关闭路径
+                        Utils.DrawRect(Utils.NumToPosition(LoadMap.transform.position, new Vector2(j, i), UnitWidth, MapWidth, MapHeight), UnitWidth, UnitWidth, 0, Color.green);
+                    }
+                }
+            }
+        }
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,9 @@ using UnityEngine;
 /// </summary>
 public class AStarPathFinding
 {
+
+
+    public static int[][] closePathMap = null;
     /// <summary>
     /// 节点对比方法
     /// </summary>
@@ -68,7 +72,6 @@ public class AStarPathFinding
         }
 
         // 复制数据, 用于标记关闭列表
-        int[][] closePathMap;
         Utils.CopyArray(map,out closePathMap, rowCount, colCount);
         // 二叉堆open列表
         var openBHList = new BinaryHeapList<Node>(compareTo, rowCount, colCount);
@@ -85,7 +88,7 @@ public class AStarPathFinding
 
         // 寻路G值
         int g;
-        Node[] surroundPointArray;
+        //Node[] surroundPointArray;
         Node currentPoint;
         
         do
@@ -106,9 +109,13 @@ public class AStarPathFinding
                 closePathMap[currentPoint.Y][currentPoint.X] = Utils.Closed;
             }
             // 获取当前节点周围的节点
-            surroundPointArray = SurroundPoint(currentPoint);
+            // TODO 预加载 刷新地图(多层地图)
+            if (currentPoint.Surround == null)
+            {
+                currentPoint.Surround = SurroundPoint(currentPoint);
+            }
 
-            foreach (Node surroundPoint in surroundPointArray)
+            foreach (Node surroundPoint in currentPoint.Surround)
             {
                 // 斜向是否可移动
                 // 判断周围节点合理性
@@ -124,8 +131,13 @@ public class AStarPathFinding
                     if (node == null)
                     {
                         // 计算H值, 通过水平和垂直距离确定
-                        surroundPoint.H = (int)(Math.Sqrt(Math.Pow(endX - surroundPoint.X, 2) + Math.Pow(endY - surroundPoint.Y, 2))) * 10; 
+                        //surroundPoint.H = (int)(Math.Sqrt(Math.Pow(endX - surroundPoint.X, 2) + Math.Pow(endY - surroundPoint.Y, 2))) * 10;
                                 //Math.Abs(endX - surroundPoint.X)*10 + Math.Abs(endY - surroundPoint.Y)*10;//
+                        //if (surroundPoint.Surround == null)
+                        //{
+                        //    surroundPoint.Surround = SurroundPoint(surroundPoint);
+                        //}
+                        surroundPoint.H = (int)(Math.Sqrt(Math.Pow(endX - surroundPoint.X, 2) + Math.Pow(endY - surroundPoint.Y, 2)));// * 10 + (NearObstacle(surroundPoint.Surround, map, colCount, rowCount) ? 10 : 0);
                         surroundPoint.G = g;
                         surroundPoint.F = surroundPoint.H + surroundPoint.G;
                         surroundPoint.Parent = currentPoint;
@@ -219,6 +231,155 @@ public class AStarPathFinding
         return path;
     }
 
+
+    public static IEnumerator ISearchRoad(int[][] map, int startX, int startY, int endX, int endY, int diameterX, int diameterY)
+    {
+
+        // 结束节点
+        Node endNode = null;
+        // 行列数量
+        var rowCount = map.Length;
+        var colCount = map[0].Length;
+
+        // 柔化边缘寻路
+        if (endX + diameterX >= colCount)
+        {
+            endX = colCount - diameterX - 1;
+        }
+        if (endX - diameterX <= 0)
+        {
+            endX = diameterX + 1;
+        }
+        if (endY + diameterY >= rowCount)
+        {
+            endY = rowCount - diameterY - 1;
+        }
+        if (endY - diameterY <= 0)
+        {
+            endY = diameterY + 1;
+        }
+
+        // 复制数据, 用于标记关闭列表
+        Utils.CopyArray(map, out closePathMap, rowCount, colCount);
+        // 二叉堆open列表
+        var openBHList = new BinaryHeapList<Node>(compareTo, rowCount, colCount);
+        // 初始化开始节点
+        openBHList.Push(new Node(startX, startY));
+        // 如果搜索次数大于(w+h) * 4 则停止搜索
+        var maxSearchCount = (rowCount + colCount) * 40;
+
+        // 计算结束偏移
+        endX = endX - diameterX;
+        endY = endY - diameterY;
+
+        var counter = 0;
+
+        // 寻路G值
+        int g;
+        //Node[] surroundPointArray;
+        Node currentPoint;
+
+        do
+        {
+            counter++;
+            // 获取最小节点
+            currentPoint = openBHList.Pop();
+            // 找到路径
+            if (currentPoint.X == endX && currentPoint.Y == endY)
+            {
+                endNode = currentPoint;
+                break;
+            }
+
+            // 关闭节点
+            if (closePathMap[currentPoint.Y][currentPoint.X] == Utils.Accessibility)
+            {
+                closePathMap[currentPoint.Y][currentPoint.X] = Utils.Closed;
+            }
+            // 获取当前节点周围的节点
+            // TODO 预加载 刷新地图(多层地图)
+            if (currentPoint.Surround == null)
+            {
+                currentPoint.Surround = SurroundPoint(currentPoint);
+            }
+
+            foreach (Node surroundPoint in currentPoint.Surround)
+            {
+                // 斜向是否可移动
+                // 判断周围节点合理性
+                if (ValidPos(surroundPoint.X, surroundPoint.Y, colCount, rowCount) &&
+                    closePathMap[surroundPoint.Y][surroundPoint.X] != Utils.Closed &&
+                    IsPassable(map, surroundPoint, currentPoint, diameterX, diameterY))
+                {
+                    // 计算G值 上下左右为10, 四角为14
+                    g = currentPoint.G + (((currentPoint.X - surroundPoint.X) * (currentPoint.Y - surroundPoint.Y)) == 0 ? 10 : 14);
+
+                    // 该点是否在开启列表中
+                    var node = openBHList.OpenArray[surroundPoint.Y][surroundPoint.X];
+                    if (node == null)
+                    {
+                        // 计算H值, 通过水平和垂直距离确定
+                        //surroundPoint.H = (int)(Math.Sqrt(Math.Pow(endX - surroundPoint.X, 2) + Math.Pow(endY - surroundPoint.Y, 2))) * 10;
+                        //Math.Abs(endX - surroundPoint.X)*10 + Math.Abs(endY - surroundPoint.Y)*10;//
+                        //if (surroundPoint.Surround == null)
+                        //{
+                        //    surroundPoint.Surround = SurroundPoint(surroundPoint);
+                        //}
+                        surroundPoint.H = (int)(Math.Sqrt(Math.Pow(endX - surroundPoint.X, 2) + Math.Pow(endY - surroundPoint.Y, 2)));// * 10 + (NearObstacle(surroundPoint.Surround, map, colCount, rowCount) ? 10 : 0);
+                        surroundPoint.G = g;
+                        surroundPoint.F = surroundPoint.H + surroundPoint.G;
+                        surroundPoint.Parent = currentPoint;
+                        openBHList.Push(surroundPoint);
+                    }
+                    else // 存在于开启列表, 比较当前的G值与之前的G值大小
+                    {
+                        if (g < node.G)
+                        {
+                            node.Parent = currentPoint;
+                            node.G = g;
+                            node.F = g + node.H;
+                        }
+                    }
+                }
+            }
+
+
+            // 如果开放列表为空, 则没有通路
+            if (openBHList.Count == 0)
+            {
+                break;
+            }
+
+            // 如果搜索次数大于(w+h) * 4 则停止搜索
+            if (counter > maxSearchCount)
+            {
+                //openList = null;
+                Debug.Log("无可行路径");
+                // TODO 行进到最近能到的位置
+                break;
+            }
+            yield return new WaitForEndOfFrame();
+        } while (true);
+
+        IList<Node> path = new List<Node>();
+        // 如果有可行路径
+        if (endNode != null)
+        {
+            // 将路径回退并放入列表
+            var currentNode = endNode;
+            do
+            {
+                path.Add(currentNode);
+                currentNode = currentNode.Parent;
+            } while (currentNode.X != startX || currentNode.Y != startY);
+        }
+        else
+        {
+            Debug.Log("无路径, 寻路次数:" + counter);
+        }
+        yield break;
+    }
+
     /// <summary>
     /// 当前位置是否可以通过
     /// </summary>
@@ -265,6 +426,31 @@ public class AStarPathFinding
         //Debug.Log(string.Format("{0:#.#######}",Time.realtimeSinceStartup - now));
 
         return true;
+    }
+
+    /// <summary>
+    /// 检查节点中是否有障碍物
+    /// </summary>
+    /// <param name="nodeArray">被检查列表</param>
+    /// <param name="map">地图信息</param>
+    /// <param name="colCount"></param>
+    /// <param name="rowCount"></param>
+    /// <returns></returns>
+    public static bool NearObstacle(Node[] nodeArray, int[][] map, int colCount, int rowCount)
+    {
+        var result = false;
+        if (nodeArray != null && nodeArray.Length > 0 && map != null)
+        {
+            foreach (var node in nodeArray)
+            {
+                if (ValidPos(node.X, node.Y, colCount, rowCount) && map[node.Y][node.X] == Utils.Obstacle)
+                {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
     }
 
     /// <summary>
@@ -472,12 +658,12 @@ public class BinaryHeapList<T> where T : Node
     /// <param name="start">开始调整位置</param>
     private void FilterUp(int start)
     {
-        var current = start;
+        //var current = start;
         // 获取父节点位置
-        var parent = (current - 1) >> 1;
+        var parent = (start - 1) >> 1;
         // 当前节点值
-        var item = itemArray[current];
-        while (current > 0)
+        var item = itemArray[start];
+        while (start > 0)
         {
             // 对比当前节点与父节点大小
             if (compTo(itemArray[parent], item) < 0)
@@ -488,13 +674,13 @@ public class BinaryHeapList<T> where T : Node
             else
             {
                 // 节点上移
-                itemArray[current] = itemArray[parent];
-                current = parent;
+                itemArray[start] = itemArray[parent];
+                start = parent;
                 parent = (parent - 1) >> 1;
             }
         }
 
-        itemArray[current] = item;
+        itemArray[start] = item;
     }
 
     /// <summary>
@@ -505,11 +691,11 @@ public class BinaryHeapList<T> where T : Node
     private void FileterDown(int start, int end)
     {
         // 当前节点
-        var current = start;
+        //var current = start;
         // 左子节点
-        var left = (current << 1) + 1;
+        var left = (start << 1) + 1;
         // 当前节点值
-        var item = itemArray[current];
+        var item = itemArray[start];
 
         while (left <= end)
         {
@@ -523,14 +709,11 @@ public class BinaryHeapList<T> where T : Node
                 // 如果当前节点值(判断)大于子节点则退出
                 break;
             }
-            else
-            {
-                // 节点下移
-                itemArray[current] = itemArray[left];
-                current = left;
-                left = (left << 1) + 1;
-            }
+            // 节点下移
+            itemArray[start] = itemArray[left];
+            start = left;
+            left = (left << 1) + 1;
         }
-        itemArray[current] = item;
+        itemArray[start] = item;
     }
 }
