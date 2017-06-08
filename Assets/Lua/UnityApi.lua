@@ -14144,6 +14144,9 @@ function Utils.LoadFileInfo() end
 ----Single Utils.GetTheta(Vector3 targetPos,Vector3 startPos,Single speed,Single gravity)
 function Utils.GetTheta() end 
 
+----Vector3 Utils.WithOutY(Vector3 vec3)
+function Utils.WithOutY() end 
+
 ----Single Utils.GetRange(Single min,Single max,Single val)
 function Utils.GetRange() end 
 
@@ -14252,6 +14255,12 @@ function AStarPathFinding.New() end
 --*
 ----IList`1 AStarPathFinding.SearchRoad(Int32[][] map,Int32 startX,Int32 startY,Int32 endX,Int32 endY,Int32 diameterX,Int32 diameterY,Boolean isJumpPoint,Action completeCallback)
 function AStarPathFinding.SearchRoad() end 
+
+----IEnumerator AStarPathFinding.ISearchRoad(Int32[][] map,Int32 startX,Int32 startY,Int32 endX,Int32 endY,Int32 diameterX,Int32 diameterY)
+function AStarPathFinding.ISearchRoad() end 
+
+----Int32 AStarPathFinding.NearObstacleCount(Node node,Int32[][] map,Int32 colCount,Int32 rowCount)
+function AStarPathFinding.NearObstacleCount() end 
 
 PacketManage = {} 
 --*
@@ -15099,4 +15108,147 @@ Camp = nil
 --*
 ----Void VOBase:SetSoldierData(armybase_cInfo data)
 function SetSoldierData() end 
+
+ClusterData = {} 
+--*
+--[Comment]
+--consturctor for ClusterData overrides:
+--*
+--ClusterData.New()
+--*
+
+function ClusterData.New() end
+--*
+--[Comment]
+-- property: Single ClusterData.RotateSpeed	get	set	
+RotateSpeed = nil 
+--*
+--[Comment]
+-- property: Single ClusterData.RotateWeight	get	set	
+RotateWeight = nil 
+--*
+--[Comment]
+-- property: Vector3 ClusterData.TargetPos	get	set	
+TargetPos = nil 
+--*
+--[Comment]
+-- property: Action`1 ClusterData.Moveing	get	set	
+Moveing = nil 
+--*
+--[Comment]
+-- property: Action`1 ClusterData.Wait	get	set	
+Wait = nil 
+--*
+--[Comment]
+-- property: Action`1 ClusterData.Complete	get	set	
+Complete = nil 
+--*
+--[Comment]
+-- property: VOBase ClusterData.MemberData	get	set	
+MemberData = nil 
+--*
+--[Comment]
+-- property: ICollisionGraphics ClusterData.MyCollisionGraphics	get	set	
+MyCollisionGraphics = nil 
+--*
+--[Comment]
+-- property: Int64 ClusterData.Id	get	
+Id = nil 
+--*
+--[Comment]
+-- property: PhysicsInfo ClusterData.PhysicsInfo	get	
+PhysicsInfo = nil 
+--*
+--[Comment]
+-- property: Single ClusterData.Diameter	get	set	
+Diameter = nil 
+--*
+--[Comment]
+-- property: Vector3 ClusterData.Position	get	set	
+Position = nil 
+--*
+--[Comment]
+-- property: Single ClusterData.X	get	set	
+X = nil 
+--*
+--[Comment]
+-- property: Single ClusterData.Y	get	set	
+Y = nil 
+--*
+--[Comment]
+-- property: Vector3 ClusterData.Rotate	set	
+Rotate = nil 
+--*
+--[Comment]
+-- property: Vector3 ClusterData.Direction	get	set	
+Direction = nil 
+--*
+--[Comment]
+-- property: Vector3 ClusterData.DirectionRight	get	
+DirectionRight = nil 
+--*
+--[Comment]
+-- property: GameObject ClusterData.ItemObj	get	
+ItemObj = nil 
+--*
+--[Comment]
+-- property: Boolean ClusterData.CouldMove	get	
+CouldMove = nil 
+--*
+--[Comment]
+-- property: Boolean ClusterData.IsMoving	get	
+IsMoving = nil 
+--*
+--[Comment]
+-- property: Boolean ClusterData.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean ClusterData.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean ClusterData.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform ClusterData.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject ClusterData.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String ClusterData.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String ClusterData.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags ClusterData.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void ClusterData:SetDataValue(VOBase data)
+function SetDataValue() end 
+
+----Void ClusterData:PushTarget(Vector3 target)
+function PushTarget() end 
+
+----Void ClusterData:PushTargetList(List`1 targetList)
+function PushTargetList() end 
+
+----Boolean ClusterData:PopTarget()
+function PopTarget() end 
+
+----Void ClusterData:ClearTarget()
+function ClearTarget() end 
+
+----Void ClusterData:Update()
+function Update() end 
+
+----Void ClusterData:Destory()
+function Destory() end 
 

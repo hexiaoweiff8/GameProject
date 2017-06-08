@@ -608,6 +608,16 @@ public class Utils
     }
 
     /// <summary>
+    /// 排除Y轴
+    /// </summary>
+    /// <param name="vec3">被排除向量</param>
+    /// <returns>被排除后的数据</returns>
+    public static Vector3 WithOutY(Vector3 vec3)
+    {
+        return new Vector3(vec3.x, 0, vec3.z);
+    }
+
+    /// <summary>
     /// 获取范围值
     /// </summary>
     /// <param name="min">最小值</param>

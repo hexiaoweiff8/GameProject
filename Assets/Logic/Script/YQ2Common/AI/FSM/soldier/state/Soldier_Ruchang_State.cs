@@ -25,15 +25,27 @@ public class Soldier_Ruchang_State : SoldierFSMState
         AstarFight at = GameObject.Find("/AstarFight").GetComponent<AstarFight>();
         at.toXunLu(fsm.Display.ClusterData, soldier.isEnemy, soldier.groupIndex, fsm.Display);
 
-        float DeployTime;
+        float DeployTime = 0f;
         var ObjId = fsm.Display.MFAModelRender.ObjId;
-        if (ObjId.ObjType == ObjectID.ObjectType.EnemySoldier || ObjId.ObjType == ObjectID.ObjectType.EnemyTank)
+        //if (ObjId.ObjType == ObjectID.ObjectType.EnemySoldier || ObjId.ObjType == ObjectID.ObjectType.EnemyTank)
+        //{
+        //    DeployTime = DataManager.Single.GetEnemySoldier(fsm.Display.MFAModelRender.ObjId.ID).DeployTime;
+        //}
+        //else
+        //{
+        //    DeployTime = DataManager.Single.GetMySoldier(fsm.Display.MFAModelRender.ObjId.ID).DeployTime;
+        //}
+        switch (ObjId.ObjType)
         {
-            DeployTime = DataManager.Single.GetEnemySoldier(fsm.Display.MFAModelRender.ObjId.ID).DeployTime;
-        }
-        else
-        {
-            DeployTime = DataManager.Single.GetMySoldier(fsm.Display.MFAModelRender.ObjId.ID).DeployTime;
+            case ObjectID.ObjectType.EnemySoldier:
+            case ObjectID.ObjectType.EnemyTank:
+                DeployTime = DataManager.Single.GetEnemySoldier(fsm.Display.MFAModelRender.ObjId.ID).DeployTime;
+                break;
+
+            case ObjectID.ObjectType.MySoldier:
+            case ObjectID.ObjectType.MyTank:
+                DeployTime = DataManager.Single.GetMySoldier(fsm.Display.MFAModelRender.ObjId.ID).DeployTime;
+                break;
         }
 
 

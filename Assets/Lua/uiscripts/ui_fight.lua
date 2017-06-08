@@ -6,7 +6,7 @@ function Onfs()
     ui_manager:ShowWB(WNDTYPE.ui_fight)
 end
 
-local isPress = false
+--local isPress = false
 local selectedCardItem = nil
 function ui_fight:OnShowDone()
     math.newrandomseed()
@@ -308,6 +308,7 @@ function ui_fight:OnShowDone()
                 
                 
                 if isFeiEnough and isenterRect then --拖到屏幕中
+                    print("333")
                     self:doEvent(tf, var, 3)
                 else
                     if isFeiEnough == false and isenterRect then
@@ -315,8 +316,10 @@ function ui_fight:OnShowDone()
                     end
                     local cardBounds = Bounds(tf.localPosition, Vector3(self.nowMyCardSizetb.x, self.nowMyCardSizetb.y, 0) * tf.localScale.x)
                     if self.feiBounds:Intersects(cardBounds) then --回收卡
+                        print("444")
                         self:doEvent(tf, var, 1)
                     else --拖回下方
+                        print("555")
                         self:doEvent(tf, var, 0)
                     end
                 end
@@ -513,6 +516,7 @@ function ui_fight:getModel(id, index)
             sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_TexturePackName, ArmyID),
             sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_IsHero, ArmyID) == 1, tonumber(ArmyID .. "001"), id)
         selectedCardItem = FightUnitFactory.CreateUnit(index == 5 and 4 or 3, paramTab)
+        print(selectedCardItem.ClusterData.MemberData.ObjID)
         tempMod = selectedCardItem.GameObj.transform
         tempMod.gameObject:SetActive(true)
         tempMod.parent = go
@@ -643,6 +647,7 @@ function ui_fight:doEvent(tf, var, isXiaBing)
             self.feiBar3Spr.gameObject:SetActive(false)
             self.feiBar4Spr.gameObject:SetActive(false)
             self.nowFeiLabel.color = whiteColor
+            print("aaa")
             self:backCallback(tf, true)
             if (self.nowFei < self.allFei) == false then --如果满费则什么也不做
                 self:cardFront(tf, var)
@@ -683,10 +688,11 @@ function ui_fight:doEvent(tf, var, isXiaBing)
         end
     else -- 返回事件
         lgyPrint("返回事件")
+        print("bbb")
         self:backCallback(tf, true)
         self:cardFront(tf, var)
     end
-    isPress = false
+    --isPress = false
     return true
 end
 -- 卡牌前置
@@ -716,17 +722,9 @@ function ui_fight:backCallback(tf, b)
     table.remove(self.maxSpan, index)
     if b then
         tf.localScale = Vector3.one
-        Object.Destroy(table.remove(self.onPressArmytb, index).gameObject)
-        -- 删除创建对象
-        if isPress then
-            isPress = false
-            if selectedCardItem ~= nil then
-                FightUnitFactory.DeleteUnit(selectedCardItem.ClusterData.MemberData)
-                selectedCardItem = nil
-            end
-        else
-            isPress = true
-        end
+        local tmpObj = table.remove(self.onPressArmytb, index).gameObject
+        -- 删除父级
+        Object.Destroy(tmpObj)
     else
         self.groupIndex = self.groupIndex + 1
         --从父物体中移除（加入父物体是为了移动的时候只移动父物体）
@@ -738,15 +736,6 @@ function ui_fight:backCallback(tf, b)
         self.ctPosition = self.AstarFight:getNum(self.onPressArmytb[index].position)
         --删除父物体
         Object.Destroy(table.remove(self.onPressArmytb, index).gameObject)
-        if isPress then
-            isPress = false
-            if selectedCardItem ~= nil then
-                FightUnitFactory.DeleteUnit(selectedCardItem.ClusterData.MemberData)
-                selectedCardItem = nil
-            end
-        else
-            isPress = true
-        end
     end
 end
 function ui_fight:Update()

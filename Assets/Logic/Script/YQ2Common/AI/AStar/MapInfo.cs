@@ -186,9 +186,9 @@ public class Node : IComparable<Node>
     public int X = 0;
     public int Y = 0;
 
-    public int G = 0;
-    public int H = 0;
-    public int F = 0;
+    public float G = 0;
+    public float H = 0;
+    public float F = 0;
     public Node Parent = null;
 
     /// <summary>

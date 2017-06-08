@@ -131,12 +131,15 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
     {
         switch (objId.ObjType)
         {
+            // TODO 基地目前从士兵列表中获取
+            case ObjectID.ObjectType.MyJiDi:
             case ObjectID.ObjectType.MySoldier:
                 if (_allMyDisPlayDict.ContainsKey(objId.ID))
                 {
                     return _allMyDisPlayDict[objId.ID];
                 }
                 break;
+            case ObjectID.ObjectType.EnemyJiDi:
             case ObjectID.ObjectType.EnemySoldier:
                 if (_allEnemyDisPlayDict.ContainsKey(objId.ID))
                 {

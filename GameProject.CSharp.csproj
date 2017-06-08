@@ -246,7 +246,6 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\IMove.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\ObjectBase.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\ObjectID.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\vo\BulletVO.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\vo\FightVO.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\vo\HuojianbingVO.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\vo\JidiVO.cs" />
@@ -716,6 +715,7 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\BaseWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\BoxScrollObjectWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\ByteBufferWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\ClusterDataWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\ClusterManagerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\CreateActorParamWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\DG_Tweening_DOTweenWrap.cs" />

@@ -163,9 +163,19 @@ public class DataManager : MonoEX.Singleton<DataManager>
             cluster.Stop();
             ClusterManager.Single.Add(cluster);
 
+            // 创建RanderControl
+            //var randerControl = myBase.AddComponent<RanderControl>();
+
+
             // 创建外层持有类
             var displayOwner = new DisplayOwner(myBase, cluster, null, null);
             DisplayerManager.Single.AddElement(myjidi.ObjID, displayOwner);
+
+            //// 创建MFAModelRander
+            //var mfaModelRander = myBase.GetComponent<MFAModelRender>();
+            //mfaModelRander.ObjId = cluster.MemberData.ObjID;
+
+            //displayOwner.MFAModelRender = mfaModelRander;
         }
 
         return result;
@@ -215,9 +225,18 @@ public class DataManager : MonoEX.Singleton<DataManager>
             cluster.Stop();
             ClusterManager.Single.Add(cluster);
 
+            // 创建RanderControl
+            //var randerControl = enemyBase.AddComponent<RanderControl>();
+
             // 创建外层持有类
             var displayOwner = new DisplayOwner(enemyBase, cluster, null, null);
             DisplayerManager.Single.AddElement(enemyjidi.ObjID, displayOwner);
+
+            //// 创建MFAModelRander
+            //var mfaModelRander = enemyBase.GetComponent<MFAModelRender>();
+            //mfaModelRander.ObjId = cluster.MemberData.ObjID;
+
+            //displayOwner.MFAModelRender = mfaModelRander;
         }
         return result;
     }

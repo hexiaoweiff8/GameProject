@@ -81,14 +81,13 @@ public class AStarPathFinding
         var maxSearchCount = (rowCount + colCount) * 40;
 
         // 计算结束偏移
-        endX = endX - diameterX;
-        endY = endY - diameterY;
+        //endX = endX - diameterX;
+        //endY = endY - diameterY;
 
         var counter = 0;
 
         // 寻路G值
-        int g;
-        //Node[] surroundPointArray;
+        float g;
         Node currentPoint;
         
         do
@@ -124,20 +123,15 @@ public class AStarPathFinding
                     IsPassable(map, surroundPoint, currentPoint, diameterX, diameterY))
                 {
                     // 计算G值 上下左右为10, 四角为14
-                    g = currentPoint.G + (((currentPoint.X - surroundPoint.X)*(currentPoint.Y - surroundPoint.Y)) == 0 ? 10 : 14);
+                    // 计算G值 上下左右为10, 四角为14
+                    g = currentPoint.G + (((currentPoint.X - endX) * (currentPoint.Y - endY)) == 0 ? 1 : 1.414f);
 
+                    var nearObstacle = 0;
                     // 该点是否在开启列表中
                     var node = openBHList.OpenArray[surroundPoint.Y][surroundPoint.X];
                     if (node == null)
                     {
-                        // 计算H值, 通过水平和垂直距离确定
-                        //surroundPoint.H = (int)(Math.Sqrt(Math.Pow(endX - surroundPoint.X, 2) + Math.Pow(endY - surroundPoint.Y, 2))) * 10;
-                                //Math.Abs(endX - surroundPoint.X)*10 + Math.Abs(endY - surroundPoint.Y)*10;//
-                        //if (surroundPoint.Surround == null)
-                        //{
-                        //    surroundPoint.Surround = SurroundPoint(surroundPoint);
-                        //}
-                        surroundPoint.H = (int)(Math.Sqrt(Math.Pow(endX - surroundPoint.X, 2) + Math.Pow(endY - surroundPoint.Y, 2)));// * 10 + (NearObstacle(surroundPoint.Surround, map, colCount, rowCount) ? 10 : 0);
+                        surroundPoint.H = (float)Math.Sqrt(Math.Pow(endX - surroundPoint.X, 2) + Math.Pow(endY - surroundPoint.Y, 2)) * 10 + (NearObstacleCount(surroundPoint, map, colCount, rowCount) * 14);// Math.Abs(endX - surroundPoint.X) + Math.Abs(endY - surroundPoint.Y);
                         surroundPoint.G = g;
                         surroundPoint.F = surroundPoint.H + surroundPoint.G;
                         surroundPoint.Parent = currentPoint;
@@ -231,7 +225,17 @@ public class AStarPathFinding
         return path;
     }
 
-
+    /// <summary>
+    /// 携程寻路, 可以查看寻路过程
+    /// </summary>
+    /// <param name="map"></param>
+    /// <param name="startX"></param>
+    /// <param name="startY"></param>
+    /// <param name="endX"></param>
+    /// <param name="endY"></param>
+    /// <param name="diameterX"></param>
+    /// <param name="diameterY"></param>
+    /// <returns></returns>
     public static IEnumerator ISearchRoad(int[][] map, int startX, int startY, int endX, int endY, int diameterX, int diameterY)
     {
 
@@ -240,19 +244,21 @@ public class AStarPathFinding
         // 行列数量
         var rowCount = map.Length;
         var colCount = map[0].Length;
+        var halfDiameterX = diameterX/2;
+        var halfDiameterY = diameterY/2;
 
         // 柔化边缘寻路
-        if (endX + diameterX >= colCount)
+        if (endX + halfDiameterX >= colCount)
         {
-            endX = colCount - diameterX - 1;
+            endX = colCount - halfDiameterX - 1;
         }
-        if (endX - diameterX <= 0)
+        if (endX - halfDiameterX <= 0)
         {
-            endX = diameterX + 1;
+            endX = halfDiameterX + 1;
         }
-        if (endY + diameterY >= rowCount)
+        if (endY + halfDiameterY >= rowCount)
         {
-            endY = rowCount - diameterY - 1;
+            endY = rowCount - halfDiameterY - 1;
         }
         if (endY - diameterY <= 0)
         {
@@ -269,14 +275,14 @@ public class AStarPathFinding
         var maxSearchCount = (rowCount + colCount) * 40;
 
         // 计算结束偏移
-        endX = endX - diameterX;
-        endY = endY - diameterY;
+        endX = endX - diameterX / 2;
+        endY = endY - diameterY / 2;
+
 
         var counter = 0;
 
         // 寻路G值
-        int g;
-        //Node[] surroundPointArray;
+        float g;
         Node currentPoint;
 
         do
@@ -284,6 +290,7 @@ public class AStarPathFinding
             counter++;
             // 获取最小节点
             currentPoint = openBHList.Pop();
+            Debug.Log(currentPoint.F + ":" + currentPoint.G);
             // 找到路径
             if (currentPoint.X == endX && currentPoint.Y == endY)
             {
@@ -312,20 +319,13 @@ public class AStarPathFinding
                     IsPassable(map, surroundPoint, currentPoint, diameterX, diameterY))
                 {
                     // 计算G值 上下左右为10, 四角为14
-                    g = currentPoint.G + (((currentPoint.X - surroundPoint.X) * (currentPoint.Y - surroundPoint.Y)) == 0 ? 10 : 14);
+                    g = currentPoint.G + (((currentPoint.X - endX) * (currentPoint.Y - endY)) == 0 ? 1 : 1.414f);
 
                     // 该点是否在开启列表中
                     var node = openBHList.OpenArray[surroundPoint.Y][surroundPoint.X];
                     if (node == null)
                     {
-                        // 计算H值, 通过水平和垂直距离确定
-                        //surroundPoint.H = (int)(Math.Sqrt(Math.Pow(endX - surroundPoint.X, 2) + Math.Pow(endY - surroundPoint.Y, 2))) * 10;
-                        //Math.Abs(endX - surroundPoint.X)*10 + Math.Abs(endY - surroundPoint.Y)*10;//
-                        //if (surroundPoint.Surround == null)
-                        //{
-                        //    surroundPoint.Surround = SurroundPoint(surroundPoint);
-                        //}
-                        surroundPoint.H = (int)(Math.Sqrt(Math.Pow(endX - surroundPoint.X, 2) + Math.Pow(endY - surroundPoint.Y, 2)));// * 10 + (NearObstacle(surroundPoint.Surround, map, colCount, rowCount) ? 10 : 0);
+                        surroundPoint.H = (float)Math.Sqrt(Math.Pow(endX - surroundPoint.X, 2) + Math.Pow(endY - surroundPoint.Y, 2)) * 10;// Math.Abs(endX - surroundPoint.X) + Math.Abs(endY - surroundPoint.Y);
                         surroundPoint.G = g;
                         surroundPoint.F = surroundPoint.H + surroundPoint.G;
                         surroundPoint.Parent = currentPoint;
@@ -431,23 +431,31 @@ public class AStarPathFinding
     /// <summary>
     /// 检查节点中是否有障碍物
     /// </summary>
-    /// <param name="nodeArray">被检查列表</param>
+    /// <param name="node">被检查节点</param>
     /// <param name="map">地图信息</param>
     /// <param name="colCount"></param>
     /// <param name="rowCount"></param>
     /// <returns></returns>
-    public static bool NearObstacle(Node[] nodeArray, int[][] map, int colCount, int rowCount)
+    public static int NearObstacleCount(Node node, int[][] map, int colCount, int rowCount)
     {
-        var result = false;
-        if (nodeArray != null && nodeArray.Length > 0 && map != null)
+        var result = 0;
+        if (node != null && map != null && ValidPos(node.X, node.Y, colCount, rowCount))
         {
-            foreach (var node in nodeArray)
+            if (ValidPos(node.X + 1, node.Y, colCount, rowCount) && map[node.Y][node.X + 1] == Utils.Obstacle)
             {
-                if (ValidPos(node.X, node.Y, colCount, rowCount) && map[node.Y][node.X] == Utils.Obstacle)
-                {
-                    result = true;
-                    break;
-                }
+                result++;
+            }
+            if (ValidPos(node.X, node.Y + 1, colCount, rowCount) && map[node.Y + 1][node.X] == Utils.Obstacle)
+            {
+                result++;
+            }
+            if (ValidPos(node.X - 1, node.Y, colCount, rowCount) && map[node.Y][node.X - 1] == Utils.Obstacle)
+            {
+                result++;
+            }
+            if (ValidPos(node.X, node.Y - 1, colCount, rowCount) && map[node.Y - 1][node.X] == Utils.Obstacle)
+            {
+                result++;
             }
         }
         return result;

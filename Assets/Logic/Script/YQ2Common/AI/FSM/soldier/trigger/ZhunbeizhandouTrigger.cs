@@ -30,6 +30,8 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger{
         }
         var res = TargetSelecter.GetCollisionItemList(list, fsm.Display.ClusterData.X, fsm.Display.ClusterData.Y, fsm.Display.ClusterData.MemberData.SightRange);
 
+        // TODO 视野范围
+        // TODO 攻击范围
         if (res.Count > 0)
         {
             return CheckSkill(fsm, res) || CheckPuTongGongji(fsm, res);

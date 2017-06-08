@@ -66,6 +66,7 @@ public static class LuaBinder
 		DisplayOwnerWrap.Register(L);
 		PositionObjectWrap.Register(L);
 		VOBaseWrap.Register(L);
+		ClusterDataWrap.Register(L);
 		UIRectWrap.Register(L);
 		UIBasicSpriteWrap.Register(L);
 		UIProgressBarWrap.Register(L);
@@ -244,6 +245,7 @@ public static class LuaBinder
 		L.RegFunction("Action_string_PacketRouting", System_Action_string_PacketRouting);
 		L.RegFunction("Action_string_float", System_Action_string_float);
 		L.RegFunction("Action_object_object", System_Action_object_object);
+		L.RegFunction("Action_UnityEngine_GameObject", System_Action_UnityEngine_GameObject);
 		L.EndModule();
 		L.BeginModule("UIPanel");
 		L.RegFunction("OnGeometryUpdated", UIPanel_OnGeometryUpdated);
@@ -1621,6 +1623,33 @@ public static class LuaBinder
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
 				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(System.Action<object,object>), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int System_Action_UnityEngine_GameObject(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(System.Action<UnityEngine.GameObject>), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(System.Action<UnityEngine.GameObject>), func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;

@@ -24,6 +24,7 @@ public class UtilsWrap
 		L.RegFunction("CreateOrOpenFile", CreateOrOpenFile);
 		L.RegFunction("LoadFileInfo", LoadFileInfo);
 		L.RegFunction("GetTheta", GetTheta);
+		L.RegFunction("WithOutY", WithOutY);
 		L.RegFunction("GetRange", GetRange);
 		L.RegFunction("GetTwoPointDistance2D", GetTwoPointDistance2D);
 		L.RegFunction("CopyArray", CopyArray);
@@ -414,6 +415,23 @@ public class UtilsWrap
 			float arg3 = (float)LuaDLL.luaL_checknumber(L, 4);
 			float o = Utils.GetTheta(arg0, arg1, arg2, arg3);
 			LuaDLL.lua_pushnumber(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int WithOutY(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 1);
+			UnityEngine.Vector3 o = Utils.WithOutY(arg0);
+			ToLua.Push(L, o);
 			return 1;
 		}
 		catch(Exception e)

@@ -72,9 +72,24 @@ public class MapEditor : MonoBehaviour
     //--------------------私有属性-----------------------
 
     /// <summary>
-    /// 地图数据
+    /// 障碍物Level1
     /// </summary>
-    private int[][] map = null;
+    private int[][] mapLevel1 = null;
+
+    /// <summary>
+    /// 障碍物Level2
+    /// </summary>
+    private int[][] mapLevel2 = null;
+
+    /// <summary>
+    /// 建筑层地图数据
+    /// </summary>
+    private int[][] mapLevel3 = null;
+
+    /// <summary>
+    /// 当前操控中的Level(1,2,3)
+    /// </summary>
+    private int controlLevel = 1;
 
     /// <summary>
     /// 鼠标点击状态
@@ -140,21 +155,30 @@ public class MapEditor : MonoBehaviour
     {
         if (Plane != null)
         {
-            // 设置地图大小
             // 设置地缩放
             Plane.transform.localScale = new Vector3(MapWidth, 1, MapHeight);
 
-
             // 创建对应大小的map数据
-            map = new int[MapHeight][];
+            mapLevel1 = new int[MapHeight][];
+            mapLevel2 = new int[MapHeight][];
+            mapLevel3 = new int[MapHeight][];
+
             for (var row = 0; row < MapHeight; row++)
             {
-                map[row] = new int[MapWidth];
+                mapLevel1[row] = new int[MapWidth];
+            }
+            for (var row = 0; row < MapHeight; row++)
+            {
+                mapLevel2[row] = new int[MapWidth];
+            }
+            for (var row = 0; row < MapHeight; row++)
+            {
+                mapLevel3[row] = new int[MapWidth];
             }
 
             // 初始化优化数据
-            halfMapWidth = MapWidth / 2.0f;
-            halfMapHight = MapHeight / 2.0f;
+            halfMapWidth = MapWidth * 0.5f;
+            halfMapHight = MapHeight * 0.5f;
 
             // 获得起始点
             Vector3 startPosition = Plane.transform.position;
@@ -184,30 +208,40 @@ public class MapEditor : MonoBehaviour
             Debug.Log("主相机为空.");
             return;
         }
-        // 位置移动
+        // 上下左右位置移动
         // 移动x,z轴
-        if (Input.GetKey(KeyCode.UpArrow))
+        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
         {
-            MainCamera.transform.localPosition += MainCamera.transform.forward;
+            MainCamera.transform.localPosition += new Vector3(MainCamera.transform.forward.x, 0, MainCamera.transform.forward.z);
         }
-        if (Input.GetKey(KeyCode.DownArrow))
+        if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
         {
-            MainCamera.transform.localPosition -= MainCamera.transform.forward;
+            MainCamera.transform.localPosition -= new Vector3(MainCamera.transform.forward.x, 0, MainCamera.transform.forward.z);
         }
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
         {
             MainCamera.transform.localPosition += Quaternion.Euler(0, -90, 0) * new Vector3(MainCamera.transform.forward.x, 0, MainCamera.transform.forward.z);
         }
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
         {
             MainCamera.transform.localPosition += Quaternion.Euler(0, 90, 0) * new Vector3(MainCamera.transform.forward.x, 0, MainCamera.transform.forward.z);
         }
+        // 滚轮拉近拉远
+        if (Input.GetAxis("Mouse ScrollWheel") < 0)
+        {
+            MainCamera.transform.localPosition -= MainCamera.transform.forward;
+        }
+        if (Input.GetAxis("Mouse ScrollWheel") > 0)
+        {
+            MainCamera.transform.localPosition += MainCamera.transform.forward;
+        }  
+
         // 移动y轴
-        if (Input.GetKey(KeyCode.PageUp))
+        if (Input.GetKey(KeyCode.PageUp) || Input.GetKey(KeyCode.E))
         {
             MainCamera.transform.localPosition = new Vector3(MainCamera.transform.localPosition.x, MainCamera.transform.localPosition.y + 1, MainCamera.transform.localPosition.z);
         }
-        if (Input.GetKey(KeyCode.PageDown))
+        if (Input.GetKey(KeyCode.PageDown) || Input.GetKey(KeyCode.Q))
         {
             MainCamera.transform.localPosition = new Vector3(MainCamera.transform.localPosition.x, MainCamera.transform.localPosition.y - 1, MainCamera.transform.localPosition.z);
         }
@@ -220,17 +254,34 @@ public class MapEditor : MonoBehaviour
             MainCamera.transform.localEulerAngles = new Vector3(rotateX, rotateY, 0);
         }
 
-        // 输出地图数据
-        if (Input.GetKey(KeyCode.KeypadEnter))
+        // 输出地图数据 回车
+        if (Input.GetKey(KeyCode.KeypadEnter) || Input.GetKey(KeyCode.Return))
         {
             ConsoleMap();
         }
 
-        // 清空地图
+        // 清空地图 esc
         if (Input.GetKey(KeyCode.Escape))
         {
             Init();
         }
+
+        // 输出第一层 地图(障碍物level1)
+        if (Input.GetKey(KeyCode.Alpha1) || Input.GetKey(KeyCode.Keypad1))
+        {
+            controlLevel = 1;
+        }
+        // 输出第一层 地图(障碍物level2)
+        if (Input.GetKey(KeyCode.Alpha2) || Input.GetKey(KeyCode.Keypad2))
+        {
+            controlLevel = 2;
+        }
+        // 输出第一层 地图(建筑)
+        if (Input.GetKey(KeyCode.Alpha3) || Input.GetKey(KeyCode.Keypad3))
+        {
+            controlLevel = 3;
+        }
+
     }
 
     /// <summary>
@@ -285,7 +336,7 @@ public class MapEditor : MonoBehaviour
                     // 若该位置没有障碍则记录并创建障碍, 若该位置有障碍则消除该位置的障碍
                     if (!isInControl)
                     {
-                        mapControlState = map[posOnMap[1]][posOnMap[0]] == Utils.Obstacle ? SetYet : CouldSet;
+                        mapControlState = mapLevel1[posOnMap[1]][posOnMap[0]] == Utils.Obstacle ? SetYet : CouldSet;
                         isInControl = true;
                     }
                     else
@@ -294,11 +345,11 @@ public class MapEditor : MonoBehaviour
                         {
                             case SetYet:
                                 // 如果该位置已有障碍, 则将障碍清除, 反之不处理
-                                map[posOnMap[1]][posOnMap[0]] = Utils.Accessibility;
+                                mapLevel1[posOnMap[1]][posOnMap[0]] = Utils.Accessibility;
                                 break;
                             case CouldSet:
                                 // 如果该位置未有障碍, 则将障碍设置, 反之不处理
-                                map[posOnMap[1]][posOnMap[0]] = Utils.Obstacle;
+                                mapLevel1[posOnMap[1]][posOnMap[0]] = Utils.Obstacle;
                                 break;
                         }
                     }
@@ -316,12 +367,13 @@ public class MapEditor : MonoBehaviour
 
     /// <summary>
     /// 将map状态刷到plane上
+    /// TODO 修改增加层(活动障碍物与建筑)
     /// </summary>
     private void RefreshMap()
     {
-        for (long row = 0; row < map.Length; row++)
+        for (long row = 0; row < mapLevel1.Length; row++)
         {
-            var oneRow = map[row];
+            var oneRow = mapLevel1[row];
             for (long col = 0; col < oneRow.Length; col++)
             {
                 var key = (row << 32) + col;
@@ -410,15 +462,15 @@ public class MapEditor : MonoBehaviour
     {
 
         var strResult = new StringBuilder();
-        for (var row = 0; row < map.Length; row++)
+        for (var row = 0; row < mapLevel1.Length; row++)
         {
-            var oneRow = map[row];
+            var oneRow = mapLevel1[row];
             for (var col = 0; col < oneRow.Length; col++)
             {
                 var cell = oneRow[col];
                 strResult.Append(cell + ((col == oneRow.Length - 1) ? "" : ","));
             }
-            strResult.Append((row == map.Length - 1) ? "" : "\n");
+            strResult.Append((row == mapLevel1.Length - 1) ? "" : "\n");
         }
         Debug.Log(strResult);
         // TODO 弹出框强制输入文件名称

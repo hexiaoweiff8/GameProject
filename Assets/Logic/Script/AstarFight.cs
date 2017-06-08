@@ -398,12 +398,15 @@ public class AstarFight : MonoBehaviour
             {
                 continue;
             }
-            int armyID = int.Parse(string.Format("{0}{1:D3}", SData_armycardbase_c.Single.GetDataOfID(_cardID).ArmyID, level[starti]));
-            int _width = (int)Math.Ceiling(SData_armybase_c.Single.GetDataOfID(armyID).SpaceSet);//物体宽
-            int _height = (int)SData_armybase_c.Single.GetDataOfID(armyID).SpaceSet;//物体高
+            var cardData = SData_armycardbase_c.Single.GetDataOfID(_cardID);
+            int armyID = int.Parse(string.Format("{0}{1:D3}", cardData.ArmyID, level[starti]));
+
+            var armyData = SData_armybase_c.Single.GetDataOfID(armyID);
+            int _width = (int)Math.Ceiling(armyData.SpaceSet);//物体宽
+            int _height = (int)armyData.SpaceSet;//物体高
 
             //解析阵型数据到数组中
-            string s = SData_array_c.Single.GetDataOfID(SData_armycardbase_c.Single.GetDataOfID(_cardID).ArrayID).Position;
+            string s = SData_array_c.Single.GetDataOfID(cardData.ArrayID).Position;
             List<int> tempA = new List<int>();
             var tempS1 = s.Split(';');
             for (int i = 0; i < tempS1.Length; i++)
@@ -642,7 +645,7 @@ public class AstarFight : MonoBehaviour
         ClusterData clusterData = data;
         clusterData.RotateSpeed = 10;
         clusterData.RotateWeight = 1;
-        clusterData.PhysicsInfo.MaxSpeed = clusterData.MemberData.MoveSpeed;
+        clusterData.PhysicsInfo.MaxSpeed = 60;//clusterData.MemberData.MoveSpeed;
         clusterData.Diameter *= ClusterManager.Single.UnitWidth;
         clusterData.PushTargetList(Utils.NumToPostionByList(LoadMap.MapPlane.transform.position, path, UnitWidth, MapWidth, MapHeight));
         // 默认出事状态不行进

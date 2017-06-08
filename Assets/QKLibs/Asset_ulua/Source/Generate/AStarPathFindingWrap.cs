@@ -8,8 +8,11 @@ public class AStarPathFindingWrap
 	{
 		L.BeginClass(typeof(AStarPathFinding), typeof(System.Object));
 		L.RegFunction("SearchRoad", SearchRoad);
+		L.RegFunction("ISearchRoad", ISearchRoad);
+		L.RegFunction("NearObstacleCount", NearObstacleCount);
 		L.RegFunction("New", _CreateAStarPathFinding);
 		L.RegFunction("__tostring", ToLua.op_ToString);
+		L.RegVar("closePathMap", get_closePathMap, set_closePathMap);
 		L.EndClass();
 	}
 
@@ -67,6 +70,78 @@ public class AStarPathFindingWrap
 			System.Collections.Generic.IList<Node> o = AStarPathFinding.SearchRoad(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
 			ToLua.PushObject(L, o);
 			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int ISearchRoad(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 7);
+			int[][] arg0 = ToLua.CheckObjectArray<int[]>(L, 1);
+			int arg1 = (int)LuaDLL.luaL_checknumber(L, 2);
+			int arg2 = (int)LuaDLL.luaL_checknumber(L, 3);
+			int arg3 = (int)LuaDLL.luaL_checknumber(L, 4);
+			int arg4 = (int)LuaDLL.luaL_checknumber(L, 5);
+			int arg5 = (int)LuaDLL.luaL_checknumber(L, 6);
+			int arg6 = (int)LuaDLL.luaL_checknumber(L, 7);
+			System.Collections.IEnumerator o = AStarPathFinding.ISearchRoad(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int NearObstacleCount(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 4);
+			Node arg0 = (Node)ToLua.CheckObject(L, 1, typeof(Node));
+			int[][] arg1 = ToLua.CheckObjectArray<int[]>(L, 2);
+			int arg2 = (int)LuaDLL.luaL_checknumber(L, 3);
+			int arg3 = (int)LuaDLL.luaL_checknumber(L, 4);
+			int o = AStarPathFinding.NearObstacleCount(arg0, arg1, arg2, arg3);
+			LuaDLL.lua_pushinteger(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_closePathMap(IntPtr L)
+	{
+		try
+		{
+			ToLua.Push(L, AStarPathFinding.closePathMap);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_closePathMap(IntPtr L)
+	{
+		try
+		{
+			int[][] arg0 = ToLua.CheckObjectArray<int[]>(L, 2);
+			AStarPathFinding.closePathMap = arg0;
+			return 0;
 		}
 		catch(Exception e)
 		{

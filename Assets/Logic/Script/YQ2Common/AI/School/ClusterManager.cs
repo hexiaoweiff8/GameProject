@@ -113,7 +113,7 @@ public class ClusterManager : ILoopItem
             // 刷新四叉树
             targetList.Refresh();
             // 刷新地图对应位置
-            targetList.RebulidMapInfo();
+            //targetList.RebulidMapInfo();
             // 单位移动
             AllMemberMove(targetList.List);
             // 绘制四叉树
@@ -297,11 +297,11 @@ public class ClusterManager : ILoopItem
             {
                 OneMemberMove(member as ClusterData, cosForwardAngle);
             }
-            else if (member is FixtureData)
-            {
-                // 不移动
-                // TODO 是否对周围产生斥力?
-            }
+            //else if (member is FixtureData)
+            //{
+            //    // 不移动
+            //    // TODO 是否对周围产生斥力?
+            //}
         }
 
         // 清空对比列表
@@ -698,7 +698,7 @@ public class ClusterManager : ILoopItem
             }
         }
 
-        if ((member.Position - member.TargetPos).magnitude < member.Diameter * UnitWidth)
+        if (Utils.WithOutY(member.Position - member.TargetPos).magnitude < (member.Diameter * 0.5f + 0.5f) * UnitWidth)
         {
             if (member.State != SchoolItemState.Complete)
             {

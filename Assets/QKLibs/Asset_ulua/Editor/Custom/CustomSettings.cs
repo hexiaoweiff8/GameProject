@@ -254,6 +254,7 @@ public static class CustomSettings
         _GT(typeof (DisplayOwner)),
         _GT(typeof (PositionObject)),
         _GT(typeof (VOBase)),
+        _GT(typeof (ClusterData)),
         
     };
 
