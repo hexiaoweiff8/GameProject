@@ -151,6 +151,7 @@
     <Compile Include="Assets\QKLibs\Asset_EasyTouch\EasyTouchBundle\EasyTouchControls\Plugins\Editor\ETCTouchPadInspector.cs" />
     <Compile Include="Assets\QKLibs\Asset_GameProject\Source\Editor\TargetPlatform.cs" />
     <Compile Include="Assets\QKLibs\Asset_GameProject\Source\Editor\UI_ImportConfigs.cs" />
+    <Compile Include="Assets\QKLibs\Asset_GameProject\Source\Editor\UI_ImportMapData.cs" />
     <Compile Include="Assets\QKLibs\Asset_GameProject\Source\Editor\UI_ResPacketsImport.cs" />
     <Compile Include="Assets\QKLibs\Asset_GameProjectLua\Source\Editor\UI_LuaPacket.cs" />
     <Compile Include="Assets\QKLibs\Asset_Memoryprofiler\Memoryprofiler\Editor\ArrayTools.cs" />

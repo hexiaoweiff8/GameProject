@@ -177,9 +177,9 @@ public class AstarFight : MonoBehaviour
     /// </summary>
     private void Init()
     {
-        // TODO 文件应该从配置文件中读取
         var mapInfoPath = Application.dataPath + Path.AltDirectorySeparatorChar + "mapinfo";
         var mapInfoStr = Utils.LoadFileInfo(mapInfoPath);
+
         mapInfoData = DeCodeInfo(mapInfoStr);
 
         MapWidth = mapInfoData[0].Length;

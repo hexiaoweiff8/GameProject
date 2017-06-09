@@ -18,11 +18,12 @@ public class Utils
     /// </summary>
     public static Utils Single
     {
-        get {
+        get
+        {
             if (single == null)
             {
                 single = new Utils();
-            } 
+            }
             return single;
         }
     }
@@ -109,7 +110,7 @@ public class Utils
     /// <summary>
     /// 弧度转角度常数
     /// </summary>
-    public static readonly float RadianToAngle = 180/(float)Math.PI;
+    public static readonly float RadianToAngle = 180 / (float)Math.PI;
 
     /// <summary>
     /// 角度转弧度常数
@@ -362,12 +363,12 @@ public class Utils
     /// <param name="color">绘制颜色</param>
     public static void DrawRect(Vector3 position, float width, float height, float rotation, Color color)
     {
-        var angle = rotation*Math.PI/180;
-        var halfWidth = width*0.5f;
-        var halfHeight = height*0.5f;
+        var angle = rotation * AngleToPi;
+        var halfWidth = width * 0.5f;
+        var halfHeight = height * 0.5f;
 
-        var sin = (float) (Math.Sin(angle));
-        var cos = (float) (Math.Cos(angle));
+        var sin = (float)(Math.Sin(angle));
+        var cos = (float)(Math.Cos(angle));
         var left = (-halfWidth);
         var right = (halfWidth);
         var top = (halfHeight);
@@ -523,7 +524,7 @@ public class Utils
         StreamWriter sw;
         FileInfo fi = new FileInfo(path + Path.AltDirectorySeparatorChar + fileName);
         sw = fi.CreateText();
-        sw.WriteLine(info);
+        sw.Write(info);
         sw.Close();
     }
 
@@ -568,6 +569,84 @@ public class Utils
     }
 
     /// <summary>
+    /// 合并文件(字符串文件)
+    /// </summary>
+    /// <param name="pathList">被合并文件Path列表</param>
+    /// <returns>合并后的文件内容</returns>
+    public static string CombineFile(List<string> pathList)
+    {
+        if (pathList == null || pathList.Count == 0)
+        {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+
+        foreach (var path in pathList)
+        {
+            var fileInfo = new FileInfo(path);
+            if (fileInfo.Exists)
+            {
+                sb.Append(fileInfo.Name);
+                sb.Append("%\n%");
+                sb.Append(LoadFileInfo(fileInfo));
+                sb.Append("%\r\n%");
+            }
+        }
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// 分解文件内容
+    /// </summary>
+    /// <param name="data">被分解数据</param>
+    /// <returns>分解后的文件对照表(文件名, 文件内容)</returns>
+    public static Dictionary<string, string> DepartFileData(string data)
+    {
+        if (string.IsNullOrEmpty(data))
+        {
+            return null;
+        }
+        var result = new Dictionary<string, string>();
+
+        // 解析数据
+        var filesDataArray = data.Split(new[] { "%\r\n%" }, StringSplitOptions.RemoveEmptyEntries);
+        foreach (var fileData in filesDataArray)
+        {
+            var dataDepart = fileData.Split(new[] { "%\n%" }, StringSplitOptions.RemoveEmptyEntries);
+            if (dataDepart.Length == 2)
+            {
+                var fileName = dataDepart[0];
+                var fileInfo = dataDepart[1];
+                result.Add(fileName, fileInfo);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 按照文件名加载对应文件数据
+    /// </summary>
+    /// <param name="fileName">被加载文件名</param>
+    /// <returns>被加载文件内容</returns>
+    public static string GetMapDataByFileName(string fileName)
+    {
+        var result = "";
+
+        if (!string.IsNullOrEmpty(fileName))
+        {
+            var dic = DepartFileData(LoadFileInfo(fileName));
+            if (dic != null)
+            {
+                result = dic[fileName];
+            }
+        }
+
+        return result;
+    }
+
+
+    /// <summary>
     /// 求射出角度
     /// 角度 = arctan((speed^2 +- √(speed^4 - g(g*x^2 + 2yspeed^2)))/(gx))
     /// </summary>
@@ -578,7 +657,7 @@ public class Utils
     /// <returns>射出角度, 如果是小于-998则无解, 否则返回射出的弧度值</returns>
     public static float GetTheta(Vector3 targetPos, Vector3 startPos, float speed, float gravity)
     {
-        var speedSquare = speed*speed;
+        var speedSquare = speed * speed;
         var offsetTarget = targetPos - startPos;
 
         // 计算角度全部取正值
@@ -597,9 +676,12 @@ public class Utils
 
         var theta1 = (float)Math.Atan((speedSquare + Math.Sqrt(delta)) / (gravity * offsetTarget.x));
         var theta2 = (float)Math.Atan((speedSquare - Math.Sqrt(delta)) / (gravity * offsetTarget.x));
-        if (theta1 < 0) {
+        if (theta1 < 0)
+        {
             theta1 = theta2;
-        }else if (theta2 < theta1) {
+        }
+        else if (theta2 < theta1)
+        {
             // 取小角度解
             theta1 = theta2;
         }
@@ -650,7 +732,7 @@ public class Utils
     {
         var xOffset = x1 - x2;
         var yOffset = y1 - y2;
-        return (float)Math.Sqrt(xOffset*xOffset + yOffset*yOffset);
+        return (float)Math.Sqrt(xOffset * xOffset + yOffset * yOffset);
     }
 
     /// <summary>
@@ -660,7 +742,7 @@ public class Utils
     /// <param name="to">目标数组</param>
     /// <param name="rowCount">行数</param>
     /// <param name="colCount">列数</param>
-    public static void CopyArray(int[][] from,out int[][] to, int rowCount, int colCount)
+    public static void CopyArray(int[][] from, out int[][] to, int rowCount, int colCount)
     {
         if (from == null || rowCount <= 0 || colCount <= 0)
         {
@@ -695,7 +777,7 @@ public class Utils
         }
     }
 
-    
+
 
 
     // ---------------------静态方法-------------------------
