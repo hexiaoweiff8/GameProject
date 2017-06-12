@@ -218,7 +218,7 @@ public class ClusterData: PositionObject
 
         return result;
     }
-    
+
     /// <summary>
     /// 清空目标点栈
     /// </summary>

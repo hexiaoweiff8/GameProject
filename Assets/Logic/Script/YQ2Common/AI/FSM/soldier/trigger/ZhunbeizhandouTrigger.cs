@@ -13,29 +13,47 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger{
 
     public override bool CheckTrigger(SoldierFSMSystem fsm)
     {
-        
-        // TODO 目标选择器
-        var myObjid = fsm.Display.MFAModelRender.ObjId;
-
-        var enemy = DisplayerManager.Single.GetOpposingCamps(myObjid);
-
-        IList<DisplayOwner> list = new List<DisplayOwner>();
-        foreach (var display in enemy)
+        var objId = fsm.Display.ClusterData.MemberData.ObjID;
         {
-            //排除掉已经死了的目标
-            if (display.Value.ClusterData.MemberData.CurrentHP > 0)
+            // 攻击范围内是否有敌人
+            var pos = new Vector2(fsm.Display.ClusterData.X, fsm.Display.ClusterData.Y);
+            var list = CheckRange(objId, pos, fsm.Display.ClusterData.MemberData.AttackRange, fsm.Display.ClusterData.MemberData.Camp, true);
+            Utils.DrawGraphics(new CircleGraphics(pos, fsm.Display.ClusterData.MemberData.AttackRange), Color.yellow);
+            if (list.Count > 0)
             {
-                list.Add(display.Value);
+                // 攻击目标
+                fsm.TargetIsLoseEfficacy = false;
+                if (CheckSkill(fsm, list))
+                {
+                    fsm.IsCanInPutonggongji = false;
+                    fsm.IsCanInJinenggongji = true;
+                    return true;
+                }
+                if (SetTarget(fsm, list))
+                {
+                    fsm.IsCanInJinenggongji = false;
+                    fsm.IsCanInPutonggongji = true;
+                    return true;
+                }
+                return false;
             }
         }
-        var res = TargetSelecter.GetCollisionItemList(list, fsm.Display.ClusterData.X, fsm.Display.ClusterData.Y, fsm.Display.ClusterData.MemberData.SightRange);
 
-        // TODO 视野范围
-        // TODO 攻击范围
-        if (res.Count > 0)
         {
-            return CheckSkill(fsm, res) || CheckPuTongGongji(fsm, res);
+            // 视野范围内是否有敌人
+            var pos = new Vector2(fsm.Display.ClusterData.X, fsm.Display.ClusterData.Y);
+            var list = CheckRange(objId, pos, 200, fsm.Display.ClusterData.MemberData.Camp, true);
+            Utils.DrawGraphics(new CircleGraphics(pos, 200), Color.yellow);
+            //fsm.Display.ClusterData.MemberData.SightRange
+            if (list.Count > 0)
+            {
+                // 追击目标
+                // 设置状态 切追击状态
+                fsm.IsZhuiJi = true;
+                return SetTarget(fsm, list);
+            }
         }
+
         return false;
     }
 
@@ -45,7 +63,7 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger{
     /// <param name="fsm"></param>
     /// <param name="res">目标列表</param>
     /// <returns></returns>
-    private bool CheckSkill(SoldierFSMSystem fsm, IList<DisplayOwner> res)
+    private bool CheckSkill(SoldierFSMSystem fsm, IList<PositionObject> res)
     {
         var result = false;
 
@@ -105,25 +123,61 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger{
             // 确定释放技能, 设置目标
             System.Random ran = new System.Random();
             var target = res[ran.Next(0, res.Count)];
-            fsm.EnemyTarget = target;
+            fsm.EnemyTarget = DisplayerManager.Single.GetElementByPositionObject(target);
             fsm.TargetIsLoseEfficacy = false;
         }
 
         return result;
     }
-
+    
     /// <summary>
-    /// 是否可以普通攻击
+    /// 设置目标单位
     /// </summary>
     /// <param name="fsm"></param>
-    /// <param name="res">目标列表</param>
+    /// <param name="res"></param>
     /// <returns></returns>
-    private bool CheckPuTongGongji(SoldierFSMSystem fsm, IList<DisplayOwner> res)
+    private bool SetTarget(SoldierFSMSystem fsm, IList<PositionObject> res)
     {
         var ran = new System.Random();
+        // TODO 取最近的
         var target = res[ran.Next(0, res.Count)];
-        fsm.EnemyTarget = target;
-        fsm.TargetIsLoseEfficacy = false;
+        fsm.EnemyTarget = DisplayerManager.Single.GetElementByPositionObject(target);
         return res.Count > 0;
+    }
+
+    /// <summary>
+    /// 检测范围内单位
+    /// </summary>
+    /// <param name="objId">筛选者Id</param>
+    /// <param name="pos">检测位置</param>
+    /// <param name="range">检测半径</param>
+    /// <param name="myCamp">当前单位阵营</param>
+    /// <param name="isExceptMyCamp">是否排除己方阵营</param>
+    /// <returns>范围内单位</returns>
+    private IList<PositionObject> CheckRange(ObjectID objId, Vector2 pos, float range, int myCamp = -1, bool isExceptMyCamp = false)
+    {
+        var memberInSightScope =
+                ClusterManager.Single.GetPositionObjectListByGraphics(
+                    new CircleGraphics(pos, range));
+
+        IList<PositionObject> list = new List<PositionObject>();
+        foreach (var member in memberInSightScope)
+        {
+            // 区分自己
+            if (objId.ID == member.MemberData.ObjID.ID)
+            {
+                continue;
+            }
+            // 区分阵营
+            if (member.MemberData.CurrentHP > 0 
+                && (myCamp == -1 
+                || (isExceptMyCamp && member.MemberData.Camp != myCamp)
+                || (!isExceptMyCamp && member.MemberData.Camp == myCamp)))
+            {
+                list.Add(member);
+            }
+        }
+
+        return list;
     }
 }

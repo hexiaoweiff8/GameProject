@@ -15,20 +15,23 @@ public class Soldier_Zhunbeizhandou_State : SoldierFSMState
     /// <param name="fsm"></param>
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
-        var myself = fsm.Display.RanderControl;
-        myself.ModelRander.SetClip("run".GetHashCode());
-        fsm.Display.ClusterData.Stop();
+        if (fsm.IsCanInPutonggongji || fsm.IsCanInJinenggongji)
+        {
+            var myself = fsm.Display.RanderControl;
+            myself.ModelRander.SetClip("run".GetHashCode());
+            fsm.Display.ClusterData.Stop();
+        }
 
 
         // 状态切换路由
-        if (fsm.EnemyTarget != null && fsm.Skill == null)
-        {
-            fsm.IsCanInPutonggongji = true;
-        }
-        else if(fsm.Skill != null)
-        {
-            fsm.IsCanInJinenggongji = true;
-        }
+        //if (fsm.EnemyTarget != null && fsm.Skill == null)
+        //{
+        //    fsm.IsCanInPutonggongji = true;
+        //}
+        //else if(fsm.Skill != null)
+        //{
+        //    fsm.IsCanInJinenggongji = true;
+        //}
     }
 
     public override void Action(SoldierFSMSystem fsm)

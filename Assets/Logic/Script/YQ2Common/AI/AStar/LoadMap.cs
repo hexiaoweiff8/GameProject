@@ -15,6 +15,11 @@ public class LoadMap : MonoBehaviour
     //-------------------------公共属性-----------------------------
 
     /// <summary>
+    /// 单例
+    /// </summary>
+    public static LoadMap Single = null;
+
+    /// <summary>
     /// 地图底板
     /// </summary>
     public GameObject MapPlane;
@@ -111,14 +116,13 @@ public class LoadMap : MonoBehaviour
     void Start()
     {
         IsShow = true;
+        Single = this;
     }
 
     void Update()
     {
-
         // 画格子
         DrawLine();
-
     }
 
 
@@ -160,10 +164,23 @@ public class LoadMap : MonoBehaviour
         //RefreshMap();
     }
 
+    /// <summary>
+    /// 获取左下位置
+    /// </summary>
+    /// <returns></returns>
     public Vector3 GetLeftBottom()
     {
         var localPos = transform.localPosition;
         return new Vector3(localPos.x - mapWidth * unitWidth * 0.5f, localPos.y, localPos.z - mapHeight * unitWidth * 0.5f);
+    }
+
+    /// <summary>
+    /// 获取当前地图数据
+    /// </summary>
+    /// <returns></returns>
+    public int[][] GetMapData()
+    {
+        return mapData;
     }
 
     ///// <summary>

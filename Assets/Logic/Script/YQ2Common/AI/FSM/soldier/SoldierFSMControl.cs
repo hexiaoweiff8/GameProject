@@ -69,6 +69,10 @@ public class SoldierFSMControl{
         Soldier_Siwang_State siwang = new Soldier_Siwang_State();
         siwang.AddTrigger(SoldierTriggerID.SiWang, SoldierStateID.SiWang);
         fsm.AddState(siwang);
+
+        Soldier_Zhuiji_State zhuiji = new Soldier_Zhuiji_State();
+        zhuiji.AddTrigger(SoldierTriggerID.ZhuiJi, SoldierStateID.ZhuiJi);
+        fsm.AddState(zhuiji);
     }
 
     public void Destory()

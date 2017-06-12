@@ -85,6 +85,16 @@ public class Utils
     /// </summary>
     public const short MemberItemTypeAircraft = 5;
 
+    /// <summary>
+    /// 敌方阵营
+    /// </summary>
+    public const int EnemyCamp = 2;
+
+    /// <summary>
+    /// 我方阵营
+    /// </summary>
+    public const int MyCamp = 1;
+
     // ----------------------------单位类型--------------------------
 
     // ----------------------------单位大类型-----------------------------
@@ -152,10 +162,14 @@ public class Utils
     /// </summary>
     public static readonly float ApproachKZero = -0.00001f;
 
-
+    /// <summary>
+    /// 角度转π
+    /// </summary>
     public const float AngleToPi = 0.0174532925199433f;
 
-
+    /// <summary>
+    /// π转角度
+    /// </summary>
     public const float PiToAngle = 57.2957795130823f;
 
 
@@ -569,6 +583,32 @@ public class Utils
     }
 
     /// <summary>
+    /// 从两个目录中加载文件, 如果persistentDataPath中存在文件则加载, 否则从streamingAssetsPath中加载
+    /// </summary>
+    /// <param name="path">文件路径(在目录中的结构)</param>
+    /// <returns>文件内容</returns>
+    public static string LoadFileRotate(string path)
+    {
+        string result = null;
+        FileInfo fi = new FileInfo(Path.Combine(Application.persistentDataPath, path));
+        if (fi.Exists)
+        {
+            result = LoadFileInfo(fi);
+        }
+        else
+        {
+            fi = new FileInfo(Path.Combine(Application.streamingAssetsPath, path));
+            // 继续加载
+            if (fi.Exists)
+            {
+                result = LoadFileInfo(fi);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// 合并文件(字符串文件)
     /// </summary>
     /// <param name="pathList">被合并文件Path列表</param>
@@ -778,6 +818,28 @@ public class Utils
     }
 
 
+
+    /// <summary>
+    /// 生成地图文件名
+    /// </summary>
+    /// <param name="mapId">地图ID</param>
+    /// <param name="mapLevel">地图层级</param>
+    /// <returns>地图文件名</returns>
+    public static string GetMapFileNameById(int mapId, int mapLevel)
+    {
+        return GetMapFileNameById(string.Format("{0:0000}", mapId), mapLevel);
+    }
+
+    /// <summary>
+    /// 生成地图文件名
+    /// </summary>
+    /// <param name="mapId">地图ID</param>
+    /// <param name="mapLevel">地图层级</param>
+    /// <returns>地图文件名</returns>
+    public static string GetMapFileNameById(string mapId, int mapLevel)
+    {
+        return "MapInfo" + mapId + "_Level" + mapLevel;
+    }
 
 
     // ---------------------静态方法-------------------------

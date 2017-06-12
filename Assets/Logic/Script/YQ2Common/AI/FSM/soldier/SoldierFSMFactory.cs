@@ -8,39 +8,65 @@ public class SoldierFSMFactory
     {
         switch(stateName){
             case SoldierTriggerID.RuChang:
-
-                var xingjin = new XingjinTrigger();
-                _fsmTrriggerList.Add(xingjin);
-
-                break;
+                {
+                    var xingjin = new XingjinTrigger();
+                    _fsmTrriggerList.Add(xingjin);
+                    break;
+                }
             case SoldierTriggerID.Xingjin:
-                var zhunbeizhandou = new ZhunbeizhandouTrigger();
-                _fsmTrriggerList.Add(zhunbeizhandou);
-                break;
+                {
+                    var zhunbeizhandou = new ZhunbeizhandouTrigger();
+                    _fsmTrriggerList.Add(zhunbeizhandou);
+                    var zhuiji = new ZhuiJiTrigger();
+                    _fsmTrriggerList.Add(zhuiji);
+                    break;
+                }
             case SoldierTriggerID.Zhunbeizhandou:
-                var putong = new PutongGongjiTrigger();
-                _fsmTrriggerList.Add(putong);
-                var jineng = new JinengGongjiTrigger();
-                _fsmTrriggerList.Add(jineng);
-                break;
+                {
+                    var putong = new PutongGongjiTrigger();
+                    _fsmTrriggerList.Add(putong);
+                    var jineng = new JinengGongjiTrigger();
+                    _fsmTrriggerList.Add(jineng);
+                    var zhuiji = new ZhuiJiTrigger();
+                    _fsmTrriggerList.Add(zhuiji);
+                    break;
+                }
             case SoldierTriggerID.SiWang:
-                return;
+                {
+                    return;
+                }
             case SoldierTriggerID.PutongGongji:
-                var putongToXingjin = new XingjinTrigger();
-                _fsmTrriggerList.Add(putongToXingjin);
-                //var putongToJineng = new JinengGongjiTrigger();
-                //_fsmTrriggerList.Add(putongToJineng);
-                //var putongToZhunbeizhandou = new ZhunbeizhandouTrigger();
-                //_fsmTrriggerList.Add(putongToZhunbeizhandou);
+                {
+                    var putongToXingjin = new XingjinTrigger();
+                    _fsmTrriggerList.Add(putongToXingjin);
+                    var zhuiji = new ZhuiJiTrigger();
+                    _fsmTrriggerList.Add(zhuiji);
+                    //var putongToJineng = new JinengGongjiTrigger();
+                    //_fsmTrriggerList.Add(putongToJineng);
+                    //var putongToZhunbeizhandou = new ZhunbeizhandouTrigger();
+                    //_fsmTrriggerList.Add(putongToZhunbeizhandou);
+                }
                 break;
             case SoldierTriggerID.JinengGongji:
-                var jinengToXingjin = new XingjinTrigger();
-                _fsmTrriggerList.Add(jinengToXingjin);
-                //var jinengToPutong = new PutongGongjiTrigger();
-                //_fsmTrriggerList.Add(jinengToPutong);
-                //var jinengGongjiToZhunbeizhandou = new ZhunbeizhandouTrigger();
-                //_fsmTrriggerList.Add(jinengGongjiToZhunbeizhandou);
-                break;
+                {
+                    var jinengToXingjin = new XingjinTrigger();
+                    _fsmTrriggerList.Add(jinengToXingjin);
+                    //var jinengToPutong = new PutongGongjiTrigger();
+                    //_fsmTrriggerList.Add(jinengToPutong);
+                    //var jinengGongjiToZhunbeizhandou = new ZhunbeizhandouTrigger();
+                    //_fsmTrriggerList.Add(jinengGongjiToZhunbeizhandou);
+                    break;
+                }
+            case SoldierTriggerID.ZhuiJi:
+                {
+                    var zhuijiToXingjin = new XingjinTrigger();
+                    _fsmTrriggerList.Add(zhuijiToXingjin);
+                    var putong = new PutongGongjiTrigger();
+                    _fsmTrriggerList.Add(putong);
+                    var jineng = new JinengGongjiTrigger();
+                    _fsmTrriggerList.Add(jineng);
+                    break;
+                }
         }
         //除死亡状态以外的任何状态都可以切死亡
         var siwang = new SiwangTrigger();
@@ -61,6 +87,8 @@ public class SoldierFSMFactory
                 return SoldierStateID.JinengGongji;
             case SoldierTriggerID.SiWang:
                 return SoldierStateID.SiWang;
+            case SoldierTriggerID.ZhuiJi:
+                return SoldierStateID.ZhuiJi;
         }
         return SoldierStateID.NullState;
     }

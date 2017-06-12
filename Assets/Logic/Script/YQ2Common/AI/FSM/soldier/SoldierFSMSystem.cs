@@ -30,6 +30,11 @@ public class SoldierFSMSystem {
     public bool IsCanInJinenggongji = false;
 
     /// <summary>
+    /// 是否追击
+    /// </summary>
+    public bool IsZhuiJi = false;
+
+    /// <summary>
     /// 标记角色血量是否为0
     /// </summary>
     public bool IsDie = false;

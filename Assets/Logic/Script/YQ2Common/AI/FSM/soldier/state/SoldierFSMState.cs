@@ -163,6 +163,8 @@ public enum SoldierStateID
     PutongGongji,
     //技能攻击中状态
     JinengGongji,
+    // 追击状态
+    ZhuiJi,
     //受击状态
     Shouji,
     //混乱状态
@@ -193,6 +195,8 @@ public enum SoldierTriggerID
     PutongGongji,
     //技能攻击
     JinengGongji,
+    // 追击
+    ZhuiJi,
     //受击
     Shouji,
     //混乱

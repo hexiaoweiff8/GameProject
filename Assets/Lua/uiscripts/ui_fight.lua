@@ -308,7 +308,7 @@ function ui_fight:OnShowDone()
                 
                 
                 if isFeiEnough and isenterRect then --拖到屏幕中
-                    print("333")
+                    --print("333")
                     self:doEvent(tf, var, 3)
                 else
                     if isFeiEnough == false and isenterRect then
@@ -316,10 +316,10 @@ function ui_fight:OnShowDone()
                     end
                     local cardBounds = Bounds(tf.localPosition, Vector3(self.nowMyCardSizetb.x, self.nowMyCardSizetb.y, 0) * tf.localScale.x)
                     if self.feiBounds:Intersects(cardBounds) then --回收卡
-                        print("444")
+                        --print("444")
                         self:doEvent(tf, var, 1)
                     else --拖回下方
-                        print("555")
+                        --print("555")
                         self:doEvent(tf, var, 0)
                     end
                 end
@@ -516,7 +516,7 @@ function ui_fight:getModel(id, index)
             sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_TexturePackName, ArmyID),
             sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_IsHero, ArmyID) == 1, tonumber(ArmyID .. "001"), id)
         selectedCardItem = FightUnitFactory.CreateUnit(index == 5 and 4 or 3, paramTab)
-        print(selectedCardItem.ClusterData.MemberData.ObjID)
+        --print(selectedCardItem.ClusterData.MemberData.ObjID)
         tempMod = selectedCardItem.GameObj.transform
         tempMod.gameObject:SetActive(true)
         tempMod.parent = go
@@ -647,7 +647,7 @@ function ui_fight:doEvent(tf, var, isXiaBing)
             self.feiBar3Spr.gameObject:SetActive(false)
             self.feiBar4Spr.gameObject:SetActive(false)
             self.nowFeiLabel.color = whiteColor
-            print("aaa")
+            --print("aaa")
             self:backCallback(tf, true)
             if (self.nowFei < self.allFei) == false then --如果满费则什么也不做
                 self:cardFront(tf, var)
@@ -688,7 +688,7 @@ function ui_fight:doEvent(tf, var, isXiaBing)
         end
     else -- 返回事件
         lgyPrint("返回事件")
-        print("bbb")
+        --print("bbb")
         self:backCallback(tf, true)
         self:cardFront(tf, var)
     end

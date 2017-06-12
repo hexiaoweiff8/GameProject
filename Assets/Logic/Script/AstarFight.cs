@@ -177,10 +177,13 @@ public class AstarFight : MonoBehaviour
     /// </summary>
     private void Init()
     {
-        var mapInfoPath = Application.dataPath + Path.AltDirectorySeparatorChar + "mapinfo";
-        var mapInfoStr = Utils.LoadFileInfo(mapInfoPath);
+        //var mapInfoPath = Application.dataPath + Path.AltDirectorySeparatorChar + "mapinfo";
+        //var mapInfoStr = Utils.LoadFileInfo(mapInfoPath);
+        //mapInfoData = DeCodeInfo(mapInfoStr);
 
-        mapInfoData = DeCodeInfo(mapInfoStr);
+        // TODO 加载0001地图第1层 后期该值由外部传入
+        // TODO 同时加载两层 
+        mapInfoData = MapManager.Instance().GetMapInfoById(1, 1);
 
         MapWidth = mapInfoData[0].Length;
         MapHeight = mapInfoData.Length;

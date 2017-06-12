@@ -74,6 +74,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
                 // TODO 需要根据等级获得对应数据
                 var myJidiConfig = SData_armybase_c.Single.GetDataOfID(220001001);
                 myJidi.SetSoldierData(myJidiConfig);
+                myJidi.Camp = Utils.MyCamp;
                 result = CreateMyJidi(myJidi);
                 break;
             case ObjectID.ObjectType.EnemyJiDi:
@@ -85,7 +86,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
                 break;
             case ObjectID.ObjectType.MySoldier:
                 var mysoldier = value as FightVO;
-                mysoldier.Camp = 1;
+                mysoldier.Camp = Utils.MyCamp;
                 var soldierid = otherParam.SoldierID;
                 var config = SData_armybase_c.Single.GetDataOfID(soldierid);
                 mysoldier.SetSoldierData(config);
@@ -102,7 +103,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
                 break;
             case ObjectID.ObjectType.EnemySoldier:
                 var enemysoldier = value as FightVO;
-                enemysoldier.Camp = 2;
+                enemysoldier.Camp = Utils.EnemyCamp;
                 var enemyId = otherParam.SoldierID;
                 var enemyConfig = SData_armybase_c.Single.GetDataOfID(enemyId);
                 enemysoldier.SetSoldierData(enemyConfig);

@@ -254,7 +254,7 @@ public class ClusterManagerWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			ClusterManager obj = (ClusterManager)o;
-			float ret = obj.MovementWidth;
+			float ret = obj.MapWidth;
 			LuaDLL.lua_pushnumber(L, ret);
 			return 1;
 		}
@@ -273,7 +273,7 @@ public class ClusterManagerWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			ClusterManager obj = (ClusterManager)o;
-			float ret = obj.MovementHeight;
+			float ret = obj.MapHeight;
 			LuaDLL.lua_pushnumber(L, ret);
 			return 1;
 		}
@@ -421,7 +421,7 @@ public class ClusterManagerWrap
 			o = ToLua.ToObject(L, 1);
 			ClusterManager obj = (ClusterManager)o;
 			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
-			obj.MovementWidth = arg0;
+			obj.MapWidth = arg0;
 			return 0;
 		}
 		catch(Exception e)
@@ -440,7 +440,7 @@ public class ClusterManagerWrap
 			o = ToLua.ToObject(L, 1);
 			ClusterManager obj = (ClusterManager)o;
 			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
-			obj.MovementHeight = arg0;
+			obj.MapHeight = arg0;
 			return 0;
 		}
 		catch(Exception e)

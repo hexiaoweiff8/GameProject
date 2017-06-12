@@ -11,8 +11,9 @@ public class Soldier_JinengGongji_State : SoldierFSMState
 
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
-        Debug.Log("技能攻击");
+        Debug.Log("技能攻击:" + fsm.Display.GameObj.name);
     }
+
     public override void Action(SoldierFSMSystem fsm)
     {
         // fsm 中带技能

@@ -237,7 +237,30 @@ public class VOBase
     public ObjectID ObjID
     {
         get { return _objID; }
-        set { _objID = value; }
+        set
+        {
+            _objID = value;
+            if (_objID != null)
+            {
+                switch (_objID.ObjType)
+                {
+                    case ObjectID.ObjectType.EnemyJiDi:
+                    case ObjectID.ObjectType.EnemyObstacle:
+                    case ObjectID.ObjectType.EnemySoldier:
+                    case ObjectID.ObjectType.EnemyTank:
+                    case ObjectID.ObjectType.EnemyTower:
+                        Camp = Utils.EnemyCamp;
+                        break;
+                    case ObjectID.ObjectType.MyJiDi:
+                    case ObjectID.ObjectType.MyObstacle:
+                    case ObjectID.ObjectType.MySoldier:
+                    case ObjectID.ObjectType.MyTank:
+                    case ObjectID.ObjectType.MyTower:
+                        Camp = Utils.MyCamp;
+                        break;
+                }
+            }
+        }
     }
     
     /// <summary>

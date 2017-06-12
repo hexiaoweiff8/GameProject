@@ -29,10 +29,10 @@ public class ClusterManager : ILoopItem
     public Vector3 MovementPlanePosition;
 
 
-    public float MovementWidth;
+    public float MapWidth;
 
 
-    public float MovementHeight;
+    public float MapHeight;
     
     /// <summary>
     /// 判定前方角度
@@ -174,8 +174,8 @@ public class ClusterManager : ILoopItem
         targetList = new TargetList<PositionObject>(x, y, w, h, unitw);
         targetList.MapInfo = new MapInfo<PositionObject>();
         targetList.MapInfo.AddMap(unitw, w, h, map);
-        MovementHeight = h;
-        MovementWidth = w;
+        MapHeight = h;
+        MapWidth = w;
         UnitWidth = unitw;
     }
 
@@ -269,6 +269,7 @@ public class ClusterManager : ILoopItem
         {
             return null;
         }
+        Utils.DrawGraphics(graphics, Color.white);
         IList<PositionObject> result = targetList.QuadTree.GetScope(graphics);
         return result;
     } 

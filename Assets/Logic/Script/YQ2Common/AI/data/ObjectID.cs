@@ -41,7 +41,15 @@ public class ObjectID {
         /// <summary>
         /// 中立障碍物 可能有血条 但没有阵营
         /// </summary>
-        NPCObstacle = 9
+        NPCObstacle = 9,
+        /// <summary>
+        /// 我方防御塔
+        /// </summary>
+        MyTower = 10,
+        /// <summary>
+        /// 敌方防御塔
+        /// </summary>
+        EnemyTower = 11,
     }
     /// <summary>
     /// 所有可显示对象起始id
@@ -76,4 +84,20 @@ public class ObjectID {
         tempID = _id;
         _objType = objType;
     }
+
+    /// <summary>
+    /// 重载Equals
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object obj)
+    {
+        var objId = obj as ObjectID;
+        if (objId == null)
+        {
+            return false;
+        }
+        return objId.ID == tempID;
+    }
+
 }

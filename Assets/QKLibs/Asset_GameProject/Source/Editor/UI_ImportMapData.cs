@@ -18,7 +18,7 @@ public class UI_ImportMapData
         var fileInfo = new FileInfo(mapFilePath);
         if (fileInfo.Exists)
         {
-            fileInfo.CopyTo(Application.dataPath + @"\StreamingAssets\MapData\mapdata");
+            fileInfo.CopyTo(Application.dataPath + @"\StreamingAssets\MapData\mapdata", true);
             Debug.Log("文件引入完成");
         }
         else

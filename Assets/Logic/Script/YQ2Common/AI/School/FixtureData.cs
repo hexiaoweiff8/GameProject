@@ -75,6 +75,7 @@ public class FixtureData : PositionObject
                         var fix = fixItem.AddComponent<FixtureData>();
                         fix.MemberData = new VOBase()
                         {
+                            ObjID = new ObjectID(ObjectID.ObjectType.NPCObstacle),
                             SpaceSet = 1 * unitWidth
                         };
                         fix.transform.localScale = new Vector3(unitWidth, unitWidth, unitWidth);

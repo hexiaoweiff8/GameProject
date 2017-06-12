@@ -322,9 +322,10 @@ public class AstarTest : MonoBehaviour {
     /// </summary>
     public int[][] InitMapInfo()
     {
-        var mapInfoPath = Application.dataPath + Path.AltDirectorySeparatorChar + "mapinfo";
-        var mapInfoStr = Utils.LoadFileInfo(mapInfoPath);
-        var mapInfoData = DeCodeInfo(mapInfoStr);
+        //var mapInfoPath = Application.dataPath + Path.AltDirectorySeparatorChar + "mapinfo";
+        //var mapInfoStr = Utils.LoadFileInfo(mapInfoPath);
+        //var mapInfoData = DeCodeInfo(mapInfoStr);
+        var mapInfoData = MapManager.Instance().GetMapInfoById(1, 1);
         LoadMap.Init(mapInfoData, UnitWidth);
         ClusterManager.Single.Init(-MapWidth * 0.5f, -MapHeight * 0.5f, MapWidth, MapHeight, 10, mapInfoData);
         MapWidth = mapInfoData[0].Length;

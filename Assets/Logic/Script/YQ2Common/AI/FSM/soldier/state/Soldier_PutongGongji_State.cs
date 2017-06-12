@@ -3,7 +3,6 @@ using System.Collections;
 using Util;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 public class Soldier_PutongGongji_State : SoldierFSMState
 {
@@ -145,6 +144,7 @@ public class Soldier_PutongGongji_State : SoldierFSMState
             if (AdjustTargetIsInRange(fsm))
             {
                 fsm.TargetIsLoseEfficacy = true;
+                // TODO 如果在视野范围内开始追击
             }
             // 有技能可放
 
