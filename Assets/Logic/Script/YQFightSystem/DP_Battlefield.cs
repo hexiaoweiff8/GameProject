@@ -88,11 +88,11 @@ public class DP_Battlefield : MonoEX.SingletonAuto<DP_Battlefield>
     public void LoadBase()
     {
         // 不同等级基地不同模型
-        var rightBase = new CreateActorParam(5, false, 0, "lingtong", "lingtong", true, 1008001);
-        var leftBase = new CreateActorParam(5, false, 0, "lingtong", "lingtong", true, 1008001);
+        //var rightBase = new CreateActorParam(5, false, 0, "lingtong", "lingtong", true, 1008001);
+        //var leftBase = new CreateActorParam(5, false, 0, "lingtong", "lingtong", true, 1008001);
 
-        FightUnitFactory.CreateUnit(1, leftBase);
-        FightUnitFactory.CreateUnit(2, rightBase);
+        //FightUnitFactory.CreateUnit(1, leftBase);
+        //FightUnitFactory.CreateUnit(2, rightBase);
     }
 
     /// <summary>

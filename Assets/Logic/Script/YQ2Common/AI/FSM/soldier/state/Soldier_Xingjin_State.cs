@@ -23,15 +23,21 @@ public class Soldier_Xingjin_State : SoldierFSMState
     /// <param name="fsm"></param>
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
+        //Debug.Log("行进:" + fsm.Display.GameObj.name);
         base.DoBeforeEntering(fsm);
         fsm.Display.ClusterData.ContinueMove();
-        clusterData = fsm.Display.ClusterData;
+        clusterData = fsm.Display.ClusterData as ClusterData;
+
+        // 切换动作
+        var myself = fsm.Display.RanderControl;
+        myself.ModelRander.SetClip("run".GetHashCode());
 
         // 重新寻路
         ReFindPath();
     }
     public override void DoBeforeLeaving(SoldierFSMSystem fsm)
     {
+        //Debug.Log("行进结束:" + fsm.Display.GameObj.name);
         base.DoBeforeLeaving(fsm);
         fsm.IsCanRun = false;
     }
@@ -49,7 +55,7 @@ public class Soldier_Xingjin_State : SoldierFSMState
     /// <param name="fsm"></param>
     private void ReFindPath()
     {
-        Debug.Log("重新寻路");
+        //Debug.Log("重新寻路");
         // 重新寻路设置目标点
         // 清空当前目标点
         clusterData.ClearTarget();

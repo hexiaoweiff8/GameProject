@@ -16,6 +16,21 @@ public class CreateActorParam
     //卡牌ID
     public int CardID;
 
+    /// <summary>
+    /// 单位等级
+    /// </summary>
+    public int Level = 1;
+
+    /// <summary>
+    /// 加载单位X轴位置
+    /// </summary>
+    public float X;
+
+    /// <summary>
+    /// 加载单位Y轴位置
+    /// </summary>
+    public float Y;
+
     public CreateActorParam(AvatarCM cmType,
         //ModleMaskColor maskColor,
         bool colorMat,
@@ -54,5 +69,33 @@ public class CreateActorParam
         this.TexturePackName = texturePackName;
         this.IsHero = isHero;
         this.CardID = cardID;
+    }
+
+    /// <summary>
+    /// 创建单位(基地炮塔)
+    /// </summary>
+    /// <param name="x">单位位置x</param>
+    /// <param name="y">单位位置y</param>
+    /// <param name="level">单位等级</param>
+    public CreateActorParam(float x,
+        float y,
+        int level)
+    {
+        this.X = x;
+        this.Y = y;
+        this.Level = level;
+    }
+
+    /// <summary>
+    /// 创建单位(障碍物)
+    /// </summary>
+    /// <param name="x">单位位置x</param>
+    /// <param name="y">单位位置y</param>
+    /// <param name="level">单位等级</param>
+    public CreateActorParam(float x,
+        float y)
+    {
+        this.X = x;
+        this.Y = y;
     }
 }

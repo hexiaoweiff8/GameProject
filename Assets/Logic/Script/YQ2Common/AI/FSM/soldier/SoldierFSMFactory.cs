@@ -27,8 +27,6 @@ public class SoldierFSMFactory
                     _fsmTrriggerList.Add(putong);
                     var jineng = new JinengGongjiTrigger();
                     _fsmTrriggerList.Add(jineng);
-                    var zhuiji = new ZhuiJiTrigger();
-                    _fsmTrriggerList.Add(zhuiji);
                     break;
                 }
             case SoldierTriggerID.SiWang:
@@ -39,32 +37,20 @@ public class SoldierFSMFactory
                 {
                     var putongToXingjin = new XingjinTrigger();
                     _fsmTrriggerList.Add(putongToXingjin);
-                    var zhuiji = new ZhuiJiTrigger();
-                    _fsmTrriggerList.Add(zhuiji);
-                    //var putongToJineng = new JinengGongjiTrigger();
-                    //_fsmTrriggerList.Add(putongToJineng);
-                    //var putongToZhunbeizhandou = new ZhunbeizhandouTrigger();
-                    //_fsmTrriggerList.Add(putongToZhunbeizhandou);
                 }
                 break;
             case SoldierTriggerID.JinengGongji:
                 {
                     var jinengToXingjin = new XingjinTrigger();
                     _fsmTrriggerList.Add(jinengToXingjin);
-                    //var jinengToPutong = new PutongGongjiTrigger();
-                    //_fsmTrriggerList.Add(jinengToPutong);
-                    //var jinengGongjiToZhunbeizhandou = new ZhunbeizhandouTrigger();
-                    //_fsmTrriggerList.Add(jinengGongjiToZhunbeizhandou);
                     break;
                 }
             case SoldierTriggerID.ZhuiJi:
                 {
                     var zhuijiToXingjin = new XingjinTrigger();
                     _fsmTrriggerList.Add(zhuijiToXingjin);
-                    var putong = new PutongGongjiTrigger();
-                    _fsmTrriggerList.Add(putong);
-                    var jineng = new JinengGongjiTrigger();
-                    _fsmTrriggerList.Add(jineng);
+                    var zhunbeizhandou = new ZhunbeizhandouTrigger();
+                    _fsmTrriggerList.Add(zhunbeizhandou);
                     break;
                 }
         }

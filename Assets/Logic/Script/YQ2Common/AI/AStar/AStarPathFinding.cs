@@ -48,7 +48,7 @@ public class AStarPathFinding
 
         // 结束节点
         Node endNode = null;
-        //var now = Time.realtimeSinceStartup;
+        var now = Time.realtimeSinceStartup;
         // 行列数量
         var rowCount = map.Length;
         var colCount = map[0].Length;
@@ -125,13 +125,18 @@ public class AStarPathFinding
                     // 计算G值 上下左右为10, 四角为14
                     // 计算G值 上下左右为10, 四角为14
                     g = currentPoint.G + (((currentPoint.X - endX) * (currentPoint.Y - endY)) == 0 ? 1 : 1.414f);
+                    var x2y = (Math.Max(endX - surroundPoint.X, 0.1) / Math.Max(endY - surroundPoint.Y, 0.1));
+                    var y2x = 1/Math.Max(x2y, 0.1);
+
+                    //Debug.Log(x2y + ":" + y2x);
 
                     var nearObstacle = 0;
                     // 该点是否在开启列表中
                     var node = openBHList.OpenArray[surroundPoint.Y][surroundPoint.X];
                     if (node == null)
                     {
-                        surroundPoint.H = (float)Math.Sqrt(Math.Pow(endX - surroundPoint.X, 2) + Math.Pow(endY - surroundPoint.Y, 2)) * 10 + (NearObstacleCount(surroundPoint, map, colCount, rowCount) * 14);// Math.Abs(endX - surroundPoint.X) + Math.Abs(endY - surroundPoint.Y);
+                        // 两点直线最近, 并且靠近障碍物的路线更昂贵
+                        surroundPoint.H = (float)Math.Sqrt(Math.Pow((endX - surroundPoint.X) * y2x, 2) + Math.Pow((endY - surroundPoint.Y) * x2y, 2)) * 10 + (NearObstacleCount(surroundPoint, map, colCount, rowCount) * 14);// Math.Abs(endX - surroundPoint.X) + Math.Abs(endY - surroundPoint.Y);
                         surroundPoint.G = g;
                         surroundPoint.F = surroundPoint.H + surroundPoint.G;
                         surroundPoint.Parent = currentPoint;
@@ -175,14 +180,7 @@ public class AStarPathFinding
             do
             {
                 path.Add(currentNode);
-                try
-                {
-                    currentNode = currentNode.Parent;
-                }
-                catch
-                {
-                    int w = 1;
-                }
+				currentNode = currentNode.Parent;
             } while (currentNode.X != startX || currentNode.Y != startY);
         }
         else
@@ -227,7 +225,7 @@ public class AStarPathFinding
             completeCallback();
         }
 
-        //Debug.Log(string.Format("{0:#.##########}", Time.realtimeSinceStartup - now));
+        Debug.Log(string.Format("{0:#.##########}", Time.realtimeSinceStartup - now));
         // 返回路径, 如果路径数量为0 则没有可行路径
         return path;
     }

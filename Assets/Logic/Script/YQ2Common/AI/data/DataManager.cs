@@ -14,6 +14,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
     private Dictionary<int, TankVO> _enemyTankDict;
     private Dictionary<int, ObstacleVO> _myObstacleDict;
     private Dictionary<int, ObstacleVO> _enemyObstacleDict;
+    private Dictionary<int, VOBase> _npcObstacleDict; 
 
     public DataManager()
     {
@@ -25,6 +26,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
         _enemyTankDict = new Dictionary<int, TankVO>();
         _myObstacleDict = new Dictionary<int, ObstacleVO>();
         _enemyObstacleDict = new Dictionary<int, ObstacleVO>();
+        _npcObstacleDict = new Dictionary<int, VOBase>();
     }
     /// <summary>
     /// 获取某一个阵营的所有对象包括士兵 装甲 飞机等 1我方 2敌方 3中立
@@ -71,18 +73,18 @@ public class DataManager : MonoEX.Singleton<DataManager>
         {
             case ObjectID.ObjectType.MyJiDi:
                 var myJidi = value as JiDiVO;
-                // TODO 需要根据等级获得对应数据
-                var myJidiConfig = SData_armybase_c.Single.GetDataOfID(220001001);
+                // 根据等级获得对应数据
+                var myJidiConfig = SData_armybase_c.Single.GetDataOfID(220001000 + otherParam.Level);
                 myJidi.SetSoldierData(myJidiConfig);
                 myJidi.Camp = Utils.MyCamp;
-                result = CreateMyJidi(myJidi);
+                result = CreateBase(myJidi, Utils.MyCamp, otherParam);
                 break;
             case ObjectID.ObjectType.EnemyJiDi:
                 var enemyjidi = value as JiDiVO;
-                // TODO 需要根据等级获得对应数据
-                var enemyJidiConfig = SData_armybase_c.Single.GetDataOfID(220001001);
+                // 根据等级获得对应数据
+                var enemyJidiConfig = SData_armybase_c.Single.GetDataOfID(220001000 + otherParam.Level);
                 enemyjidi.SetSoldierData(enemyJidiConfig);
-                result = CreateEnemyJidi(enemyjidi);
+                result = CreateBase(enemyjidi, Utils.EnemyCamp, otherParam);
                 break;
             case ObjectID.ObjectType.MySoldier:
                 var mysoldier = value as FightVO;
@@ -134,33 +136,55 @@ public class DataManager : MonoEX.Singleton<DataManager>
                 var enemyobstacle = value as ObstacleVO;
                 CreateEnemyObstacle(enemyobstacle);
                 break;
+
+            case ObjectID.ObjectType.NPCObstacle:
+                result = CreateNPCObstacle(value, otherParam);
+                break;
         }
         return result;
     }
 
-    private DisplayOwner CreateMyJidi(JiDiVO myjidi)
+
+    /// <summary>
+    /// 创建基地
+    /// </summary>
+    /// <param name="jidiVo">基地数据</param>
+    /// <param name="camp">基地阵营</param>
+    /// <param name="otherParam">其他参数</param>
+    /// <returns></returns>
+    private DisplayOwner CreateBase(JiDiVO jidiVo, int camp, CreateActorParam otherParam)
     {
         DisplayOwner result = null;
-        if (myjidi != null)
+        if (jidiVo != null)
         {
-            _myJidiDict.Add(myjidi.ObjID.ID, myjidi);
+            _myJidiDict.Add(jidiVo.ObjID.ID, jidiVo);
             // 创建基地模型
             // 从AB包中加载
-            var myBase = GameObjectExtension.InstantiateFromPacket("jidi", "zhujidi_model", null);
-            var mesh = myBase.GetComponentInChildren<SkinnedMeshRenderer>();
-            mesh.material.mainTexture = PacketManage.Single.GetPacket("jidi").Load("zhujidi_b_texture") as Texture;
-            // TODO 设置角度与位置
-            myBase.transform.position = new Vector3(-140, -35, -20);
-            myBase.transform.Rotate(new Vector3(0, 90, 0));
+            var baseObj = GameObjectExtension.InstantiateFromPacket("jidi", "zhujidi_model", null);
+            var mesh = baseObj.GetComponentInChildren<SkinnedMeshRenderer>();
+            Texture texture = null;
+            switch (camp)
+            {
+                case Utils.MyCamp:
+                    baseObj.transform.Rotate(new Vector3(0, 90, 0));
+                    texture = PacketManage.Single.GetPacket("jidi").Load("zhujidi_b_texture") as Texture;
+                    break;
+                case Utils.EnemyCamp:
+                    baseObj.transform.Rotate(new Vector3(0, -90, 0));
+                    texture = PacketManage.Single.GetPacket("jidi").Load("zhujidi_r_texture") as Texture;
+                    break;
+            }
+            mesh.material.mainTexture = texture;
+            baseObj.transform.position = new Vector3(otherParam.X, -35, otherParam.Y);
 
 
-            var cluster = myBase.AddComponent<ClusterData>();
-            cluster.MemberData = myjidi;
+            var cluster = baseObj.AddComponent<ClusterData>();
+            cluster.MemberData = jidiVo;
             //cluster.GroupId = 999;
             cluster.MemberData.MoveSpeed = -1;
             cluster.Diameter = 40;
-            cluster.X = -140;
-            cluster.Y = -20;
+            cluster.X = otherParam.X;
+            cluster.Y = otherParam.Y;
             cluster.Stop();
             ClusterManager.Single.Add(cluster);
 
@@ -169,8 +193,8 @@ public class DataManager : MonoEX.Singleton<DataManager>
 
 
             // 创建外层持有类
-            var displayOwner = new DisplayOwner(myBase, cluster, null, null);
-            DisplayerManager.Single.AddElement(myjidi.ObjID, displayOwner);
+            var displayOwner = new DisplayOwner(baseObj, cluster, null, null);
+            DisplayerManager.Single.AddElement(jidiVo.ObjID, displayOwner);
 
             //// 创建MFAModelRander
             //var mfaModelRander = myBase.GetComponent<MFAModelRender>();
@@ -198,48 +222,6 @@ public class DataManager : MonoEX.Singleton<DataManager>
         {
             throw new Exception(String.Format("我方基地列表中不存在这个id {0}", id));
         }
-    }
-
-    private DisplayOwner CreateEnemyJidi(JiDiVO enemyjidi)
-    {
-        DisplayOwner result = null;
-        if (enemyjidi != null)
-        {
-            _enemyJidiDict.Add(enemyjidi.ObjID.ID, enemyjidi);
-            // 创建基地模型
-            // 从AB包中加载
-            var enemyBase = GameObjectExtension.InstantiateFromPacket("jidi", "zhujidi_model", null);
-            var mesh = enemyBase.GetComponentInChildren<SkinnedMeshRenderer>();
-            mesh.material.mainTexture = PacketManage.Single.GetPacket("jidi").Load("zhujidi_r_texture") as Texture;
-            // TODO 设置角度与位置
-            enemyBase.transform.position = new Vector3(1330, -35, -20);
-            enemyBase.transform.Rotate(new Vector3(0, -90, 0));
-
-
-            var cluster = enemyBase.AddComponent<ClusterData>();
-            cluster.MemberData = enemyjidi;
-            cluster.MemberData.MoveSpeed = -1;
-            cluster.Diameter = 40;
-            //cluster.GroupId = 999;
-            cluster.X = 1330;
-            cluster.Y = -20;
-            cluster.Stop();
-            ClusterManager.Single.Add(cluster);
-
-            // 创建RanderControl
-            //var randerControl = enemyBase.AddComponent<RanderControl>();
-
-            // 创建外层持有类
-            var displayOwner = new DisplayOwner(enemyBase, cluster, null, null);
-            DisplayerManager.Single.AddElement(enemyjidi.ObjID, displayOwner);
-
-            //// 创建MFAModelRander
-            //var mfaModelRander = enemyBase.GetComponent<MFAModelRender>();
-            //mfaModelRander.ObjId = cluster.MemberData.ObjID;
-
-            //displayOwner.MFAModelRender = mfaModelRander;
-        }
-        return result;
     }
 
     private JiDiVO GetEnemyJidi(int id)
@@ -406,6 +388,40 @@ public class DataManager : MonoEX.Singleton<DataManager>
         {
             throw new Exception(String.Format("敌方障碍物列表中不存在这个id {0}", id));
         }
+    }
+
+    /// <summary>
+    /// 创建中立障碍物
+    /// </summary>
+    /// <param name="vo">数据</param>
+    private DisplayOwner CreateNPCObstacle(VOBase vo, CreateActorParam otherParam)
+    {
+        _npcObstacleDict.Add(vo.ObjID.ID, vo);
+        var fixItem = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        fixItem.layer = LayerMask.NameToLayer("Scenery");//TODODO 下边测试
+        //fixItem.name += i;
+        var fix = fixItem.AddComponent<FixtureData>();
+        var unitWidth = ClusterManager.Single.UnitWidth;
+        var mapWidth = ClusterManager.Single.MapWidth;
+        var mapHeight = ClusterManager.Single.MapHeight;
+        var offsetPos = LoadMap.Single.transform.position;
+        fix.MemberData = new VOBase()
+        {
+            ObjID = new ObjectID(ObjectID.ObjectType.NPCObstacle),
+            SpaceSet = 1 * unitWidth,
+        };
+        fix.transform.localScale = new Vector3(unitWidth, unitWidth, unitWidth);
+        fix.transform.position = Utils.NumToPosition(offsetPos, new Vector2(otherParam.X, otherParam.Y), unitWidth, mapWidth, mapHeight);
+        fix.X = otherParam.X * unitWidth - mapWidth * unitWidth * 0.5f + offsetPos.x;
+        fix.Y = otherParam.Y * unitWidth - mapHeight * unitWidth * 0.5f + offsetPos.z;
+        fix.Diameter = 1 * unitWidth;
+        var result = new DisplayOwner(fixItem, fix, null, null);
+
+        ClusterManager.Single.Add(fix);
+
+        DisplayerManager.Single.AddElement(vo.ObjID, result);
+
+        return result;
     }
 
     public T Retrieve<T>(ObjectID ObjID) where T : class

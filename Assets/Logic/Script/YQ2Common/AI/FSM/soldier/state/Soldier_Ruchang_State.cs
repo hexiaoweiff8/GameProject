@@ -23,7 +23,7 @@ public class Soldier_Ruchang_State : SoldierFSMState
         Vector3 ff = UICamera.currentCamera.ScreenToWorldPoint(pt);
         soldier.bloodBar.position = ff;
         AstarFight at = GameObject.Find("/AstarFight").GetComponent<AstarFight>();
-        at.toXunLu(fsm.Display.ClusterData, soldier.isEnemy, soldier.groupIndex, fsm.Display);
+        at.toXunLu(fsm.Display.ClusterData as ClusterData, soldier.isEnemy, soldier.groupIndex, fsm.Display);
 
         float DeployTime = 0f;
         var ObjId = fsm.Display.MFAModelRender.ObjId;

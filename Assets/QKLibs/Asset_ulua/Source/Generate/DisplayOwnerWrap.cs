@@ -106,7 +106,7 @@ public class DisplayOwnerWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			DisplayOwner obj = (DisplayOwner)o;
-			ClusterData ret = obj.ClusterData;
+			ClusterData ret = obj.ClusterData as ClusterData;
 			ToLua.Push(L, ret);
 			return 1;
 		}

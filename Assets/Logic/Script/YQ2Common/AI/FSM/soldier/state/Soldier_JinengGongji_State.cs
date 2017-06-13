@@ -11,7 +11,13 @@ public class Soldier_JinengGongji_State : SoldierFSMState
 
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
-        Debug.Log("技能攻击:" + fsm.Display.GameObj.name);
+        //Debug.Log("技能攻击:" + fsm.Display.GameObj.name);
+        // 单位转向目标
+        var clusterData = fsm.Display.ClusterData as ClusterData;
+        if (clusterData != null)
+        {
+            clusterData.RotateToWithoutYAxis(fsm.EnemyTarget.ClusterData.transform.position);
+        }
     }
 
     public override void Action(SoldierFSMSystem fsm)
@@ -30,6 +36,10 @@ public class Soldier_JinengGongji_State : SoldierFSMState
                 StartPos = fsm.Display.ClusterData.gameObject.transform.position,
                 TargetPos = fsm.EnemyTarget.ClusterData.gameObject.transform.position
             });
+            // 攻击动作
+            var myself = fsm.Display.RanderControl;
+            myself.ModelRander.SetClip("attack".GetHashCode());
+
             fsm.IsCanInJinenggongji = false;
             fsm.Skill = null;
             // 切换状态到行进状态
@@ -40,6 +50,6 @@ public class Soldier_JinengGongji_State : SoldierFSMState
 
     public override void DoBeforeLeaving(SoldierFSMSystem fsm)
     {
-        Debug.Log("技能攻击结束");
+        //Debug.Log("技能攻击结束");
     }
 }

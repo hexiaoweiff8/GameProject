@@ -11,7 +11,7 @@ local selectedCardItem = nil
 function ui_fight:OnShowDone()
     math.newrandomseed()
 
-    DP_Battlefield.Single:LoadBase()
+    --DP_Battlefield.Single:LoadBase()
     local time_txt = self.transform:Find("time_bg/txt"):GetComponent("UILabel")
     --战斗计时器
     self.TimeTickerTb[1] = startTimer(5 * 60,

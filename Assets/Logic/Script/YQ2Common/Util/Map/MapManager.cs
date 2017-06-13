@@ -64,6 +64,67 @@ public class MapManager : Singleton<MapManager>
     }
 
 
+
+
+    /// <summary>
+    /// 解析建筑地图
+    /// </summary>
+    /// <param name="buildingMap">地图数据</param>
+    public void AnalysisBuidingMap(int[][] buildingMap)
+    {
+
+        // 获取基地位置
+        for (var row = 0; row < buildingMap.Length; row++)
+        {
+            var line = buildingMap[row];
+            for (var col = 0; col < line.Length; col++)
+            {
+                var cell = line[col];
+                var pos = Utils.NumToPosition(LoadMap.Single.transform.position, new Vector2(col, row),
+                    ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth,
+                    ClusterManager.Single.MapHeight);
+                switch (cell)
+                {
+                    case Utils.Accessibility:
+                        // 无障碍
+                        break;
+                    case Utils.Obstacle:
+                        // 障碍物
+                        {
+                            var paramObj = new CreateActorParam(pos.x, pos.z);
+                            FightUnitFactory.CreateUnit((int) ObjectID.ObjectType.NPCObstacle, paramObj);
+                        }
+                        break;
+                    case Utils.MyBaseId:
+                        // 我方基地
+                        {
+                            // TODO 当前基地等级
+                            var paramObj = new CreateActorParam(pos.x, pos.z, 1);
+                            FightUnitFactory.CreateUnit((int)ObjectID.ObjectType.MyJiDi, paramObj);
+                        }
+                        break;
+                    case Utils.MyTurretId:
+                        // 我方防御塔
+
+                        break;
+                    case Utils.EnemyBaseId:
+                        // 敌方基地
+                        {
+                            // TODO 当前基地等级
+                            var paramObj = new CreateActorParam(pos.x, pos.z, 1);
+                            FightUnitFactory.CreateUnit((int)ObjectID.ObjectType.EnemyJiDi, paramObj);
+                        }
+                        break;
+                    case Utils.EnemyTurretId:
+                        // 敌方防御塔
+
+                        break;
+                }
+            }
+        }
+    }
+
+
     /// <summary>
     /// 解码地图数据
     /// </summary>

@@ -6,13 +6,17 @@ using System.Collections.Generic;
 /// </summary>
 public class SoldierFSMSystem {
 
-    private List<SoldierFSMState> _states;
 
     /// <summary>
     /// 允许状态机持有显示对象
     /// 修改为外层持有对象
     /// </summary>
     public DisplayOwner Display;
+
+    /// <summary>
+    /// 通过目标选择器筛选并锁定的敌人
+    /// </summary>
+    public DisplayOwner EnemyTarget;
 
     /// <summary>
     /// 是否可以开始走的标记 只被用在判断士兵入场以后是否已经经过了一秒的等待
@@ -39,33 +43,51 @@ public class SoldierFSMSystem {
     /// </summary>
     public bool IsDie = false;
 
-
-    private SoldierStateID _currentStateId;
-
-    //不要直接修改这个变量，之所以让他公有是因为得让其他脚本调用这个变量。
-    public SoldierStateID CurrentStateID { get { return _currentStateId; } }
-
-    //记录当前状态
-    private SoldierFSMState _currentState;
-
-    public SoldierFSMState CurrentState { get { return _currentState; } }
-
-    /// <summary>
-    /// 通过目标选择器筛选并锁定的敌人
-    /// </summary>
-    public DisplayOwner EnemyTarget;
-
     /// <summary>
     /// 标记攻击目标是否失效 如果目标失效需要切除状态
     /// </summary>
     public bool TargetIsLoseEfficacy;
-
 
     /// <summary>
     /// 被释放技能
     /// </summary>
     public SkillInfo Skill = null;
 
+
+    /// <summary>
+    /// 当前状态ID
+    /// 不要直接修改这个变量，之所以让他公有是因为得让其他脚本调用这个变量。
+    /// </summary>
+    public SoldierStateID CurrentStateID { get { return _currentStateId; } }
+
+    /// <summary>
+    /// 当前状态
+    /// </summary>
+    public SoldierFSMState CurrentState { get { return _currentState; } }
+
+    // ----------------------------私有属性----------------------------
+
+    /// <summary>
+    /// 现有状态列表
+    /// </summary>
+    private List<SoldierFSMState> _states;
+
+    /// <summary>
+    /// 当前状态Id
+    /// </summary>
+    private SoldierStateID _currentStateId;
+
+    /// <summary>
+    /// 当前状态
+    /// </summary>
+    private SoldierFSMState _currentState;
+
+    // -----------------------------公共方法-----------------------------
+
+
+    /// <summary>
+    /// 初始化
+    /// </summary>
     public SoldierFSMSystem()
     {
         _states = new List<SoldierFSMState>();

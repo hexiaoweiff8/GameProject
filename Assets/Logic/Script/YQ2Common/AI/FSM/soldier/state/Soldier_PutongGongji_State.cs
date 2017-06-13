@@ -35,6 +35,7 @@ public class Soldier_PutongGongji_State : SoldierFSMState
 
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
+        //Debug.Log("普通攻击:" + fsm.Display.GameObj.name);
         _fireTick = fsm.Display.ClusterData.MemberData.AttackRate1;
         _fireTimer = new Timer(_fireTick,true);
         _fireTimer.OnCompleteCallback(() => { fire(fsm); }).Start();
@@ -42,6 +43,12 @@ public class Soldier_PutongGongji_State : SoldierFSMState
         _bulletCount = fsm.Display.ClusterData.MemberData.Clipsize1;
         _bulletMax = fsm.Display.ClusterData.MemberData.Clipsize1;
         _reloadTime = fsm.Display.ClusterData.MemberData.ReloadTime1;
+        // 单位转向目标
+        var clusterData = fsm.Display.ClusterData as ClusterData;
+        if (clusterData != null)
+        {
+            clusterData.RotateToWithoutYAxis(fsm.EnemyTarget.ClusterData.transform.position);
+        }
     }
 
     private void fire(SoldierFSMSystem fsm)
@@ -120,6 +127,10 @@ public class Soldier_PutongGongji_State : SoldierFSMState
             }, 12);
         ballistic.Begin();
 
+        // 攻击动作
+        var myself = fsm.Display.RanderControl;
+        myself.ModelRander.SetClip("attack".GetHashCode());
+
         // 开火后子弹数量-1
         _bulletCount--;
     }
@@ -133,6 +144,7 @@ public class Soldier_PutongGongji_State : SoldierFSMState
 
     public override void DoBeforeLeaving(SoldierFSMSystem fsm)
     {
+        //Debug.Log("普通攻击结束:" + fsm.Display.GameObj.name);
         _fireTimer.Kill();
     }
 
@@ -143,8 +155,8 @@ public class Soldier_PutongGongji_State : SoldierFSMState
             // 范围内没有敌人
             if (AdjustTargetIsInRange(fsm))
             {
+                fsm.IsCanInPutonggongji = false;
                 fsm.TargetIsLoseEfficacy = true;
-                // TODO 如果在视野范围内开始追击
             }
             // 有技能可放
 
@@ -165,7 +177,7 @@ public class Soldier_PutongGongji_State : SoldierFSMState
         var targetPos = fsm.EnemyTarget.ClusterData.Position;
         var myPos = fsm.Display.ClusterData.Position;
         var distance = AI_Math.V2Distance(targetPos.x, targetPos.z, myPos.x, myPos.z) - fsm.EnemyTarget.ClusterData.Diameter * 0.5f - fsm.Display.ClusterData.Diameter * 0.5f;
-        return (distance > fsm.Display.ClusterData.MemberData.SightRange) ||
+        return (distance > fsm.Display.ClusterData.MemberData.AttackRange) ||
                (fsm.EnemyTarget.ClusterData.MemberData.CurrentHP <= 0);
     }
 }

@@ -39,6 +39,10 @@ public class FightUnitFactory {
             case (int)ObjectID.ObjectType.EnemyObstacle:
                 vo = null;
                 break;
+            case (int)ObjectID.ObjectType.NPCObstacle:
+                vo = new VOBase();
+                vo.ObjID = new ObjectID(ObjectID.ObjectType.NPCObstacle);
+                break;
         }
         return DataManager.Single.Create(vo, otherParam);
     }

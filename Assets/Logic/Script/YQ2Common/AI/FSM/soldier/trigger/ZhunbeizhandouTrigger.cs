@@ -14,45 +14,33 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger{
     public override bool CheckTrigger(SoldierFSMSystem fsm)
     {
         var objId = fsm.Display.ClusterData.MemberData.ObjID;
+
+        // 攻击范围内是否有敌人
+        var pos = new Vector2(fsm.Display.ClusterData.X, fsm.Display.ClusterData.Y);
+        var list = CheckRange(objId, pos, fsm.Display.ClusterData.MemberData.AttackRange,
+            fsm.Display.ClusterData.MemberData.Camp, true);
+        Utils.DrawGraphics(new CircleGraphics(pos, fsm.Display.ClusterData.MemberData.AttackRange), Color.yellow);
+        if (list.Count > 0)
         {
-            // 攻击范围内是否有敌人
-            var pos = new Vector2(fsm.Display.ClusterData.X, fsm.Display.ClusterData.Y);
-            var list = CheckRange(objId, pos, fsm.Display.ClusterData.MemberData.AttackRange, fsm.Display.ClusterData.MemberData.Camp, true);
-            Utils.DrawGraphics(new CircleGraphics(pos, fsm.Display.ClusterData.MemberData.AttackRange), Color.yellow);
-            if (list.Count > 0)
+            // 攻击目标
+            fsm.TargetIsLoseEfficacy = false;
+            // 检测技能
+            if (CheckSkill(fsm, list))
             {
-                // 攻击目标
-                fsm.TargetIsLoseEfficacy = false;
-                if (CheckSkill(fsm, list))
-                {
-                    fsm.IsCanInPutonggongji = false;
-                    fsm.IsCanInJinenggongji = true;
-                    return true;
-                }
-                if (SetTarget(fsm, list))
-                {
-                    fsm.IsCanInJinenggongji = false;
-                    fsm.IsCanInPutonggongji = true;
-                    return true;
-                }
-                return false;
+                fsm.IsCanInPutonggongji = false;
+                fsm.IsCanInJinenggongji = true;
+                return true;
             }
+            // 检测普通攻击
+            if (SetTarget(fsm, list))
+            {
+                fsm.IsCanInJinenggongji = false;
+                fsm.IsCanInPutonggongji = true;
+                return true;
+            }
+            return false;
         }
 
-        {
-            // 视野范围内是否有敌人
-            var pos = new Vector2(fsm.Display.ClusterData.X, fsm.Display.ClusterData.Y);
-            var list = CheckRange(objId, pos, 200, fsm.Display.ClusterData.MemberData.Camp, true);
-            Utils.DrawGraphics(new CircleGraphics(pos, 200), Color.yellow);
-            //fsm.Display.ClusterData.MemberData.SightRange
-            if (list.Count > 0)
-            {
-                // 追击目标
-                // 设置状态 切追击状态
-                fsm.IsZhuiJi = true;
-                return SetTarget(fsm, list);
-            }
-        }
 
         return false;
     }

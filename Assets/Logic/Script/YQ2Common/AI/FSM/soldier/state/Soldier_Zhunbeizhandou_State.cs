@@ -17,8 +17,8 @@ public class Soldier_Zhunbeizhandou_State : SoldierFSMState
     {
         if (fsm.IsCanInPutonggongji || fsm.IsCanInJinenggongji)
         {
-            var myself = fsm.Display.RanderControl;
-            myself.ModelRander.SetClip("run".GetHashCode());
+            //var myself = fsm.Display.RanderControl;
+            //myself.ModelRander.SetClip("attack".GetHashCode());
             fsm.Display.ClusterData.Stop();
         }
 

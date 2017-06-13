@@ -184,6 +184,7 @@ public class AstarFight : MonoBehaviour
         // TODO 加载0001地图第1层 后期该值由外部传入
         // TODO 同时加载两层 
         mapInfoData = MapManager.Instance().GetMapInfoById(1, 1);
+        var mapInfoBuildingData = MapManager.Instance().GetMapInfoById(1, 2);
 
         MapWidth = mapInfoData[0].Length;
         MapHeight = mapInfoData.Length;
@@ -200,13 +201,10 @@ public class AstarFight : MonoBehaviour
         var loadMapPos = LoadMap.GetLeftBottom();
         ClusterManager.Single.Init(loadMapPos.x + MapWidth * UnitWidth * 0.5f, loadMapPos.z + MapHeight * UnitWidth * 0.5f, MapWidth, MapHeight, UnitWidth, mapInfoData);
 
-        // 创建障碍物
-        var fixtureList = FixtureData.GetFixtureDataList(mapInfoData, LoadMap.transform.position, MapWidth, MapHeight, UnitWidth);
-        // 将障碍物加入列表
-        foreach (var fixture in fixtureList)
-        {
-            ClusterManager.Single.Add(fixture);
-        }
+
+        // 解析地图
+        MapManager.Instance().AnalysisBuidingMap(mapInfoData);
+        MapManager.Instance().AnalysisBuidingMap(mapInfoBuildingData);
     }
 
 
@@ -648,7 +646,7 @@ public class AstarFight : MonoBehaviour
         ClusterData clusterData = data;
         clusterData.RotateSpeed = 10;
         clusterData.RotateWeight = 1;
-        clusterData.PhysicsInfo.MaxSpeed = 60;//clusterData.MemberData.MoveSpeed;
+        clusterData.PhysicsInfo.MaxSpeed = clusterData.MemberData.MoveSpeed;
         clusterData.Diameter *= ClusterManager.Single.UnitWidth;
         clusterData.PushTargetList(Utils.NumToPostionByList(LoadMap.MapPlane.transform.position, path, UnitWidth, MapWidth, MapHeight));
         // 默认出事状态不行进
@@ -656,46 +654,6 @@ public class AstarFight : MonoBehaviour
         ClusterManager.Single.Add(clusterData);
         // 外层对象持有ClusterData引用
         displayOwner.ClusterData = clusterData;
-    }
-
-    /// <summary>
-    /// TODO 解码地图数据
-    /// </summary>
-    /// <param name="mapInfoJson">地图数据json</param>
-    /// <returns>地图数据数组</returns>
-    private int[][] DeCodeInfo(string mapInfoJson)
-    {
-        if (string.IsNullOrEmpty(mapInfoJson))
-        {
-            return null;
-        }
-        //var mapData = new List<List<int>>();
-        // 读出数据
-        var mapLines = mapInfoJson.Split('\n');
-
-        int[][] mapInfo = new int[mapLines.Length - 1][];
-        for (var row = 0; row < mapLines.Length; row++)
-        {
-            var line = mapLines[row];
-            if (string.IsNullOrEmpty(line))
-            {
-                continue;
-            }
-            var cells = line.Split(',');
-            // Debug.Log(line);
-            mapInfo[row] = new int[cells.Length];
-            for (int col = 0; col < cells.Length; col++)
-            {
-                if (string.IsNullOrEmpty(cells[col].Trim()))
-                {
-                    continue;
-                }
-                //Debug.Log(cells[col]);
-                mapInfo[row][col] = int.Parse(cells[col]);
-            }
-        }
-
-        return mapInfo;
     }
 
 }

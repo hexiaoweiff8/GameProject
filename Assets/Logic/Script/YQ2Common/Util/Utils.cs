@@ -49,6 +49,26 @@ public class Utils
     public const int Accessibility = 0;
 
     /// <summary>
+    /// 我方基地id
+    /// </summary>
+    public const int MyBaseId = 10;
+
+    /// <summary>
+    /// 我方防御塔id
+    /// </summary>
+    public const int MyTurretId = 11;
+
+    /// <summary>
+    /// 敌方基地id
+    /// </summary>
+    public const int EnemyBaseId = 110;
+
+    /// <summary>
+    /// 地方防御塔id
+    /// </summary>
+    public const int EnemyTurretId = 111;
+
+    /// <summary>
     /// 已关闭
     /// </summary>
     public const int Closed = -1;

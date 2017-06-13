@@ -14,7 +14,7 @@ public class DisplayOwner
     /// <summary>
     /// 集群数据引用
     /// </summary>
-    public ClusterData ClusterData { get; set; }
+    public PositionObject ClusterData { get; set; }
 
     /// <summary>
     /// 显示数据引用
@@ -33,7 +33,7 @@ public class DisplayOwner
 
 
 
-    public DisplayOwner(GameObject gameObj, ClusterData clusterData, MFAModelRender modelRender, RanderControl randerControl)
+    public DisplayOwner(GameObject gameObj, PositionObject clusterData, MFAModelRender modelRender, RanderControl randerControl)
     {
         GameObj = gameObj;
         ClusterData = clusterData;
@@ -49,9 +49,7 @@ public class DisplayOwner
     public void Destroy()
     {
         GameObject.Destroy(GameObj);
-        ClusterData = null;
-        MFAModelRender = null;
-        //MemberData = null;
+        CleanData();
     }
 
 

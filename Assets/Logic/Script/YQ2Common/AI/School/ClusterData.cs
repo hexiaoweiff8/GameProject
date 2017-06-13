@@ -176,6 +176,19 @@ public class ClusterData: PositionObject
     /// </summary>
     private Stack<Vector3> targetQueue = new Stack<Vector3>();
 
+
+
+    // ------------------------------公共方法---------------------------------
+
+    /// <summary>
+    /// 转向目标(延Y轴旋转)
+    /// </summary>
+    /// <param name="target">目标点</param>
+    public void RotateToWithoutYAxis(Vector3 target)
+    {
+        this.transform.LookAt(new Vector3(target.x, this.transform.position.y, target.z));
+    }
+
     /// <summary>
     /// 压入新位置, 并将该位置设置为当前目标点
     /// </summary>
