@@ -63,7 +63,8 @@ public class Soldier_Zhuiji_State : SoldierFSMState
     public override void Action(SoldierFSMSystem fsm)
     {
 
-        // TODO 继续查找最近单位, 如果有更近的选择更近的
+        // 继续查找最近单位, 如果有更近的选择更近的
+        CheckChangeTarget();
         // 检测目标是否在追击范围内
         if (TargetIsInScope(fsm))
         {
@@ -73,7 +74,6 @@ public class Soldier_Zhuiji_State : SoldierFSMState
                 // 重巡路径
                 ReFindPath(fsm);
             }
-
         }
         else
         {
@@ -153,10 +153,92 @@ public class Soldier_Zhuiji_State : SoldierFSMState
             {
                 result = false;
             }
-
-
         }
         return result;
+    }
+
+    /// <summary>
+    /// 检测变更目标
+    /// </summary>
+    private void CheckChangeTarget()
+    {
+        var list = CheckRange(clusterData.MemberData.ObjID, new Vector2(clusterData.X, clusterData.Y), clusterData.MemberData.SightRange, clusterData.MemberData.Camp, true);
+        if (list != null && list.Count > 0)
+        {
+            var closeObj = list[0];
+            var closeDistance = GetDistance(clusterData, closeObj);
+            foreach (var item in list)
+            {
+                if (!(item is ClusterData))
+                {
+                    continue;
+                }
+                var newDistance = GetDistance(clusterData, item);
+                if (closeDistance > newDistance)
+                {
+                    closeObj = item;
+                    closeDistance = newDistance;
+                }
+            }
+            Debug.Log("变更目标.");
+            clusterData = closeObj as ClusterData;
+        }
+
+    }
+
+    /// <summary>
+    /// 计算两单位距离
+    /// </summary>
+    /// <param name="obj1"></param>
+    /// <param name="obj2"></param>
+    /// <returns></returns>
+    private float GetDistance(PositionObject obj1, PositionObject obj2)
+    {
+        var result = 0f;
+        if (obj1 != null && obj2 != null)
+        {
+            result = (new Vector2(obj1.X, obj1.Y) - new Vector2(obj2.X, obj2.Y)).magnitude;
+        }
+
+        return result;
+    }
+
+
+
+    /// <summary>
+    /// 检测范围内单位
+    /// </summary>
+    /// <param name="objId">筛选者Id</param>
+    /// <param name="pos">检测位置</param>
+    /// <param name="range">检测半径</param>
+    /// <param name="myCamp">当前单位阵营</param>
+    /// <param name="isExceptMyCamp">是否排除己方阵营</param>
+    /// <returns>范围内单位</returns>
+    private List<PositionObject> CheckRange(ObjectID objId, Vector2 pos, float range, int myCamp = -1, bool isExceptMyCamp = false)
+    {
+        var memberInSightScope =
+                ClusterManager.Single.GetPositionObjectListByGraphics(new CircleGraphics(pos, range));
+
+        List<PositionObject> list = new List<PositionObject>();
+        foreach (var member in memberInSightScope)
+        {
+            // 区分自己
+            if (objId.ID == member.MemberData.ObjID.ID)
+            {
+                continue;
+            }
+            // || objId.ObjType != ObjectID.ObjectType.NPCObstacle
+            // 区分阵营
+            if (member.MemberData.CurrentHP > 0
+                && (myCamp == -1
+                || (isExceptMyCamp && member.MemberData.Camp != myCamp)
+                || (!isExceptMyCamp && member.MemberData.Camp == myCamp)))
+            {
+                list.Add(member);
+            }
+        }
+
+        return list;
     }
 
 }

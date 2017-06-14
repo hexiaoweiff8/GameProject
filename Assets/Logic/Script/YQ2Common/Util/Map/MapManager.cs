@@ -80,9 +80,6 @@ public class MapManager : Singleton<MapManager>
             for (var col = 0; col < line.Length; col++)
             {
                 var cell = line[col];
-                var pos = Utils.NumToPosition(LoadMap.Single.transform.position, new Vector2(col, row),
-                    ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth,
-                    ClusterManager.Single.MapHeight);
                 switch (cell)
                 {
                     case Utils.Accessibility:
@@ -91,7 +88,7 @@ public class MapManager : Singleton<MapManager>
                     case Utils.Obstacle:
                         // 障碍物
                         {
-                            var paramObj = new CreateActorParam(pos.x, pos.z);
+                            var paramObj = new CreateActorParam(col, row);
                             FightUnitFactory.CreateUnit((int) ObjectID.ObjectType.NPCObstacle, paramObj);
                         }
                         break;
@@ -99,6 +96,9 @@ public class MapManager : Singleton<MapManager>
                         // 我方基地
                         {
                             // TODO 当前基地等级
+                            var pos = Utils.NumToPosition(LoadMap.Single.transform.position, new Vector2(col, row),
+                                ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth,
+                                ClusterManager.Single.MapHeight);
                             var paramObj = new CreateActorParam(pos.x, pos.z, 1);
                             FightUnitFactory.CreateUnit((int)ObjectID.ObjectType.MyJiDi, paramObj);
                         }
@@ -111,6 +111,9 @@ public class MapManager : Singleton<MapManager>
                         // 敌方基地
                         {
                             // TODO 当前基地等级
+                            var pos = Utils.NumToPosition(LoadMap.Single.transform.position, new Vector2(col, row),
+                                ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth,
+                                ClusterManager.Single.MapHeight);
                             var paramObj = new CreateActorParam(pos.x, pos.z, 1);
                             FightUnitFactory.CreateUnit((int)ObjectID.ObjectType.EnemyJiDi, paramObj);
                         }

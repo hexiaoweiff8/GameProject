@@ -48,7 +48,7 @@ public class AStarPathFinding
 
         // 结束节点
         Node endNode = null;
-        var now = Time.realtimeSinceStartup;
+        //var now = Time.realtimeSinceStartup;
         // 行列数量
         var rowCount = map.Length;
         var colCount = map[0].Length;
@@ -86,9 +86,18 @@ public class AStarPathFinding
 
         var counter = 0;
 
+        // 中间变量定义
         // 寻路G值
         float g;
+        // 当前被搜索节点
         Node currentPoint;
+        //// 开放节点值
+        //Node node = null;
+        //// 当前节点与目标点x,y差
+        //int xOff = 0;
+        //int yOff = 0;
+        //// 当前路线斜率
+        //float k = 0;
         
         do
         {
@@ -114,42 +123,54 @@ public class AStarPathFinding
                 currentPoint.Surround = SurroundPoint(currentPoint);
             }
 
-            foreach (Node surroundPoint in currentPoint.Surround)
+            for (var i = 0; i < currentPoint.Surround.Length; i++)
             {
+                var surroundPoint = currentPoint.Surround[i];
                 // 斜向是否可移动
                 // 判断周围节点合理性
-                if (ValidPos(surroundPoint.X, surroundPoint.Y, colCount, rowCount) &&
-                    closePathMap[surroundPoint.Y][surroundPoint.X] != Utils.Closed &&
-                    IsPassable(map, surroundPoint, currentPoint, diameterX, diameterY))
+                if (!ValidPos(surroundPoint.X, surroundPoint.Y, colCount, rowCount) ||
+                    closePathMap[surroundPoint.Y][surroundPoint.X] == Utils.Closed ||
+                    !IsPassable(map, surroundPoint, currentPoint, diameterX, diameterY))
                 {
-                    // 计算G值 上下左右为10, 四角为14
-                    // 计算G值 上下左右为10, 四角为14
-                    g = currentPoint.G + (((currentPoint.X - endX) * (currentPoint.Y - endY)) == 0 ? 1 : 1.414f);
-                    var x2y = (Math.Max(endX - surroundPoint.X, 0.1) / Math.Max(endY - surroundPoint.Y, 0.1));
-                    var y2x = 1/Math.Max(x2y, 0.1);
+                    continue;
+                }
+                // 计算G值 上下左右为10, 四角为14
+                g = currentPoint.G + (((currentPoint.X - endX) * (currentPoint.Y - endY)) == 0 ? 1 : 1.414f);
 
-                    //Debug.Log(x2y + ":" + y2x);
+                // 该点是否在开启列表中
+                var node = openBHList.OpenArray[surroundPoint.Y][surroundPoint.X];
+                if (node == null)
+                {
+                    // 两点直线最近, 并且靠近障碍物的路线更昂贵
+                    var xOff = (endX - surroundPoint.X);
+                    var yOff = (endY - surroundPoint.Y);
+                    // 求直线斜率(为了让路径更符合人类行为)
+                    //k = (yOff / (float)xOff);
 
-                    var nearObstacle = 0;
-                    // 该点是否在开启列表中
-                    var node = openBHList.OpenArray[surroundPoint.Y][surroundPoint.X];
-                    if (node == null)
+                    //var rate = k < 0.5 ? 0.1f : 10f;
+                    //Debug.Log(k);
+                    //var angle = Vector2.Angle(new Vector2(xOff, yOff), Vector2.right);
+                    //var x2Line = Math.Abs(Math.Cos(angle * Utils.AngleToPi));
+                    //var y2Line = Math.Abs(Math.Sin(angle * Utils.AngleToPi));
+                    //Debug.Log(k + ", " + xOff + ", " + yOff);
+
+                    // 欧几里得启发
+                    //(float)Math.Sqrt(xOff * xOff / y2Line + yOff * yOff / x2Line)
+                    // 曼哈顿启发
+                    //(Math.Abs(xOff) + Math.Abs(yOff)) 
+                    surroundPoint.H = (float)Math.Sqrt(xOff * xOff + yOff * yOff) * 2 + (NearObstacleCount(surroundPoint, map, colCount, rowCount) * 8);
+                    surroundPoint.G = g;
+                    surroundPoint.F = surroundPoint.H + surroundPoint.G;
+                    surroundPoint.Parent = currentPoint;
+                    openBHList.Push(surroundPoint);
+                }
+                else // 存在于开启列表, 比较当前的G值与之前的G值大小
+                {
+                    if (g < node.G)
                     {
-                        // 两点直线最近, 并且靠近障碍物的路线更昂贵
-                        surroundPoint.H = (float)Math.Sqrt(Math.Pow((endX - surroundPoint.X) * y2x, 2) + Math.Pow((endY - surroundPoint.Y) * x2y, 2)) * 10 + (NearObstacleCount(surroundPoint, map, colCount, rowCount) * 14);// Math.Abs(endX - surroundPoint.X) + Math.Abs(endY - surroundPoint.Y);
-                        surroundPoint.G = g;
-                        surroundPoint.F = surroundPoint.H + surroundPoint.G;
-                        surroundPoint.Parent = currentPoint;
-                        openBHList.Push(surroundPoint);
-                    }
-                    else // 存在于开启列表, 比较当前的G值与之前的G值大小
-                    {
-                        if (g < node.G)
-                        {
-                            node.Parent = currentPoint;
-                            node.G = g;
-                            node.F = g + node.H;
-                        }
+                        node.Parent = currentPoint;
+                        node.G = g;
+                        node.F = g + node.H;
                     }
                 }
             }
@@ -225,7 +246,7 @@ public class AStarPathFinding
             completeCallback();
         }
 
-        Debug.Log(string.Format("{0:#.##########}", Time.realtimeSinceStartup - now));
+        //Debug.Log(string.Format("{0:#.##########}", Time.realtimeSinceStartup - now));
         // 返回路径, 如果路径数量为0 则没有可行路径
         return path;
     }
@@ -288,14 +309,21 @@ public class AStarPathFinding
 
         // 寻路G值
         float g;
+        // 当前被搜索节点
         Node currentPoint;
+        // 开放节点值
+        Node node = null;
+        // 当前节点与目标点x,y差
+        int xOff = 0;
+        int yOff = 0;
+        // 当前路线斜率
+        float k = 0;
 
         do
         {
             counter++;
             // 获取最小节点
             currentPoint = openBHList.Pop();
-            Debug.Log(currentPoint.F + ":" + currentPoint.G);
             // 找到路径
             if (currentPoint.X == endX && currentPoint.Y == endY)
             {
@@ -317,33 +345,49 @@ public class AStarPathFinding
 
             foreach (Node surroundPoint in currentPoint.Surround)
             {
-                // 斜向是否可移动
+                 // 斜向是否可移动
                 // 判断周围节点合理性
-                if (ValidPos(surroundPoint.X, surroundPoint.Y, colCount, rowCount) &&
-                    closePathMap[surroundPoint.Y][surroundPoint.X] != Utils.Closed &&
-                    IsPassable(map, surroundPoint, currentPoint, diameterX, diameterY))
+                if (!ValidPos(surroundPoint.X, surroundPoint.Y, colCount, rowCount) ||
+                    closePathMap[surroundPoint.Y][surroundPoint.X] == Utils.Closed ||
+                    !IsPassable(map, surroundPoint, currentPoint, diameterX, diameterY))
                 {
-                    // 计算G值 上下左右为10, 四角为14
-                    g = currentPoint.G + (((currentPoint.X - endX) * (currentPoint.Y - endY)) == 0 ? 1 : 1.414f);
+                    continue;
+                }
+                // 计算G值 上下左右为10, 四角为14
+                g = currentPoint.G + (((currentPoint.X - endX) * (currentPoint.Y - endY)) == 0 ? 1 : 1.414f);
 
-                    // 该点是否在开启列表中
-                    var node = openBHList.OpenArray[surroundPoint.Y][surroundPoint.X];
-                    if (node == null)
+                // 该点是否在开启列表中
+                node = openBHList.OpenArray[surroundPoint.Y][surroundPoint.X];
+                if (node == null)
+                {
+
+                    // 两点直线最近, 并且靠近障碍物的路线更昂贵
+                    xOff = (endX - surroundPoint.X);
+                    yOff = (endY - surroundPoint.Y);
+                    // 求直线斜率(为了让路径更符合人类行为)
+                    //k = (yOff / (float)xOff);
+
+                    //var rate = k < 0.5 ? 0.1f : 10f;
+                    //Debug.Log(k);
+                    //var angle = Vector2.Angle(new Vector2(xOff, yOff), Vector2.right);
+                    //var x2Line = Math.Abs(Math.Cos(angle * Utils.AngleToPi));
+                    //var y2Line = Math.Abs(Math.Sin(angle * Utils.AngleToPi));
+                    //Debug.Log(k + ", " + xOff + ", " + yOff);
+
+                    //(float)Math.Sqrt(xOff * xOff / y2Line + yOff * yOff / x2Line)
+                    surroundPoint.H = (Math.Abs(xOff) + Math.Abs(yOff)) * 8 + (NearObstacleCount(surroundPoint, map, colCount, rowCount) * 8);
+                    surroundPoint.G = g;
+                    surroundPoint.F = surroundPoint.H + surroundPoint.G;
+                    surroundPoint.Parent = currentPoint;
+                    openBHList.Push(surroundPoint);
+                }
+                else // 存在于开启列表, 比较当前的G值与之前的G值大小
+                {
+                    if (g < node.G)
                     {
-                        surroundPoint.H = (float)Math.Sqrt(Math.Pow(endX - surroundPoint.X, 2) + Math.Pow(endY - surroundPoint.Y, 2)) * 10;// Math.Abs(endX - surroundPoint.X) + Math.Abs(endY - surroundPoint.Y);
-                        surroundPoint.G = g;
-                        surroundPoint.F = surroundPoint.H + surroundPoint.G;
-                        surroundPoint.Parent = currentPoint;
-                        openBHList.Push(surroundPoint);
-                    }
-                    else // 存在于开启列表, 比较当前的G值与之前的G值大小
-                    {
-                        if (g < node.G)
-                        {
-                            node.Parent = currentPoint;
-                            node.G = g;
-                            node.F = g + node.H;
-                        }
+                        node.Parent = currentPoint;
+                        node.G = g;
+                        node.F = g + node.H;
                     }
                 }
             }
@@ -477,13 +521,13 @@ public class AStarPathFinding
         var y = curPoint.Y;
         return new[]
         {
-            //new Node(x - 1, y - 1),
+            new Node(x - 1, y - 1),
             new Node(x, y - 1),
-            //new Node(x + 1, y - 1),
+            new Node(x + 1, y - 1),
             new Node(x + 1, y),
-            //new Node(x + 1, y + 1),
+            new Node(x + 1, y + 1),
             new Node(x, y + 1),
-            //new Node(x - 1, y + 1),
+            new Node(x - 1, y + 1),
             new Node(x - 1, y)
         };
     }
