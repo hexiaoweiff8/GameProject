@@ -14,7 +14,8 @@ local data ={
 		["ui_kejitree"]={"ui_kejitree","ui_kejitree;heroU;ui_fightU;commonU;ui_equip",10000,2,0,2,1,0},
 		["ui_keji_jiasu"]={"ui_keji_jiasu","ui_keji_jiasu",10000,3,0,4,3,0},
 		["ui_cardyc"]={"ui_cardyc","ui_cardyc;commonU;ui_fightU;heroU",10000,2,0,2,1,0},
-		["ui_tips"]={"ui_tips","ui_tips;commonU",10000,3,0,4,1,1}
+		["ui_tips"]={"ui_tips","ui_tips;commonU",10000,3,0,4,1,1},
+		["ui_cangku"]={"ui_cangku","ui_cangku",1,2,0,2,1,0},
 	}
 }
 return data

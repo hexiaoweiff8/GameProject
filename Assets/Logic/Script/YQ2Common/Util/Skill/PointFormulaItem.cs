@@ -153,7 +153,7 @@ public class PointFormulaItem : AbstractFormulaItem
         {
             var pos = myTargetPos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
             // 判断发射与接收位置
-            EffectsFactory.Single.CreatePointEffect(myEffectKey, null, pos, new Vector3(scaleX, scaleY, scaleZ), myDurTime, mySpeed, callback, 12).Begin();
+            EffectsFactory.Single.CreatePointEffect(myEffectKey, null, pos, new Vector3(scaleX, scaleY, scaleZ), myDurTime, mySpeed, callback, Utils.EffectLayer).Begin();
         }, myFormulaType);
 
         return result;

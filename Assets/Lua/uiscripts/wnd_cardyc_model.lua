@@ -79,10 +79,8 @@ function wnd_cardyc_model:getDatas(cardIndex)
     self.cardInfo.slotState = cardTbl[cardIndex].slot
     self.cardInfo.skill_Lv_Table = cardTbl[cardIndex].skill
     self.cardInfo.synergyLvTbl = cardTbl[cardIndex].team--协同表
-    print(cardTbl[cardIndex].team[1],cardTbl[cardIndex].team[2],cardTbl[cardIndex].team[3],cardTbl[cardIndex].team[4])
     self:init_upQualityItems()
     self:init_skillIDTable()
-    
     self:init_synergyIDTbl()
     self:init_synergyStateTbl()
     print("================wnd_cardyc_model:getDatas============end===========")
@@ -90,6 +88,14 @@ function wnd_cardyc_model:getDatas(cardIndex)
     
 end
 
+--获取属性信息
+function wnd_cardyc_model:getAttributeInfo(property,attributeID)
+    return sdata_attribute_data:GetFieldV(property, attributeID)
+end
+--获取物品属性信息
+function wnd_cardyc_model:getItemInfo(property,itemID)
+    return sdata_cangku_data:GetFieldV(property, itemID)
+end
 --[[
     获取卡牌的基础信息
     ]]
@@ -170,11 +176,15 @@ function wnd_cardyc_model:isCan_UpQuality()
         if self.cardInfo.slotState[i]==self.EquipState.Enable_NotEnough then
             print("材料不足！！！！！")--不满足：提示缺少材料
             tipsText = self:getString(20102)
-        return tipsText
+            return tipsText
+        elseif self.userInfo.goldNum < self:getUpQualityNeedGold(self.cardInfo.qualityLv) then 
+            print("金币不足！！！！！")--不满足：提示金币不足
+            tipsText = self:getString(20105)
+            return tipsText
         elseif self.cardInfo.slotState[i]==self.EquipState.Enable_Enough then
             print("尚未激活！！！！！")--不满足：提示尚未激活
             tipsText = self:getString(20103)
-        return tipsText
+            return tipsText
         end
     end
     local limitLv = self:getLimitLvFromQualityLv( self:GetNextQualityLv() )
@@ -219,9 +229,12 @@ function wnd_cardyc_model:init_upQualityItems()
         for _,v in pairs(self.userInfo.itemList) do
             if v.id == needItem.id then 
                 haveItem.num = v.num
+                break
             end
         end
         self.upQualityHaveItems[i] = haveItem
+
+
         if self.cardInfo.slotState[i] == self.EquipState.Enable_NotEnough then 
             if self.upQualityHaveItems[i].num >= self.upQualityNeedItems[i].num then 
                 self.cardInfo.slotState[i] = self.EquipState.Enable_Enough
@@ -277,7 +290,6 @@ end
 
 --[[
                     卡牌升级部分
-
 ]]
 --判断是否可以升级
 function wnd_cardyc_model:isCan_UpLevel()
@@ -452,23 +464,36 @@ function wnd_cardyc_model:isCan_UpSoldier()
         return tipsText
     end
     --判断卡牌碎片是否足够
-    if self:getUpSoldierNeedGoods("Card",self.cardInfo.soldierLv) > self.cardInfo.cardFragment then
+    if self:getUpSoldierNeedGoods("Card",self.cardInfo.soldierLv + 1) > self.cardInfo.cardFragment then
         print("卡牌碎片不足")
         tipsText = self:getString(20502)
         return tipsText
     end
     --判断兵牌是否足够
-    if self:getUpSoldierNeedGoods("Coin",self.cardInfo.soldierLv) > self.userInfo.badgeNum then
+    if self:getUpSoldierNeedGoods("Coin",self.cardInfo.soldierLv + 1) > self.userInfo.badgeNum then
         print("兵牌碎片不足")
         tipsText = self:getString(20503)
         return tipsText
     end
     return 0
 end
+function wnd_cardyc_model:getNextSoldierLv(lv, maxlv)
+    if lv  then
+        if lv < maxlv then
+            return lv+1
+        end
+        return maxlv
+    end
+end
 function wnd_cardyc_model:getUpSoldierNeedGoods(property,soldierLv)
 
     return sdata_armycarduselimitcost_data:GetFieldV(property,soldierLv)
 end
+function wnd_cardyc_model:getSoldierLimit(soldierLv)
+    local uid = tonumber(string.format("%d%.2d",self.cardInfo.cardId,soldierLv))
+    return sdata_armycarduselimit_data:GetFieldV("UseLimit",uid)
+end
+
 
 --[[
                         协同部分
@@ -482,15 +507,14 @@ wnd_cardyc_model.synergyStateTbl = {}        --协同状态
 wnd_cardyc_model.synergyIDTbl={}   -----协同ID
 function wnd_cardyc_model:init_synergyStateTbl()
     -- body
-    self.synergyStateTbl = {}
     for i = 1,#self.cardInfo.synergyLvTbl do
         if self.cardInfo.synergyLvTbl[i] > 0 then 
-            table.insert( self.synergyStateTbl, self.SynergyState.activated )
+            self.synergyStateTbl[i] = self.SynergyState.activated
         else 
             if self:isCan_UpSynergy(i) == 0 then 
-                table.insert( self.synergyStateTbl, self.SynergyState.canActive )
+                self.synergyStateTbl[i] = self.SynergyState.canActive 
             else 
-                table.insert( self.synergyStateTbl, self.SynergyState.unactive )
+                self.synergyStateTbl[i] = self.SynergyState.unactive 
             end
         end
     end 
@@ -501,7 +525,6 @@ function wnd_cardyc_model:init_synergyIDTbl()
     end 
 end 
 function wnd_cardyc_model:isCan_UpSynergy(index)
-
     local isCardCan = false
     for k,v in ipairs(cardTbl) do 
         if self.synergyIDTbl[index] == v.id then 

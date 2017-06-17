@@ -27,7 +27,8 @@ WNDTYPE = {
     ui_keji_jiasu = "ui_keji_jiasu",
     ui_kejitree = "ui_kejitree",
     Cardyc = "ui_cardyc",
-    ui_tips = "ui_tips"
+    ui_tips = "ui_tips",
+    Cangku = "ui_cangku",
 }
 UiDefine = luacsv.new(require("pk_tabs/UiDefine"))
 -- 登录窗体组件名列表
@@ -47,7 +48,8 @@ gameinit.wndlist = {
     {name = WNDTYPE.ui_keji_jiasu, cm = "uiscripts/ui_keji_jiasu"},
     {name = WNDTYPE.ui_kejitree, cm = "uiscripts/ui_kejitree"},
     {name = WNDTYPE.Cardyc, cm = "uiscripts/wnd_cardyc_controller"},
-    {name = WNDTYPE.ui_tips,cm = "uiscripts/ui_tips"}
+    {name = WNDTYPE.ui_tips,cm = "uiscripts/ui_tips"},
+    {name = WNDTYPE.Cangku, cm = "uiscripts/cangku/wnd_cangku_controller"},
 }
 _all_Reg_Wnd_list = {}
 --- <summary>
@@ -204,6 +206,8 @@ function gameinit:GameStart()
 
     --用户角色表
     sdata_userrose_data = luacsv.new(require("pk_tabs/userdata_c"))
+    --单位目标权重表
+    sdata_armyaim_data = luacsv.new(require("pk_tabs/armyaim_c"))
     --卡牌表
     sdata_armybase_data = luacsv.new(require("pk_tabs/armybase_c"))
     --卡牌基础表
@@ -234,8 +238,15 @@ function gameinit:GameStart()
     sdata_skill_data = luacsv.new(require("pk_tabs/skill_c"))
 	--克制关系表
     sdata_kezhi_data = luacsv.new(require("pk_tabs/kezhi_c"))
+    --手选宝箱表
+    sdata_selectchest_data = luacsv.new(require("pk_tabs/selectchest_c"))
+    --仓库物品表
+    sdata_cangku_data = luacsv.new(require("pk_tabs/item_c"))
+    --仓库页卡标签表
+    sdata_tab_data = luacsv.new(require("pk_tabs/pack_c"))
     
     
+    SDataUtils.setData("armyaim_c", sdata_armyaim_data.mData.head, sdata_armyaim_data.mData.body)
     SDataUtils.setData("armybase_c", sdata_armybase_data.mData.head, sdata_armybase_data.mData.body)
     SDataUtils.setData("armycardbase_c", sdata_armycardbase_data.mData.head, sdata_armycardbase_data.mData.body)
     SDataUtils.setData("array_c", sdata_array_data.mData.head, sdata_array_data.mData.body)

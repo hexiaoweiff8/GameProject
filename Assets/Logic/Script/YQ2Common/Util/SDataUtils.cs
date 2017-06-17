@@ -20,6 +20,12 @@ public class SDataUtils
 
         switch (index)
         {
+            case "armyaim_c":
+                {
+                    SData_armyaim_c.AutoInstance();
+                    SData_armyaim_c.Single.setData(table1, table2);
+                }
+                break;
             case "armybase_c":
                 {
                     SData_armybase_c.AutoInstance();

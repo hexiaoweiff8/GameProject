@@ -175,7 +175,7 @@ public class PointToPointFormulaItem : AbstractFormulaItem
             var receivePosition = myRecvPos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
             // TODO 父级暂时没有
             EffectsFactory.Single.CreatePointToPointEffect(myEffectKey, null, releasePosition,
-                                receivePosition, new Vector3(scaleX, scaleY, scaleZ), mySpeed, myFlyType, callback, 12).Begin();
+                                receivePosition, new Vector3(scaleX, scaleY, scaleZ), mySpeed, myFlyType, callback, Utils.EffectLayer).Begin();
         }, myFormulaType);
 
         return result;

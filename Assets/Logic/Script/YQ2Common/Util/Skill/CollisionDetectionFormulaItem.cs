@@ -145,7 +145,8 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
         // 数据本地化
         var myReceivePos = ReceivePos;
         var myTargetCamps = TargetCamps;
-        var selecterData = paramsPacker.ReleaseMember.ClusterData.MemberData;
+        var clusterData = paramsPacker.ReleaseMember.ClusterData;
+        //var selecterData = clusterData.MemberData;
         var myFormulaType = FormulaType;
         result = new Formula((callback) =>
         {
@@ -178,7 +179,7 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
             for (var i = 0; i < packerList.Count; i++)
             {
                 var nowPacker = packerList[i];
-                if (!TargetSelecter.CouldSelectTarget(nowPacker.ReceiverMenber.ClusterData.MemberData, selecterData))
+                if (!TargetSelecter.CouldSelectTarget(nowPacker.ReceiverMenber.ClusterData, clusterData))
                 {
                     packerList.RemoveAt(i);
                     i--;

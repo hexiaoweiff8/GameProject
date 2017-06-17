@@ -89,20 +89,21 @@ function wnd_cardyc_view:getView()
 
 
     --兵员部分
-    self.soldierP_cardNameL = self.soldierPanel.transform:Find("cardName_Lab").gameObject --卡牌名
-    self.soldierP_badgeNameL = self.soldierPanel.transform:Find("badgeName_Lab").gameObject--兵牌
-    self.soldierP_cardSp = self.soldierPanel.transform:Find("soldier_Sp").gameObject--卡牌图
-    self.soldierP_badgeSp = self.soldierPanel.transform:Find("badge_Sp").gameObject--卡牌图
     self.soldierP_LvProLab = self.soldierPanel.transform:Find("lvProgress_Lab").gameObject
     self.soldierP_desLab = self.soldierPanel.transform:Find("des_Lab").gameObject
-    self.soldierP_cardNeedL = self.soldierPanel.transform:Find("neednumLab_1").gameObject
-    self.soldierP_badgeNeednumL = self.soldierPanel.transform:Find("neednumLab_2").gameObject
-    self.soldierP_cardHavaLab = self.soldierPanel.transform:Find("numLab_1").gameObject
-    self.soldierP_badgeHaveLab = self.soldierPanel.transform:Find("numLab_2").gameObject
+    self.soldierP_cost = self.soldierPanel.transform:Find("cost").gameObject--兵员升级消耗物品显示
+    self.soldierP_cardNameL = self.soldierPanel.transform:Find("cost/cardName_Lab").gameObject --卡牌名
+    self.soldierP_badgeNameL = self.soldierPanel.transform:Find("cost/badgeName_Lab").gameObject--兵牌
+    self.soldierP_cardSp = self.soldierPanel.transform:Find("cost/soldier_Sp").gameObject--卡牌图
+    self.soldierP_badgeSp = self.soldierPanel.transform:Find("cost/badge_Sp").gameObject--兵牌图
+    self.soldierP_cardNeedL = self.soldierPanel.transform:Find("cost/neednumLab_1").gameObject
+    self.soldierP_badgeNeednumL = self.soldierPanel.transform:Find("cost/neednumLab_2").gameObject
+    self.soldierP_cardHavaLab = self.soldierPanel.transform:Find("cost/numLab_1").gameObject
+    self.soldierP_badgeHaveLab = self.soldierPanel.transform:Find("cost/numLab_2").gameObject
     self.soldierP_btnUpSoldier = self.soldierPanel.transform:Find("Btn_soldierUpLv").gameObject
-    self.soldierP_btnUpSoldier_Lab=self.soldierPanel.transform:Find("Btn_soldierUpLv/lab").gameObject
+    self.soldierP_btnUpSoldier_Lab = self.soldierPanel.transform:Find("Btn_soldierUpLv/lab").gameObject
     self.soldierP_maxSoldierP = self.soldierPanel.transform:Find("maxSoldier").gameObject
-    self.soldierP_btnUpSoldier_redDot=self.soldierPanel.transform:Find("Btn_soldierUpLv/redDot").gameObject
+    self.soldierP_btnUpSoldier_redDot = self.soldierPanel.transform:Find("Btn_soldierUpLv/redDot").gameObject
 
     --协同部分
     self.synergyP_tipLab = self.synergyPanel.transform:Find("atbAddPanel/tipLab").gameObject --加成提示信息
@@ -324,7 +325,8 @@ function wnd_cardyc_view:init_UpQuality_SuccessPanel()
     self.upQuality_SuccessP = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "adSuccess",  self.gameObject)
     self.upQualitySP_clickPanel = self.upQuality_SuccessP.transform:Find("clickPanel").gameObject
     self.upQualitySP_titleL = self.upQuality_SuccessP.transform:Find("title_Lab").gameObject
-    for i=1,#data.qualityPropName do
+    -- print(#data.qualityPropName)
+    for i=1,3 do
         self["upQualitySP_propSp_"..i] = self.upQuality_SuccessP.transform:Find("upsSp_"..i).gameObject
         self["upQualitySP_propName_"..i] = self.upQuality_SuccessP.transform:Find("desLab_"..i).gameObject
         self["upQualitySP_propBeValue_"..i] = self.upQuality_SuccessP.transform:Find("Label_a"..i).gameObject

@@ -184,6 +184,8 @@ public class BallisticFactory
         {
             return null;
         }
+        // 设置父级
+        ParentManager.Instance().SetParent(ball, ParentManager.BallisticParent);
         var result = ball.AddComponent<Ballistic>();
 
         result.StartPos = startPos;

@@ -7,7 +7,7 @@ using UnityEngine;
 /// <summary>
 /// 位置对象
 /// </summary>
-public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHolder//, IGraphical<Rectangle>
+public abstract class PositionObject : MonoBehaviour, ISelectWeightDataHolder, IBaseMember, IGraphicsHolder//, IGraphical<Rectangle>
 {
 
     /// <summary>
@@ -86,7 +86,7 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
         {
             MemberData.SpaceSet = value < 0 ? 1 : value;
             // 更新图形空间值
-            CollisionGraphics.SetGraphicsSpaceSet(MyCollisionGraphics, value);
+            CollisionGraphics.SetGraphicsSpaceSet(MyCollisionGraphics, value * 0.5f);
             // 质量 = 直径平方
             physicsInfo.Quality = MemberData.SpaceSet * MemberData.SpaceSet;
         }
@@ -308,6 +308,11 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
     //    }
     //    return hisRectangle;
     //}
+
+    /// <summary>
+    /// 目标选择权重
+    /// </summary>
+    public SelectWeightData SelectWeightData { get; set; }
 }
 
 

@@ -80,30 +80,45 @@ public class Utils
 
 
     // --------------------------单位类型----------------------------
-    /// <summary>
-    /// 单位类型-士兵
-    /// </summary>
-    public const short MemberItemTypeSoldier = 1;
+    ///// <summary>
+    ///// 单位类型-士兵
+    ///// </summary>
+    //public const short MemberItemTypeSoldier = 1;
+
+    ///// <summary>
+    ///// 单位类型-重型载具(坦克)
+    ///// </summary>
+    //public const short MemberItemTypeTank = 2;
+
+    ///// <summary>
+    ///// 单位类型-轻型载具
+    ///// </summary>
+    //public const short MemberItemTypeLV = 3;
+
+    ///// <summary>
+    ///// 单位类型-火炮
+    ///// </summary>
+    //public const short MemberItemTypeCannon = 4;
+
+    ///// <summary>
+    ///// 单位类型-飞行器
+    ///// </summary>
+    //public const short MemberItemTypeAircraft = 5;
 
     /// <summary>
-    /// 单位类型-重型载具(坦克)
+    /// 单位类型-人族
     /// </summary>
-    public const short MemberItemTypeTank = 2;
+    public const short MemberItemTypeHuman = 1;
 
     /// <summary>
-    /// 单位类型-轻型载具
+    /// 单位类型-兽族
     /// </summary>
-    public const short MemberItemTypeLV = 3;
+    public const short MemberItemTypeOrc = 2;
 
     /// <summary>
-    /// 单位类型-火炮
+    /// 单位类型-智械
     /// </summary>
-    public const short MemberItemTypeCannon = 4;
-
-    /// <summary>
-    /// 单位类型-飞行器
-    /// </summary>
-    public const short MemberItemTypeAircraft = 5;
+    public const short MemberItemTypeOmnic = 3;
 
     /// <summary>
     /// 敌方阵营
@@ -135,6 +150,16 @@ public class Utils
     public const short GeneralTypeBuilding = 3;
 
     // ----------------------------单位大类型-----------------------------
+
+
+    // ----------------------------基地BaseID---------------------------------
+
+    /// <summary>
+    /// 基地baseId
+    /// </summary>
+    public const int BaseBaseId = 220001000;
+
+    // ----------------------------基地BaseID---------------------------------
 
 
     /// <summary>
@@ -191,6 +216,11 @@ public class Utils
     /// π转角度
     /// </summary>
     public const float PiToAngle = 57.2957795130823f;
+
+    /// <summary>
+    /// 特效显示层
+    /// </summary>
+    public const int EffectLayer = 12;
 
 
     /// <summary>

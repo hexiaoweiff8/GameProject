@@ -111,7 +111,7 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
         var myTargetCamps = TargetCamps;
         var myFormulaType = FormulaType;
 
-        var selecterData = paramsPacker.ReleaseMember.ClusterData.MemberData;
+        var clusterData = paramsPacker.ReleaseMember.ClusterData;
 
         // 上一次列表
         List<FormulaParamsPacker> prvPackerList = new List<FormulaParamsPacker>();
@@ -157,8 +157,7 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
                         for (var i = 0; i < tmpPackerList.Count; i++)
                         {
                             var nowPacker = tmpPackerList[i];
-                            if (!TargetSelecter.CouldSelectTarget(nowPacker.ReceiverMenber.ClusterData.MemberData,
-                                    selecterData))
+                            if (!TargetSelecter.CouldSelectTarget(nowPacker.ReceiverMenber.ClusterData, clusterData))
                             {
                                 tmpPackerList.RemoveAt(i);
                                 i--;

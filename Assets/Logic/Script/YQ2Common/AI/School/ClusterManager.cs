@@ -272,7 +272,51 @@ public class ClusterManager : ILoopItem
         Utils.DrawGraphics(graphics, Color.white);
         IList<PositionObject> result = targetList.QuadTree.GetScope(graphics);
         return result;
-    } 
+    }
+
+    /// <summary>
+    /// 检测范围内单位
+    /// </summary>
+    /// <param name="pos">检测位置</param>
+    /// <param name="range">检测半径</param>
+    /// <param name="myCamp">当前单位阵营</param>
+    /// <param name="isExceptMyCamp">是否排除己方阵营</param>
+    /// <returns>范围内单位</returns>
+    public IList<PositionObject> CheckRange(Vector2 pos, float range, int myCamp = -1, bool isExceptMyCamp = false)
+    {
+        return CheckRange(new CircleGraphics(pos, range), myCamp, isExceptMyCamp);
+    }
+
+    /// <summary>
+    /// 检测范围内单位
+    /// </summary>
+    /// <param name="graphics">范围图形</param>
+    /// <param name="myCamp">当前单位阵营</param>
+    /// <param name="isExceptMyCamp">是否排除己方阵营</param>
+    /// <returns>范围内单位</returns>
+    public IList<PositionObject> CheckRange(ICollisionGraphics graphics, int myCamp = -1, bool isExceptMyCamp = false)
+    {
+        var memberInSightScope = GetPositionObjectListByGraphics(graphics);
+
+        IList<PositionObject> list = new List<PositionObject>();
+        foreach (var member in memberInSightScope)
+        {
+            // 区分自己
+            // 区分空地属性
+            // 区分阵营
+            if (member.MemberData.CurrentHP > 0
+                && (myCamp == -1
+                || (isExceptMyCamp && member.MemberData.Camp != myCamp)
+                || (!isExceptMyCamp && member.MemberData.Camp == myCamp)))
+            //&& objId.ID != member.MemberData.ObjID.ID)
+            {
+                list.Add(member);
+            }
+        }
+
+        return list;
+    }
+
 
     // ------------------------私有方法--------------------------
 

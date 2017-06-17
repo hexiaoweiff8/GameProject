@@ -152,7 +152,7 @@ public class PointToObjFormulaItem : AbstractFormulaItem
             // 判断发射与接收位置
             // TODO 父级暂时没有
             EffectsFactory.Single.CreatePointToObjEffect(myEffectKey, null, paramsPacker.StartPos,
-                                paramsPacker.ReceiverMenber.GameObj, new Vector3(scaleX, scaleY, scaleZ), mySpeed, myFlyType, callback, 12).Begin();
+                                paramsPacker.ReceiverMenber.GameObj, new Vector3(scaleX, scaleY, scaleZ), mySpeed, myFlyType, callback, Utils.EffectLayer).Begin();
         }, myFormulaType);
 
         return result;

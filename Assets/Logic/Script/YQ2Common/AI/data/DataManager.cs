@@ -74,7 +74,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
             case ObjectID.ObjectType.MyJiDi:
                 var myJidi = value as JiDiVO;
                 // 根据等级获得对应数据
-                var myJidiConfig = SData_armybase_c.Single.GetDataOfID(220001000 + otherParam.Level);
+                var myJidiConfig = SData_armybase_c.Single.GetDataOfID(Utils.BaseBaseId + otherParam.Level);
                 myJidi.SetSoldierData(myJidiConfig);
                 myJidi.Camp = Utils.MyCamp;
                 result = CreateBase(myJidi, Utils.MyCamp, otherParam);
@@ -82,16 +82,18 @@ public class DataManager : MonoEX.Singleton<DataManager>
             case ObjectID.ObjectType.EnemyJiDi:
                 var enemyjidi = value as JiDiVO;
                 // 根据等级获得对应数据
-                var enemyJidiConfig = SData_armybase_c.Single.GetDataOfID(220001000 + otherParam.Level);
+                var enemyJidiConfig = SData_armybase_c.Single.GetDataOfID(Utils.BaseBaseId + otherParam.Level);
                 enemyjidi.SetSoldierData(enemyJidiConfig);
                 result = CreateBase(enemyjidi, Utils.EnemyCamp, otherParam);
                 break;
             case ObjectID.ObjectType.MySoldier:
                 var mysoldier = value as FightVO;
                 mysoldier.Camp = Utils.MyCamp;
-                var soldierid = otherParam.SoldierID;
-                var config = SData_armybase_c.Single.GetDataOfID(soldierid);
+                var soldierId = otherParam.SoldierID;
+                var config = SData_armybase_c.Single.GetDataOfID(soldierId);
                 mysoldier.SetSoldierData(config);
+                // TODO 设置目标选择权重数据
+                var myAimData = SData_armyaim_c.Single.GetDataOfID(config.ArmyID);
                 // 加载并设置技能
                 mysoldier.SkillInfoList = SkillManager.Single.LoadSkillInfoList(new List<int>()
                 {
@@ -102,6 +104,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
                     mysoldier.Skill5,
                 });
                 result = CreateSoldier(mysoldier, otherParam);
+                result.ClusterData.SelectWeightData = new SelectWeightData(myAimData);
                 break;
             case ObjectID.ObjectType.EnemySoldier:
                 var enemysoldier = value as FightVO;
@@ -109,6 +112,8 @@ public class DataManager : MonoEX.Singleton<DataManager>
                 var enemyId = otherParam.SoldierID;
                 var enemyConfig = SData_armybase_c.Single.GetDataOfID(enemyId);
                 enemysoldier.SetSoldierData(enemyConfig);
+                // TODO 设置目标选择权重数据
+                var enemyAimData = SData_armyaim_c.Single.GetDataOfID(enemyConfig.ArmyID);
                 // 加载并设置技能
                 enemysoldier.SkillInfoList = SkillManager.Single.LoadSkillInfoList(new List<int>()
                 {
@@ -119,6 +124,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
                     enemysoldier.Skill5,
                 });
                 result = CreateSoldier(enemysoldier, otherParam);
+                result.ClusterData.SelectWeightData = new SelectWeightData(enemyAimData);
                 break;
             case ObjectID.ObjectType.MyTank:
                 var mytank = value as TankVO;
@@ -161,6 +167,8 @@ public class DataManager : MonoEX.Singleton<DataManager>
             // 创建基地模型
             // 从AB包中加载
             var baseObj = GameObjectExtension.InstantiateFromPacket("jidi", "zhujidi_model", null);
+            // 设置父级
+            ParentManager.Instance().SetParent(baseObj, ParentManager.BuildingParent);
             var mesh = baseObj.GetComponentInChildren<SkinnedMeshRenderer>();
             Texture texture = null;
             switch (camp)
@@ -254,7 +262,9 @@ public class DataManager : MonoEX.Singleton<DataManager>
         }
         //var display = DP_FightPrefabManage.InstantiateAvatar(param);
         //通过对象池创建角色
-        var display = DisplayerManager.Single.CreateAvatar(soldier.Name,param);
+        var display = DisplayerManager.Single.CreateAvatar(soldier.Name, param);
+        // 设置父级
+        ParentManager.Instance().SetParent(display, ParentManager.ClusterParent);
 
         var mfa = display.GetComponent<MFAModelRender>();
         mfa.ObjId = soldier.ObjID;
@@ -398,6 +408,8 @@ public class DataManager : MonoEX.Singleton<DataManager>
     {
         _npcObstacleDict.Add(vo.ObjID.ID, vo);
         var fixItem = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        // 设置父级
+        ParentManager.Instance().SetParent(fixItem, ParentManager.ObstacleParent);
         fixItem.layer = LayerMask.NameToLayer("Scenery");//TODODO 下边测试
         //fixItem.name += i;
         var fix = fixItem.AddComponent<FixtureData>();

@@ -303,7 +303,7 @@ public class VOBase
         set
         {
             _currentHP = value;
-            _currentHP = Mathf.Max(0,Mathf.Min(_currentHP, TotalHp));
+            //_currentHP = Mathf.Max(0,Mathf.Min(_currentHP, TotalHp));
         }
     }
 

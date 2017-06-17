@@ -521,13 +521,13 @@ public class AStarPathFinding
         var y = curPoint.Y;
         return new[]
         {
-            new Node(x - 1, y - 1),
+            //new Node(x - 1, y - 1),
             new Node(x, y - 1),
-            new Node(x + 1, y - 1),
+            //new Node(x + 1, y - 1),
             new Node(x + 1, y),
-            new Node(x + 1, y + 1),
+            //new Node(x + 1, y + 1),
             new Node(x, y + 1),
-            new Node(x - 1, y + 1),
+            //new Node(x - 1, y + 1),
             new Node(x - 1, y)
         };
     }

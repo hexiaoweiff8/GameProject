@@ -64,7 +64,7 @@ public class Soldier_Zhuiji_State : SoldierFSMState
     {
 
         // 继续查找最近单位, 如果有更近的选择更近的
-        CheckChangeTarget();
+        CheckChangeTarget(fsm);
         // 检测目标是否在追击范围内
         if (TargetIsInScope(fsm))
         {
@@ -79,6 +79,7 @@ public class Soldier_Zhuiji_State : SoldierFSMState
         {
             // 切换行进状态
             fsm.IsZhuiJi = false;
+            fsm.TargetIsLoseEfficacy = true;
         }
     }
 
@@ -160,9 +161,9 @@ public class Soldier_Zhuiji_State : SoldierFSMState
     /// <summary>
     /// 检测变更目标
     /// </summary>
-    private void CheckChangeTarget()
+    private void CheckChangeTarget(SoldierFSMSystem fsm)
     {
-        var list = CheckRange(clusterData.MemberData.ObjID, new Vector2(clusterData.X, clusterData.Y), clusterData.MemberData.SightRange, clusterData.MemberData.Camp, true);
+        var list = ClusterManager.Single.CheckRange(new Vector2(clusterData.X, clusterData.Y), clusterData.MemberData.SightRange, clusterData.MemberData.Camp, true);
         if (list != null && list.Count > 0)
         {
             var closeObj = list[0];
@@ -181,7 +182,7 @@ public class Soldier_Zhuiji_State : SoldierFSMState
                 }
             }
             Debug.Log("变更目标.");
-            clusterData = closeObj as ClusterData;
+            fsm.EnemyTarget = DisplayerManager.Single.GetElementById(closeObj.MemberData.ObjID);
         }
 
     }
@@ -201,44 +202,6 @@ public class Soldier_Zhuiji_State : SoldierFSMState
         }
 
         return result;
-    }
-
-
-
-    /// <summary>
-    /// 检测范围内单位
-    /// </summary>
-    /// <param name="objId">筛选者Id</param>
-    /// <param name="pos">检测位置</param>
-    /// <param name="range">检测半径</param>
-    /// <param name="myCamp">当前单位阵营</param>
-    /// <param name="isExceptMyCamp">是否排除己方阵营</param>
-    /// <returns>范围内单位</returns>
-    private List<PositionObject> CheckRange(ObjectID objId, Vector2 pos, float range, int myCamp = -1, bool isExceptMyCamp = false)
-    {
-        var memberInSightScope =
-                ClusterManager.Single.GetPositionObjectListByGraphics(new CircleGraphics(pos, range));
-
-        List<PositionObject> list = new List<PositionObject>();
-        foreach (var member in memberInSightScope)
-        {
-            // 区分自己
-            if (objId.ID == member.MemberData.ObjID.ID)
-            {
-                continue;
-            }
-            // || objId.ObjType != ObjectID.ObjectType.NPCObstacle
-            // 区分阵营
-            if (member.MemberData.CurrentHP > 0
-                && (myCamp == -1
-                || (isExceptMyCamp && member.MemberData.Camp != myCamp)
-                || (!isExceptMyCamp && member.MemberData.Camp == myCamp)))
-            {
-                list.Add(member);
-            }
-        }
-
-        return list;
     }
 
 }

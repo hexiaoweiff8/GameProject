@@ -23,10 +23,10 @@ public class ZhuiJiTrigger : SoldierFSMTrigger
             return false;
         }
         var clusterData = fsm.Display.ClusterData;
-        var objId = clusterData.MemberData.ObjID;
+        //var objId = clusterData.MemberData.ObjID;
         // 视野范围内是否有敌人
         var pos = new Vector2(clusterData.X, clusterData.Y);
-        var list = CheckRange(objId, pos, clusterData.MemberData.SightRange, clusterData.MemberData.Camp, true);
+        var list = ClusterManager.Single.CheckRange( pos, clusterData.MemberData.SightRange, clusterData.MemberData.Camp, true);
         Utils.DrawGraphics(new CircleGraphics(pos, clusterData.MemberData.SightRange), Color.yellow);
         //fsm.Display.ClusterData.MemberData.SightRange
         if (list.Count > 0)
@@ -54,42 +54,5 @@ public class ZhuiJiTrigger : SoldierFSMTrigger
         var target = res[ran.Next(0, res.Count)];
         fsm.EnemyTarget = DisplayerManager.Single.GetElementByPositionObject(target);
         return res.Count > 0;
-    }
-
-    /// <summary>
-    /// 检测范围内单位
-    /// </summary>
-    /// <param name="objId">筛选者Id</param>
-    /// <param name="pos">检测位置</param>
-    /// <param name="range">检测半径</param>
-    /// <param name="myCamp">当前单位阵营</param>
-    /// <param name="isExceptMyCamp">是否排除己方阵营</param>
-    /// <returns>范围内单位</returns>
-    private IList<PositionObject> CheckRange(ObjectID objId, Vector2 pos, float range, int myCamp = -1, bool isExceptMyCamp = false)
-    {
-        var memberInSightScope =
-                ClusterManager.Single.GetPositionObjectListByGraphics(
-                    new CircleGraphics(pos, range));
-
-        IList<PositionObject> list = new List<PositionObject>();
-        foreach (var member in memberInSightScope)
-        {
-            // 区分自己
-            if (objId.ID == member.MemberData.ObjID.ID)
-            {
-                continue;
-            }
-            // || objId.ObjType != ObjectID.ObjectType.NPCObstacle
-            // 区分阵营
-            if (member.MemberData.CurrentHP > 0
-                && (myCamp == -1
-                || (isExceptMyCamp && member.MemberData.Camp != myCamp)
-                || (!isExceptMyCamp && member.MemberData.Camp == myCamp)))
-            {
-                list.Add(member);
-            }
-        }
-
-        return list;
     }
 }

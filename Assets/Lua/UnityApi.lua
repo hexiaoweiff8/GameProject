@@ -14141,6 +14141,18 @@ function Utils.CreateOrOpenFile() end
 --String Utils.LoadFileInfo(FileInfo fi)
 function Utils.LoadFileInfo() end 
 
+----String Utils.LoadFileRotate(String path)
+function Utils.LoadFileRotate() end 
+
+----String Utils.CombineFile(List`1 pathList)
+function Utils.CombineFile() end 
+
+----Dictionary`2 Utils.DepartFileData(String data)
+function Utils.DepartFileData() end 
+
+----String Utils.GetMapDataByFileName(String fileName)
+function Utils.GetMapDataByFileName() end 
+
 ----Single Utils.GetTheta(Vector3 targetPos,Vector3 startPos,Single speed,Single gravity)
 function Utils.GetTheta() end 
 
@@ -14155,6 +14167,10 @@ function Utils.GetTwoPointDistance2D() end
 
 ----Void Utils.CopyArray(Int32[][] from,Int32[][]& to,Int32 rowCount,Int32 colCount)
 function Utils.CopyArray() end 
+
+----String Utils.GetMapFileNameById(Int32 mapId,Int32 mapLevel)
+--String Utils.GetMapFileNameById(String mapId,Int32 mapLevel)
+function Utils.GetMapFileNameById() end 
 
 ----Void Utils:MoveAndRotateObj(IList`1 paramList,GameObject obj,Int32 frameRate,Action completeCallback)
 function MoveAndRotateObj() end 
@@ -15251,4 +15267,257 @@ function Update() end
 
 ----Void ClusterData:Destory()
 function Destory() end 
+
+UIScrollViewAdapter = {} 
+--*
+--[Comment]
+--consturctor for UIScrollViewAdapter overrides:
+--*
+--UIScrollViewAdapter.New()
+--*
+
+function UIScrollViewAdapter.New() end
+--*
+--[Comment]
+-- property: Boolean UIScrollViewAdapter.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean UIScrollViewAdapter.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean UIScrollViewAdapter.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform UIScrollViewAdapter.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject UIScrollViewAdapter.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String UIScrollViewAdapter.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String UIScrollViewAdapter.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags UIScrollViewAdapter.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void UIScrollViewAdapter:ItemLoaded(UIScrollViewItemBase item,Boolean clear)
+function ItemLoaded() end 
+
+----Void UIScrollViewAdapter:ItemSelected(UIScrollViewItemBase item,Boolean clear)
+function ItemSelected() end 
+
+----Void UIScrollViewAdapter:ListMoved()
+function ListMoved() end 
+
+----Void UIScrollViewAdapter:Create(Int32 items,UIScrollViewItemBase listItemPrefab)
+function Create() end 
+
+----Void UIScrollViewAdapter:Reload(Int32 items)
+function Reload() end 
+
+----Void UIScrollViewAdapter:Clear()
+function Clear() end 
+
+UIScrollViewItemBase = {} 
+--*
+--[Comment]
+--consturctor for UIScrollViewItemBase overrides:
+--*
+--UIScrollViewItemBase.New()
+--*
+
+function UIScrollViewItemBase.New() end
+--*
+--[Comment]
+-- property: Int32 UIScrollViewItemBase.Index	get	set	
+Index = nil 
+--*
+--[Comment]
+-- property: Vector2 UIScrollViewItemBase.Size	get	set	
+Size = nil 
+--*
+--[Comment]
+-- property: Vector2 UIScrollViewItemBase.Position	get	set	
+Position = nil 
+--*
+--[Comment]
+-- property: Boolean UIScrollViewItemBase.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean UIScrollViewItemBase.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean UIScrollViewItemBase.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform UIScrollViewItemBase.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject UIScrollViewItemBase.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String UIScrollViewItemBase.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String UIScrollViewItemBase.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags UIScrollViewItemBase.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void UIScrollViewItemBase:Selected(Boolean clear)
+function Selected() end 
+
+UI_Cangku_Item = {} 
+--*
+--[Comment]
+--consturctor for UI_Cangku_Item overrides:
+--*
+--UI_Cangku_Item.New()
+--*
+
+function UI_Cangku_Item.New() end
+--*
+--[Comment]
+-- property: GameObject UI_Cangku_Item.cItem	get	set	
+cItem = nil 
+--*
+--[Comment]
+-- property: GameObject UI_Cangku_Item.cEquipment	get	set	
+cEquipment = nil 
+--*
+--[Comment]
+-- property: Int32 UI_Cangku_Item.Index	get	set	
+Index = nil 
+--*
+--[Comment]
+-- property: Vector2 UI_Cangku_Item.Size	get	set	
+Size = nil 
+--*
+--[Comment]
+-- property: Vector2 UI_Cangku_Item.Position	get	set	
+Position = nil 
+--*
+--[Comment]
+-- property: Boolean UI_Cangku_Item.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean UI_Cangku_Item.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean UI_Cangku_Item.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform UI_Cangku_Item.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject UI_Cangku_Item.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String UI_Cangku_Item.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String UI_Cangku_Item.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags UI_Cangku_Item.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void UI_Cangku_Item:setIcon(String spriteName)
+--Void UI_Cangku_Item:setIcon(UIAtlas atlas,String spriteName)
+function setIcon() end 
+
+----Void UI_Cangku_Item:setIconFrame(String spriteName)
+--Void UI_Cangku_Item:setIconFrame(UIAtlas atlas,String spriteName)
+function setIconFrame() end 
+
+----Void UI_Cangku_Item:setCompositeMark(Boolean show,Boolean KePinHe)
+function setCompositeMark() end 
+
+----Void UI_Cangku_Item:setItemSelect(Boolean selected)
+function setItemSelect() end 
+
+----Void UI_Cangku_Item:setItemCount(Int32 count)
+function setItemCount() end 
+
+----Void UI_Cangku_Item:setItemCountHide(Boolean shouldBeHide)
+function setItemCountHide() end 
+
+----Void UI_Cangku_Item:setEquipmentLevel(Int32 level)
+function setEquipmentLevel() end 
+
+----Void UI_Cangku_Item:setEquipped(Boolean Equipped)
+function setEquipped() end 
+
+----Void UI_Cangku_Item:setEquipmentLock(Boolean Locked)
+function setEquipmentLock() end 
+
+UIDragScrollView = {} 
+--*
+--[Comment]
+--consturctor for UIDragScrollView overrides:
+--*
+--UIDragScrollView.New()
+--*
+
+function UIDragScrollView.New() end
+--*
+--[Comment]
+-- property: Boolean UIDragScrollView.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean UIDragScrollView.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean UIDragScrollView.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform UIDragScrollView.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject UIDragScrollView.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String UIDragScrollView.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String UIDragScrollView.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags UIDragScrollView.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void UIDragScrollView:OnPan(Vector2 delta)
+function OnPan() end 
 

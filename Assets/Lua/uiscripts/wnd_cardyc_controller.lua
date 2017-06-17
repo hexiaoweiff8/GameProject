@@ -10,6 +10,12 @@ local TABLE_INDEX={
     SOLDIER =3,
     SYNERGY =4
 }
+local COLOR = {
+    Gray = Color(105/255,105/255,105/255,255/255),
+    White = Color(255/255,255/255,255/255,255/255),
+    Green = Color(0/255,255/255,0/255,255/255),
+    Red = Color(255/255,0/255,0/255,255/255),
+}
 local CurrentTabIndex = TABLE_INDEX.INFORMATION
 local CardIndex = 1
 local TestAtlas
@@ -53,19 +59,16 @@ function wnd_cardyc_controller:init_leftCard_Data()
     end
     UIEventListener.Get(view.btn_upLevel).onPress = function(btn_upLevel, args)
         if args then
-            print("升级 ")
             self:show_UpLevel_Layer()
         end
     end
     UIEventListener.Get(view.btn_upStar).onPress = function(btn_upStar, args)
         if args then
-        print("升星 ")
             self:show_UpStar_Layer()
         end
     end
     UIEventListener.Get(view.btn_left).onPress = function(btn_left, args)
         if args then
-            print("左左左 ")
             if CardIndex > 1 then
                 CardIndex = CardIndex - 1
                 self:showCard()
@@ -78,7 +81,6 @@ function wnd_cardyc_controller:init_leftCard_Data()
     end
     UIEventListener.Get(view.btn_right).onPress = function(btn_right, args)
         if args then
-            print("右右右 ")
             if CardIndex < data:getCardNum() then
                 CardIndex = CardIndex + 1
                 self:showCard()
@@ -99,8 +101,6 @@ function wnd_cardyc_controller:init_rightBody()
 end
 --根据当前显示的界面刷新右侧
 function wnd_cardyc_controller:refresh_RightBody()
-    print("refresh rightbody!!!!!!")
-    print(CurrentTabIndex)
     if CurrentTabIndex == TABLE_INDEX.INFORMATION then
         self:information_Body()
     elseif CurrentTabIndex == TABLE_INDEX.SKILL then
@@ -291,7 +291,6 @@ function wnd_cardyc_controller:upStar_refresh()
     if not data:getDatas(CardIndex) then 
         return 
     end 
-    print(string.format("controller star refresh+++starLv=====%d",data.cardInfo.starLv))
     view.upStarPanel:SetActive(false)
     self:show_UpStar_Success()
     self:init_leftCard_Data()
@@ -423,6 +422,7 @@ local isInitMedalItemLayer = false  --是否初始化物品内容界面
 local isInitGainLayer  = false      --是否初始化获得方式界面
 local isSlotInit = false            --是否初始化物品插槽
 local isInitAmSLayer = false        --是否初始化晋升成功界面
+local isEquipAll = false            --判断是否激活全部插槽
 --初始化卡片信息和进阶部分界面
 function wnd_cardyc_controller:information_Body()
     
@@ -434,7 +434,7 @@ end
 function wnd_cardyc_controller:init_InformationPanel()
     -- view.infoP_liveL.transform:Find("UILabel").text = 88
 end
-
+--初始化克制关系部分
 function wnd_cardyc_controller:init_suppressPanel()
 
     local currentType = data:getCardArmyType(data.cardInfo.cardId)
@@ -455,66 +455,64 @@ function wnd_cardyc_controller:init_suppressPanel()
 end
 --初始化卡牌进阶部分
 function wnd_cardyc_controller:init_upQualityPanel()
-    print("init_quality")
     -- 判断卡牌的阶品否已达最大
     if data.cardInfo.qualityLv == data.Const.MAX_QUALITY_LV then
-        print("已达最大阶品！！！！")
         view.upQuality_Panel:SetActive(false)
         view.maxUpQuality_Panel:SetActive(true)
-    else 
-        view.upQuality_Panel:SetActive(true)
-        view.maxUpQuality_Panel:SetActive(false)
-        --根据插槽状态的数量初始化插槽
-        for i=1,#data.cardInfo.slotState do
-            local name = string.format("itemHead_%d",i)
-            local v3 = Vector3(-150+(i-1)*100, 40 ,0)
-            if not isSlotInit then
-                self:create_itemHead(view.upQuality_Panel,name,v3)           
-            end
-            self:refresh_itemHead(view[name],i)
-            UIEventListener.Get(view[name].itemhead_itemSp).onPress = function(itemhead_itemSp, args)
-                if args then
-                    self:showItemInfoPanel(i)
-                end
+        return
+    end
+    view.upQuality_Panel:SetActive(true)
+    view.maxUpQuality_Panel:SetActive(false)
+    --根据插槽状态的数量初始化插槽
+    for i=1,#data.cardInfo.slotState do
+        local name = string.format("itemHead_%d",i)
+        local v3 = Vector3(-150+(i-1)*100, 40 ,0)
+        if not isSlotInit then
+            self:create_itemHead(view.upQuality_Panel,name,v3)
+        end
+        self:refresh_itemHead(view[name],i)
+        UIEventListener.Get(view[name].itemhead_itemSp).onPress = function(itemhead_itemSp, args)
+            if args then
+                self:showItemInfoPanel(i)
             end
         end
-        isSlotInit = true
+    end
+    isSlotInit = true
 
 
-        --判断插槽是否全部激活
-        local isEquipAll = false
-        for i,v in ipairs(data.cardInfo.slotState) do
-            if v == data.EquipState.Active then
-                isEquipAll = true
-            else
-                isEquipAll = false
-                break
-            end
-        end
-        --如果全部激活显示进阶按钮和进阶所需的金币，否则显示一键装备按钮
-        if isEquipAll then
-            view.upQualityP_btnEpuipAll:SetActive(false)
-            view.upQualityP_btnUpQ:SetActive(true)
-            view.upQualityP_Cost:SetActive(true)
-            view.upQualityP_Cost_Lab.transform:GetComponent("UILabel").text = data:getUpQualityNeedGold(data:GetNextQualityLv()) --晋升所需金币
+    --判断插槽是否全部激活
+    local isAllSlotActive = false
+    for i,v in ipairs(data.cardInfo.slotState) do
+        if v == data.EquipState.Active then
+            isAllSlotActive = true
         else
-            view.upQualityP_btnUpQ:SetActive(false)
-            view.upQualityP_Cost:SetActive(false)
-            view.upQualityP_btnEpuipAll:SetActive(true)
+            isAllSlotActive = false
+            break
         end
+    end
+    --如果全部激活显示进阶按钮和进阶所需的金币，否则显示一键装备按钮
+    if isAllSlotActive then
+        view.upQualityP_btnEpuipAll:SetActive(false)
+        view.upQualityP_btnUpQ:SetActive(true)
+        view.upQualityP_Cost:SetActive(true)
+        view.upQualityP_Cost_Lab.transform:GetComponent("UILabel").text = data:getUpQualityNeedGold(data:GetNextQualityLv()) --晋升所需金币
+    else
+        view.upQualityP_btnUpQ:SetActive(false)
+        view.upQualityP_Cost:SetActive(false)
+        view.upQualityP_btnEpuipAll:SetActive(true)
+    end
 
-        --监听进阶按钮
-        UIEventListener.Get(view.upQualityP_btnUpQ).onPress = function(upQualityP_btnUpQ, args)
-            if args then
-                self:upQualityBtn_onclick()
-            end
+    --监听进阶按钮
+    UIEventListener.Get(view.upQualityP_btnUpQ).onPress = function(upQualityP_btnUpQ, args)
+        if args then
+            self:upQualityBtn_onclick()
         end
+    end
 
-        --监听一键装备按钮
-        UIEventListener.Get(view.upQualityP_btnEpuipAll).onPress = function(upQualityP_btnEpuipAll, args)
-            if args then
-                self:equipAllCallBack()
-            end
+    --监听一键装备按钮
+    UIEventListener.Get(view.upQualityP_btnEpuipAll).onPress = function(upQualityP_btnEpuipAll, args)
+        if args then
+            self:equipAllCallBack()
         end
     end
 end
@@ -541,8 +539,8 @@ function wnd_cardyc_controller:show_upQuality_SuccessPanel()
     --显示卡牌进阶所提升的属性信息
     for i=1,#data.qualityPropName do
         view["upQualitySP_propName_"..i].transform:GetComponent("UILabel").text = data:getString(20036+i)
-        view["upQualitySP_propBeValue_"..i].transform:GetComponent("UILabel").text = string.format("%.2f",data:getCardQualityInfo(data.qualityPropName[i],data.cardInfo.cardId,data.cardInfo.qualityLv-1))
-        view["upQualitySP_propAfValue_"..i].transform:GetComponent("UILabel").text = string.format("%.2f",data:getCardQualityInfo(data.qualityPropName[i],data.cardInfo.cardId,data.cardInfo.qualityLv))
+        view["upQualitySP_propBeValue_"..i].transform:GetComponent("UILabel").text = string.format("%d",data:getCardQualityInfo(data.qualityPropName[i],data.cardInfo.cardId,data.cardInfo.qualityLv-1))
+        view["upQualitySP_propAfValue_"..i].transform:GetComponent("UILabel").text = string.format("%d",data:getCardQualityInfo(data.qualityPropName[i],data.cardInfo.cardId,data.cardInfo.qualityLv))
     end
     view.upQuality_SuccessP:SetActive(true) 
 end
@@ -556,7 +554,18 @@ function wnd_cardyc_controller:showItemInfoPanel(index)
         view.itemInfoPanel:SetActive(false)
         isInitMedalItemLayer = true
     end
-    view.itemInfoP_itemNameLab.transform:GetComponent("UILabel").text = data:getCardQualityInfo("CardEquip"..index,data.cardInfo.cardId,data.cardInfo.qualityLv)
+
+
+    local itemName = data:getItemInfo("Name",data:getCardQualityInfo("ItemID"..index,data.cardInfo.cardId,data.cardInfo.qualityLv))
+    local itemSpriteName = data:getItemInfo("Icon",data:getCardQualityInfo("ItemID"..index,data.cardInfo.cardId,data.cardInfo.qualityLv))
+    local attributeID = data:getCardQualityInfo("CardEquip"..index,data.cardInfo.cardId,data.cardInfo.qualityLv)
+    local attributeName = data:getAttributeInfo("AttributeName",attributeID)
+    local attributePoint = data:getCardQualityInfo("Point"..index,data.cardInfo.cardId,data.cardInfo.qualityLv)
+    local attributeSymbol = data:getAttributeInfo("Symbol",attributeID)
+
+    view.itemInfoP_itemNameLab.transform:GetComponent("UILabel").text = itemName
+    view.itemInfoP_addDesLab.transform:GetComponent("UILabel").text = string.format( "%s+%d%s", attributeName, attributePoint,attributeSymbol)
+    view.itemInfoP_itemImg.transform:GetComponent("UISprite").spriteName = itemSpriteName
    --[[
        判断物品信息的显示状态
    ]]
@@ -565,12 +574,13 @@ function wnd_cardyc_controller:showItemInfoPanel(index)
     else
         view.itemInfoP_haveLab.transform:GetComponent("UILabel").text = string.format("%s%d",data:getString(20043),data.upQualityHaveItems[index].num)
         view.itemInfoP_needLab.transform:GetComponent("UILabel").text = string.format("%s%d",data:getString(20044),data.upQualityNeedItems[index].num)
-        view.itemInfoP_haveLab.transform:GetComponent("UILabel").color = Color(1,1,1,1)--黑
+        view.itemInfoP_haveLab.transform:GetComponent("UILabel").color = COLOR.White
         if data.upQualityHaveItems[index].num < data.upQualityNeedItems[index].num then
-            view.itemInfoP_haveLab.transform:GetComponent("UILabel").color = Color(1,0,0,1)--红  
+            view.itemInfoP_haveLab.transform:GetComponent("UILabel").color = COLOR.Red
         end
         view.itemInfoP_needPanel:SetActive(true)
     end
+
     --判断按钮的显示状态，并添加监听
     view.itemInfoP_btn_equip:SetActive(false)
     view.itemInfoP_btn_gain:SetActive(false)
@@ -579,7 +589,6 @@ function wnd_cardyc_controller:showItemInfoPanel(index)
         view.itemInfoP_btn_gain:SetActive(true)
         UIEventListener.Get(view.itemInfoP_btn_gain).onPress = function(itemInfoP_btn_gain, args)
             if args then
-                print("获得，，，") --点击后跳转至军功章获取界面 获得途径界面
                 self:GainWayLayer()
             end
         end
@@ -587,7 +596,7 @@ function wnd_cardyc_controller:showItemInfoPanel(index)
         view.itemInfoP_btn_equip:SetActive(true)
         UIEventListener.Get(view.itemInfoP_btn_equip).onPress = function(itemInfoP_btn_equip, args)
             if args then
-                self:equipCallBack(index)
+                self:equipSlotByIndex(index)
             end
         end
     elseif data.cardInfo.slotState[index] == data.EquipState.Active then
@@ -600,7 +609,6 @@ function wnd_cardyc_controller:showItemInfoPanel(index)
     end
     UIEventListener.Get(view.itemInfoP_btn_back).onPress = function(itemInfoP_btn_back, args)
         if args then
-            print("返回")
             view.itemInfoPanel:SetActive(false)
         end
     end
@@ -648,13 +656,16 @@ end
 function wnd_cardyc_controller:equipAllCallBack()
     for i=1,#data.cardInfo.slotState do
         if data.cardInfo.slotState[i] == data.EquipState.Enable_Enough and (data.upQualityNeedItems[i].num <= data.upQualityHaveItems[i].num) then
-            Message_Manager:SendPB_10013(data.cardInfo.cardId, i-1)
+            isEquipAll = true
+            self:equipSlotByIndex(i)
+            return
         end
     end
+    tipsText = "没有可激活的插槽"
+    ui_manager:ShowWB(WNDTYPE.ui_tips)
 end
 --点击装备按钮
-function wnd_cardyc_controller:equipCallBack(index)
-    print(data.cardInfo.cardId, index-1)
+function wnd_cardyc_controller:equipSlotByIndex(index)
     Message_Manager:SendPB_10013(data.cardInfo.cardId, index-1)
 end
 --装备成功后刷新界面
@@ -662,7 +673,19 @@ function wnd_cardyc_controller:epuip_refresh()
     if not data:getDatas(CardIndex) then 
         return 
     end 
-    view.itemInfoPanel:SetActive(false)
+
+    if isEquipAll then 
+        for i=1,#data.cardInfo.slotState do
+            if data.cardInfo.slotState[i] == data.EquipState.Enable_Enough and (data.upQualityNeedItems[i].num <= data.upQualityHaveItems[i].num) then
+                self:equipSlotByIndex(i)
+                return
+            end
+        end
+    end
+    isEquipAll = false
+    if view.itemInfoPanel then 
+        view.itemInfoPanel:SetActive(false)
+    end
     self:init_upQualityPanel()
     self:init_redDot()
 end
@@ -679,7 +702,6 @@ local isfiveSIinit = false      --是否初始化技能选项
 local isInitSptReset = false    --是否初始化技能重置界面
 --技能tab界面
 function wnd_cardyc_controller:skill_Body()
-    print("skill_body!!!!!!")
     --初始化技能点
     view.skillP_pointLab.transform:GetComponent("UILabel").text = data.userInfo.totalSkPt
     --监听重置技能点按钮
@@ -785,9 +807,8 @@ function wnd_cardyc_controller:upSkill_refresh()
 end
 --显示重置技能点界面
 function wnd_cardyc_controller:show_SkillPoint_Reset_Panel()
-    print("技能点重置,,,")
     if not isInitSptReset then
-        view:init_skillPointResetPanels(  )
+        view:init_skillPointResetPanels()
         view.sPtRPanel.name = "sPtReset"
         self:create_CardHead(view.sPtRPanel,"resetSPt_cardhead",Vector3(-199,40,0))
         view.sPtRPanel:SetActive(false)
@@ -854,17 +875,40 @@ function wnd_cardyc_controller:soldier_Body()
         end
         isInitAcFrame = true
     end
-
-    --初始化卡牌头像，显示当前卡牌的默认星级
+    --刷新卡牌头像，显示当前卡牌的默认星级
     self:refresh_CardHead(view["upSoldier_cardhead"],data.cardInfo.cardId)
+    --显示兵员等级
+    view.soldierP_LvProLab.transform:GetComponent("UILabel").text
+        = string.format("%s%d/%d",data:getString(20041),data.cardInfo.soldierLv,data.Const.MAX_ARMY_LV)--兵员等级/兵员等级上限
+    
+    --判断是否达到最大兵员等级，设置界面显示内容
+    if data.cardInfo.soldierLv >= data.Const.MAX_ARMY_LV then 
+        view.soldierP_btnUpSoldier:SetActive(false)
+        view.soldierP_cost:SetActive(false)
+        view.soldierP_maxSoldierP:SetActive(true)
+         --显示兵员等级达到最大时的可携带兵员数量
+        view.soldierP_desLab.transform:GetComponent("UILabel").text
+            = string.format(data:getString(20504)
+                    ,data:getSoldierLimit(data.cardInfo.soldierLv))
+        return
+    end
+
+    --未达兵员等级上限设置界面显示
+    view.soldierP_btnUpSoldier:SetActive(true)
+    view.soldierP_cost:SetActive(true)
+    view.soldierP_maxSoldierP:SetActive(false)
+    
     view.soldierP_cardNameL.transform:GetComponent("UILabel").text = data:getCardInfo("Name",data.cardInfo.cardId)
     view.soldierP_badgeNameL.transform:GetComponent("UILabel").text = data:getString(20027)
-    view.soldierP_LvProLab.transform:GetComponent("UILabel").text --兵员等级上限
-        = string.format("%s%d/%d",data:getString(20041),data.cardInfo.soldierLv,data.Const.MAX_ARMY_LV)--兵员等级/兵员等级上限
-    view.soldierP_desLab = data:getString(20042)
 
-    local needCardNum = data:getUpSoldierNeedGoods("Card",data.cardInfo.soldierLv)
-    local needCoinNum = data:getUpSoldierNeedGoods("Coin",data.cardInfo.soldierLv)
+    --显示兵员当前和下一等级可携带兵员数量
+    view.soldierP_desLab.transform:GetComponent("UILabel").text
+        = string.format(data:getString(20503)
+                ,data:getSoldierLimit(data.cardInfo.soldierLv)
+                ,data:getSoldierLimit(data.cardInfo.soldierLv + 1))
+    --设置兵员升级消耗显示
+    local needCardNum = data:getUpSoldierNeedGoods("Card",data.cardInfo.soldierLv + 1)
+    local needCoinNum = data:getUpSoldierNeedGoods("Coin",data.cardInfo.soldierLv + 1)
     view.soldierP_cardNeedL.transform:GetComponent("UILabel").text = string.format("x%d",needCardNum)
     view.soldierP_badgeNeednumL.transform:GetComponent("UILabel").text = string.format("x%d",needCoinNum)
     view.soldierP_cardHavaLab.transform:GetComponent("UILabel").text = string.format("(%s%d)",data:getString(20028),data.cardInfo.cardFragment)
@@ -879,16 +923,6 @@ function wnd_cardyc_controller:soldier_Body()
         view.soldierP_badgeHaveLab.transform:GetComponent("UILabel").color = Color(255/255,0/255,0/255,255/255)
     else
         view.soldierP_badgeHaveLab.transform:GetComponent("UILabel").color = Color(0/255,255/255,255/255,255/255)
-    end
-
-
-    --判断是否达到最大兵员等级
-    if data.cardInfo.soldierLv >= data.Const.MAX_ARMY_LV then 
-        view.soldierP_btnUpSoldier:SetActive(false)
-        view.soldierP_maxSoldierP:SetActive(true)
-    else
-        view.soldierP_btnUpSoldier:SetActive(true)
-        view.soldierP_maxSoldierP:SetActive(false)
     end
 end
 --点击兵员升级按钮
@@ -915,9 +949,9 @@ end
 --[[
     协同部分
 ]]
-local UpSynergyIndex = 0    --保存所选中的协同选项
-local isAttrItemInit = false--是否初始化协同选项
-local isInitxtLayer = false --是否初始化协同详细信息界面
+local UpSynergyIndex = 0        --保存所选中的协同选项
+local isAttrItemInit = false    --是否初始化协同选项
+local isInitxtLayer = false     --是否初始化协同详细信息界面
 --刷新协同部分
 function wnd_cardyc_controller:synergy_Body()
 
@@ -942,36 +976,21 @@ function wnd_cardyc_controller:synergy_Body()
             count = count+1
         end
     end
-
-    print(string.format( "count::::%d",count))
     --根据协同选项的数量解锁协同额外属性
-    view.synergyP_addProperty_1.transform:GetComponent("UILabel").text = "property1"
-    view.synergyP_addProperty_2.transform:GetComponent("UILabel").text = "property2"
-    view.synergyP_addProperty_3.transform:GetComponent("UILabel").text = "property3"
-    view.synergyP_addProperty_1.transform:GetComponent("UILabel").color= Color(1,1,1,1)
-    view.synergyP_addProperty_2.transform:GetComponent("UILabel").color= Color(1,1,1,1)
-    view.synergyP_addProperty_3.transform:GetComponent("UILabel").color= Color(1,1,1,1)
-    if count > 0 then 
-        view.synergyP_addProperty_1.transform:GetComponent("UILabel").color= Color(0,1,0,1)
-    end
-    if count > 1 then 
-        view.synergyP_addProperty_2.transform:GetComponent("UILabel").color= Color(0,1,0,1)
-    end
-    if count > 2 then 
-        view.synergyP_addProperty_3.transform:GetComponent("UILabel").color= Color(0,1,0,1)
-    end
-
-        -- local atbAddLab = atbAddPanel.transform:Find("atbAddLab_"..i):GetComponent("UILabel")
-        -- --UnionAttributeAdd1  AddPoint1
-        -- local utadd = sdata_armycardunion_data:GetFieldV("UnionAttributeAdd"..i, auid)
-        -- local addpoint = sdata_armycardunion_data:GetFieldV("AddPoint"..i,auid)
-        -- atbAddLab.text = string.format("type%d+%d (have %d xt)",utadd,addpoint*100,i+1)  --类型+加成
-
-        -- if count >= i+1 then
-        --     atbAddLab.text = string.format("[00ff00]type%d+%d[-]",utadd,addpoint*100)  --类型+加成
-        -- end
-
-    
+    for i = 1, 3 do 
+        --设置显示的属性信息
+        local attributeName = data:getAttributeInfo("AttributeName",data:getSynergyItemInfo("UnionAttributeAdd",i))
+        local attributePoint = data:getSynergyItemInfo("AddPoint",i)
+        local attributeSymbol = data:getAttributeInfo("Symbol",data:getSynergyItemInfo("UnionAttributeAdd",i))
+        view["synergyP_addProperty_"..i]:GetComponent("UILabel").text =
+            string.format(data:getString(20611), attributeName, attributePoint, attributeSymbol)
+        --[[激活2,3,4张协同卡牌时解锁相应的属性]]
+        if count - 1 >= i then  
+            view["synergyP_addProperty_"..i].transform:GetComponent("UILabel").color= COLOR.Green
+        else
+            view["synergyP_addProperty_"..i].transform:GetComponent("UILabel").color= COLOR.White
+        end
+    end 
 end
 --点击协同选项
 function wnd_cardyc_controller:synergyItem_onClicked(index)
@@ -992,10 +1011,10 @@ function wnd_cardyc_controller:synergyItem_onClicked(index)
                 view.upSynergyP:SetActive(false)
             end
         end
-        UIEventListener.Get(view.upSynergyP_btnOk).onPress = function(upSynergyP_btnOk, args)
-            if args then
-                self:upSynergyP_btnOk_onClicked(index)
-            end
+    end
+    UIEventListener.Get(view.upSynergyP_btnOk).onPress = function(upSynergyP_btnOk, args)
+        if args then
+            self:upSynergyP_btnOk_onClicked(index)
         end
     end
     view.upSynergyP:SetActive(false)
@@ -1065,7 +1084,6 @@ function wnd_cardyc_controller:upSynergyP_btnOk_onClicked(index)
 end
 --协同升级成功后刷新界面
 function wnd_cardyc_controller:upSynergy_refresh()
-    print("upSynergy_refresh!!!")
     --获取数据
     if not data:getDatas(CardIndex) then 
         return 
@@ -1094,33 +1112,65 @@ function wnd_cardyc_controller:create_synergyItem(parent,name,index)
 end
 --刷新协同选项
 function wnd_cardyc_controller:refresh_synergyItem(synergyItem,index)
-    --c初始化协同选项
+
+
+    local CardName = data:getCardInfo("Name",data.synergyIDTbl[index])
+    local spriteName = data:getCardInfo("IconID",data.synergyIDTbl[index])
+
+    local needStarLv = data:getSynergyItemInfo("RequireCardStar",index)
+    local needCardLv = data:getSynergyItemInfo("RequireCardLevel",index)
+    local needQualityLv = data:getSynergyItemInfo("RequireCardQuality",index)
+
+    local attributeName = data:getAttributeInfo("AttributeName",data:getSynergyItemInfo("UnionAttribute",index))
+    local attributePoint = data:getSynergyItemInfo("Point",index)
+    local attributeSymbol = data:getAttributeInfo("Symbol",data:getSynergyItemInfo("UnionAttribute",index))
+    --初始化协同选项
+
+
     --设置卡牌头像图片
     synergyItem.synergyItem_Sp.transform:GetComponent("UISprite").atlas = TestAtlas
-    synergyItem.synergyItem_Sp.transform:GetComponent("UISprite").spriteName = data:getCardInfo("IconID",data.synergyIDTbl[index])
-    synergyItem.synergyItem_Sp.transform:GetComponent("UISprite").color = Color(105/255,105/255,105/255,105/255)
-    synergyItem.synergyItem_itemBg.transform:GetComponent("UISprite").color = Color(105/255,105/255,105/255,105/255)
+    synergyItem.synergyItem_Sp.transform:GetComponent("UISprite").spriteName = spriteName
+    synergyItem.synergyItem_Sp.transform:GetComponent("UISprite").color = COLOR.Gray
+    synergyItem.synergyItem_itemBg.transform:GetComponent("UISprite").color = COLOR.Gray
     synergyItem.synergyItem_upSp:SetActive(false)
     synergyItem.synergyItem_plusSp:SetActive(false)
-    synergyItem.synergyItem_nowPropL.transform:GetComponent("UILabel").text = string.format("%s",data:getCardInfo("Name",data.synergyIDTbl[index]))
-    synergyItem.synergyItem_nowPropL.transform:GetComponent("UILabel").color = Color(105/255,105/255,105/255,105/255)
-    synergyItem.synergyItem_nextPropL.transform:GetComponent("UILabel").text = string.format("%s",data:getCardInfo("Name",data.synergyIDTbl[index]))
-    synergyItem.synergyItem_nextPropL.transform:GetComponent("UILabel").color = Color(105/255,105/255,105/255,105/255)
-
     
+    if needStarLv ~= -1 then
+        synergyItem.synergyItem_nowPropL.transform:GetComponent("UILabel").text 
+            = string.format(data:getString(20608), CardName, needStarLv, "00FF00", attributeName, attributePoint, attributeSymbol)
+    elseif needCardLv ~= -1 then
+        synergyItem.synergyItem_nowPropL.transform:GetComponent("UILabel").text 
+            = string.format(data:getString(20609), CardName, needCardLv, "00FF00", attributeName, attributePoint, attributeSymbol)
+    elseif needQualityLv ~= -1 then
+        synergyItem.synergyItem_nowPropL.transform:GetComponent("UILabel").text 
+            = string.format(data:getString(20610), CardName, needQualityLv, "00FF00", attributeName, attributePoint, attributeSymbol)
+    end
+    
+
+    synergyItem.synergyItem_nextPropL:SetActive(false)
+    synergyItem.synergyItem_nextPropL.transform:GetComponent("UILabel").text 
+        = string.format("%s","已激活")
+
+
+    if data.synergyStateTbl[index] == data.SynergyState.unactive  then
+        synergyItem.synergyItem_nowPropL.transform:GetComponent("UILabel").color = COLOR.Gray
+        synergyItem.synergyItem_nextPropL.transform:GetComponent("UILabel").color = COLOR.Gray
     --如果可以激活显示激活加号图标
-    if data.synergyStateTbl[index] == data.SynergyState.canActive  then
-        if data.cardInfo.synergyLvTbl[index] == 0 then
-            synergyItem.synergyItem_plusSp:SetActive(true)
-        else
-            synergyItem.synergyItem_upSp:SetActive(true)
-        end
+    elseif data.synergyStateTbl[index] == data.SynergyState.canActive  then
+        synergyItem.synergyItem_nowPropL.transform:GetComponent("UILabel").color = COLOR.Gray
+        synergyItem.synergyItem_nextPropL.transform:GetComponent("UILabel").color = COLOR.Gray
+        synergyItem.synergyItem_plusSp:SetActive(true)
+
     --如果已经激活字体和图片颜色变亮
     elseif data.synergyStateTbl[index] == data.SynergyState.activated  then
-        synergyItem.synergyItem_Sp.transform:GetComponent("UISprite").color = Color(255/255,255/255,255/255,255/255)
-        synergyItem.synergyItem_itemBg.transform:GetComponent("UISprite").color = Color(255/255,255/255,255/255,255/255)
-        synergyItem.synergyItem_nowPropL.transform:GetComponent("UILabel").color = Color(255/255,255/255,255/255,255/255)
-        synergyItem.synergyItem_nextPropL.transform:GetComponent("UILabel").color = Color(255/255,255/255,255/255,255/255)
+        synergyItem.synergyItem_nextPropL:SetActive(true)
+        synergyItem.synergyItem_Sp.transform:GetComponent("UISprite").color = COLOR.White
+        synergyItem.synergyItem_itemBg.transform:GetComponent("UISprite").color = COLOR.White
+        synergyItem.synergyItem_nowPropL.transform:GetComponent("UILabel").color = COLOR.White
+        synergyItem.synergyItem_nextPropL.transform:GetComponent("UILabel").color = COLOR.White
+        if data:isCan_UpSynergy(index) == 0 then 
+            synergyItem.synergyItem_upSp:SetActive(true)
+        end
     end
 end
 
@@ -1141,22 +1191,22 @@ end
 --刷新物品插槽
 function wnd_cardyc_controller:refresh_itemHead(itemHead,index)
     itemHead.itemhead_numLab.transform:GetComponent("UILabel").text = string.format("%d/%d",data.upQualityHaveItems[index].num,data.upQualityNeedItems[index].num)    
-    itemHead.itemhead_Sprite:SetActive(true)
-    itemHead.itemhead_lockSp:SetActive(false)
+    itemHead.itemhead_Sprite:SetActive(false)
+    itemHead.itemhead_lockSp:SetActive(true)
     if data.cardInfo.slotState[index] == data.EquipState.Enable_NotEnough then
-        itemHead.itemhead_itemSp.transform:GetComponent("UISprite").color = Color(123/255,123/255,123/255,123/255)
+        itemHead.itemhead_itemSp.transform:GetComponent("UISprite").color = COLOR.Gray
         itemHead.itemhead_plusSp:SetActive(false)
-        itemHead.itemhead_Sprite:SetActive(false)
-        itemHead.itemhead_lockSp:SetActive(true)
         itemHead.itemhead_numLab:SetActive(true)
     elseif data.cardInfo.slotState[index] == data.EquipState.Enable_Enough then
-        itemHead.itemhead_itemSp.transform:GetComponent("UISprite").color = Color(255/255,255/255,255/255,255/255)
+        itemHead.itemhead_itemSp.transform:GetComponent("UISprite").color = COLOR.White
         itemHead.itemhead_plusSp:SetActive(true)
         itemHead.itemhead_numLab:SetActive(true)
     elseif data.cardInfo.slotState[index] == data.EquipState.Active then
+        itemHead.itemhead_Sprite:SetActive(true)
+        itemHead.itemhead_lockSp:SetActive(false)
         itemHead.itemhead_plusSp:SetActive(false)
         itemHead.itemhead_numLab:SetActive(false)
-        itemHead.itemhead_itemSp.transform:GetComponent("UISprite").color = Color(255/255,255/255,255/255,255/255)
+        itemHead.itemhead_itemSp.transform:GetComponent("UISprite").color = COLOR.White
     end
 end
 

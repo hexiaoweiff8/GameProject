@@ -5,21 +5,30 @@ using System.Collections.Generic;
 /// <summary>
 /// 准备战斗触发器
 /// </summary>
-public class ZhunbeizhandouTrigger : SoldierFSMTrigger{
+public class ZhunbeizhandouTrigger : SoldierFSMTrigger
+{
+
     public override void Init()
     {
         triggerId = SoldierTriggerID.Zhunbeizhandou;
     }
 
+
     public override bool CheckTrigger(SoldierFSMSystem fsm)
     {
-        var objId = fsm.Display.ClusterData.MemberData.ObjID;
+        var searchData = fsm.Display.ClusterData;
+        //var objId = searchData.MemberData.ObjID;
 
         // 攻击范围内是否有敌人
         var pos = new Vector2(fsm.Display.ClusterData.X, fsm.Display.ClusterData.Y);
-        var list = CheckRange(objId, pos, fsm.Display.ClusterData.MemberData.AttackRange,
-            fsm.Display.ClusterData.MemberData.Camp, true);
-        Utils.DrawGraphics(new CircleGraphics(pos, fsm.Display.ClusterData.MemberData.AttackRange), Color.yellow);
+        //var list = ClusterManager.Single.CheckRange(objId, pos, fsm.Display.ClusterData.MemberData.AttackRange,
+        //    fsm.Display.ClusterData.MemberData.Camp, true);
+
+        // 目标选择器选择目标列表
+        var list = TargetSelecter.Single.TargetFilter(searchData,
+            ClusterManager.Single.CheckRange(pos, searchData.MemberData.AttackRange, searchData.MemberData.Camp, true));
+        
+        Utils.DrawGraphics(new CircleGraphics(pos, searchData.MemberData.AttackRange), Color.yellow);
         if (list.Count > 0)
         {
             // 攻击目标
@@ -109,10 +118,9 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger{
         if (result)
         {
             // 确定释放技能, 设置目标
-            System.Random ran = new System.Random();
-            var target = res[ran.Next(0, res.Count)];
+            //System.Random ran = new System.Random();
+            var target = res[0];
             fsm.EnemyTarget = DisplayerManager.Single.GetElementByPositionObject(target);
-            fsm.TargetIsLoseEfficacy = false;
         }
 
         return result;
@@ -126,46 +134,10 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger{
     /// <returns></returns>
     private bool SetTarget(SoldierFSMSystem fsm, IList<PositionObject> res)
     {
-        var ran = new System.Random();
+        //var ran = new System.Random();
         // TODO 取最近的
-        var target = res[ran.Next(0, res.Count)];
+        var target = res[0];
         fsm.EnemyTarget = DisplayerManager.Single.GetElementByPositionObject(target);
         return res.Count > 0;
-    }
-
-    /// <summary>
-    /// 检测范围内单位
-    /// </summary>
-    /// <param name="objId">筛选者Id</param>
-    /// <param name="pos">检测位置</param>
-    /// <param name="range">检测半径</param>
-    /// <param name="myCamp">当前单位阵营</param>
-    /// <param name="isExceptMyCamp">是否排除己方阵营</param>
-    /// <returns>范围内单位</returns>
-    private IList<PositionObject> CheckRange(ObjectID objId, Vector2 pos, float range, int myCamp = -1, bool isExceptMyCamp = false)
-    {
-        var memberInSightScope =
-                ClusterManager.Single.GetPositionObjectListByGraphics(
-                    new CircleGraphics(pos, range));
-
-        IList<PositionObject> list = new List<PositionObject>();
-        foreach (var member in memberInSightScope)
-        {
-            // 区分自己
-            if (objId.ID == member.MemberData.ObjID.ID)
-            {
-                continue;
-            }
-            // 区分阵营
-            if (member.MemberData.CurrentHP > 0 
-                && (myCamp == -1 
-                || (isExceptMyCamp && member.MemberData.Camp != myCamp)
-                || (!isExceptMyCamp && member.MemberData.Camp == myCamp)))
-            {
-                list.Add(member);
-            }
-        }
-
-        return list;
     }
 }

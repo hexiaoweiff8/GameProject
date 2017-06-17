@@ -78,54 +78,13 @@ public class Soldier_PutongGongji_State : SoldierFSMState
             TypeLevel1 = SkillTriggerLevel1.Fight,
             TypeLevel2 = SkillTriggerLevel2.Attack
         });
-
-        var ballistic = EffectsFactory.Single.CreatePointToPointEffect("test/TrailPrj", null,
-            fsm.Display.ClusterData.Position, fsm.EnemyTarget.ClusterData.Position, new Vector3(1, 1, 1), 200, TrajectoryAlgorithmType.Line,
-            () =>
-            {
-                // 判断是否命中
-                var isMiss = HurtResult.AdjustIsMiss(fsm.Display, fsm.EnemyTarget);
-                if (!isMiss)
-                {
-                    // 计算伤害
-                    var hurt = HurtResult.GetHurt(fsm.Display, fsm.EnemyTarget);
-                    if (null != fsm.EnemyTarget &&
-                        null != fsm.EnemyTarget.ClusterData &&
-                        null != fsm.EnemyTarget.RanderControl)
-                    {
-                        // 记录被击触发 记录扣血 伤害结算时结算
-                        SkillManager.Single.SetSkillTriggerData(new SkillTriggerData()
-                        {
-                            HealthChangeValue = hurt,
-                            ReceiveMember = fsm.Display,
-                            ReleaseMember = fsm.EnemyTarget,
-                            TypeLevel1 = SkillTriggerLevel1.Fight,
-                            TypeLevel2 = SkillTriggerLevel2.BeAttack
-                        });
-                    }
-                    // 命中时检测技能
-                    SkillManager.Single.SetSkillTriggerData(new SkillTriggerData()
-                    {
-                        ReceiveMember = fsm.EnemyTarget,
-                        ReleaseMember = fsm.Display,
-                        TypeLevel1 = SkillTriggerLevel1.Fight,
-                        TypeLevel2 = SkillTriggerLevel2.Hit
-                    });
-                }
-                else
-                {
-                    // TODO 播放miss特效
-                    // 闪避时事件
-                    SkillManager.Single.SetSkillTriggerData(new SkillTriggerData()
-                    {
-                        ReceiveMember = fsm.Display,
-                        ReleaseMember = fsm.EnemyTarget,
-                        TypeLevel1 = SkillTriggerLevel1.Fight,
-                        TypeLevel2 = SkillTriggerLevel2.Dodge
-                    });
-                }
-            }, 12);
-        ballistic.Begin();
+        GeneralAttackManager.Instance()
+            .GetNormalGeneralAttack(fsm.Display.ClusterData, fsm.EnemyTarget.ClusterData, "test/TrailPrj",
+                fsm.Display.ClusterData.transform.position + new Vector3(0, 10, 0),
+                fsm.EnemyTarget.ClusterData.gameObject,
+                200,
+                TrajectoryAlgorithmType.Line,
+                null);
 
         // 攻击动作
         var myself = fsm.Display.RanderControl;

@@ -155,6 +155,9 @@
     <Compile Include="Assets\Logic\Script\Game\Network\Protocal.cs" />
     <Compile Include="Assets\Logic\Script\Game\Network\SocketClient.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\BloodBar.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\Cangku\UIScrollViewAdapter.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\Cangku\UIScrollViewItemBase.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\Cangku\UI_Cangku_Item.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\DragableCard.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\LoopHorizontalScrollRect.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\LoopScrollRect.cs" />
@@ -248,6 +251,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\IMove.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\ObjectBase.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\ObjectID.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\ParentManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\vo\FightVO.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\vo\HuojianbingVO.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\vo\JidiVO.cs" />
@@ -264,14 +268,19 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\FightParameter.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\RanderControl.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\SpinWithMouse.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Ballistic.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\Util\BallisticFactory.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Ballistic\Ballistic.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Ballistic\BallisticFactory.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Collision\CircleGraphics.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Collision\CollisionGraphics.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Collision\ICollisionGraphics.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Collision\RectGraphics.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Collision\SectorGraphics.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\EffectsFactory.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\GeneralAttack\GeneralAttackManager.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\GeneralAttack\NormalGeneralAttack.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\GeneralAttack\PointToObjScopeGeneralAttack.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\GeneralAttack\PointToPositionScopeGeneralAttack.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\GeneralAttack\PositionScopeGeneralAttack.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\ItemSelecter.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Looper.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Map\MapManager.cs" />
@@ -294,6 +303,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SlideCollisionDetectionFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\TargetSelecter\ISelectWeightData.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\TargetSelecter\ISelectWeightDataHolder.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\TargetSelecter\Member.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\TargetSelecter\MemberItemType.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\TargetSelecter\TargetList.cs" />
@@ -355,6 +365,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_Vibration.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_XilianshiData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_Zhenfa.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armyaim_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armycardbase_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armycardexp_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armycardquality_c.cs" />
@@ -769,6 +780,7 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIBasicSprite_FlipWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UICameraWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIDragObjectEXWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIDragScrollViewWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIEventListenerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIFollowWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIGridWrap.cs" />
@@ -778,6 +790,8 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIProgressBarWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIRectWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIRect_AnchorUpdateWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIScrollViewAdapterWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIScrollViewItemBaseWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIScrollViewWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UISliderWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UISpriteWrap.cs" />
@@ -785,6 +799,7 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UITweenerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIWidgetContainerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIWidgetWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UI_Cangku_ItemWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_AnimationBlendModeWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_AnimationClipWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_AnimationStateWrap.cs" />
