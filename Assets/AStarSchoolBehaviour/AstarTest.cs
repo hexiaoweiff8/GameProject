@@ -187,12 +187,12 @@ public class AstarTest : MonoBehaviour {
     {
         if (scaner != null)
         {
-            var resultList = TargetSelecter.GetCollisionItemList(itemList, scaner.X, scaner.Y, scaner.MemberData.AttackRange*0.5f);
-            Utils.DrawCircle(new Vector3(scaner.X, 0, scaner.Y), scaner.MemberData.AttackRange * 0.5f, Color.white);
+            var resultList = TargetSelecter.GetCollisionItemList(itemList, scaner.X, scaner.Y, scaner.AllData.MemberData.AttackRange*0.5f);
+            Utils.DrawCircle(new Vector3(scaner.X, 0, scaner.Y), scaner.AllData.MemberData.AttackRange * 0.5f, Color.white);
             for (var i = 0; i < resultList.Count; i++)
             {
                 var item = resultList[i];
-                Utils.DrawCircle(new Vector3(item.X, 0, item.Y), item.MemberData.SpaceSet * 0.5f, Color.white);
+                Utils.DrawCircle(new Vector3(item.X, 0, item.Y), item.AllData.MemberData.SpaceSet * 0.5f, Color.white);
             }
         }
     }
@@ -229,6 +229,7 @@ public class AstarTest : MonoBehaviour {
             if (hit.collider != null && hit.collider.name.Equals(LoadMap.MapPlane.name))
             {
                 var posOnMap = Utils.PositionToNum(LoadMap.MapPlane.transform.position, hit.point, UnitWidth, MapWidth, MapHeight);
+                Debug.Log("start:" + lastTimeTargetX + "," + lastTimeTargetY + " end:" + posOnMap[0] + "," + posOnMap[1]);
                 // 加载文件内容
                 var mapInfoData = InitMapInfo();
 
@@ -481,7 +482,7 @@ public class AstarTest : MonoBehaviour {
             var objId = new ObjectID(ObjectID.ObjectType.MySoldier);
             schoolItem = GameObject.CreatePrimitive(PrimitiveType.Cube);
             school = schoolItem.AddComponent<ClusterData>();
-            school.MemberData = new VOBase()
+            school.AllData.MemberData = new VOBase()
             {
                 AttackRange = 20,
                 SpaceSet = 3,
@@ -501,6 +502,33 @@ public class AstarTest : MonoBehaviour {
 
             //school.Wait = (a) => { Debug.Log(a.name + "Wait"); };
             //school.Complete = (a) => { Debug.Log(a.name + "Complete"); };
+            // 目标选择权重
+            var fightData = new SelectWeightData();
+            // 选择目标数据
+            fightData.AirWeight = 100;
+            fightData.BuildWeight = 100;
+            fightData.SurfaceWeight = 100;
+
+            fightData.HumanWeight = 10;
+            fightData.OrcWeight = 10;
+            fightData.OmnicWeight = 10;
+            //member.TankWeight = 10;
+            //member.LVWeight = 10;
+            //member.CannonWeight = 10;
+            //member.AirCraftWeight = 10;
+            //member.SoldierWeight = 10;
+
+            fightData.HideWeight = -1;
+            fightData.TauntWeight = 1000;
+
+            fightData.HealthMaxWeight = 0;
+            fightData.HealthMinWeight = 10;
+            //member.AngleWeight = 10;
+            fightData.DistanceMaxWeight = 0;
+            fightData.DistanceMinWeight = 10;
+            school.AllData.SelectWeightData = fightData;
+            school.AllData.MemberData.CurrentHP = 10;
+
             itemList.Add(school);
             ClusterManager.Single.Add(school);
             DisplayerManager.Single.AddElement(objId, new DisplayOwner(schoolItem, school, null, null));
@@ -544,7 +572,7 @@ public class AstarTest : MonoBehaviour {
                         fixItem = GameObject.CreatePrimitive(PrimitiveType.Cube);
                         fixItem.name += i;
                         fix = fixItem.AddComponent<FixtureData>();
-                        fix.MemberData = new VOBase()
+                        fix.AllData.MemberData = new VOBase()
                         {
                             SpaceSet = 1 * UnitWidth
                         };

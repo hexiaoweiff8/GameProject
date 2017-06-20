@@ -12,7 +12,7 @@ public class HurtResult
     /// <returns></returns>
     public static float GetHurt(DisplayOwner active, DisplayOwner target)
     {
-        var zhanqianJueduizhi = active.ClusterData.MemberData.Attack1;
+        var zhanqianJueduizhi = active.ClusterData.AllData.MemberData.Attack1;
         var zhandouJueduizhiAdd = 0.0f;
         var zhanqianBaifenbiAdd = 0.0f;
         var zhandouBaifenbiAdd = 0.0f;
@@ -67,15 +67,15 @@ public class HurtResult
 	        如果a<=命中率差值*1000,判定为命中
 	        如果a>命中率差值*1000,判定为闪避
         **/
-        if (null == target || null == target.ClusterData || target.ClusterData.MemberData.CurrentHP <= 0 ||
+        if (null == target || null == target.ClusterData || target.ClusterData.AllData.MemberData.CurrentHP <= 0 ||
             null == active || null == active.ClusterData)
         {
             return true;
         }
-        var gongjiMingzhong = active.ClusterData.MemberData.Hit;
+        var gongjiMingzhong = active.ClusterData.AllData.MemberData.Hit;
         var gongjiMingzhongAdd = 0.0f;
 
-        var fangshouShanbi = target.ClusterData.MemberData.Dodge;
+        var fangshouShanbi = target.ClusterData.AllData.MemberData.Dodge;
         var fangshouShanbiAdd = 0.0f;
 
         var mingzhongchazhi = Mathf.Max(0.3f,
@@ -94,10 +94,10 @@ public class HurtResult
     /// <returns></returns>
     public static float AdjustIsBaoji(DisplayOwner active, DisplayOwner target)
     {
-        var gongjiBaoji = active.ClusterData.MemberData.Crit;
+        var gongjiBaoji = active.ClusterData.AllData.MemberData.Crit;
         var gongjiBaojiAdd = 0.0f;
 
-        var fangshouFangbao = target.ClusterData.MemberData.AntiCrit;
+        var fangshouFangbao = target.ClusterData.AllData.MemberData.AntiCrit;
         var fangshouFangbaoAdd = 0.0f;
 
         var chazhi = Mathf.Max(0, gongjiBaoji*(1 + gongjiBaojiAdd) - fangshouFangbao*(1 + fangshouFangbaoAdd));
@@ -129,21 +129,21 @@ public class HurtResult
         var chuanjiaBaifenbiAdd = 0.0f;
         var chuanjiaZhanqianAdd = 0.0f;
 
-        var chuanjiashuxing = active.ClusterData.MemberData.AntiArmor;
+        var chuanjiashuxing = active.ClusterData.AllData.MemberData.AntiArmor;
         var chuanjia = (chuanjiashuxing + chuanjiaJueduizhiAdd)*(1 + chuanjiaZhanqianAdd + chuanjiaBaifenbiAdd);
 
         var fangyuJueduizhiAdd = 0.0f;
         var fangyuBaifenbiAdd = 0.0f;
         var fangyuZhanqianAdd = 0.0f;
 
-        var fangyuShuxing = target.ClusterData.MemberData.Defence;
+        var fangyuShuxing = target.ClusterData.AllData.MemberData.Defence;
         var fangyu = (fangyuShuxing + chuanjiaJueduizhiAdd)*(1 + fangyuZhanqianAdd + fangyuBaifenbiAdd);
 
         var zhuangjiaJueduizhiADD = 0.0f;
         var zhuangjiaBaifenbiiADD = 0.0f;
         var zhuangjiaZhanqianADD = 0.0f;
 
-        var zhuangjiaShuxing = target.ClusterData.MemberData.Armor;
+        var zhuangjiaShuxing = target.ClusterData.AllData.MemberData.Armor;
         var zhuangjia = (zhuangjiaShuxing + zhuangjiaJueduizhiADD)*(1 + zhuangjiaZhanqianADD + zhuangjiaBaifenbiiADD);
         //判定攻击是否无视防御或装甲,攻击方有几率无视防御或装甲的技能，在1 - 1000中取随机整数a
         var wushifangyu = 0.0f;
@@ -168,8 +168,8 @@ public class HurtResult
     /// <returns></returns>
     public static float AdjustKezhi(DisplayOwner active, DisplayOwner target)
     {
-        var config = SData_kezhi_c.Single.GetDataOfID(active.ClusterData.MemberData.ArmyType);
-        if (config.KezhiType == target.ClusterData.MemberData.ArmyType)
+        var config = SData_kezhi_c.Single.GetDataOfID(active.ClusterData.AllData.MemberData.ArmyType);
+        if (config.KezhiType == target.ClusterData.AllData.MemberData.ArmyType)
         {
             return 1 + config.KezhiAdd;
         }

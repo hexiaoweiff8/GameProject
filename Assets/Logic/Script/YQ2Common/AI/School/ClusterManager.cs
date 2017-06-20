@@ -299,18 +299,21 @@ public class ClusterManager : ILoopItem
         var memberInSightScope = GetPositionObjectListByGraphics(graphics);
 
         IList<PositionObject> list = new List<PositionObject>();
-        foreach (var member in memberInSightScope)
+        if (memberInSightScope != null)
         {
-            // 区分自己
-            // 区分空地属性
-            // 区分阵营
-            if (member.MemberData.CurrentHP > 0
-                && (myCamp == -1
-                || (isExceptMyCamp && member.MemberData.Camp != myCamp)
-                || (!isExceptMyCamp && member.MemberData.Camp == myCamp)))
-            //&& objId.ID != member.MemberData.ObjID.ID)
+            foreach (var member in memberInSightScope)
             {
-                list.Add(member);
+                // 区分自己
+                // 区分空地属性
+                // 区分阵营
+                if (member.AllData.MemberData.CurrentHP > 0
+                    && (myCamp == -1
+                    || (isExceptMyCamp && member.AllData.MemberData.Camp != myCamp)
+                    || (!isExceptMyCamp && member.AllData.MemberData.Camp == myCamp)))
+                //&& objId.ID != member.MemberData.ObjID.ID)
+                {
+                    list.Add(member);
+                }
             }
         }
 

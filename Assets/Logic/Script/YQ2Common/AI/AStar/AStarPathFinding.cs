@@ -70,13 +70,19 @@ public class AStarPathFinding
         {
             endY = diameterY + 1;
         }
+        // 获取可行进目标点
+        var targetNode = GetFormatTarget(map, endX, endY, diameterX, diameterY);
+        endX = targetNode.X;
+        endY = targetNode.Y;
 
         // 复制数据, 用于标记关闭列表
         Utils.CopyArray(map,out closePathMap, rowCount, colCount);
         // 二叉堆open列表
         var openBHList = new BinaryHeapList<Node>(compareTo, rowCount, colCount);
+        // 起始节点
+        var startNode = new Node(startX, startY);
         // 初始化开始节点
-        openBHList.Push(new Node(startX, startY));
+        openBHList.Push(startNode);
         // 如果搜索次数大于(w+h) * 4 则停止搜索
         var maxSearchCount = (rowCount + colCount) * 40;
 
@@ -130,7 +136,7 @@ public class AStarPathFinding
                 // 判断周围节点合理性
                 if (!ValidPos(surroundPoint.X, surroundPoint.Y, colCount, rowCount) ||
                     closePathMap[surroundPoint.Y][surroundPoint.X] == Utils.Closed ||
-                    !IsPassable(map, surroundPoint, currentPoint, diameterX, diameterY))
+                    !IsPassable(map, surroundPoint, diameterX, diameterY))
                 {
                     continue;
                 }
@@ -158,7 +164,7 @@ public class AStarPathFinding
                     //(float)Math.Sqrt(xOff * xOff / y2Line + yOff * yOff / x2Line)
                     // 曼哈顿启发
                     //(Math.Abs(xOff) + Math.Abs(yOff)) 
-                    surroundPoint.H = (float)Math.Sqrt(xOff * xOff + yOff * yOff) * 2 + (NearObstacleCount(surroundPoint, map, colCount, rowCount) * 8);
+                    surroundPoint.H = (float)Math.Sqrt(xOff * xOff + yOff * yOff) * 4 + (NearObstacleCount(surroundPoint, map, colCount, rowCount) * 8);
                     surroundPoint.G = g;
                     surroundPoint.F = surroundPoint.H + surroundPoint.G;
                     surroundPoint.Parent = currentPoint;
@@ -171,6 +177,10 @@ public class AStarPathFinding
                         node.Parent = currentPoint;
                         node.G = g;
                         node.F = g + node.H;
+                    }
+                    else if (node.Parent == null)
+                    {
+                        Debug.LogError("没设置父级");
                     }
                 }
             }
@@ -198,11 +208,12 @@ public class AStarPathFinding
         {
             // 将路径回退并放入列表
             var currentNode = endNode;
-            do
+            path.Add(currentNode);
+            while (currentNode.X != startX || currentNode.Y != startY)
             {
                 path.Add(currentNode);
-				currentNode = currentNode.Parent;
-            } while (currentNode.X != startX || currentNode.Y != startY);
+                currentNode = currentNode.Parent;
+            }
         }
         else
         {
@@ -349,7 +360,7 @@ public class AStarPathFinding
                 // 判断周围节点合理性
                 if (!ValidPos(surroundPoint.X, surroundPoint.Y, colCount, rowCount) ||
                     closePathMap[surroundPoint.Y][surroundPoint.X] == Utils.Closed ||
-                    !IsPassable(map, surroundPoint, currentPoint, diameterX, diameterY))
+                    !IsPassable(map, surroundPoint, diameterX, diameterY))
                 {
                     continue;
                 }
@@ -430,29 +441,73 @@ public class AStarPathFinding
     }
 
     /// <summary>
+    /// 过得可行进目标点
+    /// </summary>
+    /// <param name="map">地图数据</param>
+    /// <param name="targetX">目标点X</param>
+    /// <param name="targetY">目标点Y</param>
+    /// <param name="diameterX">单位宽度X</param>
+    /// <param name="diameterY">单位高度Y</param>
+    /// <returns></returns>
+    private static Node GetFormatTarget(int[][] map, int targetX, int targetY, int diameterX, int diameterY)
+    {
+        var targetNode = new Node(targetX, targetY);
+        var counterForFindTarget = 0;
+        // 验证起始节点 如果该节点不可达则朝向xy两轴正负方向寻找可前进点
+        while (!IsPassable(map, targetNode, diameterX, diameterY))
+        {
+            var num = counterForFindTarget % 4;
+            switch (num)
+            {
+                case 0:
+                    targetNode.X = targetX + counterForFindTarget / 4 + 1;
+                    break;
+                case 1:
+                    targetNode.X = targetX - counterForFindTarget / 4 + 1;
+                    break;
+                case 2:
+                    targetNode.Y = targetY + counterForFindTarget / 4 + 1;
+                    break;
+                case 3:
+                    targetNode.Y = targetY + counterForFindTarget / 4 + 1;
+                    break;
+            }
+            //Debug.Log(targetNode);
+            counterForFindTarget++;
+            if (counterForFindTarget > 100)
+            {
+                Debug.LogError("没有路径");
+                return null;
+            }
+        }
+        return targetNode;
+    }
+
+    /// <summary>
     /// 当前位置是否可以通过
     /// </summary>
     /// <param name="computeMap">地图</param>
     /// <param name="nowNode">当前位置</param>
-    /// <param name="prvNode">父节点</param>
     /// <param name="diameterX">移动物体X轴高度</param>
     /// <param name="diameterY">移动物体Y轴高度</param>
     /// <returns></returns>
-    private static bool IsPassable(int[][] computeMap, Node nowNode, Node prvNode, int diameterX, int diameterY)
+    private static bool IsPassable(int[][] computeMap, Node nowNode, int diameterX, int diameterY)
     {
         //var now = Time.realtimeSinceStartup;
         // 定义 物体位置为左上角(主要指直径大于1的)
         // 验证参数是否合法
-        if (diameterX <= 0 || diameterY < 0 || computeMap == null || nowNode == null || prvNode == null)
+        if (diameterX <= 0 || diameterY < 0 || computeMap == null || nowNode == null)
         {
             return false;
         }
+        var halfX = (int)(diameterX * 0.5f);
+        var halfY = (int)(diameterY * 0.5f);
         // TODO 优化方案 差值判断不同区域, 重复区域忽略
         // 遍历直径内的点
         // 优化, 中间忽略, 只判断外圈
-        for (var i = 0; i < diameterX; i++)
+        for (var i = -halfX; i < halfX; i++)
         {
-            for (var j = 0; j < diameterY; j++)
+            for (var j = -halfY; j < halfY; j++)
             {
                 if (i > 0 && i < diameterX - 1 && j > 0 && j < diameterY - 1)
                 {

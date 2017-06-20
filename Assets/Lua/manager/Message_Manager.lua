@@ -464,12 +464,8 @@ function Message_Manager:getCardData(gw2c)
         --卡牌ID -经验 -星级 -兵员等级 -军阶等级 -数量
     	print( string.format("card==> id:%d, exp:%d, star:%d, slv:%d, rlv:%d, num:%d",v.id, v.exp, v.star, v.slv, v.rlv, v.num,v.lv) )
         print( string.format("teamNum:%d, skillNum:%d, slotNum:%d", #v.team, #v.skill,  #v.slot) )
-		--for k, v in ipairs(v.slot) do --slot
-	        --print(k,v)
-	    --end	
         print(v.skill[1])
 		cardTbl[k] = Card(v.id, v.exp, v.star, v.slv, v.rlv, v.num, v.slot, v.skill, v.team,v.lv)
-		-- print("id:" .. cardTbl[k]["id"])
     end
 end
 
@@ -492,7 +488,7 @@ function Message_Manager:changeCardData(gw2c, msgId)
             end
         end
         currencyTbl["expPool"] = gw2c.currency.expPool
-        wnd_cardyc_controller:upLevel_refresh()
+        upLevel_controller:upLevel_refresh()
         
     elseif msgId == 10010 then--升星
         for k, v in ipairs(cardTbl) do
@@ -503,7 +499,7 @@ function Message_Manager:changeCardData(gw2c, msgId)
             end
         end
         currencyTbl["coin"] = gw2c.currency.coin
-        wnd_cardyc_controller:upStar_refresh()
+        upStar_controller:upStar_refresh()
 
     elseif msgId == 10011 then	--兵员升级
         for k, v in ipairs(cardTbl) do
@@ -512,7 +508,7 @@ function Message_Manager:changeCardData(gw2c, msgId)
             end
         end
         currencyTbl["coin"] = gw2c.currency.coin
-        wnd_cardyc_controller:upSoldier_refresh()
+        upSoldier_controller:upSoldier_refresh()
 
 	elseif msgId == 10012 then--进阶
         for k,v in pairs(cardTbl) do
@@ -522,7 +518,7 @@ function Message_Manager:changeCardData(gw2c, msgId)
             end
         end
         currencyTbl["gold"] = gw2c.currency.gold
-        wnd_cardyc_controller:upQuality_refresh()
+        information_controller:upQuality_refresh()
 
     elseif msgId == 10013 then--装备
         for k,v in pairs(cardTbl) do
@@ -538,7 +534,7 @@ function Message_Manager:changeCardData(gw2c, msgId)
             end
         end
         
-        wnd_cardyc_controller:epuip_refresh()
+        information_controller:epuip_refresh()
 
     elseif msgId == 10014 then
         for k,v in pairs(cardTbl) do
@@ -548,7 +544,7 @@ function Message_Manager:changeCardData(gw2c, msgId)
             end
         end
         currencyTbl["skillpt"] = gw2c.currency.skillPt
-        wnd_cardyc_controller:upSkill_refresh()
+        upSkill_controller:upSkill_refresh()
         
     elseif msgId == 10015 then--技能重置
          for k,v in pairs(cardTbl) do
@@ -559,7 +555,7 @@ function Message_Manager:changeCardData(gw2c, msgId)
         end
 	    currencyTbl["skillpt"] = gw2c.currency.skillPt
 	    currencyTbl["diamond"] = gw2c.currency.diamond
-        wnd_cardyc_controller:skillReset_refresh()
+        upSkill_controller:skillReset_refresh()
 
     elseif msgId == 10018 then--协同升级和激活
         for k,v in pairs(cardTbl) do
@@ -571,7 +567,7 @@ function Message_Manager:changeCardData(gw2c, msgId)
 
 	    currencyTbl["coin"] = gw2c.currency.coin
         currencyTbl["gold"] = gw2c.currency.gold
-        wnd_cardyc_controller:upSynergy_refresh()
+        upSynergy_controller:upSynergy_refresh()
     end
 end
 

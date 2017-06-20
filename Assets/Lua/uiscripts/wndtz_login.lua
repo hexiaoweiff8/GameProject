@@ -6,6 +6,10 @@ local class = require("common/middleclass")
 local class_wnd_login = class("class_wnd_login", wnd_base)
 require("manager/Message_Manager")
 Message_Manager = Message_Manager()
+require("uiscripts/redDotControl")
+redDotControl = redDotControl()
+
+
 
 function class_wnd_login:OnShowDone()
     local btn_go = self.transform:Find("mainpanel/btn_go").gameObject
@@ -32,7 +36,6 @@ end
 
 
 function class_wnd_login:OnAddHandler()
-
     Message_Manager:OnAddHandler()
 end
 return class_wnd_login

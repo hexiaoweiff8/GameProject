@@ -38,13 +38,13 @@ public class TargetSelecter
     /// <param name="searchObj">搜索对象</param>
     /// <param name="quadTree">四叉树</param>
     /// <returns></returns>
-    public IList<T> TargetFilter<T>(T searchObj, QuadTree<T> quadTree) where T : ISelectWeightDataHolder, IBaseMember, IGraphicsHolder
+    public IList<T> TargetFilter<T>(T searchObj, QuadTree<T> quadTree) where T : IBaseMember, IGraphicsHolder
     {
         IList<T> result = null;
-        if (searchObj != null && searchObj.MemberData != null && quadTree != null)
+        if (searchObj != null && searchObj.AllData.MemberData != null && quadTree != null)
         {
             // 取出范围内的单位
-            var range = searchObj.MemberData.AttackRange;
+            var range = searchObj.AllData.MemberData.AttackRange;
             //var halfRange = range;
             var inScope =
                 quadTree.GetScope(new RectGraphics(new Vector2(searchObj.X, searchObj.Y), range, range, 0));
@@ -69,15 +69,15 @@ public class TargetSelecter
     /// <param name="searchObj">搜索对象</param>
     /// <param name="dataList">搜索列表</param>
     /// <returns></returns>
-    public IList<T> TargetFilter<T>(T searchObj, IList<T> dataList) where T : ISelectWeightDataHolder, IBaseMember, IGraphicsHolder
+    public IList<T> TargetFilter<T>(T searchObj, IList<T> dataList) where T : IAllDataHolder, IBaseMember, IGraphicsHolder
     {
         IList<T> result = null;
-        if (searchObj != null && searchObj.MemberData != null && dataList != null)
+        if (searchObj != null && searchObj.AllData.MemberData != null && dataList != null)
         {
 
 
             // 单位数量
-            var targetCount = searchObj.MemberData.MultiAimMax;
+            var targetCount = searchObj.AllData.MemberData.MultiAimMax;
             // 目标列表Array
             var targetArray = new T[targetCount];
             // 目标权重值
@@ -103,31 +103,31 @@ public class TargetSelecter
                     continue;
                 }
                 // 计算空地属性权重
-                switch (item.MemberData.GeneralType)
+                switch (item.AllData.MemberData.GeneralType)
                 {
                     case Utils.GeneralTypeAir:
-                        sumWeight += searchObj.SelectWeightData.AirWeight;
+                        sumWeight += searchObj.AllData.SelectWeightData.AirWeight;
                         break;
                     case Utils.GeneralTypeBuilding:
-                        sumWeight += searchObj.SelectWeightData.BuildWeight;
+                        sumWeight += searchObj.AllData.SelectWeightData.BuildWeight;
                         break;
                     case Utils.GeneralTypeSurface:
-                        sumWeight += searchObj.SelectWeightData.SurfaceWeight;
+                        sumWeight += searchObj.AllData.SelectWeightData.SurfaceWeight;
                         break;
                 }
 
                 // -------------------------Level2-----------------------------
                 // 计算单位类型权重
-                switch (item.MemberData.ArmyType)
+                switch (item.AllData.MemberData.ArmyType)
                 {
                     case Utils.MemberItemTypeHuman:
-                        sumWeight += searchObj.SelectWeightData.HumanWeight;
+                        sumWeight += searchObj.AllData.SelectWeightData.HumanWeight;
                         break;
                     case Utils.MemberItemTypeOrc:
-                        sumWeight += searchObj.SelectWeightData.OrcWeight;
+                        sumWeight += searchObj.AllData.SelectWeightData.OrcWeight;
                         break;
                     case Utils.MemberItemTypeOmnic:
-                        sumWeight += searchObj.SelectWeightData.OmnicWeight;
+                        sumWeight += searchObj.AllData.SelectWeightData.OmnicWeight;
                         break;
                     //case Utils.MemberItemTypeTank:
                     //    sumWeight += searchObj.SelectWeightData.TankWeight;
@@ -148,13 +148,13 @@ public class TargetSelecter
 
                 // -------------------------Level3-----------------------------
                 // 隐形单位
-                if (item.MemberData.IsHide)
+                if (item.AllData.MemberData.IsHide)
                 {
-                    if (searchObj.SelectWeightData.HideWeight < 0)
+                    if (searchObj.AllData.SelectWeightData.HideWeight < 0)
                     {
                         continue;
                     }
-                    sumWeight += searchObj.SelectWeightData.HideWeight;
+                    sumWeight += searchObj.AllData.SelectWeightData.HideWeight;
                 }
                 // 嘲讽单位
                 //if (item.IsTaunt)
@@ -168,17 +168,17 @@ public class TargetSelecter
 
                 // -------------------------Level4-----------------------------
                 // 小生命权重, 血越少权重越高
-                if (searchObj.SelectWeightData.HealthMaxWeight > 0)
+                if (searchObj.AllData.SelectWeightData.HealthMaxWeight > 0)
                 {
                     // 血量 (最大血量 - 当前血量)/最大血量 * 生命权重
-                    sumWeight += searchObj.SelectWeightData.HealthMaxWeight * (item.MemberData.TotalHp - item.MemberData.CurrentHP) / item.MemberData.TotalHp;
+                    sumWeight += searchObj.AllData.SelectWeightData.HealthMaxWeight * (item.AllData.MemberData.TotalHp - item.AllData.MemberData.CurrentHP) / item.AllData.MemberData.TotalHp;
                 }
 
                 // 大生命权重, 生命值越多权重越高
-                if (searchObj.SelectWeightData.HealthMinWeight > 0)
+                if (searchObj.AllData.SelectWeightData.HealthMinWeight > 0)
                 {
                     // 血量 当前血量/最大血量 * 生命权重
-                    sumWeight += searchObj.SelectWeightData.HealthMinWeight * item.MemberData.CurrentHP / item.MemberData.TotalHp;
+                    sumWeight += searchObj.AllData.SelectWeightData.HealthMinWeight * item.AllData.MemberData.CurrentHP / item.AllData.MemberData.TotalHp;
                 }
 
                 //// 角度权重, 角度越大权重越小
@@ -189,17 +189,17 @@ public class TargetSelecter
 
                 var distance = Utils.GetTwoPointDistance2D(searchObj.X, searchObj.Y, item.X, item.Y);
                 // 长距离权重, 距离越远权重越大
-                if (searchObj.SelectWeightData.DistanceMinWeight > 0)
+                if (searchObj.AllData.SelectWeightData.DistanceMinWeight > 0)
                 {
-                    sumWeight += searchObj.SelectWeightData.DistanceMinWeight *
-                                 (searchObj.MemberData.AttackRange - distance) /
-                                 searchObj.MemberData.AttackRange;
+                    sumWeight += searchObj.AllData.SelectWeightData.DistanceMinWeight *
+                                 (searchObj.AllData.MemberData.AttackRange - distance) /
+                                 searchObj.AllData.MemberData.AttackRange;
                 }
 
                 // 短距离权重, 距离越远权重越小
-                if (searchObj.SelectWeightData.DistanceMaxWeight > 0)
+                if (searchObj.AllData.SelectWeightData.DistanceMaxWeight > 0)
                 {
-                    sumWeight += searchObj.SelectWeightData.DistanceMaxWeight * distance / searchObj.MemberData.AttackRange;
+                    sumWeight += searchObj.AllData.SelectWeightData.DistanceMaxWeight * distance / searchObj.AllData.MemberData.AttackRange;
                 }
 
                 // TODO 各项为插入式结构
@@ -239,9 +239,9 @@ public class TargetSelecter
         List<T> result = null;
         // 散射, 按照距离搜索周围的单位, 并将其中一个作为本次的目标
         // 如果散射参数有值, 并且筛选列表中存在目标, 则取第一个单位作为筛选目标散射周围单位
-        if (searchObj != null && searchObj.MemberData != null && searchObj.MemberData.SpreadRange > Utils.ApproachZero && targetObj != null)
+        if (searchObj != null && searchObj.AllData.MemberData != null && searchObj.AllData.MemberData.SpreadRange > Utils.ApproachZero && targetObj != null)
         {
-            var memberData = searchObj.MemberData;
+            var memberData = searchObj.AllData.MemberData;
             result = new List<T>();
             var target = targetObj;
             // TODO 圆形 取单位周围单位
@@ -270,7 +270,7 @@ public class TargetSelecter
             var sumVolume = 0f;
             foreach (var scatteringItem in scatteringList)
             {
-                sumVolume += scatteringItem.MemberData.SpaceSet * scatteringItem.MemberData.SpaceSet;
+                sumVolume += scatteringItem.AllData.MemberData.SpaceSet * scatteringItem.AllData.MemberData.SpaceSet;
             }
             hitRate = (1 - (float)Math.Pow(1 - memberData.Accuracy, sumVolume)) * 100;
             // 先随机命中, 如果命中则返回一个对象
@@ -328,12 +328,12 @@ public class TargetSelecter
     /// <returns>是否碰撞</returns>
     public static bool IsCollisionItem(IBaseMember item, float scanerX, float scanerY, float radius, float openAngle = 361f, float rotate = 0f)
     {
-        if (item == null || item.MemberData == null)
+        if (item == null || item.AllData.MemberData == null)
         {
             return false;
         }
 
-        var memberDta = item.MemberData;
+        var memberDta = item.AllData.MemberData;
         // 求距离
         var xOff = item.X - scanerX;
         var yOff = item.Y - scanerY;
@@ -448,7 +448,7 @@ public class TargetSelecter
     /// <param name="targetData">目标数据</param>
     /// <param name="selecterData">选择者数据</param>
     /// <returns>是否可以攻击</returns>
-    public static bool CouldSelectTarget<T>(T targetData, T selecterData)where T : ISelectWeightDataHolder, IBaseMember
+    public static bool CouldSelectTarget<T>(T targetData, T selecterData)where T : IAllDataHolder, IBaseMember
     {
         if (selecterData == null || targetData == null)
         {
@@ -461,19 +461,19 @@ public class TargetSelecter
         // 或处于死亡或假死状态
         // 或目标是障碍物
         // 则不能选择该单位
-        if ((selecterData.SelectWeightData.BuildWeight < 0 &&
-             targetData.MemberData.GeneralType == Utils.GeneralTypeBuilding) ||
-            (selecterData.SelectWeightData.AirWeight < 0 && targetData.MemberData.GeneralType == Utils.GeneralTypeAir) ||
-            (selecterData.SelectWeightData.SurfaceWeight < 0 &&
-             targetData.MemberData.GeneralType == Utils.GeneralTypeSurface) ||
-            targetData.MemberData.CurrentHP <= 0 ||
+        if ((selecterData.AllData.SelectWeightData.BuildWeight < 0 &&
+             targetData.AllData.MemberData.GeneralType == Utils.GeneralTypeBuilding) ||
+            (selecterData.AllData.SelectWeightData.AirWeight < 0 && targetData.AllData.MemberData.GeneralType == Utils.GeneralTypeAir) ||
+            (selecterData.AllData.SelectWeightData.SurfaceWeight < 0 &&
+             targetData.AllData.MemberData.GeneralType == Utils.GeneralTypeSurface) ||
+            targetData.AllData.MemberData.CurrentHP <= 0 ||
             targetData is FixtureData)
         {
             return false;
         }
         // 如果可选类型相等或目标是建筑
         // 如果目标隐形并且选择者反隐, 或者不隐形
-        if ((targetData.MemberData.IsHide && selecterData.MemberData.IsAntiHide) || !targetData.MemberData.IsHide)
+        if ((targetData.AllData.MemberData.IsHide && selecterData.AllData.MemberData.IsAntiHide) || !targetData.AllData.MemberData.IsHide)
         {
             // 目标可被选择
             result = true;

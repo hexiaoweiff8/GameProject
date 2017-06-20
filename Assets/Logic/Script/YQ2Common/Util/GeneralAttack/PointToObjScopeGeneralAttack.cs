@@ -24,7 +24,7 @@ public class PointToObjScopeGeneralAttack : IGeneralAttack
     /// <param name="durTime">范围特效持续时间</param>
     /// <param name="taType">子弹飞行轨迹</param>
     /// <param name="callback">攻击结束回调</param>
-    public PointToObjScopeGeneralAttack(ClusterData attacker, 
+    public PointToObjScopeGeneralAttack(PositionObject attacker, 
         string[] effectKey, 
         Vector3 releasePos, 
         GameObject targetObj, 
@@ -38,10 +38,12 @@ public class PointToObjScopeGeneralAttack : IGeneralAttack
         {
             throw new Exception("攻击者集群数据为空");
         }
+        var key1 = effectKey[0];
+        var key2 = effectKey[1];
         // 范围伤害
         Action scopeDemage = () =>
         {
-            var positionScopeAttack = new PositionScopeGeneralAttack(attacker, effectKey[1], targetObj.transform.position, scopeRaduis,
+            var positionScopeAttack = new PositionScopeGeneralAttack(attacker, key2, targetObj.transform.position, scopeRaduis,
                 durTime, callback);
             positionScopeAttack.Begin();
         };
@@ -52,7 +54,7 @@ public class PointToObjScopeGeneralAttack : IGeneralAttack
         //}
 
         // 飞行轨迹
-        effect = EffectsFactory.Single.CreatePointToObjEffect(effectKey[0], 
+        effect = EffectsFactory.Single.CreatePointToObjEffect(key1, 
             ParentManager.Instance().GetParent(ParentManager.BallisticParent).transform,
             releasePos, 
             targetObj, 
@@ -65,10 +67,6 @@ public class PointToObjScopeGeneralAttack : IGeneralAttack
 
     public void Begin()
     {
-        if (effect == null)
-        {
-            throw new Exception("弹道创建失败");
-        }
         effect.Begin();
     }
 }

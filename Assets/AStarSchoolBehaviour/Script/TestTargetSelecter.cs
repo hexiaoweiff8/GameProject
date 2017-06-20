@@ -126,7 +126,7 @@ public class TestTargetSelecter : MonoBehaviour
         bool isTouchLeftBorder = false;
         foreach (var member in MemberList.List)
         {
-            var memberData = member.MemberData;
+            var memberData = member.AllData.MemberData;
             // 判断是否碰到边框
             isTouchTopBorder = member.X + memberData.SpaceSet >= MapPlane.transform.localPosition.x + MapWidth * 0.5f;
             isTouchBottomBorder = member.X <= MapPlane.transform.localPosition.x - MapWidth * 0.5f;
@@ -173,7 +173,7 @@ public class TestTargetSelecter : MonoBehaviour
         //{
 
         var item = _leader;
-        var memberData = item.MemberData;
+        var memberData = item.AllData.MemberData;
         // 根据对象的搜寻外径获取对向列表
         var itemRect = new RectGraphics(new Vector2(item.X, item.Y), memberData.AttackRange,
                 memberData.AttackRange, 0);
@@ -318,7 +318,7 @@ public class TestTargetSelecter : MonoBehaviour
             memberData.ArmyType = (short)random.Next(1, 4);
             memberData.IsHide = random.Next(1) > 0;
 
-            member.MemberData = memberData;
+            member.AllData.MemberData = memberData;
             //    new VOBase()
             //{
             //    AttackRange = 20,
@@ -340,32 +340,33 @@ public class TestTargetSelecter : MonoBehaviour
             // 随机给方向
             member.Direction = new Vector3(random.Next(1, 100), 0, random.Next(1, 100));
 
-            member.SelectWeightData = new SelectWeightData();
+            var fightData = member.AllData.SelectWeightData;
+            fightData = new SelectWeightData();
             // 选择目标数据
-            member.SelectWeightData.AirWeight = -1;
-            member.SelectWeightData.BuildWeight = 100;
-            member.SelectWeightData.SurfaceWeight = 100;
+            fightData.AirWeight = -1;
+            fightData.BuildWeight = 100;
+            fightData.SurfaceWeight = 100;
 
-            member.SelectWeightData.HumanWeight = 10;
-            member.SelectWeightData.OrcWeight = 10;
-            member.SelectWeightData.OmnicWeight = 10;
-            //member.SelectWeightData.TankWeight = 10;
-            //member.SelectWeightData.LVWeight = 10;
-            //member.SelectWeightData.CannonWeight = 10;
-            //member.SelectWeightData.AirCraftWeight = 10;
-            //member.SelectWeightData.SoldierWeight = 10;
+            fightData.HumanWeight = 10;
+            fightData.OrcWeight = 10;
+            fightData.OmnicWeight = 10;
+            //member.TankWeight = 10;
+            //member.LVWeight = 10;
+            //member.CannonWeight = 10;
+            //member.AirCraftWeight = 10;
+            //member.SoldierWeight = 10;
 
-            member.SelectWeightData.HideWeight = -1;
-            member.SelectWeightData.TauntWeight = 1000;
+            fightData.HideWeight = -1;
+            fightData.TauntWeight = 1000;
 
-            member.SelectWeightData.HealthMaxWeight = 0;
-            member.SelectWeightData.HealthMinWeight = 10;
-            //member.SelectWeightData.AngleWeight = 10;
-            member.SelectWeightData.DistanceMaxWeight = 0;
-            member.SelectWeightData.DistanceMinWeight = 10;
+            fightData.HealthMaxWeight = 0;
+            fightData.HealthMinWeight = 10;
+            //member.AngleWeight = 10;
+            fightData.DistanceMaxWeight = 0;
+            fightData.DistanceMinWeight = 10;
 
-            member.MemberData.Accuracy = 0.9f;
-            member.MemberData.SpreadRange = 10;
+            member.AllData.MemberData.Accuracy = 0.9f;
+            member.AllData.MemberData.SpreadRange = 10;
 
             memberData.MultiAimMax = 10;
             MemberList.Add(member);

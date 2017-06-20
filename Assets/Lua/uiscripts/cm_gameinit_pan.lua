@@ -3,9 +3,23 @@ require "framework/classWC"
 require "framework/luacsv"
 require 'events'
 require "common/protocal"
+require "manager/Config_Manager"
 require("uiscripts/equipP")
 require("uiscripts/kejiP")
-require("uiscripts/cardycP")
+require("uiscripts/cardyc/cardycP")
+require("uiscripts/Const")
+--引用工具类
+require("uiscripts/Util/stringUtil")
+require("uiscripts/Util/cardUtil")
+require("uiscripts/Util/colorUtil")
+require("uiscripts/Util/attributeUtil")
+require("uiscripts/Util/synergyUtil")
+require("uiscripts/Util/skillUtil")
+require("uiscripts/Util/starUtil")
+require("uiscripts/Util/itemUtil")
+require("uiscripts/Util/qualityUtil")
+
+
 gameinit = classWC()
 -- 单例
 GameInit = nil
@@ -31,7 +45,7 @@ WNDTYPE = {
     Cangku = "ui_cangku",
 }
 UiDefine = luacsv.new(require("pk_tabs/UiDefine"))
--- 登录窗体组件名列表
+-- 登录窗体组件名列表 
 local lgwnds = {
     {name = WNDTYPE.Healthadvice, cm = "uiscripts/wnd_healthadvice"}
 }
@@ -47,7 +61,7 @@ gameinit.wndlist = {
     {name = WNDTYPE.ui_chongzhu, cm = "uiscripts/ui_chongzhu"},
     {name = WNDTYPE.ui_keji_jiasu, cm = "uiscripts/ui_keji_jiasu"},
     {name = WNDTYPE.ui_kejitree, cm = "uiscripts/ui_kejitree"},
-    {name = WNDTYPE.Cardyc, cm = "uiscripts/wnd_cardyc_controller"},
+    {name = WNDTYPE.Cardyc, cm = "uiscripts/cardyc/wnd_cardyc_controller"},
     {name = WNDTYPE.ui_tips,cm = "uiscripts/ui_tips"},
     {name = WNDTYPE.Cangku, cm = "uiscripts/cangku/wnd_cangku_controller"},
 }
@@ -185,73 +199,8 @@ function gameinit:GameStart()
     GameObject.Find("GameManager"):AddComponent(typeof(LuaBehaviour)):Init(self)
     self.mPacketLoadDone = false
     self:coStartGame()
-    -- 启动一个协程
-    --读取士兵阵型表
-    sdata_array_data = luacsv.new(require("pk_tabs/array_c"))
-    --读取士兵模型表
-    sdata_soldierRender_data = luacsv.new(require("pk_tabs/soldierRender_data"))
-    --读取装备数据表
-    sdata_equip_data = luacsv.new(require("pk_tabs/equip_c"))
-    --读取属性名数据表
-    sdata_attribute_data = luacsv.new(require("pk_tabs/attribute_c"))
-    --读取装备套装数据表
-    sdata_equipsuit_data = luacsv.new(require("pk_tabs/equipsuit_c"))
-    --读取装备属性方案数据表
-    sdata_EquipPlan_data = require("pk_tabs/EquipPlan_data")
-    --读取语言本地化数据表
-    sdata_UILiteral = luacsv.new(require("pk_tabs/UILiteral"))
-    --科技表
-    sdata_tech_data = luacsv.new(require("pk_tabs/tech_c"))
-
-
-    --用户角色表
-    sdata_userrose_data = luacsv.new(require("pk_tabs/userdata_c"))
-    --单位目标权重表
-    sdata_armyaim_data = luacsv.new(require("pk_tabs/armyaim_c"))
-    --卡牌表
-    sdata_armybase_data = luacsv.new(require("pk_tabs/armybase_c"))
-    --卡牌基础表
-    sdata_armycardbase_data = luacsv.new(require("pk_tabs/armycardbase_c"))
-    --卡牌经验表
-    sdata_armycardexp_data = luacsv.new(require("pk_tabs/armycardexp_c"))
-    --品质表
-    sdata_armycardquality_data = luacsv.new(require("pk_tabs/armycardquality_c"))
-    --品质消耗表
-    sdata_armycardqualitycost_data = luacsv.new(require("pk_tabs/armycardqualitycost_c"))
-    --品质显示表
-    sdata_armycardqualityshow_data = luacsv.new(require("pk_tabs/armycardqualityshow_c"))
-    --技能消耗表
-    sdata_armycardskillcost_data = luacsv.new(require("pk_tabs/armycardskillcost_c"))
-    --星级表
-    sdata_armycardstar_data = luacsv.new(require("pk_tabs/armycardstar_c"))
-    --星级消耗表
-    sdata_armycardstarcost_data = luacsv.new(require("pk_tabs/armycardstarcost_c"))
-    --协同表
-    sdata_armycardunion_data = luacsv.new(require("pk_tabs/armycardunion_c"))
-    --协同消耗表
-    sdata_armycardunioncost_data = luacsv.new(require("pk_tabs/armycardunioncost_c"))
-    --兵员表
-    sdata_armycarduselimit_data = luacsv.new(require("pk_tabs/armycarduselimit_c"))
-    --兵员消耗表
-    sdata_armycarduselimitcost_data = luacsv.new(require("pk_tabs/armycarduselimitcost_c"))
-    --技能表
-    sdata_skill_data = luacsv.new(require("pk_tabs/skill_c"))
-	--克制关系表
-    sdata_kezhi_data = luacsv.new(require("pk_tabs/kezhi_c"))
-    --手选宝箱表
-    sdata_selectchest_data = luacsv.new(require("pk_tabs/selectchest_c"))
-    --仓库物品表
-    sdata_cangku_data = luacsv.new(require("pk_tabs/item_c"))
-    --仓库页卡标签表
-    sdata_tab_data = luacsv.new(require("pk_tabs/pack_c"))
-    
-    
-    SDataUtils.setData("armyaim_c", sdata_armyaim_data.mData.head, sdata_armyaim_data.mData.body)
-    SDataUtils.setData("armybase_c", sdata_armybase_data.mData.head, sdata_armybase_data.mData.body)
-    SDataUtils.setData("armycardbase_c", sdata_armycardbase_data.mData.head, sdata_armycardbase_data.mData.body)
-    SDataUtils.setData("array_c", sdata_array_data.mData.head, sdata_array_data.mData.body)
-    SDataUtils.setData("soldierRender", sdata_soldierRender_data.mData.head, sdata_soldierRender_data.mData.body)
-    SDataUtils.setData("kezhi_c", sdata_kezhi_data.mData.head, sdata_kezhi_data.mData.body)
+    -- 启动一个协程 加载数据
+    Config_Manager:LoadConfig()
 end
 -- --贯穿整个游戏生命周期
 -- function gameinit:Update()

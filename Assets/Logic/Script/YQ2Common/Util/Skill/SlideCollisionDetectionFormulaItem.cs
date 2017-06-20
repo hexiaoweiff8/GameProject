@@ -198,8 +198,8 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
                         foreach (var packer in tmpPackerList)
                         {
                             var subSkill = new SkillInfo(packer.SkillNum);
-                            subSkill.DataList = paramsPacker.DataList;
                             FormulaParamsPackerFactroy.Single.CopyPackerData(paramsPacker, packer);
+                            subSkill.DataList = paramsPacker.DataList;
                             subSkill.AddFormulaItem(SubFormulaItem);
                             //subSkill.GetFormula(packer);
                             SkillManager.Single.DoShillInfo(subSkill, packer, true);

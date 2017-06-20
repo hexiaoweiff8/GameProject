@@ -60,7 +60,7 @@ public class Soldier_Xingjin_State : SoldierFSMState
         // 清空当前目标点
         clusterData.ClearTarget();
         // 取最近的对方建筑
-        var buildingList = DisplayerManager.Single.GetBuildingByType(GetTypeArray(clusterData.MemberData.ObjID.ObjType));
+        var buildingList = DisplayerManager.Single.GetBuildingByType(GetTypeArray(clusterData.AllData.MemberData.ObjID.ObjType));
 
         // 当前地图数据
         var mapData = LoadMap.Single.GetMapData();
@@ -70,8 +70,18 @@ public class Soldier_Xingjin_State : SoldierFSMState
         var endPos = Utils.PositionToNum(LoadMap.Single.MapPlane.transform.position, GetClosestBuildingPos(buildingList), ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth, ClusterManager.Single.MapHeight);
         // 生成路径
         var path = AStarPathFinding.SearchRoad(mapData, startPos[0], startPos[1], endPos[0], endPos[1], (int)clusterData.Diameter, (int)clusterData.Diameter + 1);
-
-        clusterData.PushTargetList(Utils.NumToPostionByList(LoadMap.Single.MapPlane.transform.position, path, ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth, ClusterManager.Single.MapHeight));
+        if (path != null && path.Count > 0)
+        {
+            // 清空当前目标点
+            clusterData.ClearTarget();
+            clusterData.PushTargetList(Utils.NumToPostionByList(LoadMap.Single.MapPlane.transform.position, path,
+                ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth, ClusterManager.Single.MapHeight));
+        }
+        else
+        {
+            Debug.Log("xingjin 目标点不可达:start:" + startPos[0] + "," + startPos[1] + " end:" + endPos[0] + "," + endPos[1]);
+        }
+        //clusterData.PushTargetList(Utils.NumToPostionByList(LoadMap.Single.MapPlane.transform.position, path, ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth, ClusterManager.Single.MapHeight));
     }
 
 

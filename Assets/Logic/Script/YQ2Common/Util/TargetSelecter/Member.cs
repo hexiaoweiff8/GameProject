@@ -153,14 +153,9 @@ using UnityEngine;
 /// <summary>
 /// Mamber基础接口
 /// </summary>
-public interface IBaseMember
+public interface IBaseMember : IAllDataHolder
 {
     // ----------------------------------暴露接口--------------------------------------
-
-    /// <summary>
-    /// 持有数据对象
-    /// </summary>
-    VOBase MemberData { get; }
     
     ///// <summary>
     ///// 扫描范围形状类型

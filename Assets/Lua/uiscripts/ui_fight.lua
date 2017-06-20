@@ -832,7 +832,7 @@ function ui_fight:Update()
     end
     local tempFei
     --费每秒增长
-    self.nowFei = self.nowFei + 1
+    self.nowFei = self.nowFei + 10
     if self.nowFei > self.allFei then
         if firstTrueVar == nil and self.feiBg2.gameObject.activeSelf == true then
             self.feiBg2.gameObject:SetActive(false)

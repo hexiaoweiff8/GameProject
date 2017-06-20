@@ -71,7 +71,7 @@ public class RanderControl : MonoBehaviour
 
     public void SetBloodBarValue()
     {
-        var value = data.ClusterData.MemberData.CurrentHP / data.ClusterData.MemberData.TotalHp;
+        var value = data.ClusterData.AllData.MemberData.CurrentHP / data.ClusterData.AllData.MemberData.TotalHp;
         bloodBarCom.SetBloodBarValue(value);
     }
 

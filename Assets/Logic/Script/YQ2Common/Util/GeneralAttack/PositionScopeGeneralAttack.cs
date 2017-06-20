@@ -13,7 +13,7 @@ public class PositionScopeGeneralAttack : IGeneralAttack
     /// <summary>
     /// 攻击者数据
     /// </summary>
-    private ClusterData attacker = null;
+    private PositionObject attacker = null;
 
     /// <summary>
     /// 显示特效
@@ -50,7 +50,7 @@ public class PositionScopeGeneralAttack : IGeneralAttack
     /// <param name="scopeRaduis">范围半径</param>
     /// <param name="durTime">持续时间</param>
     /// <param name="callback">结束回调</param>
-    public PositionScopeGeneralAttack(ClusterData attacker, 
+    public PositionScopeGeneralAttack(PositionObject attacker, 
         string effectKey, 
         Vector3 targetPos, 
         float scopeRaduis, 
@@ -78,7 +78,7 @@ public class PositionScopeGeneralAttack : IGeneralAttack
     /// <param name="graphics">范围检测图形</param>
     /// <param name="durTime">持续时间</param>
     /// <param name="callback">结束回调</param>
-    public PositionScopeGeneralAttack(ClusterData attacker, 
+    public PositionScopeGeneralAttack(PositionObject attacker, 
         string effectKey, 
         Vector3 targetPos, 
         ICollisionGraphics graphics, 
@@ -100,7 +100,7 @@ public class PositionScopeGeneralAttack : IGeneralAttack
     public void Begin()
     {
         // 范围内选择单位
-        var memberList = ClusterManager.Single.CheckRange(graphics, attacker.MemberData.Camp, true);
+        var memberList = ClusterManager.Single.CheckRange(graphics, attacker.AllData.MemberData.Camp, true);
         // 攻击者数据
         var attackerDisplayOwner = DisplayerManager.Single.GetElementByPositionObject(attacker);
         // 所有单位扣除生命

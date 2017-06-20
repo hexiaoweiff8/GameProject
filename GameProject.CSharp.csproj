@@ -268,6 +268,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\FightParameter.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\RanderControl.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\SpinWithMouse.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\AllData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Ballistic\Ballistic.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Ballistic\BallisticFactory.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Collision\CircleGraphics.cs" />
@@ -276,6 +277,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Collision\RectGraphics.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Collision\SectorGraphics.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\EffectsFactory.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\GeneralAttack\ArmyAOEData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\GeneralAttack\GeneralAttackManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\GeneralAttack\NormalGeneralAttack.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\GeneralAttack\PointToObjScopeGeneralAttack.cs" />
@@ -289,11 +291,14 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\ResourceLoader.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\SDataUtils.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\CollisionDetectionFormulaItem.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\Formula\Formula.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\Formula\IFormula.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\FormulaConstructor.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\FormulaParamsPacker.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\FormulaParamsPackerFactroy.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\HealthScopeFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\IFormulaItem.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\IfFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\MoveFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\PauseFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\PointFormulaItem.cs" />
@@ -301,6 +306,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\PointToPointFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillManager.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillTriggerData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SlideCollisionDetectionFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\TargetSelecter\ISelectWeightData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\TargetSelecter\ISelectWeightDataHolder.cs" />
@@ -366,6 +372,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_XilianshiData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_Zhenfa.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armyaim_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armyaoe_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armycardbase_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armycardexp_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armycardquality_c.cs" />

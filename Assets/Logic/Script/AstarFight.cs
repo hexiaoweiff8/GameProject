@@ -640,13 +640,13 @@ public class AstarFight : MonoBehaviour
         }
         //把物体当前世界坐标转换为格子坐标
         int[] a = Utils.PositionToNum(LoadMap.MapPlane.transform.position, go.transform.position, UnitWidth, MapWidth, MapHeight);
-        var path = AStarPathFinding.SearchRoad(mapInfoData, a[0], a[1], !isEnemy ? TargetX : 1, a[1], (int)data.Diameter, (int)data.Diameter + 1, IsJumpPoint);
+        var path = AStarPathFinding.SearchRoad(mapInfoData, a[0], a[1], !isEnemy ? TargetX : 1, a[1], (int)data.Diameter, (int)data.Diameter, IsJumpPoint);
 
 
         ClusterData clusterData = data;
         clusterData.RotateSpeed = 10;
         clusterData.RotateWeight = 1;
-        clusterData.PhysicsInfo.MaxSpeed = clusterData.MemberData.MoveSpeed;
+        clusterData.PhysicsInfo.MaxSpeed = 60;//clusterData.AllData.MemberData.MoveSpeed;
         clusterData.Diameter *= ClusterManager.Single.UnitWidth;
         clusterData.PushTargetList(Utils.NumToPostionByList(LoadMap.MapPlane.transform.position, path, UnitWidth, MapWidth, MapHeight));
         // 默认出事状态不行进

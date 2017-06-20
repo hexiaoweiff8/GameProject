@@ -80,7 +80,7 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
             control.gameObject.SetActive(false);
             GameObject.Destroy(control);
         }
-        var soldierType = obj.ClusterData.MemberData.Name;
+        var soldierType = obj.ClusterData.AllData.MemberData.Name;
         ClusterManager.Single.Remove(obj.ClusterData);
         if (!displayPool.ContainsKey(soldierType))
             displayPool.Add(soldierType, new Stack<GameObject>());
@@ -187,7 +187,7 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
 
         if (pObj != null)
         {
-            result = GetElementById(pObj.MemberData.ObjID);
+            result = GetElementById(pObj.AllData.MemberData.ObjID);
         }
         return result;
     }
@@ -232,14 +232,14 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
             {
                 foreach (var item in enemyBuilding)
                 {
-                    if (item.Value.ClusterData.MemberData.ObjID.ObjType == objType)
+                    if (item.Value.ClusterData.AllData.MemberData.ObjID.ObjType == objType)
                     {
                         result.Add(item.Value);
                     }
                 }
                 foreach (var item in myBuilding)
                 {
-                    if (item.Value.ClusterData.MemberData.ObjID.ObjType == objType)
+                    if (item.Value.ClusterData.AllData.MemberData.ObjID.ObjType == objType)
                     {
                         result.Add(item.Value);
                     }

@@ -171,6 +171,14 @@ public class SkillScriptEditor : EditorWindow
         {
             SkillTriggerScriptEditor.ShowSkillDataScriptWindow(SkillTriggerScriptEditor.DataType.ReleaseTime, this.position);
         }
+        if (GUILayout.Button("技能描述"))
+        {
+            SkillTriggerScriptEditor.ShowSkillDataScriptWindow(SkillTriggerScriptEditor.DataType.Description, this.position);
+        }
+        if (GUILayout.Button("技能Icon路径"))
+        {
+            SkillTriggerScriptEditor.ShowSkillDataScriptWindow(SkillTriggerScriptEditor.DataType.Icon, this.position);
+        }
         EditorGUILayout.EndVertical();
         #endregion
         #endregion

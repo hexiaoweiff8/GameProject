@@ -37,7 +37,9 @@ public class SkillTriggerScriptEditor : EditorWindow
         LevelData,  // 技能等级数据
         CDTime,     // 技能CD时间
         CDGroup,    // 技能CD组
-        ReleaseTime // 技能可释放次数
+        ReleaseTime, // 技能可释放次数
+        Description, // 技能描述
+        Icon        // 技能Icon
     }
 
     /// <summary>
@@ -65,10 +67,12 @@ public class SkillTriggerScriptEditor : EditorWindow
     /// </summary>
     private static List<string>[] dataParamTitles = new List<string>[]
     {
-        new List<string>(){"data0","data1","data2","data3","data4","data5","data6","data7","data8","data9",},
+        new List<string>(){"data0","data1","data2","data3","data4","data5","data6","data7","data8","data9"},
         new List<string>(){"cdTime"},
-        new List<string>(){"cdGroup",},
-        new List<string>(){"ReleaseTime",},
+        new List<string>(){"cdGroup"},
+        new List<string>(){"ReleaseTime"},
+        new List<string>(){"Description"},
+        new List<string>(){"Icon"}
     }; 
 
 
@@ -296,6 +300,12 @@ public class SkillTriggerScriptEditor : EditorWindow
                     break;
                 case DataType.ReleaseTime:
                     ret += "ReleaseTime";
+                    break;
+                case DataType.Description:
+                    ret += "Description";
+                    break;
+                case DataType.Icon:
+                    ret += "Icon";
                     break;
                 default:
                     return String.Empty;

@@ -26,6 +26,12 @@ public class SDataUtils
                     SData_armyaim_c.Single.setData(table1, table2);
                 }
                 break;
+            case "armyaoe_c":
+                {
+                    SData_armyaoe_c.AutoInstance();
+                    SData_armyaoe_c.Single.setData(table1, table2);
+                }
+                break;
             case "armybase_c":
                 {
                     SData_armybase_c.AutoInstance();

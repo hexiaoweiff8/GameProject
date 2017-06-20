@@ -96,7 +96,7 @@ public class SoldierFSMControl{
     /// </summary>
     private void CheckTrigger()
     {
-        var fightVo = fsm.Display.ClusterData.MemberData as FightVO;
+        var fightVo = fsm.Display.ClusterData.AllData.MemberData as FightVO;
         if (fightVo != null && fightVo.SkillInfoList != null)
         {
             // 触发当前单位的所有事件
@@ -114,7 +114,7 @@ public class SoldierFSMControl{
     /// </summary>
     private void SettlementDamage()
     {
-        var fightVO = fsm.Display.ClusterData.MemberData as FightVO;
+        var fightVO = fsm.Display.ClusterData.AllData.MemberData as FightVO;
         if (fightVO != null && fightVO.SkillInfoList != null)
         {
             var healthChangeValue = 0f;
@@ -144,7 +144,7 @@ public class SoldierFSMControl{
                 }
 
                 // 结算血量变动
-                fsm.Display.ClusterData.MemberData.CurrentHP -= healthChangeValue;
+                fsm.Display.ClusterData.AllData.MemberData.CurrentHP -= healthChangeValue;
                 // 刷新血条
                 fsm.Display.RanderControl.SetBloodBarValue();
             }

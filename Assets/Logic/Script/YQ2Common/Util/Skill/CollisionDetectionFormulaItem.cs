@@ -148,13 +148,14 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
         var clusterData = paramsPacker.ReleaseMember.ClusterData;
         //var selecterData = clusterData.MemberData;
         var myFormulaType = FormulaType;
+        var myScopeType = ScopeType;
         result = new Formula((callback) =>
         {
             // 检测范围
             ICollisionGraphics graphics = null;
             var pos = myReceivePos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
             // 获取图形对象
-            switch (ScopeType)
+            switch (myScopeType)
             {
                 case GraphicType.Circle:
                     // 圆形
@@ -194,10 +195,10 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
                     if (SubFormulaItem != null)
                     {
                         var subSkill = new SkillInfo(packer.SkillNum);
-                        subSkill.DataList = packer.DataList;
                         FormulaParamsPackerFactroy.Single.CopyPackerData(paramsPacker, packer);
+                        subSkill.DataList = packer.DataList;
                         subSkill.AddFormulaItem(SubFormulaItem);
-                        subSkill.GetFormula(packer);
+                        //subSkill.GetFormula(packer);
                         SkillManager.Single.DoShillInfo(subSkill, packer, true);
                     }
                 }
@@ -206,7 +207,7 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
             // 执行完成, 回调
             callback();
         }, myFormulaType);
-       
+        
 
         return result;
     }

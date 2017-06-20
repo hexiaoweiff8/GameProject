@@ -87,7 +87,7 @@ public class PositionObjectWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			PositionObject obj = (PositionObject)o;
-			VOBase ret = obj.MemberData;
+            VOBase ret = obj.AllData.MemberData;
 			ToLua.PushObject(L, ret);
 			return 1;
 		}
@@ -335,7 +335,7 @@ public class PositionObjectWrap
 			o = ToLua.ToObject(L, 1);
 			PositionObject obj = (PositionObject)o;
 			VOBase arg0 = (VOBase)ToLua.CheckObject(L, 2, typeof(VOBase));
-			obj.MemberData = arg0;
+            obj.AllData.MemberData = arg0;
 			return 0;
 		}
 		catch(Exception e)

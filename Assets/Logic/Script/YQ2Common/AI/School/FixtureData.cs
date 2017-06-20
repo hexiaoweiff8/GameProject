@@ -11,7 +11,7 @@ public class FixtureData : PositionObject
 {
     public FixtureData()
     {
-        MemberData = new VOBase();
+        AllData.MemberData = new VOBase();
     }
     public override bool CouldMove
     {

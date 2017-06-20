@@ -11,6 +11,19 @@ using UnityEngine;
 /// </summary>
 public class GeneralAttackManager : Singleton<GeneralAttackManager>
 {
+
+
+    public IGeneralAttack GetGeneralAttack()
+    {
+        IGeneralAttack result = null;
+
+
+
+        return result;
+    }
+
+
+
     /// <summary>
     /// 常规普通攻击
     /// </summary>
@@ -60,7 +73,7 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
     /// <param name="taType">子弹飞行轨迹</param>
     /// <param name="callback">攻击结束回调</param>
     /// <returns></returns>
-    public IGeneralAttack GetPointToObjScopeGeneralAttack(ClusterData attacker,
+    public IGeneralAttack GetPointToObjScopeGeneralAttack(PositionObject attacker,
         string[] effectKey,
         Vector3 releasePos,
         GameObject targetObj,
@@ -99,7 +112,7 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
     /// <param name="taType">弹道类型</param>
     /// <param name="callback">完成回调</param>
     /// <returns></returns>
-    public IGeneralAttack GetPointToPositionScopeGeneralAttack(ClusterData attacker,
+    public IGeneralAttack GetPointToPositionScopeGeneralAttack(PositionObject attacker,
         string[] effectKey,
         Vector3 releasePos,
         Vector3 targetPos,
@@ -136,7 +149,7 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
     /// <param name="durTime">持续时间</param>
     /// <param name="callback">结束回调</param>
     /// <returns></returns>
-    public IGeneralAttack GetPositionCircleScopeGeneralAttack(ClusterData attacker,
+    public IGeneralAttack GetPositionCircleScopeGeneralAttack(PositionObject attacker,
         string effectKey,
         Vector3 targetPos,
         float scopeRaduis,
@@ -168,7 +181,7 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
     /// <param name="durTime">持续时间</param>
     /// <param name="callback">结束回调</param>
     /// <returns></returns>
-    public IGeneralAttack GetPositionSectorScopeGeneralAttack(ClusterData attacker,
+    public IGeneralAttack GetPositionSectorScopeGeneralAttack(PositionObject attacker,
         string effectKey,
         Vector3 targetPos,
         float scopeRaduis,
@@ -203,7 +216,7 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
     /// <param name="durTime">持续时间</param>
     /// <param name="callback">结束回调</param>
     /// <returns></returns>
-    public IGeneralAttack GetPositionRectScopeGeneralAttack(ClusterData attacker,
+    public IGeneralAttack GetPositionRectScopeGeneralAttack(PositionObject attacker,
         string effectKey,
         Vector3 targetPos,
         float width,
@@ -240,7 +253,7 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
     /// <param name="durTime">持续时间</param>
     /// <param name="callback">结束回调</param>
     /// <returns></returns>
-    public IGeneralAttack GetPositionRectScopeGeneralAttack(ClusterData attacker,
+    public IGeneralAttack GetPositionRectScopeGeneralAttack(PositionObject attacker,
         string effectKey,
         Vector3 targetPos,
         float width,
@@ -278,7 +291,7 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
     /// <param name="durTime">持续时间</param>
     /// <param name="callback">结束回调</param>
     /// <returns></returns>
-    public IGeneralAttack GetPositionScopeGeneralAttack(ClusterData attacker,
+    public IGeneralAttack GetPositionScopeGeneralAttack(PositionObject attacker,
         string effectKey,
         Vector3 targetPos,
         ICollisionGraphics graphics, 

@@ -130,6 +130,38 @@ public class Utils
     /// </summary>
     public const int MyCamp = 1;
 
+    /// <summary>
+    /// 子弹类型-普通类型
+    /// </summary>
+    public const int BulletTypeNormal = 1;
+
+    /// <summary>
+    /// 子弹类型-其他类型
+    /// </summary>
+    public const int BulletTypeScope = 2;
+
+    // 1.AOE范围中心点为目标单位、2.AOE范围中心点为发动攻击时目标的座标位置、3.AOE范围中心点为自身、4.AOE范围中心在自身前方
+    /// <summary>
+    /// 目标对象位置(跟随,圆形)
+    /// </summary>
+    public const int AOEObjScope = 1;
+
+    /// <summary>
+    /// 目标位置(圆形)
+    /// </summary>
+    public const int AOEPointScope = 2;
+
+    /// <summary>
+    /// 自己位置周围(圆形, 扇形)
+    /// </summary>
+    public const int AOEScope = 3;
+
+    /// <summary>
+    /// 自身前方(矩形, 扇形)
+    /// </summary>
+    public const int AOEForwardScope = 4;
+
+
     // ----------------------------单位类型--------------------------
 
     // ----------------------------单位大类型-----------------------------

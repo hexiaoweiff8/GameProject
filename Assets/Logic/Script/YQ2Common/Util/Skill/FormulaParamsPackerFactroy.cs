@@ -163,13 +163,13 @@ public class FormulaParamsPackerFactroy
                         break;
                 }
                 // 如果不是对应阵营排除
-                if (posObj.MemberData.Camp == camps)
+                if (posObj.AllData.MemberData.Camp == camps)
                 {
                     continue;
                 }
 
                 // 查询外层持有类
-                var targetDisplayOwner = DisplayerManager.Single.GetElementById(posObj.MemberData.ObjID);
+                var targetDisplayOwner = DisplayerManager.Single.GetElementById(posObj.AllData.MemberData.ObjID);
                 // 加入列表
                 result.Add(new FormulaParamsPacker()
                 {
@@ -234,17 +234,13 @@ public class FormulaParamsPackerFactroy
                         break;
                 }
                 // 如果不是对应阵营排除
-                if (posObj.MemberData.Camp == camps)
+                if (posObj.AllData.MemberData.Camp == camps)
                 {
                     continue;
                 }
 
                 // 查询外层持有类
-                var targetDisplayOwner = DisplayerManager.Single.GetElementById(posObj.MemberData.ObjID);
-                if (targetDisplayOwner == null)
-                {
-                    int w = 0;
-                }
+                var targetDisplayOwner = DisplayerManager.Single.GetElementById(posObj.AllData.MemberData.ObjID);
                 // 加入列表
                 result.Add(new FormulaParamsPacker()
                 {

@@ -10,6 +10,6 @@ public class SiwangTrigger : SoldierFSMTrigger
     }
     public override bool CheckTrigger(SoldierFSMSystem fsm)
     {
-        return fsm.Display.ClusterData.MemberData.CurrentHP <= 0;
+        return fsm.Display.ClusterData.AllData.MemberData.CurrentHP <= 0;
     }
 }

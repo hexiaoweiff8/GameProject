@@ -38,7 +38,8 @@ public class Soldier_JinengGongji_State : SoldierFSMState
             });
             // 攻击动作
             var myself = fsm.Display.RanderControl;
-            myself.ModelRander.SetClip("attack".GetHashCode());
+            // TODO 部分模型没有攻击动作, 会报错
+            //myself.ModelRander.SetClip("attack".GetHashCode());
 
             fsm.IsCanInJinenggongji = false;
             fsm.Skill = null;

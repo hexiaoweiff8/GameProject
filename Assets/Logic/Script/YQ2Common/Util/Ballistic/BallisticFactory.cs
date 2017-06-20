@@ -296,7 +296,7 @@ public class BallisticArriveTargetForObj : BallisticArriveTarget
             // 判断位置+半径是否到达目标
             if (TargetObj != null)
             {
-                if ((ball.Position - TargetObj.transform.position).magnitude <= ball.Radius)
+                if ((ball.Position - TargetObj.transform.position).magnitude <= ball.Speed * Time.deltaTime)
                 {
                     LasttimePos = TargetObj.transform.position;
                     result = true;

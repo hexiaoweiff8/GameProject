@@ -26,9 +26,9 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger
 
         // 目标选择器选择目标列表
         var list = TargetSelecter.Single.TargetFilter(searchData,
-            ClusterManager.Single.CheckRange(pos, searchData.MemberData.AttackRange, searchData.MemberData.Camp, true));
-        
-        Utils.DrawGraphics(new CircleGraphics(pos, searchData.MemberData.AttackRange), Color.yellow);
+            ClusterManager.Single.CheckRange(pos, searchData.AllData.MemberData.AttackRange, searchData.AllData.MemberData.Camp, true));
+
+        Utils.DrawGraphics(new CircleGraphics(pos, searchData.AllData.MemberData.AttackRange), Color.yellow);
         if (list.Count > 0)
         {
             // 攻击目标
@@ -68,7 +68,7 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger
         var myObjid = fsm.Display.MFAModelRender.ObjId;
 
         // 判断主动技能是否可释放, 可释放则释放技能, 否则普通攻击
-        var data = fsm.Display.ClusterData.MemberData;
+        var data = fsm.Display.ClusterData.AllData.MemberData;
         var skillNumList = new List<int>()
         {
             data.Skill1,

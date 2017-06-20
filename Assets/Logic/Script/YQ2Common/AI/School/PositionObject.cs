@@ -7,22 +7,36 @@ using UnityEngine;
 /// <summary>
 /// 位置对象
 /// </summary>
-public abstract class PositionObject : MonoBehaviour, ISelectWeightDataHolder, IBaseMember, IGraphicsHolder//, IGraphical<Rectangle>
+public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHolder//, IGraphical<Rectangle>
 {
 
+    ///// <summary>
+    ///// 目标筛选数据
+    ///// </summary>
+    //public VOBase MemberData {
+    //    get { return memberData; }
+    //    set
+    //    {
+    //        memberData = value;
+    //        if (memberData != null)
+    //        {
+    //            // 初始化数据时初始化图形对象
+    //            MyCollisionGraphics = new CircleGraphics(new Vector2(x, y), memberData.SpaceSet * 0.5f);
+    //        }
+    //    }
+    //}
+
     /// <summary>
-    /// 目标筛选数据
+    /// 所有数据持有
     /// </summary>
-    public VOBase MemberData {
-        get { return memberData; }
+    public AllData AllData {
+        get
+        {
+            return allData;
+        }
         set
         {
-            memberData = value;
-            if (memberData != null)
-            {
-                // 初始化数据时初始化图形对象
-                MyCollisionGraphics = new CircleGraphics(new Vector2(x, y), memberData.SpaceSet * 0.5f);
-            }
+            allData = value;
         }
     }
 
@@ -34,6 +48,10 @@ public abstract class PositionObject : MonoBehaviour, ISelectWeightDataHolder, I
         get
         {
             // TODO 变大变小
+            if (collisionGraphics == null)
+            {
+                collisionGraphics = new CircleGraphics(new Vector2(x, y), allData.MemberData.SpaceSet * 0.5f);
+            }
             collisionGraphics.Postion = new Vector2(x, y);
             return collisionGraphics;
         }
@@ -65,7 +83,7 @@ public abstract class PositionObject : MonoBehaviour, ISelectWeightDataHolder, I
             if (physicsInfo == null)
             {
                 physicsInfo = new PhysicsInfo();
-                physicsInfo.MaxSpeed = MemberData.MoveSpeed;
+                physicsInfo.MaxSpeed = AllData.MemberData.MoveSpeed;
             }
             if (physicsInfo.Quality < Utils.ApproachZero)
             {
@@ -81,14 +99,14 @@ public abstract class PositionObject : MonoBehaviour, ISelectWeightDataHolder, I
     /// </summary>
     public float Diameter
     {
-        get { return MemberData.SpaceSet; }
+        get { return AllData.MemberData.SpaceSet; }
         set
         {
-            MemberData.SpaceSet = value < 0 ? 1 : value;
+            AllData.MemberData.SpaceSet = value < 0 ? 1 : value;
             // 更新图形空间值
             CollisionGraphics.SetGraphicsSpaceSet(MyCollisionGraphics, value * 0.5f);
             // 质量 = 直径平方
-            physicsInfo.Quality = MemberData.SpaceSet * MemberData.SpaceSet;
+            physicsInfo.Quality = AllData.MemberData.SpaceSet * AllData.MemberData.SpaceSet;
         }
     }
 
@@ -195,12 +213,10 @@ public abstract class PositionObject : MonoBehaviour, ISelectWeightDataHolder, I
     /// </summary>
     protected PhysicsInfo physicsInfo = new PhysicsInfo();
 
-
-
     /// <summary>
-    /// 单位数据对象
+    /// 所有数据持有
     /// </summary>
-    private VOBase memberData = null;
+    private AllData allData = new AllData();
 
     /// <summary>
     /// 图形对象
@@ -308,11 +324,6 @@ public abstract class PositionObject : MonoBehaviour, ISelectWeightDataHolder, I
     //    }
     //    return hisRectangle;
     //}
-
-    /// <summary>
-    /// 目标选择权重
-    /// </summary>
-    public SelectWeightData SelectWeightData { get; set; }
 }
 
 
@@ -428,4 +439,12 @@ public interface IGraphicsHolder
     /// 单位图形
     /// </summary>
     ICollisionGraphics MyCollisionGraphics { get; set; }
+}
+
+/// <summary>
+/// 数据持有接口
+/// </summary>
+public interface IAllDataHolder
+{
+    AllData AllData { get; set; }
 }

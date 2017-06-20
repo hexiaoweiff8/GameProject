@@ -24,7 +24,7 @@ public class Soldier_Ruchang_State : SoldierFSMState
         soldier.bloodBar.position = ff;
         AstarFight at = GameObject.Find("/AstarFight").GetComponent<AstarFight>();
         at.toXunLu(fsm.Display.ClusterData as ClusterData, soldier.isEnemy, soldier.groupIndex, fsm.Display);
-
+        Debug.Log("士兵入场, armyID:" + fsm.Display.ClusterData.AllData.MemberData.ArmyID);
         float DeployTime = 0f;
         var ObjId = fsm.Display.MFAModelRender.ObjId;
         //if (ObjId.ObjType == ObjectID.ObjectType.EnemySoldier || ObjId.ObjType == ObjectID.ObjectType.EnemyTank)
@@ -49,7 +49,7 @@ public class Soldier_Ruchang_State : SoldierFSMState
         }
 
 
-        var fightVO = fsm.Display.ClusterData.MemberData as FightVO;
+        var fightVO = fsm.Display.ClusterData.AllData.MemberData as FightVO;
         // 入场检测技能
         if (fightVO != null && fightVO.SkillInfoList != null)
         {

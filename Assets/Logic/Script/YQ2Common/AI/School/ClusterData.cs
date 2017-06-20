@@ -17,7 +17,7 @@ public class ClusterData: PositionObject
     /// </summary>
     public void SetDataValue(VOBase data)
     {
-        MemberData = data;
+        AllData.MemberData = data;
     }
     
     ///// <summary>

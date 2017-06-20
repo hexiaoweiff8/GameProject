@@ -119,8 +119,6 @@ public class Soldier_Zhuiji_State : SoldierFSMState
     {
         //Debug.Log("");
         // 重新寻路设置目标点
-        // 清空当前目标点
-        clusterData.ClearTarget();
         // 当前地图数据
         var mapData = LoadMap.Single.GetMapData();
         // 当前单位位置映射
@@ -129,8 +127,19 @@ public class Soldier_Zhuiji_State : SoldierFSMState
         var endPos = Utils.PositionToNum(LoadMap.Single.MapPlane.transform.position, fsm.EnemyTarget.ClusterData.transform.position, ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth, ClusterManager.Single.MapHeight);
         // 生成路径
         var path = AStarPathFinding.SearchRoad(mapData, startPos[0], startPos[1], endPos[0], endPos[1], (int)clusterData.Diameter, (int)clusterData.Diameter + 1);
-        targetPos = fsm.EnemyTarget.ClusterData.transform.position;
-        clusterData.PushTargetList(Utils.NumToPostionByList(LoadMap.Single.MapPlane.transform.position, path, ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth, ClusterManager.Single.MapHeight));
+        if (path != null && path.Count > 0)
+        {
+            // 清空当前目标点
+            clusterData.ClearTarget();
+            targetPos = fsm.EnemyTarget.ClusterData.transform.position;
+            clusterData.PushTargetList(Utils.NumToPostionByList(LoadMap.Single.MapPlane.transform.position, path,
+                ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth, ClusterManager.Single.MapHeight));
+        }
+        else
+        {
+            Debug.Log("zhuiji 目标点不可达:start:" + startPos[0] + "," + startPos[1] + " end:" + endPos[0] + "," + endPos[1]);
+        }
+        
     }
 
     /// <summary>
@@ -148,9 +157,9 @@ public class Soldier_Zhuiji_State : SoldierFSMState
             result = distance
                      - targetClusterData.Diameter*ClusterManager.Single.UnitWidth*0.5f
                      - clusterData.Diameter*ClusterManager.Single.UnitWidth*0.5f
-                     < clusterData.MemberData.SightRange;
+                     < clusterData.AllData.MemberData.SightRange;
             // 判断目标是否存活, 如果死亡切行进
-            if (targetClusterData.MemberData.CurrentHP <= 0)
+            if (targetClusterData.AllData.MemberData.CurrentHP <= 0)
             {
                 result = false;
             }
@@ -163,7 +172,7 @@ public class Soldier_Zhuiji_State : SoldierFSMState
     /// </summary>
     private void CheckChangeTarget(SoldierFSMSystem fsm)
     {
-        var list = ClusterManager.Single.CheckRange(new Vector2(clusterData.X, clusterData.Y), clusterData.MemberData.SightRange, clusterData.MemberData.Camp, true);
+        var list = ClusterManager.Single.CheckRange(new Vector2(clusterData.X, clusterData.Y), clusterData.AllData.MemberData.SightRange, clusterData.AllData.MemberData.Camp, true);
         if (list != null && list.Count > 0)
         {
             var closeObj = list[0];
@@ -181,8 +190,13 @@ public class Soldier_Zhuiji_State : SoldierFSMState
                     closeDistance = newDistance;
                 }
             }
-            Debug.Log("变更目标.");
-            fsm.EnemyTarget = DisplayerManager.Single.GetElementById(closeObj.MemberData.ObjID);
+            // 有变更
+            if (fsm.EnemyTarget == null ||
+                !closeObj.AllData.MemberData.ObjID.Equals(fsm.EnemyTarget.ClusterData.AllData.MemberData.ObjID))
+            {
+                Debug.Log("变更目标.");
+                fsm.EnemyTarget = DisplayerManager.Single.GetElementById(closeObj.AllData.MemberData.ObjID);
+            }
         }
 
     }

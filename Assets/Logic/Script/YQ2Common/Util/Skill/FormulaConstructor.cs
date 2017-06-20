@@ -87,7 +87,6 @@ public static class FormulaConstructor
                 {
                     // 开始括号内容
                     stackLevel++;
-                    // 创建行为链
 
                     // 将上级FormulaItem push进堆栈
                     stack.Push(tmpItem);
@@ -118,30 +117,11 @@ public static class FormulaConstructor
                 else if (stackLevel > 0)
                 {
                     // 解析行为脚本
-                    // 解析内容
-                    // TODO 判断Formula的stack等级是否与当前stack等级一直? 不一致则新建将其加入上一级formula的子集
-                    // 参数列表内容
-                    var pos = GetSmallBraketPos(line);
-                    var start = pos[0];
-                    var end = pos[1];
-
-                    // 行为类型
-                    var type = line.Substring(0, start);
-                    // 行为参数
-                    var args = line.Substring(start + 1, end - start - 1);
-                    // 消除参数空格
-                    args = args.Replace(" ", "");
-                    // 使用参数+名称获取IFormula
-                    var item = GetFormula(type, args);
-                    // formula加入暂停item
-                    var pauseItem = GetFormula("Pause", "1");
-
-                    tmpItem = tmpItem == null ? pauseItem : tmpItem.After(pauseItem);
-                    tmpItem = tmpItem.After(item);
+                    tmpItem = TransBehavior(line, tmpItem);
                 }
                 else if (dataBraket)
                 {
-                    // 解析数据
+                    // 解析数据脚本
                     TransData(skillInfo, line);
                 }
             }
@@ -150,6 +130,10 @@ public static class FormulaConstructor
             {
                 // 获得行为链生成器的head
                 tmpItem = tmpItem.GetFirst();
+                if (skillInfo == null)
+                {
+                    throw new Exception("技能没有编号!");
+                }
                 skillInfo.AddFormulaItem(tmpItem);
             }
         }
@@ -203,6 +187,39 @@ public static class FormulaConstructor
     }
 
     /// <summary>
+    /// 解析行为
+    /// </summary>
+    /// <param name="line">脚本行</param>
+    /// <param name="tmpItem">行为生成类</param>
+    /// <returns></returns>
+    private static IFormulaItem TransBehavior(string line, IFormulaItem tmpItem)
+    {
+
+        // 解析内容
+        // TODO 判断Formula的stack等级是否与当前stack等级一直? 不一致则新建将其加入上一级formula的子集
+        // 参数列表内容
+        var pos = GetSmallBraketPos(line);
+        var start = pos[0];
+        var end = pos[1];
+
+        // 行为类型
+        var type = line.Substring(0, start);
+        // 行为参数
+        var args = line.Substring(start + 1, end - start - 1);
+        // 消除参数空格
+        args = args.Replace(" ", "");
+        // 使用参数+名称获取IFormula
+        var item = GetFormula(type, args);
+        // formula加入暂停item
+        var pauseItem = GetFormula("Pause", "1");
+
+        tmpItem = tmpItem == null ? pauseItem : tmpItem.After(pauseItem);
+        tmpItem = tmpItem.After(item);
+
+        return tmpItem;
+    }
+
+    /// <summary>
     /// 解析数据
     /// </summary>
     /// <param name="skillInfo">技能类</param>
@@ -221,69 +238,70 @@ public static class FormulaConstructor
         var end = pos[1];
         // 编号长度
         var length = end - start - 1;
-
-        if (line.StartsWith("CDTime"))
+        if (end > 0 && start > 0)
         {
-            if (start < 0 || end < 0)
+            var symbol = line.Substring(0, start).Trim();
+            switch (symbol)
             {
-                throw new Exception("转换行为链失败: ()符号不完整" + line);
+                case "CDTime":
+                {
+                    skillInfo.CDTime = Convert.ToSingle(line.Substring(start + 1, length));
+                }
+                    break;
+                case "CDGroup":
+                {
+                    skillInfo.CDGroup = Convert.ToInt32(line.Substring(start + 1, length));
+                }
+                    break;
+                case "ReleaseTime":
+                {
+                    skillInfo.ReleaseTime = Convert.ToInt32(line.Substring(start + 1, length));
+                }
+                    break;
+                case "TriggerLevel1":
+                {
+                    // 技能触发事件level1
+                    var triggerType = (SkillTriggerLevel1) Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+                    skillInfo.TriggerLevel1 = triggerType;
+                }
+                    break;
+                case "TriggerLevel2":
+                {
+                    // 技能触发事件level2
+                    var triggerType = (SkillTriggerLevel2) Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+                    skillInfo.TriggerLevel2 = triggerType;
+                }
+                    break;
+                case "Description":
+                {
+                    skillInfo.Description = line.Substring(start + 1, end - start - 1);
+                }
+                    break;
+                case "Icon":
+                {
+                    skillInfo.Icon = line.Substring(start + 1, end - start - 1);
+                }
+                    break;
             }
-            skillInfo.CDTime = Convert.ToSingle(line.Substring(start + 1, length));
-        }
-        else if (line.StartsWith("CDGroup"))
-        {
-            if (start < 0 || end < 0)
-            {
-                throw new Exception("转换行为链失败: ()符号不完整" + line);
-            }
-            skillInfo.CDGroup = Convert.ToInt32(line.Substring(start + 1, length));
-        }
-        else if (line.StartsWith("ReleaseTime"))
-        {
-            if (start < 0 || end < 0)
-            {
-                throw new Exception("转换行为链失败: ()符号不完整:" + line);
-            }
-            skillInfo.ReleaseTime = Convert.ToInt32(line.Substring(start + 1, length));
-        }
-        //else if (line.StartsWith("Trigger"))
-        //{
-        //    // 触发事件
-
-        //}
-        else if (line.StartsWith("TriggerLevel1"))
-        {
-            // 技能触发事件level1
-
-            var triggerType = (SkillTriggerLevel1)Convert.ToInt32(line.Substring(start + 1, end - start - 1));
-
-            skillInfo.TriggerLevel1 = triggerType;
-        }
-        else if (line.StartsWith("TriggerLevel2"))
-        {
-            // 技能触发事件level2
-
-            var triggerType = (SkillTriggerLevel2)Convert.ToInt32(line.Substring(start + 1, end - start - 1));
-
-            skillInfo.TriggerLevel2 = triggerType;
         }
         else if (start < 0 && end < 0)
         {
             // 解析数据脚本
             var dataArray = line.Split(',');
-            var dataList = new List<string>();
-            foreach (var data in dataArray)
-            {
-                dataList.Add(data);
-            }
+            var dataList = dataArray.ToList();
             skillInfo.DataList.Add(dataList);
+        }
+        else
+        {
+            ValidSmallBraketIndex(start, end, line);
         }
     }
 
     /// <summary>
     /// 获取一行数据中的小括号位置
     /// </summary>
-    /// <param name="line"></param>
+    /// <param name="line">行</param>
+    /// <param name="vel">如果是数据行</param>
     /// <returns></returns>
     private static int[] GetSmallBraketPos(string line, bool vel = true)
     {
@@ -302,6 +320,20 @@ public static class FormulaConstructor
         }
 
         return new[] {start, end};
+    }
+
+    /// <summary>
+    /// 验证行是否合法
+    /// </summary>
+    /// <param name="start">小括号start位置</param>
+    /// <param name="end">小括号end位置</param>
+    /// <param name="line">该数据行</param>
+    private static void ValidSmallBraketIndex(int start, int end, string line)
+    {
+        if (start < 0 || end < 0)
+        {
+            throw new Exception("转换行为链失败: ()符号不完整" + line);
+        }
     }
 
     // 结构例子
@@ -326,9 +358,10 @@ public static class FormulaConstructor
          CDGroup(1)
          // 可释放次数
          ReleaseTime(10)
-        // 数据
-        1, 100
-        2, 200
+         Description(交换空间撒很快就阿萨德阖家安康收到货%0, %1)
+         // 数据
+         1, 100,,,,,
+         2, 200
       
      ]
      */
@@ -336,7 +369,7 @@ public static class FormulaConstructor
     // PointToPoint 点对点特效        参数 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),命中位置(0放技能方, 1目标方),速度,飞行轨迹,缩放(三位)
     // PointToObj 点对对象特效        参数 是否等待完成,特效Key,速度,飞行轨迹,缩放(三位)
     // Point 点特效                   参数 是否等待完成,特效Key,检测位置(0放技能方, 1目标方),持续时间,缩放(三位)
-    // Scope 范围特效                 参数 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),持续时间,范围半径
+    // --Scope 范围特效                 参数 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),持续时间,范围半径
 
     // --------------目标选择方式---------------
     // CollisionDetection 碰撞检测    参数 是否等待完成, 目标数量, 检测位置(0放技能方, 1目标方), 检测范围形状(0圆, 1方), 
@@ -348,25 +381,35 @@ public static class FormulaConstructor
     //{
     //  功能
     //}
-    // Skill 释放技能                 参数 是否等待完成,被释放技能,技能接收方(0释放者,1被释放者)
+    // Skill 释放技能                   参数 是否等待完成,被释放技能,技能接收方(0释放者,1被释放者)
     // -----------------音效--------------------
-    // Audio 音效                     参数 是否等待完成,点音,持续音,持续时间
+    // Audio 音效                       参数 是否等待完成,点音,持续音,持续时间
 
     // -----------------buff--------------------
-    // Buff buff                      参数 是否等待完成,buffID
+    // Buff buff                        参数 是否等待完成,buffID
 
     // -----------------结算--------------------
-    // Calculate 结算                 参数 是否等待完成,伤害或治疗(0,1),伤害/治疗值
+    // Calculate 结算                   参数 是否等待完成,伤害或治疗(0,1),伤害/治疗值
 
     // -----------------技能--------------------
-    // Skill 释放技能                 参数 是否等待完成,技能编号
+    // Skill 释放技能                   参数 是否等待完成,技能编号
 
     // -----------------位置--------------------
-    // Move 位置移动                  参数 是否等待完成,移动速度,是否瞬移(0: 否, 1: 是(如果是瞬移则速度无效))
+    // Move 位置移动                    参数 是否等待完成,移动速度,是否瞬移(0: 否, 1: 是(如果是瞬移则速度无效))
 
     // -----------------条件选择----------------
-    // ---If 条件选择                    参数 是否等待完成,条件
-    // HealthScope 血量范围选择       参数 是否等待完成,血量下限(最小0), 血量上限(最大100)
+    // If 条件选择                      参数 是否等待完成,条件
+    // --HealthScope 血量范围选择       参数 是否等待完成,血量下限(最小0), 血量上限(最大100)
+    // 
+
+    // -----------------数据--------------------
+    // TriggerLevel1 事件触发level1             参数 0-6 参照TriggerLevel1枚举
+    // TriggerLevel2 事件触发level2             参数 0-20 参照TriggerLevel2枚举
+    // CDTime        cd时间                     参数 时间(正值)
+    // CDGroup       cd组(不同组的cd不同公共cd)  参数 0-无穷(整数)
+    // ReleaseTime   可释放次数                 参数 1-无穷(整数)
+    // Description   描述(中间替换符可被替换)    参数 描述描述中可填写占位符%0123...同样适用数据替换与技能值相同
+    // Icon          icon地址                   参数 地址(或key)
 
 }
 
@@ -409,6 +452,16 @@ public class SkillInfo
     /// 技能可释放次数
     /// </summary>
     public int ReleaseTime { get; set; }
+
+    /// <summary>
+    /// 描述
+    /// </summary>
+    public string Description { get; set; }
+
+    /// <summary>
+    /// 卡牌Icon地址
+    /// </summary>
+    public string Icon { get; set; }
 
     /// <summary>
     /// 技能行为单元

@@ -73,58 +73,23 @@ public class DataManager : MonoEX.Singleton<DataManager>
         {
             case ObjectID.ObjectType.MyJiDi:
                 var myJidi = value as JiDiVO;
-                // 根据等级获得对应数据
-                var myJidiConfig = SData_armybase_c.Single.GetDataOfID(Utils.BaseBaseId + otherParam.Level);
-                myJidi.SetSoldierData(myJidiConfig);
-                myJidi.Camp = Utils.MyCamp;
                 result = CreateBase(myJidi, Utils.MyCamp, otherParam);
                 break;
             case ObjectID.ObjectType.EnemyJiDi:
                 var enemyjidi = value as JiDiVO;
-                // 根据等级获得对应数据
-                var enemyJidiConfig = SData_armybase_c.Single.GetDataOfID(Utils.BaseBaseId + otherParam.Level);
-                enemyjidi.SetSoldierData(enemyJidiConfig);
                 result = CreateBase(enemyjidi, Utils.EnemyCamp, otherParam);
                 break;
             case ObjectID.ObjectType.MySoldier:
                 var mysoldier = value as FightVO;
+                // 设置阵营
                 mysoldier.Camp = Utils.MyCamp;
-                var soldierId = otherParam.SoldierID;
-                var config = SData_armybase_c.Single.GetDataOfID(soldierId);
-                mysoldier.SetSoldierData(config);
-                // TODO 设置目标选择权重数据
-                var myAimData = SData_armyaim_c.Single.GetDataOfID(config.ArmyID);
-                // 加载并设置技能
-                mysoldier.SkillInfoList = SkillManager.Single.LoadSkillInfoList(new List<int>()
-                {
-                    mysoldier.Skill1,
-                    mysoldier.Skill2,
-                    mysoldier.Skill3,
-                    mysoldier.Skill4,
-                    mysoldier.Skill5,
-                });
                 result = CreateSoldier(mysoldier, otherParam);
-                result.ClusterData.SelectWeightData = new SelectWeightData(myAimData);
                 break;
             case ObjectID.ObjectType.EnemySoldier:
                 var enemysoldier = value as FightVO;
+                // 设置阵营
                 enemysoldier.Camp = Utils.EnemyCamp;
-                var enemyId = otherParam.SoldierID;
-                var enemyConfig = SData_armybase_c.Single.GetDataOfID(enemyId);
-                enemysoldier.SetSoldierData(enemyConfig);
-                // TODO 设置目标选择权重数据
-                var enemyAimData = SData_armyaim_c.Single.GetDataOfID(enemyConfig.ArmyID);
-                // 加载并设置技能
-                enemysoldier.SkillInfoList = SkillManager.Single.LoadSkillInfoList(new List<int>()
-                {
-                    enemysoldier.Skill1,
-                    enemysoldier.Skill2,
-                    enemysoldier.Skill3,
-                    enemysoldier.Skill4,
-                    enemysoldier.Skill5,
-                });
                 result = CreateSoldier(enemysoldier, otherParam);
-                result.ClusterData.SelectWeightData = new SelectWeightData(enemyAimData);
                 break;
             case ObjectID.ObjectType.MyTank:
                 var mytank = value as TankVO;
@@ -161,55 +126,62 @@ public class DataManager : MonoEX.Singleton<DataManager>
     private DisplayOwner CreateBase(JiDiVO jidiVo, int camp, CreateActorParam otherParam)
     {
         DisplayOwner result = null;
-        if (jidiVo != null)
+        if (jidiVo == null)
         {
-            _myJidiDict.Add(jidiVo.ObjID.ID, jidiVo);
-            // 创建基地模型
-            // 从AB包中加载
-            var baseObj = GameObjectExtension.InstantiateFromPacket("jidi", "zhujidi_model", null);
-            // 设置父级
-            ParentManager.Instance().SetParent(baseObj, ParentManager.BuildingParent);
-            var mesh = baseObj.GetComponentInChildren<SkinnedMeshRenderer>();
-            Texture texture = null;
-            switch (camp)
-            {
-                case Utils.MyCamp:
-                    baseObj.transform.Rotate(new Vector3(0, 90, 0));
-                    texture = PacketManage.Single.GetPacket("jidi").Load("zhujidi_b_texture") as Texture;
-                    break;
-                case Utils.EnemyCamp:
-                    baseObj.transform.Rotate(new Vector3(0, -90, 0));
-                    texture = PacketManage.Single.GetPacket("jidi").Load("zhujidi_r_texture") as Texture;
-                    break;
-            }
-            mesh.material.mainTexture = texture;
-            baseObj.transform.position = new Vector3(otherParam.X, -35, otherParam.Y);
-
-
-            var cluster = baseObj.AddComponent<ClusterData>();
-            cluster.MemberData = jidiVo;
-            //cluster.GroupId = 999;
-            cluster.MemberData.MoveSpeed = -1;
-            cluster.Diameter = 40;
-            cluster.X = otherParam.X;
-            cluster.Y = otherParam.Y;
-            cluster.Stop();
-            ClusterManager.Single.Add(cluster);
-
-            // 创建RanderControl
-            //var randerControl = myBase.AddComponent<RanderControl>();
-
-
-            // 创建外层持有类
-            var displayOwner = new DisplayOwner(baseObj, cluster, null, null);
-            DisplayerManager.Single.AddElement(jidiVo.ObjID, displayOwner);
-
-            //// 创建MFAModelRander
-            //var mfaModelRander = myBase.GetComponent<MFAModelRender>();
-            //mfaModelRander.ObjId = cluster.MemberData.ObjID;
-
-            //displayOwner.MFAModelRender = mfaModelRander;
+            return result;
         }
+        // 设置阵营
+        jidiVo.Camp = camp;
+        // 根据等级获得对应数据
+        var enemyJidiConfig = SData_armybase_c.Single.GetDataOfID(Utils.BaseBaseId + otherParam.Level);
+        jidiVo.SetSoldierData(enemyJidiConfig);
+        _myJidiDict.Add(jidiVo.ObjID.ID, jidiVo);
+
+        // 创建基地模型
+        // 从AB包中加载
+        var baseObj = GameObjectExtension.InstantiateFromPacket("jidi", "zhujidi_model", null);
+        // 设置父级
+        ParentManager.Instance().SetParent(baseObj, ParentManager.BuildingParent);
+        var mesh = baseObj.GetComponentInChildren<SkinnedMeshRenderer>();
+        Texture texture = null;
+        switch (camp)
+        {
+            case Utils.MyCamp:
+                baseObj.transform.Rotate(new Vector3(0, 90, 0));
+                texture = PacketManage.Single.GetPacket("jidi").Load("zhujidi_b_texture") as Texture;
+                break;
+            case Utils.EnemyCamp:
+                baseObj.transform.Rotate(new Vector3(0, -90, 0));
+                texture = PacketManage.Single.GetPacket("jidi").Load("zhujidi_r_texture") as Texture;
+                break;
+        }
+        mesh.material.mainTexture = texture;
+        baseObj.transform.position = new Vector3(otherParam.X, -35, otherParam.Y);
+
+
+        var cluster = baseObj.AddComponent<ClusterData>();
+        cluster.AllData.MemberData = jidiVo;
+        //cluster.GroupId = 999;
+        cluster.AllData.MemberData.MoveSpeed = -1;
+        cluster.Diameter = 40;
+        cluster.X = otherParam.X;
+        cluster.Y = otherParam.Y;
+        cluster.Stop();
+        ClusterManager.Single.Add(cluster);
+
+        // 创建RanderControl
+        //var randerControl = myBase.AddComponent<RanderControl>();
+
+
+        // 创建外层持有类
+        var displayOwner = new DisplayOwner(baseObj, cluster, null, null);
+        DisplayerManager.Single.AddElement(jidiVo.ObjID, displayOwner);
+
+        //// 创建MFAModelRander
+        //var mfaModelRander = myBase.GetComponent<MFAModelRender>();
+        //mfaModelRander.ObjId = cluster.MemberData.ObjID;
+
+        //displayOwner.MFAModelRender = mfaModelRander;
 
         return result;
     }
@@ -260,24 +232,52 @@ public class DataManager : MonoEX.Singleton<DataManager>
         {
             _enemySoldiersDict.Add(soldier.ObjID.ID, soldier);
         }
+        // 设置数据
+        var soldierId = param.SoldierID;
+        var config = SData_armybase_c.Single.GetDataOfID(soldierId);
+        soldier.SetSoldierData(config);
+
         //var display = DP_FightPrefabManage.InstantiateAvatar(param);
         //通过对象池创建角色
         var display = DisplayerManager.Single.CreateAvatar(soldier.Name, param);
         // 设置父级
         ParentManager.Instance().SetParent(display, ParentManager.ClusterParent);
 
+        // 创建渲染
         var mfa = display.GetComponent<MFAModelRender>();
         mfa.ObjId = soldier.ObjID;
 
+        // 创建集群数据
         mfa.Cluster = display.AddComponent<ClusterData>();
         mfa.Cluster.SetDataValue(soldier);
-
 
         // 创建外层持有类
         var displayOwner = new DisplayOwner(display, mfa.Cluster, mfa, null);
         DisplayerManager.Single.AddElement(soldier.ObjID, displayOwner);
+
         // 启动单位状态机
         //randerControl.StartFSM(displayOwner);
+
+        // 设置目标选择权重数据
+        var aimData = SData_armyaim_c.Single.GetDataOfID(soldier.ArmyID);
+        mfa.Cluster.AllData.SelectWeightData = new SelectWeightData(aimData);
+
+        if (soldier.AttackType == Utils.BulletTypeScope)
+        {
+            // 加载单位的AOE数据
+            var aoeData = SData_armyaoe_c.Single.GetDataOfID(soldier.ArmyID);
+            mfa.Cluster.AllData.AOEData = new ArmyAOEData(aoeData);
+        }
+
+        // 加载并设置技能
+        soldier.SkillInfoList = SkillManager.Single.LoadSkillInfoList(new List<int>()
+                {
+                    soldier.Skill1,
+                    soldier.Skill2,
+                    soldier.Skill3,
+                    soldier.Skill4,
+                    soldier.Skill5,
+                });
 
         return displayOwner;
     }
@@ -417,7 +417,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
         var mapWidth = ClusterManager.Single.MapWidth;
         var mapHeight = ClusterManager.Single.MapHeight;
         var offsetPos = LoadMap.Single.transform.position;
-        fix.MemberData = new VOBase()
+        fix.AllData.MemberData = new VOBase()
         {
             ObjID = new ObjectID(ObjectID.ObjectType.NPCObstacle),
             SpaceSet = 1 * unitWidth,

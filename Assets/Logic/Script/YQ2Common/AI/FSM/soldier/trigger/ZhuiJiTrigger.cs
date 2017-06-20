@@ -26,8 +26,8 @@ public class ZhuiJiTrigger : SoldierFSMTrigger
         //var objId = clusterData.MemberData.ObjID;
         // 视野范围内是否有敌人
         var pos = new Vector2(clusterData.X, clusterData.Y);
-        var list = ClusterManager.Single.CheckRange( pos, clusterData.MemberData.SightRange, clusterData.MemberData.Camp, true);
-        Utils.DrawGraphics(new CircleGraphics(pos, clusterData.MemberData.SightRange), Color.yellow);
+        var list = ClusterManager.Single.CheckRange(pos, clusterData.AllData.MemberData.SightRange, clusterData.AllData.MemberData.Camp, true);
+        Utils.DrawGraphics(new CircleGraphics(pos, clusterData.AllData.MemberData.SightRange), Color.yellow);
         //fsm.Display.ClusterData.MemberData.SightRange
         if (list.Count > 0)
         {

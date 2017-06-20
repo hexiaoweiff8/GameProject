@@ -41,8 +41,14 @@ public class ResourcesLoader : IResourcesLoader
         GameObject result = null;
         // TODO AB包中加载
         result = (GameObject)Resources.Load(key);
-        result = Object.Instantiate(result);
-
+        if (result != null)
+        {
+            result = Object.Instantiate(result);
+        }
+        else
+        {
+            Debug.Log("Resource not exist:" + key);
+        }
         return result;
     }
 }
