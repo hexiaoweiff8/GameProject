@@ -14,7 +14,7 @@ public class IfFormulaItem : AbstractFormulaItem
     /// <summary>
     /// 具体条件
     /// </summary>
-    public string[] ConditionArgs = null;
+    public string ConditionArgs = null;
 
     /// <summary>
     /// 是否break
@@ -73,7 +73,7 @@ public class IfFormulaItem : AbstractFormulaItem
         FormulaType = formulaType;
         IsBreak = isBreak;
         Condition = condition;
-        ConditionArgs = conditionArgs.Replace(" ","").Split(',');
+        ConditionArgs = conditionArgs;
 
     }
 
@@ -89,7 +89,7 @@ public class IfFormulaItem : AbstractFormulaItem
 
         // 数据本地化
         var myCondition = Condition;
-        var myConditionArgs = ConditionArgs;
+        var myConditionArgs = ConditionArgs.Replace(" ", "").Split('_');
 
         var check = registerCondition[myCondition];
         // 创建行为
@@ -108,8 +108,6 @@ public class IfFormulaItem : AbstractFormulaItem
                     subSkill.AddFormulaItem(SubFormulaItem);
                     SkillManager.Single.DoShillInfo(subSkill, paramsPacker, true);
                 }
-                // 执行子技能
-
             }
             else if (IsBreak > 0)
             {

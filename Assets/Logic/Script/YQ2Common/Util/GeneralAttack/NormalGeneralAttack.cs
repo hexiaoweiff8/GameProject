@@ -49,6 +49,7 @@ public class NormalGeneralAttack : IGeneralAttack
             if (!isMiss)
             {
                 // 计算伤害
+                // TODO 伤害计算加入Buff与技能的计算
                 var hurt = HurtResult.GetHurt(attackerDisplayOwner, beAttackerDisplayOwner);
                 if (null != beAttackerDisplayOwner &&
                     null != beAttackerDisplayOwner.ClusterData &&

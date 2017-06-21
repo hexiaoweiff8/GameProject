@@ -9,9 +9,9 @@ public class FightVO : VOBase
 {
     // TODO 技能对象
 
-    /// <summary>
-    /// 技能1
-    /// </summary>
-    public IList<SkillInfo> SkillInfoList { get; set; }
+    ///// <summary>
+    ///// 技能1
+    ///// </summary>
+    //public IList<SkillInfo> SkillInfoList { get; set; }
 
 }

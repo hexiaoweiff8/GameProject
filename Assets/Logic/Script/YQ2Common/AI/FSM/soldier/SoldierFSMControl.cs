@@ -96,13 +96,13 @@ public class SoldierFSMControl{
     /// </summary>
     private void CheckTrigger()
     {
-        var fightVo = fsm.Display.ClusterData.AllData.MemberData as FightVO;
-        if (fightVo != null && fightVo.SkillInfoList != null)
+        var alldata = fsm.Display.ClusterData.AllData;
+        if (alldata.MemberData != null && alldata.SkillInfoList != null)
         {
             // 触发当前单位的所有事件
-            SkillManager.Single.SetEachAction(fightVo.ObjID, (type1, type2, trigger) =>
+            SkillManager.Single.SetEachAction(alldata.MemberData.ObjID, (type1, type2, trigger) =>
             {
-                SkillManager.Single.CheckAndDoSkillInfo(fightVo.SkillInfoList, trigger.ReleaseMember,
+                SkillManager.Single.CheckAndDoSkillInfo(alldata.SkillInfoList, trigger.ReleaseMember,
                     trigger.ReceiveMember,
                     type1, type2);
             }, true);
@@ -114,12 +114,12 @@ public class SoldierFSMControl{
     /// </summary>
     private void SettlementDamage()
     {
-        var fightVO = fsm.Display.ClusterData.AllData.MemberData as FightVO;
-        if (fightVO != null && fightVO.SkillInfoList != null)
+        var alldata = fsm.Display.ClusterData.AllData;
+        if (alldata.MemberData != null && alldata.SkillInfoList != null)
         {
             var healthChangeValue = 0f;
             // 获取被击列表
-            var attackList = SkillManager.Single.GetSkillTriggerDataList(fightVO.ObjID, SkillTriggerLevel1.Fight, SkillTriggerLevel2.BeAttack);
+            var attackList = SkillManager.Single.GetSkillTriggerDataList(alldata.MemberData.ObjID, SkillTriggerLevel1.Fight, SkillTriggerLevel2.BeAttack);
             // 检测是否被击
             if (attackList != null && attackList.Count > 0)
             {
@@ -128,7 +128,7 @@ public class SoldierFSMControl{
 
                 // 如果单位死亡在抛出一个死亡事件
                 // 检测致死攻击
-                if (fightVO.CurrentHP - healthChangeValue < Utils.ApproachZero)
+                if (alldata.MemberData.CurrentHP - healthChangeValue < Utils.ApproachZero)
                 {
                     // 检测最后一个
                     var lastHitMember = attackList[attackList.Count - 1];

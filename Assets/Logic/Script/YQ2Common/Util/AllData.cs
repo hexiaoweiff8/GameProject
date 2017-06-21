@@ -24,6 +24,11 @@ public class AllData : ISelectWeightDataHolder
     /// </summary>
     public ArmyAOEData AOEData { get; set; }
 
+    /// <summary>
+    /// 技能列表
+    /// </summary>
+    public IList<SkillInfo> SkillInfoList { get; set; }
+
 
 
 }

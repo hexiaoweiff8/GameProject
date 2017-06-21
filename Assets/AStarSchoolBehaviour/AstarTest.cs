@@ -157,14 +157,37 @@ public class AstarTest : MonoBehaviour {
 {
         Move(1, 3, 0)
 }";
+        string formulaStr5 = @"SkillNum(1005)
+    {
+        SlideCollisionDetection(1, 1, %0, 40, -1)
+        {
+            If(1, 0, Health, 0_100)
+            {
+                //PointToObj(1,test/TrailPrj,10,0,10,1,10),
+                Point(1,test/ExplordScope,1,%1,10,1,10),   
+            }
+        }
+         
+    }
+
+        [
+            TriggerLevel1(1)
+            TriggerLevel2(1)
+            Description(哟哦哦{%0},哦哟哦哟{%1})
+            100, 5
+        ]
+";
         var skillInfo = FormulaConstructor.Constructor(formulaStr);
         var skillInfo2 = FormulaConstructor.Constructor(formulaStr2);
         var skillInfo3 = FormulaConstructor.Constructor(formulaStr3);
         var skillInfo4 = FormulaConstructor.Constructor(formulaStr4);
+        var skillInfo5 = FormulaConstructor.Constructor(formulaStr5);
         SkillManager.Single.AddSkillInfo(skillInfo);
         SkillManager.Single.AddSkillInfo(skillInfo2);
         SkillManager.Single.AddSkillInfo(skillInfo3);
         SkillManager.Single.AddSkillInfo(skillInfo4);
+        SkillManager.Single.AddSkillInfo(skillInfo5);
+        Debug.Log(skillInfo5.GetReplacedDescription(1));
 
         // 设定帧数
         Application.targetFrameRate = 60;
@@ -211,7 +234,7 @@ public class AstarTest : MonoBehaviour {
             if (hit.collider != null && hit.collider.name.Equals(LoadMap.MapPlane.name))
             {
                
-                SkillManager.Single.DoSkillNum(1003, new FormulaParamsPacker()
+                SkillManager.Single.DoSkillNum(1005, new FormulaParamsPacker()
                 {
                     StartPos = new Vector3(hit.point.x, 0, hit.point.z),
                     TargetPos = new Vector3(hit.point.x - 40, 0, hit.point.z + 40),
@@ -528,6 +551,7 @@ public class AstarTest : MonoBehaviour {
             fightData.DistanceMinWeight = 10;
             school.AllData.SelectWeightData = fightData;
             school.AllData.MemberData.CurrentHP = 10;
+            school.AllData.MemberData.TotalHp = 100;
 
             itemList.Add(school);
             ClusterManager.Single.Add(school);

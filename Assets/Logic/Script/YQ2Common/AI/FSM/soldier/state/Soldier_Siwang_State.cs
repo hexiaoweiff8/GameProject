@@ -15,12 +15,12 @@ public class Soldier_Siwang_State : SoldierFSMState
         ClusterManager.Single.Remove(fsm.Display.ClusterData);
         FightUnitFactory.DeleteUnit(fsm.Display.ClusterData.AllData.MemberData);
         // 释放死亡时技能
-        var fightVo = fsm.Display.ClusterData.AllData.MemberData as FightVO;
+        var allData = fsm.Display.ClusterData.AllData;
 
         // 死亡时检测技能
-        if (fightVo != null && fightVo.SkillInfoList != null)
+        if (allData.SkillInfoList != null)
         {
-            SkillManager.Single.CheckAndDoSkillInfo(fightVo.SkillInfoList, fsm.Display, fsm.EnemyTarget, SkillTriggerLevel1.Fight, SkillTriggerLevel2.Death);
+            SkillManager.Single.CheckAndDoSkillInfo(allData.SkillInfoList, fsm.Display, fsm.EnemyTarget, SkillTriggerLevel1.Fight, SkillTriggerLevel2.Death);
         }
     }
 

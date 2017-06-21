@@ -270,7 +270,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
         }
 
         // 加载并设置技能
-        soldier.SkillInfoList = SkillManager.Single.LoadSkillInfoList(new List<int>()
+        displayOwner.ClusterData.AllData.SkillInfoList = SkillManager.Single.LoadSkillInfoList(new List<int>()
                 {
                     soldier.Skill1,
                     soldier.Skill2,

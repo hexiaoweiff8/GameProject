@@ -46,6 +46,7 @@ public class PointToObjScopeGeneralAttack : IGeneralAttack
             var positionScopeAttack = new PositionScopeGeneralAttack(attacker, key2, targetObj.transform.position, scopeRaduis,
                 durTime, callback);
             positionScopeAttack.Begin();
+            //TODO 触发技能
         };
         //if (callback != null)
         //{

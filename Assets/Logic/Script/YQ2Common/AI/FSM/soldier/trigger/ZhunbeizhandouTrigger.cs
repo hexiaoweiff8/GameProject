@@ -68,36 +68,38 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger
         var myObjid = fsm.Display.MFAModelRender.ObjId;
 
         // 判断主动技能是否可释放, 可释放则释放技能, 否则普通攻击
-        var data = fsm.Display.ClusterData.AllData.MemberData;
-        var skillNumList = new List<int>()
-        {
-            data.Skill1,
-            data.Skill2,
-            data.Skill3,
-            data.Skill4,
-            data.Skill5,
-        };
-        var skillInfoList = new List<SkillInfo>();
-        foreach (var skillNum in skillNumList)
-        {
-            var type = skillNum/10000;
-            var triggerType = type%100;
-            type /= 1000;
-            var skillType = type%10;
-            // TODO 判断技能是否适合当前情况释放
-            // 主动技能并且是范围内有其他单位触发
-            if (skillType == 1 && triggerType == 1 || skillNum == 10001)
-            {
-                // 加入可能可释放列表
-                skillInfoList.Add(SkillManager.Single.LoadSkillInfo(skillNum));
-            }
-        }
+        var skillInfoList = fsm.Display.ClusterData.AllData.SkillInfoList;
+        //var skillNumList = new List<int>()
+        //{
+        //    data.Skill1,
+        //    data.Skill2,
+        //    data.Skill3,
+        //    data.Skill4,
+        //    data.Skill5,
+        //};
+        //foreach (var skillNum in skillNumList)
+        //{
+        //    var type = skillNum/10000;
+        //    var triggerType = type%100;
+        //    type /= 1000;
+        //    var skillType = type%10;
+        //    // TODO 判断技能是否适合当前情况释放
+        //    // 主动技能并且是范围内有其他单位触发
+        //    if (skillType == 1 && triggerType == 1 || skillNum == 10001)
+        //    {
+        //        // 加入可能可释放列表
+        //        skillInfoList.Add(SkillManager.Single.LoadSkillInfo(skillNum));
+        //    }
+        //}
 
         if (skillInfoList.Count > 0)
         {
             // 判断技能CD的长短, 释放技能最长的
             foreach (var skill in skillInfoList)
             {
+                // TODO 判断是否可以释放
+                // TODO 按照技能释放Enum来获取能够释放的技能
+                // 触发一个目标是敌人的技能
                 // 技能没有在CD中
                 if (CDTimer.Instance().IsInCD(myObjid.ID, skill.SkillNum))
                 {
