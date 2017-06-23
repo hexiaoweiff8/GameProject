@@ -53,7 +53,7 @@ public class Soldier_Ruchang_State : SoldierFSMState
         // 入场检测技能
         if (alldata != null && alldata.SkillInfoList != null)
         {
-            SkillManager.Single.CheckAndDoSkillInfo(alldata.SkillInfoList, fsm.Display, fsm.EnemyTarget, SkillTriggerLevel1.Fight, SkillTriggerLevel2.Enter);
+            SkillManager.Single.CheckAndDoSkillInfo(alldata.SkillInfoList, fsm.Display, fsm.EnemyTarget, TriggerLevel1.Fight, TriggerLevel2.Enter);
         }
 
         Globals.Instance.StartCoroutine(_waitFor(DeployTime, () =>
@@ -63,7 +63,7 @@ public class Soldier_Ruchang_State : SoldierFSMState
             // 入场结束检测技能
             if (alldata != null && alldata.SkillInfoList != null)
             {
-                SkillManager.Single.CheckAndDoSkillInfo(alldata.SkillInfoList, fsm.Display, fsm.EnemyTarget, SkillTriggerLevel1.Fight, SkillTriggerLevel2.EnterEnd);
+                SkillManager.Single.CheckAndDoSkillInfo(alldata.SkillInfoList, fsm.Display, fsm.EnemyTarget, TriggerLevel1.Fight, TriggerLevel2.EnterEnd);
             }
         }));
     }

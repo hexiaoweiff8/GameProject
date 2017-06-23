@@ -45,11 +45,8 @@ public class SkillManager
     /// <summary>
     /// 技能触发字典
     /// </summary>
-    private static
-        IDictionary<ObjectID, IDictionary<SkillTriggerLevel1, IDictionary<SkillTriggerLevel2, List<SkillTriggerData>>>>
-        skillTriggerList =
-            new Dictionary
-                <ObjectID, IDictionary<SkillTriggerLevel1, IDictionary<SkillTriggerLevel2, List<SkillTriggerData>>>>();
+    private static IDictionary<ObjectID, IDictionary<TriggerLevel1, IDictionary<TriggerLevel2, IDictionary<int,List<TriggerData>>>>>
+        triggerList = new Dictionary <ObjectID, IDictionary<TriggerLevel1, IDictionary<TriggerLevel2, IDictionary<int,List<TriggerData>>>>>();
 
     ///// <summary>
     ///// 攻击者列表[被攻击者ID, 攻击者列表]
@@ -89,7 +86,8 @@ public class SkillManager
             // 检查缓存
             if (SkillInfoDic.ContainsKey(skillId))
             {
-                result = SkillInfoDic[skillId];
+                // 复制技能数据
+                result = CopySkillInfo(SkillInfoDic[skillId]);
             }
             else
             {
@@ -101,7 +99,7 @@ public class SkillManager
                     var skillTxt = Utils.LoadFileInfo(file);
                     if (!string.IsNullOrEmpty(skillTxt))
                     {
-                        result = FormulaConstructor.Constructor(skillTxt);
+                        result = FormulaConstructor.SkillConstructor(skillTxt);
                         // 将其放入缓存
                         SkillInfoDic.Add(skillId, result);
                     }
@@ -145,6 +143,33 @@ public class SkillManager
         return result;
     }
 
+    /// <summary>
+    /// 复制技能信息
+    /// </summary>
+    /// <param name="skillInfo">被复制信息</param>
+    /// <returns>复制数据</returns>
+    public SkillInfo CopySkillInfo(SkillInfo skillInfo)
+    {
+        SkillInfo result = null;
+        if (skillInfo != null)
+        {
+            result = new SkillInfo(skillInfo.Num);
+            result.CDGroup = skillInfo.CDGroup;
+            result.CDTime = skillInfo.CDTime;
+            result.DataList = skillInfo.DataList;
+            result.Description = skillInfo.Description;
+            result.Icon = skillInfo.Icon;
+            result.ReleaseMember = skillInfo.ReleaseMember;
+            result.ReleaseTime = skillInfo.ReleaseTime;
+            result.TickTime = skillInfo.TickTime;
+            result.TriggerLevel1 = skillInfo.TriggerLevel1;
+            result.TriggerLevel2 = skillInfo.TriggerLevel2;
+            result.AddActionFormulaItem(skillInfo.GetActionFormulaItem());
+        }
+
+        return result;
+    }
+
 
     // -------------------------------技能执行----------------------------------
 
@@ -183,7 +208,7 @@ public class SkillManager
         else
         {
             var objId = packer.ReleaseMember.ClusterData.AllData.MemberData.ObjID.ID;
-            var skillNum = skillInfo.SkillNum;
+            var skillNum = skillInfo.Num;
             // 技能是否在CD
             if (!CDTimer.Instance().IsInCD(objId, skillNum))
             {
@@ -226,13 +251,13 @@ public class SkillManager
             throw new Exception("技能对象为空!");
         }
         // 是否已存在技能ID
-        if (SkillInfoDic.ContainsKey(skillInfo.SkillNum))
+        if (SkillInfoDic.ContainsKey(skillInfo.Num))
         {
-            throw new Exception("已存在技能编号:" + skillInfo.SkillNum);
+            throw new Exception("已存在技能编号:" + skillInfo.Num);
         }
 
         // 将技能加入字典中
-        SkillInfoDic.Add(skillInfo.SkillNum, skillInfo);
+        SkillInfoDic.Add(skillInfo.Num, skillInfo);
     }
 
     /// <summary>
@@ -246,8 +271,8 @@ public class SkillManager
     public void CheckAndDoSkillInfo(IList<SkillInfo> skillsList,
         DisplayOwner releaseOwner,
         DisplayOwner receiveOwner,
-        SkillTriggerLevel1 type1,
-        SkillTriggerLevel2 type2)
+        TriggerLevel1 type1,
+        TriggerLevel2 type2)
     {
         // 如果攻击时触发
         foreach (
@@ -320,7 +345,7 @@ public class SkillManager
     /// 添加事件数据
     /// </summary>
     /// <param name="triggerData">事件数据</param>
-    public void SetSkillTriggerData(SkillTriggerData triggerData)
+    public void SetTriggerData(TriggerData triggerData)
     {
         if (triggerData == null || triggerData.ReleaseMember == null)
         {
@@ -328,40 +353,62 @@ public class SkillManager
         }
 
         var objId = triggerData.ReleaseMember.ClusterData.AllData.MemberData.ObjID;
-        if (!skillTriggerList.ContainsKey(objId))
+        if (!triggerList.ContainsKey(objId))
         {
-            skillTriggerList.Add(objId,
-                new Dictionary<SkillTriggerLevel1, IDictionary<SkillTriggerLevel2, List<SkillTriggerData>>>()
+            triggerList.Add(objId,
+                new Dictionary<TriggerLevel1, IDictionary<TriggerLevel2, IDictionary<int, List<TriggerData>>>>()
                 {
                     {
-                        triggerData.TypeLevel1, new Dictionary<SkillTriggerLevel2, List<SkillTriggerData>>()
+                        triggerData.TypeLevel1, new Dictionary<TriggerLevel2, IDictionary<int, List<TriggerData>>>()
                         {
-                            {triggerData.TypeLevel2, new List<SkillTriggerData>() {triggerData}}
+                            {
+                                triggerData.TypeLevel2, 
+                                new Dictionary<int, List<TriggerData>>()
+                                {
+                                    {triggerData.TriggerDataType, new List<TriggerData>() {triggerData}}
+                                }
+                            }
                         }
                     }
                 });
         }
         else
         {
-            var dicLevel1 = skillTriggerList[objId];
+            var dicLevel1 = triggerList[objId];
             if (!dicLevel1.ContainsKey(triggerData.TypeLevel1))
             {
-                dicLevel1.Add(triggerData.TypeLevel1, new Dictionary<SkillTriggerLevel2, List<SkillTriggerData>>()
-                {
-                    {triggerData.TypeLevel2, new List<SkillTriggerData>() {triggerData}}
-                });
+                dicLevel1.Add(triggerData.TypeLevel1,
+                    new Dictionary<TriggerLevel2, IDictionary<int, List<TriggerData>>>()
+                    {
+                        {
+                            triggerData.TypeLevel2, new Dictionary<int, List<TriggerData>>()
+                            {
+                                {triggerData.TriggerDataType, new List<TriggerData>() {triggerData}}
+                            }
+                        }
+                    });
             }
             else
             {
                 var dicLevel2 = dicLevel1[triggerData.TypeLevel1];
                 if (!dicLevel2.ContainsKey(triggerData.TypeLevel2))
                 {
-                    dicLevel2.Add(triggerData.TypeLevel2, new List<SkillTriggerData>() {triggerData});
+                    dicLevel2.Add(triggerData.TypeLevel2, new Dictionary<int, List<TriggerData>>()
+                    {
+                        {triggerData.TriggerDataType, new List<TriggerData>() {triggerData}}
+                    });
                 }
                 else
                 {
                     var triggerDataList = dicLevel2[triggerData.TypeLevel2];
-                    triggerDataList.Add(triggerData);
+                    if (triggerDataList.ContainsKey(triggerData.TriggerDataType))
+                    {
+                        triggerDataList[triggerData.TriggerDataType].Add(triggerData);
+                    }
+                    else
+                    {
+                        triggerDataList.Add(triggerData.TriggerDataType, new List<TriggerData>() { triggerData });
+                    }
                 }
             }
         }
@@ -373,19 +420,24 @@ public class SkillManager
     /// <param name="objId">被取单位ID</param>
     /// <param name="type1">被取出类型Level1</param>
     /// <param name="type2">被取出类型Level2</param>
+    /// <param name="triggerType">触发类型 0:skill, 1:buff</param>
     /// <returns>如果有列表返回列表, 否则返回null</returns>
-    public List<SkillTriggerData> GetSkillTriggerDataList(ObjectID objId, SkillTriggerLevel1 type1,
-        SkillTriggerLevel2 type2)
+    public List<TriggerData> GetSkillTriggerDataList(ObjectID objId, TriggerLevel1 type1,
+        TriggerLevel2 type2, int triggerType)
     {
-        if (skillTriggerList.ContainsKey(objId))
+        if (triggerList.ContainsKey(objId))
         {
-            var dicLevel1 = skillTriggerList[objId];
+            var dicLevel1 = triggerList[objId];
             if (dicLevel1.ContainsKey(type1))
             {
                 var dicLevel2 = dicLevel1[type1];
                 if (dicLevel2.ContainsKey(type2))
                 {
-                    return dicLevel2[type2];
+                    var triggerTypeDic = dicLevel2[type2];
+                    if (triggerTypeDic.ContainsKey(triggerType))
+                    {
+                        return triggerTypeDic[triggerType];
+                    }
                 }
             }
         }
@@ -398,17 +450,22 @@ public class SkillManager
     /// <param name="objId">被清空单位ID</param>
     /// <param name="typeLevel1">被清空类型Level1</param>
     /// <param name="typeLevel2">被清空类型Level2</param>
-    public void ClearSkillTriggerData(ObjectID objId, SkillTriggerLevel1 typeLevel1, SkillTriggerLevel2 typeLevel2)
+    /// <param name="triggerType">触发器类型 0: 技能, 1: buff</param>
+    public void ClearSkillTriggerData(ObjectID objId, TriggerLevel1 typeLevel1, TriggerLevel2 typeLevel2, int triggerType)
     {
-        if (skillTriggerList.ContainsKey(objId))
+        if (triggerList.ContainsKey(objId))
         {
-            var dicLevel1 = skillTriggerList[objId];
+            var dicLevel1 = triggerList[objId];
             if (dicLevel1.ContainsKey(typeLevel1))
             {
                 var dicLevel2 = dicLevel1[typeLevel1];
                 if (dicLevel2.ContainsKey(typeLevel2))
                 {
-                    dicLevel2[typeLevel2].Clear();
+                    var tmpTriggerDic = dicLevel2[typeLevel2];
+                    if (tmpTriggerDic.ContainsKey(triggerType))
+                    {
+                        tmpTriggerDic[triggerType].Clear();
+                    }
                 }
             }
         }
@@ -419,42 +476,42 @@ public class SkillManager
     /// </summary>
     public void ClearAllSkillTriggerData()
     {
-        skillTriggerList.Clear();
+        triggerList.Clear();
     }
 
-    /// <summary>
-    /// 循环整体事件列表并执行each
-    /// </summary>
-    /// <param name="each">被执行单位处理</param>
-    /// <param name="isDelBeforeEnd">是否执行完毕后删除</param>
-    public void SetEachAction(Action<ObjectID, SkillTriggerLevel1, SkillTriggerLevel2, SkillTriggerData> each, bool isDelBeforeEnd = false)
-    {
-        if (each == null)
-        {
-            return;
-        }
-        foreach (var objKV in skillTriggerList)
-        {
-            var objId = objKV.Key;
-            foreach (var typeLevel1Dic in objKV.Value)
-            {
-                var typeLevel1 = typeLevel1Dic.Key;
-                foreach (var typeLevel2Dic in typeLevel1Dic.Value)
-                {
-                    var typeLevel2 = typeLevel2Dic.Key;
-                    foreach (var skillTrigger in typeLevel2Dic.Value)
-                    {
-                        each(objId, typeLevel1, typeLevel2, skillTrigger);
-                    }
-                    // 如果需要执行完毕后删除
-                    if (isDelBeforeEnd)
-                    {
-                        ClearSkillTriggerData(objId, typeLevel1, typeLevel2);
-                    }
-                }
-            }
-        }
-    }
+    ///// <summary>
+    ///// 循环整体事件列表并执行each
+    ///// </summary>
+    ///// <param name="each">被执行单位处理</param>
+    ///// <param name="isDelBeforeEnd">是否执行完毕后删除</param>
+    //public void SetEachAction(Action<ObjectID, TriggerLevel1, TriggerLevel2, TriggerData> each, bool isDelBeforeEnd = false)
+    //{
+    //    if (each == null)
+    //    {
+    //        return;
+    //    }
+    //    foreach (var objKV in triggerList)
+    //    {
+    //        var objId = objKV.Key;
+    //        foreach (var typeLevel1Dic in objKV.Value)
+    //        {
+    //            var typeLevel1 = typeLevel1Dic.Key;
+    //            foreach (var typeLevel2Dic in typeLevel1Dic.Value)
+    //            {
+    //                var typeLevel2 = typeLevel2Dic.Key;
+    //                foreach (var skillTrigger in typeLevel2Dic.Value)
+    //                {
+    //                    each(objId, typeLevel1, typeLevel2, skillTrigger);
+    //                }
+    //                // 如果需要执行完毕后删除
+    //                if (isDelBeforeEnd)
+    //                {
+    //                    ClearSkillTriggerData(objId, typeLevel1, typeLevel2);
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
 
     /// <summary>
     /// 循环整体事件列表并执行each
@@ -462,30 +519,47 @@ public class SkillManager
     /// <param name="objId">单位ObjId</param>
     /// <param name="each">被执行单位处理</param>
     /// <param name="isDelBeforeEnd">是否执行完毕后删除</param>
-    public void SetEachAction(ObjectID objId, Action<SkillTriggerLevel1, SkillTriggerLevel2, SkillTriggerData> each, bool isDelBeforeEnd = false)
+    /// <param name="triggerType">触发数据类型 0: 技能, 1: buff</param>
+    public void SetEachAction(ObjectID objId, Action<TriggerLevel1, TriggerLevel2, TriggerData> each, bool isDelBeforeEnd, int triggerType)
     {
-        if (each == null || !skillTriggerList.ContainsKey(objId))
+        if (each == null || !triggerList.ContainsKey(objId))
         {
             return;
         }
-        // 保证线程数据安全
-        lock (skillTriggerList)
+        if (triggerType != TriggerData.TriggerDataTypeSkill && triggerType != TriggerData.TriggerDataTypeBuff)
         {
-            var objKV = skillTriggerList[objId];
+            throw new Exception("技能执行参数错误");
+        }
+        // 保证线程数据安全
+        lock (triggerList)
+        {
+            var objKV = triggerList[objId];
             foreach (var typeLevel1Dic in objKV)
             {
                 var typeLevel1 = typeLevel1Dic.Key;
                 foreach (var typeLevel2Dic in typeLevel1Dic.Value)
                 {
                     var typeLevel2 = typeLevel2Dic.Key;
-                    foreach (var skillTrigger in typeLevel2Dic.Value)
+                    foreach (var triggerDic in typeLevel2Dic.Value)
                     {
-                        each(typeLevel1, typeLevel2, skillTrigger);
+                        if (triggerDic.Key != triggerType)
+                        {
+                            continue;
+                        }
+                        foreach (var trigger in triggerDic.Value)
+                        {
+                            // 不是同一类跳过
+                            if (triggerType != trigger.TriggerDataType)
+                            {
+                                continue;
+                            }
+                            each(typeLevel1, typeLevel2, trigger);
+                        }
                     }
                     // 如果需要执行完毕后删除
                     if (isDelBeforeEnd)
                     {
-                        ClearSkillTriggerData(objId, typeLevel1, typeLevel2);
+                        ClearSkillTriggerData(objId, typeLevel1, typeLevel2, triggerType);
                     }
                 }
             }

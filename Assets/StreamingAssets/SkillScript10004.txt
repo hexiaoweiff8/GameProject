@@ -1,4 +1,4 @@
-SkillNum(10001)
+SkillNum(10004)
 {
 	PointToObj(1, test/TrailPrj, 20, 1, 1,1,1);
 }

@@ -30,11 +30,11 @@ public static class FormulaConstructor
 
 
     /// <summary>
-    /// 构建行为链
+    /// 解析技能
     /// </summary>
     /// <param name="info">字符串数据源</param>
-    /// <returns>构建完成的行为链</returns>
-    public static SkillInfo Constructor(string info)
+    /// <returns>技能类</returns>
+    public static SkillInfo SkillConstructor(string info)
     {
         // 技能信息
         SkillInfo skillInfo = null;
@@ -135,12 +135,289 @@ public static class FormulaConstructor
                 {
                     throw new Exception("技能没有编号!");
                 }
-                skillInfo.AddFormulaItem(tmpItem);
+                skillInfo.AddActionFormulaItem(tmpItem);
             }
         }
 
         return skillInfo;
     }
+
+
+    // 技能结构例子
+    /*
+     SkillNum(10000)
+     {
+        PointToPoint(1,key,0,1,10,1,1),     // 需要等待其结束, 特效key(对应key,或特效path), 释放位置, 命中位置, 速度10, 飞行轨迹类型
+        Point(0,key,1,0,3),                // 不需要等待其结束, 特效key(对应key,或特效path), 释放位置, 播放速度, 持续3秒
+        CollisionDetection(1, 1, 10, 0, 10001)
+        {
+            Calculate(1,0,%0)
+        }
+     }
+     [
+         // 触发事件Level1
+         TriggerLevel1(1)
+         // 触发事件Level2
+         TriggerLevel2(1)
+         // cd时间
+         CDTime(10)
+         // cd组ID(不一样的组ID不会共享同一个公共CD
+         CDGroup(1)
+         // 可释放次数
+         ReleaseTime(10)
+         Description(交换空间撒很快就阿萨德阖家安康收到货%0, %1)
+         // 数据
+         1, 100,,,,,
+         2, 200
+      
+     ]
+    // -----------------特效-------------------- 
+    // PointToPoint 点对点特效        参数 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),命中位置(0放技能方, 1目标方),速度,飞行轨迹,缩放(三位)
+    // PointToObj 点对对象特效        参数 是否等待完成,特效Key,速度,飞行轨迹,缩放(三位)
+    // Point 点特效                   参数 是否等待完成,特效Key,检测位置(0放技能方, 1目标方),持续时间,缩放(三位)
+    // --Scope 范围特效                 参数 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),持续时间,范围半径
+
+    // --------------目标选择方式---------------
+    // CollisionDetection 碰撞检测    参数 是否等待完成, 目标数量, 检测位置(0放技能方, 1目标方), 检测范围形状(0圆, 1方), 
+    // 目标阵营(-1:都触发, 0: 己方, 1: 非己方),碰撞单位被释放技能ID范围大小(方 第一个宽, 第二个长, 第三个旋转角度, 圆的就取第一个值当半径, 扇形第一个半径, 第二个开口角度, 第三个旋转角度有更多的参数都放进来)
+    //{
+    //  功能
+    //}
+    // SlideCollisionDetection 滑动碰撞检测   参数 是否等待完成, 滑动速度, 检测宽度, 检测总长度, 目标阵营(-1:都触发, 0: 己方, 1: 非己方)
+    //{
+    //  功能
+    //}
+    // Skill 释放技能                   参数 是否等待完成,被释放技能,技能接收方(0释放者,1被释放者)
+    // -----------------音效--------------------
+    // Audio 音效                       参数 是否等待完成,点音,持续音,持续时间
+
+    // -----------------buff--------------------
+    // Buff buff                        参数 是否等待完成,buffID
+
+    // -----------------结算--------------------
+    // Calculate 结算                   参数 是否等待完成,伤害或治疗(0,1),伤害/治疗值
+
+    // -----------------技能--------------------
+    // Skill 释放技能                   参数 是否等待完成,技能编号
+
+    // -----------------位置--------------------
+    // Move 位置移动                    参数 是否等待完成,移动速度,是否瞬移(0: 否, 1: 是(如果是瞬移则速度无效))
+
+    // -----------------条件选择----------------
+    // If 条件选择                      参数 是否等待完成,条件
+    // --HealthScope 血量范围选择       参数 是否等待完成,血量下限(最小0), 血量上限(最大100)
+    // 
+
+    // -----------------数据--------------------
+    // TriggerLevel1 事件触发level1             参数 0-6 参照TriggerLevel1枚举
+    // TriggerLevel2 事件触发level2             参数 0-20 参照TriggerLevel2枚举
+    // CDTime        cd时间                     参数 时间(正值)
+    // CDGroup       cd组(不同组的cd不同公共cd)  参数 0-无穷(整数)
+    // ReleaseTime   可释放次数                 参数 1-无穷(整数)
+    // Description   描述(中间替换符可被替换)    参数 描述描述中可填写占位符%0123...同样适用数据替换与技能值相同
+    // Icon          icon地址                   参数 地址(或key)
+    
+     */
+
+
+    /// <summary>
+    /// 解析buff
+    /// </summary>
+    /// <param name="info">字符串数据源</param>
+    /// <returns>buff类</returns>
+    public static BuffInfo BuffConstructor(string info)
+    {
+        BuffInfo result = null;
+
+        if (info != null)
+        {
+            // 技能ID
+            var buffId = 0;
+            // 数据括号
+            var dataBraket = false;
+            // 当前行为栈层级
+            var stackLevel = 0;
+            // 创建临时堆栈, 存储不同层级的行为链
+            var stack = new Stack<IFormulaItem>();
+            // buff触发时行为
+            IFormulaItem actionFormulaItem = new PauseFormulaItem();
+            // buff创建行为
+            IFormulaItem attachFormulaItem = new PauseFormulaItem();
+            // buff销毁行为
+            IFormulaItem detachFormulaItem = new PauseFormulaItem();
+            IFormulaItem tmpItem = null;
+
+            // 解析字符串
+            // 根据对应行为列表创建Formula
+            var infoLines = info.Split('\n');
+            for (var i = 0; i < infoLines.Length; i++)
+            {
+                var line = infoLines[i];
+                // 消除空格
+                line = line.Trim();
+                // 跳过空行
+                if (string.IsNullOrEmpty(line))
+                {
+                    continue;
+                }
+                // 跳过注释行
+                if (line.StartsWith("//"))
+                {
+                    continue;
+                }
+
+                // 如果是技能描述开始
+                if (line.StartsWith("BuffNum"))
+                {
+                    // 读取技能号
+                    var pos = GetSmallBraketPos(line);
+                    var start = pos[0];
+                    var end = pos[1];
+
+                    // 读取技能ID
+                    var strSkillId = line.Substring(start + 1, end - start - 1);
+                    buffId = Convert.ToInt32(strSkillId);
+                    // 创建新技能
+                    result = new BuffInfo(buffId);
+                }
+                else if (line.StartsWith("Action"))
+                {
+                    // buff触发时行为
+                    tmpItem = actionFormulaItem;
+                }
+                else if (line.StartsWith("Attach"))
+                {
+                    // buff 创建时行为
+                    tmpItem = attachFormulaItem;
+                }
+                else if (line.StartsWith("Detach"))
+                {
+                    // buff 销毁时行为
+                    tmpItem = detachFormulaItem;
+                }
+                else if (line.StartsWith("{"))
+                {
+                    // 开始括号内容
+                    stackLevel++;
+
+                    // 将上级FormulaItem push进堆栈
+                    stack.Push(tmpItem);
+                    tmpItem = null;
+                }
+                else if (line.StartsWith("}"))
+                {
+                    // 关闭括号内容
+                    stackLevel--;
+                    // 将上级FormulaItem pop出来
+                    var prvLevelItem = stack.Pop();
+                    if (prvLevelItem != null && tmpItem != null)
+                    {
+                        prvLevelItem.AddSubFormulaItem(tmpItem.GetFirst());
+                        tmpItem = prvLevelItem;
+                    }
+                }
+                else if (line.StartsWith("["))
+                {
+                    // 数据开始
+                    dataBraket = true;
+                }
+                else if (line.StartsWith("]"))
+                {
+                    // 数据结束
+                    dataBraket = true;
+                }
+                else if (stackLevel > 0)
+                {
+                    // 解析行为脚本
+                    tmpItem = TransBehavior(line, tmpItem);
+                }
+                else if (dataBraket)
+                {
+                    // 解析数据脚本
+                    TransData(result, line);
+                }
+            }
+
+            if (result == null)
+            {
+                throw new Exception("技能没有编号!");
+            }
+            // buff触发行为
+            actionFormulaItem = actionFormulaItem.GetFirst();
+            result.AddActionFormulaItem(actionFormulaItem);
+            // buff创建行为
+            attachFormulaItem = attachFormulaItem.GetFirst();
+            result.AddAttachFormulaItem(attachFormulaItem);
+            // buff销毁行为
+            detachFormulaItem = detachFormulaItem.GetFirst();
+            result.AddDetachFormulaItem(detachFormulaItem);
+        }
+
+        return result;
+    }
+
+
+
+    // buff结构例子
+    /*
+    BuffNum(10000)
+    // buff被触发时行为
+    Action
+    {
+       PointToPoint(1,key,0,1,10,1,1),     // 需要等待其结束, 特效key(对应key,或特效path), 释放位置, 命中位置, 速度10, 飞行轨迹类型
+       Point(0,key,1,0,3),                // 不需要等待其结束, 特效key(对应key,或特效path), 释放位置, 播放速度, 持续3秒
+       CollisionDetection(1, 1, 10, 0, 10001)
+       {
+           Calculate(1,0,%0)
+       }
+    }
+    // buff 创建时行为
+    Attach
+    {
+        XXXXXXXXXXXXXXXX
+    }
+    // buff消失时行为
+    Detach 
+    {
+        XXXXXXXXXXXXXXXXXXX
+    }
+    [
+        // 触发事件Level1
+        TriggerLevel1(1)
+        // 触发事件Level2
+        TriggerLevel2(1)
+        
+        // buff结束事件Level1
+        DetachTriggerLevel1(1)
+        // buff结束事件Level2
+        DetachTriggerLevel2(1)
+        
+        // buff存在时间
+        BuffTime(10)
+        // buff检测时间
+        TickTime(1)
+        // buff类型
+        BuffType(1)
+        // buffLevel, 如果buff互斥则level高的会替换掉level低的, 反之不会
+        BuffLevel(10)
+        // 是否为增益buff
+        IsBeneficial(true)
+        // 调整值
+        ChangeData
+        // 数值变更类型 0: 绝对值(加), 1: 百分比(乘)
+        ChangeDataType(0)
+        // buff 存在状态
+        ExistType(0)
+        // 是否死亡消失
+        IsDeadDisappear(1)
+     
+        Description(交换空间撒很快就阿萨德阖家安康收到货%0, %1)
+        // 数据
+        1, 100,,,,,
+        2, 200
+      
+    ]
+    */
 
     /// <summary>
     /// 获取行为链
@@ -262,14 +539,14 @@ public static class FormulaConstructor
                 case "TriggerLevel1":
                 {
                     // 技能触发事件level1
-                    var triggerType = (SkillTriggerLevel1) Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+                    var triggerType = (TriggerLevel1) Convert.ToInt32(line.Substring(start + 1, end - start - 1));
                     skillInfo.TriggerLevel1 = triggerType;
                 }
                     break;
                 case "TriggerLevel2":
                 {
                     // 技能触发事件level2
-                    var triggerType = (SkillTriggerLevel2) Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+                    var triggerType = (TriggerLevel2) Convert.ToInt32(line.Substring(start + 1, end - start - 1));
                     skillInfo.TriggerLevel2 = triggerType;
                 }
                     break;
@@ -291,6 +568,122 @@ public static class FormulaConstructor
             var dataArray = line.Split(',');
             var dataList = dataArray.ToList();
             skillInfo.DataList.Add(dataList);
+        }
+        else
+        {
+            ValidSmallBraketIndex(start, end, line);
+        }
+    }
+
+
+    /// <summary>
+    /// 解析数据
+    /// </summary>
+    /// <param name="buffInfo">buff类</param>
+    /// <param name="line">数据行</param>
+    private static void TransData(BuffInfo buffInfo, string line)
+    {
+
+        // 解析数据
+        if (buffInfo == null)
+        {
+            throw new Exception("buffID未指定.buff类为空");
+        }
+
+        var pos = GetSmallBraketPos(line, false);
+        var start = pos[0];
+        var end = pos[1];
+        // 编号长度
+        var length = end - start - 1;
+        if (end > 0 && start > 0)
+        {
+            var symbol = line.Substring(0, start).Trim();
+            switch (symbol)
+            {
+                case "BuffTime":
+                    {
+                        buffInfo.BuffTime = Convert.ToSingle(line.Substring(start + 1, length));
+                    }
+                    break;
+                case "TickTime":
+                    {
+                        buffInfo.TickTime = Convert.ToInt32(line.Substring(start + 1, length));
+                    }
+                    break;
+                case "BuffType":
+                    {
+                        var buffType = (BuffType)Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+                        buffInfo.BuffType = buffType;
+                    }
+                    break;
+                case "TriggerLevel1":
+                    {
+                        // 技能触发事件level1
+                        var triggerType = (TriggerLevel1)Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+                        buffInfo.TriggerLevel1 = triggerType;
+                    }
+                    break;
+                case "TriggerLevel2":
+                    {
+                        // 技能触发事件level2
+                        var triggerType = (TriggerLevel2)Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+                        buffInfo.TriggerLevel2 = triggerType;
+                    }
+                    break;
+                case "BuffLevel":
+                    {
+                        buffInfo.BuffLevel = Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+                    }
+                    break;
+                case "IsBeneficial":
+                    {
+                        buffInfo.IsBeneficial = Convert.ToBoolean(line.Substring(start + 1, end - start - 1));
+                    }
+                    break;
+                case "ChangeData":
+                    {
+                        // TODO 使用反射获得数据
+                        //var triggerType = (SkillTriggerLevel2)Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+                        //buffInfo.TriggerLevel2 = triggerType;
+                    }
+                    break;
+                case "ChangeDataType":
+                    {
+                        // 数据变更类型
+                        var changeDataType = (ChangeDataType)Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+                        buffInfo.ChangeDataType = changeDataType;
+                    }
+                    break;
+                case "ExistType":
+                    {
+                        // buff存在状态
+                        buffInfo.ExistType = (BuffExistType)Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+                    }
+                    break;
+                case "IsDeadDisappear":
+                    {
+                        // buff存在状态
+                        buffInfo.IsDeadDisappear = Convert.ToBoolean(line.Substring(start + 1, end - start - 1));
+                    }
+                    break;
+                case "Description":
+                    {
+                        buffInfo.Description = line.Substring(start + 1, end - start - 1);
+                    }
+                    break;
+                case "Icon":
+                    {
+                        buffInfo.Icon = line.Substring(start + 1, end - start - 1);
+                    }
+                    break;
+            }
+        }
+        else if (start < 0 && end < 0)
+        {
+            // 解析数据脚本
+            var dataArray = line.Split(',');
+            var dataList = dataArray.ToList();
+            buffInfo.DataList.Add(dataList);
         }
         else
         {
@@ -337,87 +730,12 @@ public static class FormulaConstructor
         }
     }
 
-    // 结构例子
-    /*
-     SkillNum(10000)
-     {
-        PointToPoint(1,key,0,1,10,1,1),     // 需要等待其结束, 特效key(对应key,或特效path), 释放位置, 命中位置, 速度10, 飞行轨迹类型
-        Point(0,key,1,0,3),                // 不需要等待其结束, 特效key(对应key,或特效path), 释放位置, 播放速度, 持续3秒
-        CollisionDetection(1, 1, 10, 0, 10001)
-        {
-            Calculate(1,0,%0)
-        }
-     }
-     [
-         // 触发事件Level1
-         TriggerLevel1(1)
-         // 触发事件Level2
-         TriggerLevel2(1)
-         // cd时间
-         CDTime(10)
-         // cd组ID(不一样的组ID不会共享同一个公共CD
-         CDGroup(1)
-         // 可释放次数
-         ReleaseTime(10)
-         Description(交换空间撒很快就阿萨德阖家安康收到货%0, %1)
-         // 数据
-         1, 100,,,,,
-         2, 200
-      
-     ]
-     */
-    // -----------------特效-------------------- 
-    // PointToPoint 点对点特效        参数 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),命中位置(0放技能方, 1目标方),速度,飞行轨迹,缩放(三位)
-    // PointToObj 点对对象特效        参数 是否等待完成,特效Key,速度,飞行轨迹,缩放(三位)
-    // Point 点特效                   参数 是否等待完成,特效Key,检测位置(0放技能方, 1目标方),持续时间,缩放(三位)
-    // --Scope 范围特效                 参数 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),持续时间,范围半径
-
-    // --------------目标选择方式---------------
-    // CollisionDetection 碰撞检测    参数 是否等待完成, 目标数量, 检测位置(0放技能方, 1目标方), 检测范围形状(0圆, 1方), 
-    // 目标阵营(-1:都触发, 0: 己方, 1: 非己方),碰撞单位被释放技能ID范围大小(方 第一个宽, 第二个长, 第三个旋转角度, 圆的就取第一个值当半径, 扇形第一个半径, 第二个开口角度, 第三个旋转角度有更多的参数都放进来)
-    //{
-    //  功能
-    //}
-    // SlideCollisionDetection 滑动碰撞检测   参数 是否等待完成, 滑动速度, 检测宽度, 检测总长度, 目标阵营(-1:都触发, 0: 己方, 1: 非己方)
-    //{
-    //  功能
-    //}
-    // Skill 释放技能                   参数 是否等待完成,被释放技能,技能接收方(0释放者,1被释放者)
-    // -----------------音效--------------------
-    // Audio 音效                       参数 是否等待完成,点音,持续音,持续时间
-
-    // -----------------buff--------------------
-    // Buff buff                        参数 是否等待完成,buffID
-
-    // -----------------结算--------------------
-    // Calculate 结算                   参数 是否等待完成,伤害或治疗(0,1),伤害/治疗值
-
-    // -----------------技能--------------------
-    // Skill 释放技能                   参数 是否等待完成,技能编号
-
-    // -----------------位置--------------------
-    // Move 位置移动                    参数 是否等待完成,移动速度,是否瞬移(0: 否, 1: 是(如果是瞬移则速度无效))
-
-    // -----------------条件选择----------------
-    // If 条件选择                      参数 是否等待完成,条件
-    // --HealthScope 血量范围选择       参数 是否等待完成,血量下限(最小0), 血量上限(最大100)
-    // 
-
-    // -----------------数据--------------------
-    // TriggerLevel1 事件触发level1             参数 0-6 参照TriggerLevel1枚举
-    // TriggerLevel2 事件触发level2             参数 0-20 参照TriggerLevel2枚举
-    // CDTime        cd时间                     参数 时间(正值)
-    // CDGroup       cd组(不同组的cd不同公共cd)  参数 0-无穷(整数)
-    // ReleaseTime   可释放次数                 参数 1-无穷(整数)
-    // Description   描述(中间替换符可被替换)    参数 描述描述中可填写占位符%0123...同样适用数据替换与技能值相同
-    // Icon          icon地址                   参数 地址(或key)
-
 }
 
 /// <summary>
 /// 技能触发类型第一级
 /// </summary>
-public enum SkillTriggerLevel1
+public enum TriggerLevel1
 {
     None = 0,   // 无触发条件
     Scope,      // 范围内触发
@@ -432,7 +750,7 @@ public enum SkillTriggerLevel1
 /// <summary>
 /// 技能触发类型第二级
 /// </summary>
-public enum SkillTriggerLevel2
+public enum TriggerLevel2
 {
     None = 0,               // 无触发条件
     Enemy,                  // 有敌方单位
@@ -454,6 +772,7 @@ public enum SkillTriggerLevel2
     Death,                  // 死亡时
     FatalHit,               // 受到致死攻击时
 
+    TickTime,               // 每XX秒触发一次
     SafeTime,               // 安全XX时长时
     ClearScope,             // 范围内XX时长无敌人时
 

@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-
+﻿
 /// <summary>
-/// 技能触发数据类
+/// 触发数据类
 /// </summary>
-public class SkillTriggerData
+public class TriggerData
 {
     /// <summary>
-    /// 技能类列表
+    /// 数据触发类型-技能
     /// </summary>
-    //public List<SkillInfo> SkillInfoList { get; set; }
+    public const int TriggerDataTypeSkill = 0;
+
+    /// <summary>
+    /// 数据触发类型-buff
+    /// </summary>
+    public const int TriggerDataTypeBuff = 1;
 
     /// <summary>
     /// 释放技能单位
@@ -27,16 +27,23 @@ public class SkillTriggerData
     /// <summary>
     /// 技能分类Level1
     /// </summary>
-    public SkillTriggerLevel1 TypeLevel1 { get; set; }
+    public TriggerLevel1 TypeLevel1 { get; set; }
 
     /// <summary>
     /// 技能分类Level2
     /// </summary>
-    public SkillTriggerLevel2 TypeLevel2 { get; set; }
+    public TriggerLevel2 TypeLevel2 { get; set; }
 
     /// <summary>
     /// 伤害量
     /// </summary>
     public float HealthChangeValue { get; set; }
+
+    /// <summary>
+    /// 触发类型
+    /// 0: 技能
+    /// 1: buff
+    /// </summary>
+    public int TriggerDataType { get; set; }
 
 }

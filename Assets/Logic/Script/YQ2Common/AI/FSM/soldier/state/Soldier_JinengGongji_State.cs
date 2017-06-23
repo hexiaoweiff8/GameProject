@@ -30,7 +30,7 @@ public class Soldier_JinengGongji_State : SoldierFSMState
                 DataList = fsm.Skill.DataList,
                 // TODO 技能等级, 最大目标数量
                 SkillLevel = 1,
-                SkillNum = fsm.Skill.SkillNum,
+                SkillNum = fsm.Skill.Num,
                 ReceiverMenber = fsm.EnemyTarget,
                 ReleaseMember = fsm.Display,
                 StartPos = fsm.Display.ClusterData.gameObject.transform.position,

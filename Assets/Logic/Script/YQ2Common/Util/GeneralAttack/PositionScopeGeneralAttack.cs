@@ -115,13 +115,13 @@ public class PositionScopeGeneralAttack : IGeneralAttack
                 // 计算伤害值
                 var hurt = HurtResult.GetHurt(attackerDisplayOwner, beAttackDisplayOwner);
                 // 记录被击触发 记录扣血 伤害结算时结算
-                SkillManager.Single.SetSkillTriggerData(new SkillTriggerData()
+                SkillManager.Single.SetTriggerData(new TriggerData()
                 {
                     HealthChangeValue = hurt,
                     ReceiveMember = attackerDisplayOwner,
                     ReleaseMember = beAttackDisplayOwner,
-                    TypeLevel1 = SkillTriggerLevel1.Fight,
-                    TypeLevel2 = SkillTriggerLevel2.BeAttack
+                    TypeLevel1 = TriggerLevel1.Fight,
+                    TypeLevel2 = TriggerLevel2.BeAttack
                 });
             }
         }

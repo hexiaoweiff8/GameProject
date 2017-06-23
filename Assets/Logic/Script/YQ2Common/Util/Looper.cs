@@ -140,9 +140,9 @@ public abstract class LooperAbstract<T> : ILooper<T> where T : ILoopItem
         }
 
         // 删除执行完毕对象
-        foreach (var key in delList)
+        foreach (var removeItem in delList)
         {
-            Remove(key);
+            Remove(removeItem);
         }
         // 清空删除列表
         delList.Clear();
@@ -175,12 +175,26 @@ public abstract class LooperAbstract<T> : ILooper<T> where T : ILoopItem
     /// <param name="key">执行单位key(来自于Add返回的key)</param>
     public void Remove(long key)
     {
-        if (itemDic.ContainsKey(key))
+        if (Contains(key))
         {
             // 执行onDestroy
             itemDic[key].OnDestroy();
             itemDic.Remove(key);
         }
+    }
+
+    /// <summary>
+    /// 判断是否包含指定Key
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public bool Contains(long key)
+    {
+        if (itemDic.ContainsKey(key))
+        {
+            return true;
+        }
+        return false;
     }
 
     /// <summary>

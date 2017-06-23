@@ -109,7 +109,7 @@ public class FormulaParamsPackerFactroy
             DataList = skill.DataList,
             // TODO 技能等级, 最大目标数量
             SkillLevel = 1,
-            SkillNum = skill.SkillNum,
+            SkillNum = skill.Num,
             ReceiverMenber = startObj,
             ReleaseMember = targetObj,
             StartPos = startObj.ClusterData.gameObject.transform.position,

@@ -85,16 +85,20 @@ public class SoldierFSMControl{
         if (_iSAwake) return;
         fsm.CurrentState.CheckTrigger(fsm);
         fsm.CurrentState.Action(fsm);
-        // 结算伤害
-        SettlementDamage();
-        // 检测被触发的事件是否有对应技能
-        CheckTrigger();
+        // 结算技能伤害
+        SettlementDamage(TriggerData.TriggerDataTypeSkill);
+        // 结算buff伤害
+        SettlementDamage(TriggerData.TriggerDataTypeBuff);
+        // 检测被触发的Skill事件是否有对应技能
+        CheckTrigger(TriggerData.TriggerDataTypeSkill);
+        // 检测被触发的Buff事件是否有对应技能
+        CheckTrigger(TriggerData.TriggerDataTypeBuff);
     }
 
     /// <summary>
     /// 检测当前单位的触发事件
     /// </summary>
-    private void CheckTrigger()
+    private void CheckTrigger(int triggerType)
     {
         var alldata = fsm.Display.ClusterData.AllData;
         if (alldata.MemberData != null && alldata.SkillInfoList != null)
@@ -105,21 +109,23 @@ public class SoldierFSMControl{
                 SkillManager.Single.CheckAndDoSkillInfo(alldata.SkillInfoList, trigger.ReleaseMember,
                     trigger.ReceiveMember,
                     type1, type2);
-            }, true);
+            },
+            true,
+            triggerType);
         }
     }
 
     /// <summary>
     /// 结算当前单位的血量
     /// </summary>
-    private void SettlementDamage()
+    private void SettlementDamage(int triggerType)
     {
         var alldata = fsm.Display.ClusterData.AllData;
         if (alldata.MemberData != null && alldata.SkillInfoList != null)
         {
             var healthChangeValue = 0f;
             // 获取被击列表
-            var attackList = SkillManager.Single.GetSkillTriggerDataList(alldata.MemberData.ObjID, SkillTriggerLevel1.Fight, SkillTriggerLevel2.BeAttack);
+            var attackList = SkillManager.Single.GetSkillTriggerDataList(alldata.MemberData.ObjID, TriggerLevel1.Fight, TriggerLevel2.BeAttack, triggerType);
             // 检测是否被击
             if (attackList != null && attackList.Count > 0)
             {
@@ -133,13 +139,13 @@ public class SoldierFSMControl{
                     // 检测最后一个
                     var lastHitMember = attackList[attackList.Count - 1];
                     // 抛出致死攻击事件
-                    SkillManager.Single.SetSkillTriggerData(new SkillTriggerData()
+                    SkillManager.Single.SetTriggerData(new TriggerData()
                     {
                         HealthChangeValue = lastHitMember.HealthChangeValue,
                         ReceiveMember = lastHitMember.ReceiveMember,
                         ReleaseMember = lastHitMember.ReleaseMember,
-                        TypeLevel1 = SkillTriggerLevel1.Fight,
-                        TypeLevel2 = SkillTriggerLevel2.FatalHit
+                        TypeLevel1 = TriggerLevel1.Fight,
+                        TypeLevel2 = TriggerLevel2.FatalHit
                     });
                 }
 

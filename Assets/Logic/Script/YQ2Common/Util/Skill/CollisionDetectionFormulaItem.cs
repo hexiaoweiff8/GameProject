@@ -197,7 +197,7 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
                         var subSkill = new SkillInfo(packer.SkillNum);
                         FormulaParamsPackerFactroy.Single.CopyPackerData(paramsPacker, packer);
                         subSkill.DataList = packer.DataList;
-                        subSkill.AddFormulaItem(SubFormulaItem);
+                        subSkill.AddActionFormulaItem(SubFormulaItem);
                         //subSkill.GetFormula(packer);
                         SkillManager.Single.DoShillInfo(subSkill, packer, true);
                     }

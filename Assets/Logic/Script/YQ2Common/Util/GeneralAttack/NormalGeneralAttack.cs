@@ -56,34 +56,34 @@ public class NormalGeneralAttack : IGeneralAttack
                     null != beAttackerDisplayOwner.RanderControl)
                 {
                     // 记录被击触发 记录扣血 伤害结算时结算
-                    SkillManager.Single.SetSkillTriggerData(new SkillTriggerData()
+                    SkillManager.Single.SetTriggerData(new TriggerData()
                     {
                         HealthChangeValue = hurt,
                         ReceiveMember = attackerDisplayOwner,
                         ReleaseMember = beAttackerDisplayOwner,
-                        TypeLevel1 = SkillTriggerLevel1.Fight,
-                        TypeLevel2 = SkillTriggerLevel2.BeAttack
+                        TypeLevel1 = TriggerLevel1.Fight,
+                        TypeLevel2 = TriggerLevel2.BeAttack
                     });
                 }
                 // 命中时检测技能
-                SkillManager.Single.SetSkillTriggerData(new SkillTriggerData()
+                SkillManager.Single.SetTriggerData(new TriggerData()
                 {
                     ReceiveMember = beAttackerDisplayOwner,
                     ReleaseMember = attackerDisplayOwner,
-                    TypeLevel1 = SkillTriggerLevel1.Fight,
-                    TypeLevel2 = SkillTriggerLevel2.Hit
+                    TypeLevel1 = TriggerLevel1.Fight,
+                    TypeLevel2 = TriggerLevel2.Hit
                 });
             }
             else
             {
                 // TODO 播放miss特效
                 // 闪避时事件
-                SkillManager.Single.SetSkillTriggerData(new SkillTriggerData()
+                SkillManager.Single.SetTriggerData(new TriggerData()
                 {
                     ReceiveMember = attackerDisplayOwner,
                     ReleaseMember = beAttackerDisplayOwner,
-                    TypeLevel1 = SkillTriggerLevel1.Fight,
-                    TypeLevel2 = SkillTriggerLevel2.Dodge
+                    TypeLevel1 = TriggerLevel1.Fight,
+                    TypeLevel2 = TriggerLevel2.Dodge
                 });
             }
         };

@@ -29,6 +29,8 @@ public class AllData : ISelectWeightDataHolder
     /// </summary>
     public IList<SkillInfo> SkillInfoList { get; set; }
 
-
-
+    /// <summary>
+    /// 
+    /// </summary>
+    public IList<BuffInfo> BuffInfoList { get; set; } 
 }

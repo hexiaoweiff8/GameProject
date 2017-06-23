@@ -8,27 +8,8 @@ using System.Text;
 /// <summary>
 /// 技能信息
 /// </summary>
-public class SkillInfo
+public class SkillInfo : SkillBase
 {
-    /// <summary>
-    /// 技能ID
-    /// </summary>
-    public int SkillNum { get; private set; }
-
-    /// <summary>
-    /// 保存技能等级数据列表
-    /// </summary>
-    public List<List<string>> DataList = new List<List<string>>();
-
-    /// <summary>
-    /// 触发条件Level2
-    /// </summary>
-    public SkillTriggerLevel1 TriggerLevel1 { get; set; }
-
-    /// <summary>
-    /// 触发条件Level1
-    /// </summary>
-    public SkillTriggerLevel2 TriggerLevel2 { get; set; }
 
     /// <summary>
     /// 技能CD时间
@@ -45,6 +26,12 @@ public class SkillInfo
     /// </summary>
     public int ReleaseTime { get; set; }
 
+
+    /// <summary>
+    /// 每隔TickTime执行一次
+    /// </summary>
+    public float TickTime { get; set; }
+
     /// <summary>
     /// 描述
     /// </summary>
@@ -56,37 +43,49 @@ public class SkillInfo
     public string Icon { get; set; }
 
     /// <summary>
-    /// 技能行为单元
-    /// </summary>
-    private IFormulaItem formulaItem = null;
-
-    /// <summary>
     /// 构造技能信息
     /// </summary>
     /// <param name="skillNum">技能ID</param>
     public SkillInfo(int skillNum)
+        : base()
     {
-        SkillNum = skillNum;
+        Num = skillNum;
     }
 
     /// <summary>
     /// 添加行为生成器
     /// </summary>
     /// <param name="formulaItem">行为单元生成器</param>
-    public void AddFormulaItem(IFormulaItem formulaItem)
+    public void AddActionFormulaItem(IFormulaItem formulaItem)
     {
         if (formulaItem == null)
         {
             throw new Exception("行为节点为空");
         }
-        if (this.formulaItem == null)
+        if (actionFormulaItem == null)
         {
-            this.formulaItem = formulaItem;
+            actionFormulaItem = formulaItem;
         }
         else
         {
-            formulaItem.After(formulaItem);
+            actionFormulaItem.After(formulaItem);
         }
+    }
+
+
+    public IFormulaItem GetActionFormulaItem()
+    {
+        return actionFormulaItem;
+    }
+
+    public IFormulaItem GetAttachFormulaItem()
+    {
+        return attachFormulaItem;
+    }
+
+    public IFormulaItem GetDetachFormulaItem()
+    {
+        return detachFormulaItem;
     }
 
     /// <summary>
@@ -102,16 +101,16 @@ public class SkillInfo
         }
         IFormula result = null;
 
-        if (formulaItem == null)
+        if (actionFormulaItem == null)
         {
             return null;
         }
         // 循环构建行为链构造器
-        var tmpItem = formulaItem;
+        var tmpItem = actionFormulaItem;
         // 数据列表放入packer中
         paramsPacker.DataList = DataList;
         // 技能ID放入packer中
-        paramsPacker.SkillNum = SkillNum;
+        paramsPacker.SkillNum = Num;
         while (tmpItem != null)
         {
             if (result != null)

@@ -20,7 +20,7 @@ public class Soldier_Siwang_State : SoldierFSMState
         // 死亡时检测技能
         if (allData.SkillInfoList != null)
         {
-            SkillManager.Single.CheckAndDoSkillInfo(allData.SkillInfoList, fsm.Display, fsm.EnemyTarget, SkillTriggerLevel1.Fight, SkillTriggerLevel2.Death);
+            SkillManager.Single.CheckAndDoSkillInfo(allData.SkillInfoList, fsm.Display, fsm.EnemyTarget, TriggerLevel1.Fight, TriggerLevel2.Death);
         }
     }
 

@@ -101,7 +101,7 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger
                 // TODO 按照技能释放Enum来获取能够释放的技能
                 // 触发一个目标是敌人的技能
                 // 技能没有在CD中
-                if (CDTimer.Instance().IsInCD(myObjid.ID, skill.SkillNum))
+                if (CDTimer.Instance().IsInCD(myObjid.ID, skill.Num))
                 {
                     continue;
                 }

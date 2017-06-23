@@ -41,9 +41,9 @@ public class TestFormulaConstruct : MonoBehaviour
 	void Start () {
 
         // 加载技能内容
-        skillInfo = FormulaConstructor.Constructor(formulaStr);
-        skillInfo2 = FormulaConstructor.Constructor(formulaStr2);
-        skillInfo3 = FormulaConstructor.Constructor(formulaStr3);
+        skillInfo = FormulaConstructor.SkillConstructor(formulaStr);
+        skillInfo2 = FormulaConstructor.SkillConstructor(formulaStr2);
+        skillInfo3 = FormulaConstructor.SkillConstructor(formulaStr3);
 
     }
 	

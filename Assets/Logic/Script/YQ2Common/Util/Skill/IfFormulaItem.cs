@@ -105,7 +105,7 @@ public class IfFormulaItem : AbstractFormulaItem
                     // 执行子级技能
                     var subSkill = new SkillInfo(paramsPacker.SkillNum);
                     subSkill.DataList = paramsPacker.DataList;
-                    subSkill.AddFormulaItem(SubFormulaItem);
+                    subSkill.AddActionFormulaItem(SubFormulaItem);
                     SkillManager.Single.DoShillInfo(subSkill, paramsPacker, true);
                 }
             }

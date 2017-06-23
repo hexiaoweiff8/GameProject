@@ -177,18 +177,19 @@ public class AstarTest : MonoBehaviour {
             100, 5
         ]
 ";
-        var skillInfo = FormulaConstructor.Constructor(formulaStr);
-        var skillInfo2 = FormulaConstructor.Constructor(formulaStr2);
-        var skillInfo3 = FormulaConstructor.Constructor(formulaStr3);
-        var skillInfo4 = FormulaConstructor.Constructor(formulaStr4);
-        var skillInfo5 = FormulaConstructor.Constructor(formulaStr5);
+        var skillInfo = FormulaConstructor.SkillConstructor(formulaStr);
+        var skillInfo2 = FormulaConstructor.SkillConstructor(formulaStr2);
+        var skillInfo3 = FormulaConstructor.SkillConstructor(formulaStr3);
+        var skillInfo4 = FormulaConstructor.SkillConstructor(formulaStr4);
+        var skillInfo5 = FormulaConstructor.SkillConstructor(formulaStr5);
+        var buffInfo1 = FormulaConstructor.BuffConstructor(formulaStr5);
         SkillManager.Single.AddSkillInfo(skillInfo);
         SkillManager.Single.AddSkillInfo(skillInfo2);
         SkillManager.Single.AddSkillInfo(skillInfo3);
         SkillManager.Single.AddSkillInfo(skillInfo4);
         SkillManager.Single.AddSkillInfo(skillInfo5);
         Debug.Log(skillInfo5.GetReplacedDescription(1));
-
+        Debug.Log(buffInfo1.GetReplacedDescription(1));
         // 设定帧数
         Application.targetFrameRate = 60;
         mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();

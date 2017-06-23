@@ -75,12 +75,12 @@ public class Soldier_PutongGongji_State : SoldierFSMState
 
         //var fightVO = fsm.Display.ClusterData.MemberData as FightVO;
         // 攻击时检测技能
-        SkillManager.Single.SetSkillTriggerData(new SkillTriggerData()
+        SkillManager.Single.SetTriggerData(new TriggerData()
         {
             ReceiveMember = enemyDisplayOwner,
             ReleaseMember = myDisplayOwner,
-            TypeLevel1 = SkillTriggerLevel1.Fight,
-            TypeLevel2 = SkillTriggerLevel2.Attack
+            TypeLevel1 = TriggerLevel1.Fight,
+            TypeLevel2 = TriggerLevel2.Attack
         });
 
 

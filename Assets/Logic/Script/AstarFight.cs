@@ -205,6 +205,9 @@ public class AstarFight : MonoBehaviour
         // 解析地图
         MapManager.Instance().AnalysisBuidingMap(mapInfoData);
         MapManager.Instance().AnalysisBuidingMap(mapInfoBuildingData);
+        // 加载TriggerTicker
+        // TODO 战斗结束需要Stop()
+        TriggerTicker.Single.Start();
     }
 
 
