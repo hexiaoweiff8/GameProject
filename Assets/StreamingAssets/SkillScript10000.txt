@@ -3,4 +3,5 @@ SkillNum(10000)
 	PointToObj(1, test/TrailPrj, 20, 1, 1,1,1);
 }
 [
+	ChangeData(MoveSpeed, 80, 0)
 ]

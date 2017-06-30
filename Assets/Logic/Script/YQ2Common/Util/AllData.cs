@@ -30,7 +30,13 @@ public class AllData : ISelectWeightDataHolder
     public IList<SkillInfo> SkillInfoList { get; set; }
 
     /// <summary>
-    /// 
+    /// buff列表
     /// </summary>
-    public IList<BuffInfo> BuffInfoList { get; set; } 
+    public IList<BuffInfo> BuffInfoList = new List<BuffInfo>();
+
+
+
+
+    // ---------------------------公共方法------------------------------
+    //public 
 }

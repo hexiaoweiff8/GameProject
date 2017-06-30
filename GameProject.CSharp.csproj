@@ -292,12 +292,15 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\SDataUtils.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\Buff\BuffInfo.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\Buff\BuffManager.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\BuffFormulaItem.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\ChangeDataFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\CollisionDetectionFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\Formula\Formula.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\Formula\IFormula.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\FormulaConstructor.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\FormulaParamsPacker.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\FormulaParamsPackerFactroy.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\HealthChangeFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\HealthScopeFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\IFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\IfFormulaItem.cs" />
@@ -306,6 +309,8 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\PointFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\PointToObjFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\PointToPointFormulaItem.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\ResistDemageFormulaItem.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillAddition.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillBase.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillInfo.cs" />
@@ -313,7 +318,6 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillTriggerData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SlideCollisionDetectionFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\TriggerTicker.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\buffFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\TargetSelecter\ISelectWeightData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\TargetSelecter\ISelectWeightDataHolder.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\TargetSelecter\Member.cs" />
@@ -1078,6 +1082,7 @@
     <None Include="Assets\Resources\sdata_template.txt" />
     <None Include="Assets\StreamingAssets\Android\files.txt" />
     <None Include="Assets\StreamingAssets\Android\lua\pack_script\pk_script\_tmp.txt" />
+    <None Include="Assets\StreamingAssets\Script10000.txt" />
     <None Include="Assets\StreamingAssets\SkillScript10000.txt" />
     <None Include="Assets\StreamingAssets\SkillScript10001.txt" />
     <None Include="Assets\StreamingAssets\SkillScript10002.txt" />

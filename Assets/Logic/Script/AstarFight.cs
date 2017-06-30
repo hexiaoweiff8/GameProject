@@ -206,7 +206,7 @@ public class AstarFight : MonoBehaviour
         MapManager.Instance().AnalysisBuidingMap(mapInfoData);
         MapManager.Instance().AnalysisBuidingMap(mapInfoBuildingData);
         // 加载TriggerTicker
-        // TODO 战斗结束需要Stop()
+        TriggerTicker.Single.StopAndClear();
         TriggerTicker.Single.Start();
     }
 
@@ -649,7 +649,7 @@ public class AstarFight : MonoBehaviour
         ClusterData clusterData = data;
         clusterData.RotateSpeed = 10;
         clusterData.RotateWeight = 1;
-        clusterData.PhysicsInfo.MaxSpeed = 60;//clusterData.AllData.MemberData.MoveSpeed;
+        clusterData.MaxSpeed = clusterData.AllData.MemberData.MoveSpeed;
         clusterData.Diameter *= ClusterManager.Single.UnitWidth;
         clusterData.PushTargetList(Utils.NumToPostionByList(LoadMap.MapPlane.transform.position, path, UnitWidth, MapWidth, MapHeight));
         // 默认出事状态不行进

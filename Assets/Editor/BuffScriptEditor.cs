@@ -1,27 +1,29 @@
 ﻿using System;
-using UnityEngine;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
+using System.Text;
 using UnityEditor;
+using UnityEngine;
 
-public class SkillScriptEditor : BaseScriptEditor
+/// <summary>
+/// buff编辑界面
+/// </summary>
+public class BuffScriptEditor : BaseScriptEditor
 {
-
-    [MenuItem("ScriptEditor/Open Skill Script Editor")]
-    static void OpenSkillScriptEditor()
+    [MenuItem("ScriptEditor/Open Buff Script Editor")]
+    static void OpenBuffScriptEditor()
     {
-        SkillScriptEditor window = GetWindow<SkillScriptEditor>(true, "SkillScriptEditor");
+        BuffScriptEditor window = GetWindow<BuffScriptEditor>(true, "BuffScriptEditor");
         window.Init();
     }
 
     /// <summary>
     /// 文件名称
     /// </summary>
-    protected new string FileName = "SkillScript";
-
+    protected new string FileName = "BuffScript";
 
     /// <summary>
-    /// GUI绘制
+    /// GUI刷新
     /// </summary>
     void OnGUI()
     {
@@ -90,97 +92,138 @@ public class SkillScriptEditor : BaseScriptEditor
         GUI.color = Color.yellow;
 
         // 获取的实例
-        SkillTriggerScriptEditor.GetIns();
+        BuffTriggerScriptEditor.GetIns();
 
         if (GUILayout.Button("子级左括号"))
         {
-            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.LeftBracket, this.position);
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.LeftBracket, this.position);
         }
         if (GUILayout.Button("子级右括号"))
         {
-            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.RightBracket, this.position);
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.RightBracket, this.position);
         }
         if (GUILayout.Button("点对点特效"))
         {
-            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.PointToPoint, this.position);
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.PointToPoint, this.position);
         }
         if (GUILayout.Button("点对对象特效(跟踪)"))
         {
-            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.PointToObj, this.position);
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.PointToObj, this.position);
         }
         if (GUILayout.Button("点特效"))
         {
-            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Point, this.position);
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Point, this.position);
         }
         if (GUILayout.Button("范围碰撞检测"))
         {
-            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.CollisionDetection, this.position);
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.CollisionDetection, this.position);
         }
         if (GUILayout.Button("滑动碰撞检测"))
         {
-            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.SlideCollisionDetection, this.position);
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.SlideCollisionDetection, this.position);
         }
         if (GUILayout.Button("音效"))
         {
-            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Audio, this.position);
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Audio, this.position);
         }
         if (GUILayout.Button("Buff"))
         {
-            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Buff, this.position);
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Buff, this.position);
         }
         if (GUILayout.Button("Skill"))
         {
-            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Skill, this.position);
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Skill, this.position);
         }
         if (GUILayout.Button("If"))
         {
-            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.If, this.position);
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.If, this.position);
         }
         if (GUILayout.Button("伤害/治疗结算"))
         {
-            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.HealthChange, this.position);
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.HealthChange, this.position);
         }
         if (GUILayout.Button("伤害吸收"))
         {
-            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.ResistDemage, this.position);
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.ResistDemage, this.position);
         }
         if (GUILayout.Button("移动"))
         {
-            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Move, this.position);
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Move, this.position);
         }
         GUI.color = Color.white;
         EditorGUILayout.EndVertical();
         #endregion
 
         #region Data
-        // 技能
+        // Buff
         EditorGUILayout.BeginVertical("box");
         GUI.color = Color.green;
 
-        if (GUILayout.Button("技能等级数据"))
+        if (GUILayout.Button("Buff等级数据"))
         {
-            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.LevelData, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.LevelData, this.position);
         }
-        if (GUILayout.Button("技能CD值"))
+        if (GUILayout.Button("BuffCD值"))
         {
-            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.CDTime, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.CDTime, this.position);
         }
-        if (GUILayout.Button("技能CD组"))
+        if (GUILayout.Button("BuffCD组"))
         {
-            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.CDGroup, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.CDGroup, this.position);
         }
-        if (GUILayout.Button("技能可释放次数"))
+        if (GUILayout.Button("Buff可释放次数"))
         {
-            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.ReleaseTime, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.ReleaseTime, this.position);
         }
-        if (GUILayout.Button("技能描述"))
+        if (GUILayout.Button("Buff描述"))
         {
-            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.Description, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.Description, this.position);
         }
-        if (GUILayout.Button("技能Icon路径"))
+        if (GUILayout.Button("BuffIcon路径"))
         {
-            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.Icon, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.Icon, this.position);
         }
+        if (GUILayout.Button("Buff持续时间"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.BuffTime, this.position);
+        }
+        if (GUILayout.Button("Buff类型"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.BuffType, this.position);
+        }
+        if (GUILayout.Button("Buff Detach触发事件1"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.DetachTriggerLevel1, this.position);
+        }
+        if (GUILayout.Button("Buff Detach触发事件2"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.DetachTriggerLevel2, this.position);
+        }
+        if (GUILayout.Button("Buff优先级"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.BuffLevel, this.position);
+        }
+        if (GUILayout.Button("Buff所在互斥组"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.BuffGroup, this.position);
+        }
+        if (GUILayout.Button("Buff是否有益"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.IsBeneficial, this.position);
+        }
+        if (GUILayout.Button("Buff Detach 条件"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.DetachQualified, this.position);
+        }
+        if (GUILayout.Button("Buff是否死亡消失"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.IsDeadDisappear, this.position);
+        }
+        if (GUILayout.Button("Buff是否不致死"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.IsNotLethal, this.position);
+        }
+
         EditorGUILayout.EndVertical();
         #endregion
         #endregion
@@ -188,6 +231,7 @@ public class SkillScriptEditor : BaseScriptEditor
         EditorGUILayout.EndVertical();
         EditorGUILayout.EndHorizontal();
     }
+
 
 
     /// <summary>
@@ -222,10 +266,10 @@ public class SkillScriptEditor : BaseScriptEditor
                     continue;
                 }
 
-                // 如果是技能描述开始
+                // 如果是Buff描述开始
                 if (line.StartsWith("SkillNum"))
                 {
-                    // 读取技能号
+                    // 读取Buff号
                     var start = line.IndexOf("(", StringComparison.Ordinal);
                     var end = line.IndexOf(")", StringComparison.Ordinal);
                     if (start < 0 || end < 0)
@@ -239,10 +283,10 @@ public class SkillScriptEditor : BaseScriptEditor
                         throw new Exception("转换行为链失败: ()顺序错误, 行数:" + (i + 1));
                     }
 
-                    // 读取技能ID
+                    // 读取BuffID
                     var strSkillId = line.Substring(start + 1, length);
                     Num = Convert.ToInt32(strSkillId);
-                    // 创建新技能
+                    // 创建新Buff
                 }
                 else if (line.StartsWith("{"))
                 {
@@ -290,7 +334,7 @@ public class SkillScriptEditor : BaseScriptEditor
                         //var args = line.Substring(start + 1, length);
                         //// 消除参数空格
                         //args = args.Replace(" ", "");
-                        
+
                         ActionScriptContent.Add(line.Replace("\t", ""));
                     }
                     if (dataBracket)

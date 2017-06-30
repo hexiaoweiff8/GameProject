@@ -46,30 +46,36 @@ public class VOBase
     /// <summary>
     /// 火力
     /// </summary>
+    [SkillAddition]
     public float Attack1;
   
     /// <summary>
     /// 弹容量
     /// </summary>
+    [SkillAddition]
     public short Clipsize1;
 
     /// <summary>
     /// 攻击速度
     /// </summary>
+    [SkillAddition]
     public float AttackRate1;
   
     /// <summary>
     /// 装填时间
     /// </summary>
+    [SkillAddition]
     public float ReloadTime1;
    
     /// <summary>
     /// 精准度
     /// </summary>
+    [SkillAddition]
     public float Accuracy;
     /// <summary>
     /// 体积因子(受击半径)
     /// </summary>
+    [SkillAddition]
     public float SpaceSet;
     /// <summary>
     /// 散布半径
@@ -78,6 +84,7 @@ public class VOBase
     /// <summary>
     /// 防御
     /// </summary>
+    [SkillAddition]
     public float Defence;
     /// <summary>
     /// 弹道抛射角度值
@@ -86,64 +93,79 @@ public class VOBase
     /// <summary>
     /// 爆击伤害
     /// </summary>
+    [SkillAddition]
     public float CritDamage;
     /// <summary>
     /// 子弹类型
     /// </summary>
+    [SkillAddition]
     public short BulletType;
     /// <summary>
     /// 子弹速度
     /// </summary>
+    [SkillAddition]
     public float BulletSpeed;
     /// <summary>
     /// 攻击类型（单体/AOE）
     /// </summary>
+    [SkillAddition]
     public short AttackType;
     /// <summary>
     /// 多目标攻击上限
     /// </summary>
+    [SkillAddition]
     public short MultiAimMax;
     /// <summary>
     ///视野范围
     /// </summary>
+    [SkillAddition]
     public float SightRange;
     /// <summary>
     /// 是否隐形
     /// </summary>
+    [SkillAddition]
     public bool IsHide;
     /// <summary>
     /// 是否反隐形
     /// </summary>
+    [SkillAddition]
     public bool IsAntiHide;
     /// <summary>
     /// 生存时间
     /// </summary>
+    [SkillAddition]
     public float LifeTime; 
     /// <summary>
     /// 技能1
     /// </summary>
+    [SkillAddition]
     public int Skill1;
     /// <summary>
     /// 技能2
     /// </summary>
+    [SkillAddition]
     public int Skill2;
     /// <summary>
     /// 技能3
     /// </summary>
+    [SkillAddition]
     public int Skill3;
     /// <summary>
     /// 技能4
     /// </summary>
+    [SkillAddition]
     public int Skill4;
     /// <summary>
     /// 技能5
     /// </summary>
+    [SkillAddition]
     public int Skill5;
 
 
     /// <summary>
     /// 穿甲属性
     /// </summary>
+    [SkillAddition]
     public float AntiArmor
     {
         get { return _antiArmor; }
@@ -161,6 +183,7 @@ public class VOBase
     /// <summary>
     /// 战斗中的移动速度
     /// </summary>
+    [SkillAddition]
     public float MoveSpeed
     {
         get { return _moveSpeed; }
@@ -169,6 +192,7 @@ public class VOBase
     /// <summary>
     /// 攻击范围
     /// </summary>
+    [SkillAddition]
     public float AttackRange
     {
         get { return _attackRange; }
@@ -177,6 +201,7 @@ public class VOBase
     /// <summary>
     /// 命中
     /// </summary>
+    [SkillAddition]
     public float Hit
     {
         get { return _hit; }
@@ -185,6 +210,7 @@ public class VOBase
     /// <summary>
     /// 闪避
     /// </summary>
+    [SkillAddition]
     public float Dodge
     {
         get { return _dodge; }
@@ -193,6 +219,7 @@ public class VOBase
     /// <summary>
     /// 暴击概率
     /// </summary>
+    [SkillAddition]
     public float Crit
     {
         get { return _crit; }
@@ -201,6 +228,7 @@ public class VOBase
     /// <summary>
     /// 防爆率
     /// </summary>
+    [SkillAddition]
     public float AntiCrit
     {
         get { return _antiCrit; }
@@ -209,6 +237,7 @@ public class VOBase
     /// <summary>
     /// 护甲
     /// </summary>
+    [SkillAddition]
     public float Armor
     {
         get { return _armor; }
@@ -289,6 +318,7 @@ public class VOBase
     /// <summary>
     /// 总血量所有可被攻击的对象都有总血量和血量属性
     /// </summary>
+    [SkillAddition]
     public float TotalHp
     {
         get { return _totalHP; }
@@ -297,6 +327,7 @@ public class VOBase
     /// <summary>
     /// 当前实际血量[0,TotalHp]
     /// </summary>
+    [SkillAddition]
     public float CurrentHP
     {
         get { return _currentHP; }
@@ -319,6 +350,7 @@ public class VOBase
     /// <summary>
     /// 定义玩家的阵营1，我方 2 敌方
     /// </summary>
+    [SkillAddition]
     public int Camp
     {
         get { return _camp; }

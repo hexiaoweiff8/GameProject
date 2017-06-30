@@ -399,16 +399,16 @@ public class ClusterManager : ILoopItem
         member.Rotate = Vector3.up * rotate * member.RotateSpeed * Time.deltaTime;
         
         // 前进
-        Debug.DrawLine(member.Position, member.Position + member.PhysicsInfo.SpeedDirection, Color.white);
-        member.Position += member.PhysicsInfo.SpeedDirection * Time.deltaTime;
+        Debug.DrawLine(member.Position, member.Position + member.SpeedDirection, Color.white);
+        member.Position += member.SpeedDirection * Time.deltaTime;
         GetCloseMemberGrivity2(member);
         // 速度由于摩擦力的原因衰减
-        member.PhysicsInfo.SpeedDirection -= member.PhysicsInfo.SpeedDirection.normalized * Friction * Time.deltaTime;
+        member.SpeedDirection -= member.SpeedDirection.normalized * Friction * Time.deltaTime;
         // TODO 最大速度限制, 方式有待确认
-        var speed = member.PhysicsInfo.SpeedDirection.magnitude;
-        if (speed > member.PhysicsInfo.MaxSpeed)
+        var speed = member.SpeedDirection.magnitude;
+        if (speed > member.MaxSpeed)
         {
-            member.PhysicsInfo.SpeedDirection *= member.PhysicsInfo.MaxSpeed / speed;
+            member.SpeedDirection *= member.MaxSpeed / speed;
         }
     }
 
@@ -429,7 +429,7 @@ public class ClusterManager : ILoopItem
             var grivity = member.TargetPos - member.Position;
             // 如果当前方向与引力方向
             // 速度不稳定问题
-            member.PhysicsInfo.SpeedDirection = grivity.normalized * member.PhysicsInfo.MaxSpeed;
+            member.SpeedDirection = grivity.normalized * member.MaxSpeed;
 
             // 加入最大速度限制, 防止溢出
             //member.PhysicsInfo.SpeedDirection *= GetUpTopSpeed(member.PhysicsInfo.SpeedDirection.magnitude);
@@ -494,7 +494,7 @@ public class ClusterManager : ILoopItem
 
                     var minDistance = member.Diameter + closeMember.Diameter;
 
-                    var departSpeed = closeMember.PhysicsInfo.SpeedDirection - member.PhysicsInfo.SpeedDirection;
+                    var departSpeed = closeMember.SpeedDirection - member.SpeedDirection;
                     
                     // TODO 定最终拥挤方向
                     // TODO 排斥力未做
@@ -522,13 +522,13 @@ public class ClusterManager : ILoopItem
                     // 使用向量法线计算求出出射标准向量
                     // TODO 角度有问题
                     var outDir =
-                        ((member.PhysicsInfo.SpeedDirection +
-                          Vector3.Dot(member.PhysicsInfo.SpeedDirection, diffPosition) *diffPosition)*2 -
-                         member.PhysicsInfo.SpeedDirection).normalized;
+                        ((member.SpeedDirection +
+                          Vector3.Dot(member.SpeedDirection, diffPosition) *diffPosition)*2 -
+                         member.SpeedDirection).normalized;
                     
 
                     // 质量比例
-                    var qualityRate = member.PhysicsInfo.Quality * member.PhysicsInfo.Quality / (closeMember.PhysicsInfo.Quality * closeMember.PhysicsInfo.Quality);
+                    var qualityRate = member.Quality * member.Quality / (closeMember.Quality * closeMember.Quality);
                     departSpeed *= 0.5f;
 
                     // 当前对象的弹出角度为镜面弹射角度
@@ -544,10 +544,10 @@ public class ClusterManager : ILoopItem
                     }
                     // TODO 这个力和某个力冲突导致移动缓慢
                     //member.PhysicsInfo.SpeedDirection += partForMember;
-                    closeMember.PhysicsInfo.SpeedDirection -= partForCloseMember;
+                    closeMember.SpeedDirection -= partForCloseMember;
                     // 加入最大速度限制, 防止溢出
-                    member.PhysicsInfo.SpeedDirection *= GetUpTopSpeed(member.PhysicsInfo.SpeedDirection.magnitude);
-                    closeMember.PhysicsInfo.SpeedDirection *= GetUpTopSpeed(closeMember.PhysicsInfo.SpeedDirection.magnitude);
+                    member.SpeedDirection *= GetUpTopSpeed(member.SpeedDirection.magnitude);
+                    closeMember.SpeedDirection *= GetUpTopSpeed(closeMember.SpeedDirection.magnitude);
                     // 加入已对比列表
                     areadyCollisionList.Add(compereId1, true);
                     Debug.DrawLine(member.Position, partForMember + member.Position, Color.green);
@@ -584,7 +584,7 @@ public class ClusterManager : ILoopItem
             // 求聚合位置向量的垂直向量
             var transverseDir = Vector3.Cross(pressureReleaseDir, Vector3.up);
             // 随机左右
-            member.PhysicsInfo.SpeedDirection += transverseDir * member.PhysicsInfo.MaxSpeed;// * (new Random((int)DateTime.Now.Ticks).Next(10) > 5 ? -1 : 1);
+            member.SpeedDirection += transverseDir * member.MaxSpeed;// * (new Random((int)DateTime.Now.Ticks).Next(10) > 5 ? -1 : 1);
         }
     }
 
@@ -614,7 +614,7 @@ public class ClusterManager : ILoopItem
         //var collisionCouldNotThoughDir = Vector3.zero;
         //var collisionCouldNotThoughCount = 0;
         // 当前单位的体积*速度
-        var memberEnergy = member.PhysicsInfo.Quality * member.PhysicsInfo.MaxSpeed;
+        var memberEnergy = member.Quality * member.MaxSpeed;
         for (var k = 0; closeMemberList != null && k < closeMemberList.Count; k++)
         {
             var closeMember = closeMemberList[k];
@@ -645,7 +645,7 @@ public class ClusterManager : ILoopItem
 
                     var minDistance = member.Diameter + closeMember.Diameter;
 
-                    var departSpeed = closeMember.PhysicsInfo.SpeedDirection - member.PhysicsInfo.SpeedDirection;
+                    var departSpeed = closeMember.SpeedDirection - member.SpeedDirection;
 
                     // 基础排斥力
                     if (diffPosition.magnitude < minDistance)
@@ -654,7 +654,7 @@ public class ClusterManager : ILoopItem
                         // 计算不可移动方向
                         var diffPosNor = diffPosition.normalized;
                         // 对比速度与体积
-                        var closeMemberEnergy = closeMember.PhysicsInfo.MaxSpeed * closeMember.PhysicsInfo.Quality;
+                        var closeMemberEnergy = closeMember.MaxSpeed * closeMember.Quality;
 
                         collisionThoughDir += diffPosNor
                             * (minDistance / diffPosition.magnitude)
@@ -671,21 +671,21 @@ public class ClusterManager : ILoopItem
                     // 求出射角度, 出射角度*出射量
                     // 使用向量法线计算求出出射标准向量
                     var outDir =
-                        ((member.PhysicsInfo.SpeedDirection +
-                          Vector3.Dot(member.PhysicsInfo.SpeedDirection, diffPosition) * diffPosition) * 2 -
-                         member.PhysicsInfo.SpeedDirection).normalized;
+                        ((member.SpeedDirection +
+                          Vector3.Dot(member.SpeedDirection, diffPosition) * diffPosition) * 2 -
+                         member.SpeedDirection).normalized;
 
 
                     // 质量比例
-                    var qualityRate = member.PhysicsInfo.Quality * member.PhysicsInfo.Quality / (closeMember.PhysicsInfo.Quality * closeMember.PhysicsInfo.Quality);
+                    var qualityRate = member.Quality * member.Quality / (closeMember.Quality * closeMember.Quality);
                     departSpeed *= 0.5f;
 
                     // 当前对象的弹出角度为镜面弹射角度
                     var partForMember = -outDir * departSpeed.magnitude / qualityRate;
 
                     // 加入最大速度限制, 防止溢出
-                    member.PhysicsInfo.SpeedDirection *= GetUpTopSpeed(member.PhysicsInfo.SpeedDirection.magnitude);
-                    closeMember.PhysicsInfo.SpeedDirection *= GetUpTopSpeed(closeMember.PhysicsInfo.SpeedDirection.magnitude);
+                    member.SpeedDirection *= GetUpTopSpeed(member.SpeedDirection.magnitude);
+                    closeMember.SpeedDirection *= GetUpTopSpeed(closeMember.SpeedDirection.magnitude);
                     // 加入已对比列表
                     areadyCollisionList.Add(compereId1, true);
                     Debug.DrawLine(member.Position, partForMember + member.Position, Color.green);
@@ -720,7 +720,7 @@ public class ClusterManager : ILoopItem
             }
         }
 
-        if (member.PhysicsInfo.SpeedDirection.magnitude < 1)
+        if (member.SpeedDirection.magnitude < 1)
         {
             // 开始等待
             if (member.State != SchoolItemState.Waiting && member.State != SchoolItemState.Complete)

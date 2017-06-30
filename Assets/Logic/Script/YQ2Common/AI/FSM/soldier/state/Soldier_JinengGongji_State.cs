@@ -25,19 +25,11 @@ public class Soldier_JinengGongji_State : SoldierFSMState
         // fsm 中带技能
         if (fsm.IsCanInJinenggongji && fsm.EnemyTarget.ClusterData != null && fsm.EnemyTarget.GameObj != null)
         {
-            SkillManager.Single.DoShillInfo(fsm.Skill, new FormulaParamsPacker()
-            {
-                DataList = fsm.Skill.DataList,
-                // TODO 技能等级, 最大目标数量
-                SkillLevel = 1,
-                SkillNum = fsm.Skill.Num,
-                ReceiverMenber = fsm.EnemyTarget,
-                ReleaseMember = fsm.Display,
-                StartPos = fsm.Display.ClusterData.gameObject.transform.position,
-                TargetPos = fsm.EnemyTarget.ClusterData.gameObject.transform.position
-            });
+            SkillManager.Single.DoShillInfo(fsm.Skill, FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(fsm.Skill,
+                fsm.Display,
+                fsm.EnemyTarget));
             // 攻击动作
-            var myself = fsm.Display.RanderControl;
+            //var myself = fsm.Display.RanderControl;
             // TODO 部分模型没有攻击动作, 会报错
             //myself.ModelRander.SetClip("attack".GetHashCode());
 

@@ -1,0 +1,15 @@
+SkillNum(10000)
+Action
+{
+	PointToPoint(, , , , , , );
+}
+Attach
+{
+	PointToPoint(, , , , , , );
+}
+Detach
+{
+	PointToObj(, , , , );
+}
+[
+]

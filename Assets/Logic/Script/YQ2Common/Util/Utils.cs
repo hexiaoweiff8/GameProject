@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection.Emit;
 using System.Security.Cryptography;
 using System.Text;
+using JetBrains.Annotations;
 using UnityEngine;
 using Random = System.Random;
 
@@ -192,6 +195,11 @@ public class Utils
     public const int BaseBaseId = 220001000;
 
     // ----------------------------基地BaseID---------------------------------
+
+    // ----------------------------操作---------------------------------------
+
+
+    // ----------------------------操作---------------------------------------
 
 
     /// <summary>
@@ -399,6 +407,37 @@ public class Utils
         }
         return head;
     }
+
+    /// <summary>
+    /// 表达式树转换字符串对比数据
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="op"></param>
+    /// <returns></returns>
+    public static Expression<Func<T, T, bool>> Generate<T>(string op)
+    {
+        ParameterExpression x = Expression.Parameter(typeof(T), "x");
+        ParameterExpression y = Expression.Parameter(typeof(T), "y");
+        return Expression.Lambda<Func<T, T, bool>>
+        (
+            (op.Equals(">")) ? Expression.GreaterThan(x, y) :
+                (op.Equals("<")) ? Expression.LessThan(x, y) :
+                    (op.Equals(">=")) ? Expression.GreaterThanOrEqual(x, y) :
+                        (op.Equals("<=")) ? Expression.LessThanOrEqual(x, y) :
+                            (op.Equals("!=")) ? Expression.NotEqual(x, y) :
+                                Expression.Equal(x, y),
+            x,
+            y
+        );
+    }
+
+
+    public static Func<T, T, bool> GetCompare<T>(string op)
+    {
+        return Generate<T>(op).Compile();
+    } 
+
+    // -----------------------------图形-----------------------------------
 
     /// <summary>
     /// 绘制图形

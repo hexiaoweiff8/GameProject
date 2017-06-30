@@ -33,6 +33,7 @@ public class TargetSelecter
     /// <summary>
     /// 筛选对象
     /// TODO 优化
+    /// TODO 选择己方目标不用去掉自己
     /// </summary>
     /// <typeparam name="T">对象类型. 必须继承</typeparam>
     /// <param name="searchObj">搜索对象</param>

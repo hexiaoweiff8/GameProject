@@ -14,7 +14,7 @@ public class PositionObjectWrap
 		L.RegVar("MemberData", get_MemberData, set_MemberData);
 		L.RegVar("MyCollisionGraphics", get_MyCollisionGraphics, set_MyCollisionGraphics);
 		L.RegVar("Id", get_Id, null);
-		L.RegVar("PhysicsInfo", get_PhysicsInfo, null);
+        //L.RegVar("PhysicsInfo", get_PhysicsInfo, null);
 		L.RegVar("Diameter", get_Diameter, set_Diameter);
 		L.RegVar("Position", get_Position, set_Position);
 		L.RegVar("X", get_X, set_X);
@@ -135,24 +135,24 @@ public class PositionObjectWrap
 		}
 	}
 
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_PhysicsInfo(IntPtr L)
-	{
-		object o = null;
+    //[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+    //static int get_PhysicsInfo(IntPtr L)
+    //{
+    //    object o = null;
 
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			PositionObject obj = (PositionObject)o;
-			PhysicsInfo ret = obj.PhysicsInfo;
-			ToLua.PushObject(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index PhysicsInfo on a nil value" : e.Message);
-		}
-	}
+    //    try
+    //    {
+    //        o = ToLua.ToObject(L, 1);
+    //        PositionObject obj = (PositionObject)o;
+    //        PhysicsInfo ret = obj.PhysicsInfo;
+    //        ToLua.PushObject(L, ret);
+    //        return 1;
+    //    }
+    //    catch(Exception e)
+    //    {
+    //        return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index PhysicsInfo on a nil value" : e.Message);
+    //    }
+    //}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_Diameter(IntPtr L)

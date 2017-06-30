@@ -52,65 +52,146 @@ public class TriggerTicker : ILoopItem
     private IDictionary<long, long> beTriggerTimeDic = new Dictionary<long, long>();
 
     /// <summary>
-    /// 被删除的Key列表
+    /// Tick变更列表
     /// </summary>
-    private IList<long> delList = new List<long>();
+    private IDictionary<long, long> changeDic = new Dictionary<long, long>();
+
+    /// <summary>
+    /// Detach的Buff列表
+    /// </summary>
+    private IList<BuffInfo> delList = new List<BuffInfo>();
 
     // ---------------------------私有属性-------------------------------
 
 
     // -------------------------公共方法-------------------------------
 
+    /// <summary>
+    /// 添加技能id到ticker中
+    /// </summary>
+    /// <param name="skill"></param>
+    public void Add(SkillBase skill)
+    {
+        if (skill == null)
+        {
+            throw new Exception("被Ticker技能为空");
+        }
+        beTriggerTimeDic.Add(skill.AddtionId, (long)(skill.TickTime * 1000) + DateTime.Now.Ticks);
+    }
+
+    /// <summary>
+    /// 是否包含指定id
+    /// </summary>
+    /// <param name="addtionId"></param>
+    /// <returns></returns>
+    public bool Contains(long addtionId)
+    {
+        return beTriggerTimeDic.ContainsKey(addtionId);
+    }
+
+    /// <summary>
+    /// 删除指定id
+    /// </summary>
+    /// <param name="addtionId"></param>
+    public void Remove(long addtionId)
+    {
+        if (Contains(addtionId))
+        {
+            beTriggerTimeDic.Remove(addtionId);
+        }
+    }
 
     public void Do()
     {
-        BuffInfo tmpBuffInfo = null;
-        var nowTickTime = DateTime.Now.Ticks;
-        // tick所有走时间的Trigger 
-        foreach (var item in beTriggerTimeDic)
+        lock (beTriggerTimeDic)
         {
-            var buffId = item.Key;
-            var lastTick = item.Value;
-            if (BuffManager.Instance().ContainsBuffId(buffId))
+            var nowTickTime = DateTime.Now.Ticks;
+            // tick所有走时间的Trigger 
+            foreach (var item in beTriggerTimeDic)
             {
-                // 检测
-                tmpBuffInfo = BuffManager.Instance().GetBuffInstance(buffId);
-                if (tmpBuffInfo != null)
+                var id = item.Key;
+                var lastTick = item.Value;
+                var tickDiff = nowTickTime - lastTick;
+                if (BuffManager.Single.ContainsInstanceBuffId(id))
                 {
-                    // 检测上次tick与上次tick的时差, 超过或相等的执行action一次, 并更新tick
-                    var tickDiff = nowTickTime - lastTick;
-                    if (tickDiff >= tmpBuffInfo.TickTime*1000)
+                    // 检测
+                    var tmpBuffInfo = BuffManager.Single.GetBuffInstance(id);
+                    if (tmpBuffInfo != null)
                     {
-                        // 执行buff的Action
-                        BuffManager.Instance().DoBuff(tmpBuffInfo, BuffDoType.Action);
-                        // 并更新tick时间
-                        beTriggerTimeDic[buffId] = nowTickTime;
-                    }
+                        // 检测上次tick与上次tick的时差, 超过或相等的执行action一次, 并更新tick
+                        if (tickDiff >= tmpBuffInfo.TickTime*10000000)
+                        {
+                            // 执行buff的Action
+                            BuffManager.Single.DoBuff(tmpBuffInfo, BuffDoType.Action, FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(tmpBuffInfo.ReleaseMember, tmpBuffInfo.ReceiveMember, tmpBuffInfo, 1, tmpBuffInfo.IsNotLethal));
+                            // 并更新tick时间
+                            changeDic.Add(id, nowTickTime);
+                            //beTriggerTimeDic[id] = nowTickTime;
+                        }
 
-                    // 检测buff是否到时见
-                    // 到达极限时间buff直接Detach
-                    var buffStartTimeDiff = nowTickTime - tmpBuffInfo.BuffStartTime;
-                    if (buffStartTimeDiff > tmpBuffInfo.BuffTime*1000)
-                    {
-                        // buff Detach
-                        BuffManager.Instance().DoBuff(tmpBuffInfo, BuffDoType.Detach);
+                        // 检测buff是否到时见
+                        // 到达极限时间buff直接Detach
+                        var buffStartTimeDiff = nowTickTime - tmpBuffInfo.BuffStartTime;
+                        if (buffStartTimeDiff > tmpBuffInfo.BuffTime*10000000)
+                        {
+                            // buff Detach
+                            delList.Add(tmpBuffInfo);
+                        }
+
                     }
-                     
+                    //else
+                    //{
+                    //    // buff已销毁 删除本地buff时间记录
+                    //    delList.Add(id);
+                    //}
                 }
-                else
+                else if (SkillManager.Single.ContainsInstanceSkillId(id))
                 {
-                    // buff已销毁 删除本地buff时间记录
-                    delList.Add(buffId);
+                    // TODO tick类技能必须以选择目标的标记其实(因为没有初始目标)
+                    // TODO 检测技能Ticker
+                    var tmpSkillInfo = SkillManager.Single.GetSkillInstance(id);
+                    if (tmpSkillInfo != null)
+                    {
+                        if (tickDiff >= tmpSkillInfo.TickTime*10000000)
+                        {
+                            // 执行skill
+                            //SkillManager.Single.DoShillInfo(tmpSkillInfo,
+                            //    FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(
+                            //    tmpSkillInfo.ReleaseMember,
+                            //        null,
+                            //        tmpSkillInfo,
+                            //        - 1));
+
+                            // 抛出事件
+                            SkillManager.Single.SetTriggerData(new TriggerData()
+                            {
+                                ReceiveMember = tmpSkillInfo.ReleaseMember,
+                                ReleaseMember = tmpSkillInfo.ReleaseMember,
+                                TypeLevel1 = TriggerLevel1.Time,
+                                TypeLevel2 = TriggerLevel2.TickTime
+                            });
+
+                            // 并更新tick时间
+                            changeDic.Add(id, nowTickTime);
+                        }
+                    }
                 }
             }
-        }
 
-        // 删除列表内的key
-        foreach (var itemKey in delList)
-        {
-            beTriggerTimeDic.Remove(itemKey);
+            // 删除列表内的key
+            foreach (var buff in delList)
+            {
+                //beTriggerTimeDic.Remove(itemKey);
+                BuffManager.Single.DoBuff(buff, BuffDoType.Detach, FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(buff.ReleaseMember, buff.ReceiveMember, buff, 1, buff.IsNotLethal));
+            }
+            delList.Clear();
+
+            // 变更tick
+            foreach (var item in changeDic)
+            {
+                beTriggerTimeDic[item.Key] = item.Value;
+            }
+            changeDic.Clear();
         }
-        delList.Clear();
     }
 
     public bool IsEnd()

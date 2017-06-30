@@ -174,7 +174,10 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
             }
 
             // 获取周围单位DisplayOwner列表
-            var packerList = FormulaParamsPackerFactroy.Single.GetFormulaParamsPackerList(graphics, paramsPacker.StartPos, myTargetCamps,
+            var packerList = FormulaParamsPackerFactroy.Single.GetFormulaParamsPackerList(graphics, 
+                paramsPacker.StartPos, 
+                myTargetCamps,
+                paramsPacker.Skill,
                 paramsPacker.TargetMaxCount);
             // 排除不可选择目标
             for (var i = 0; i < packerList.Count; i++)

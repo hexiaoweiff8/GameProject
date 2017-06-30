@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Random = System.Random;
 
 public class AstarTest : MonoBehaviour {
@@ -118,6 +119,8 @@ public class AstarTest : MonoBehaviour {
     /// 集群单位列表
     /// </summary>
     private IList<PositionObject> itemList = new List<PositionObject>();
+
+
     
 
     void Start ()
@@ -163,6 +166,7 @@ public class AstarTest : MonoBehaviour {
         {
             If(1, 0, Health, 0_100)
             {
+                HealthChange(1,0,0,0,1)
                 //PointToObj(1,test/TrailPrj,10,0,10,1,10),
                 Point(1,test/ExplordScope,1,%1,10,1,10),   
             }
@@ -177,19 +181,90 @@ public class AstarTest : MonoBehaviour {
             100, 5
         ]
 ";
+        string formulaStr6 = @"SkillNum(1006)
+        {
+            HealthChange(1,0,0,0,1)
+        }
+
+";
+
+        string formulaStr7 = @"SkillNum(1007)
+        {
+            SlideCollisionDetection(1, 1, %0, 40, -1)
+            {
+                If(1, 0, Health, 0_100)
+                {
+                    Buff(1,1007)
+                    Buff(1,1008)
+                    //PointToObj(1,test/TrailPrj,10,0,10,1,10),
+                    Point(1,test/ExplordScope,1,%1,10,1,10),   
+                }
+            }
+        }
+
+        [
+            TriggerLevel1(1)
+            TriggerLevel2(1)
+            Description(哟哦哦{%0},哦哟哦哟{%1})
+            100, 5
+        ]
+"; 
+        string buffStr1 = @"BuffNum(1007)
+        Action
+        {
+            HealthChange(1,0,0,0,1)
+        }
+
+        [
+            TickTime(1)
+            BuffTime(10)
+            TriggerLevel1(4)
+            TriggerLevel2(18)
+            BuffLevel(1)
+            BuffGroup(1)
+            ChangeData(CurrentHP,100,0)
+        ]
+";
+
+        string buffStr2 = @"BuffNum(1008)
+        Action
+        {
+            ResistDemage(1,3,1,true)
+        }
+        [
+            BuffTime(10)
+            TriggerLevel1(3)
+            TriggerLevel2(10)
+            DetachTriggerLevel1(3)
+            DetachTriggerLevel2(10)
+            DetachQualified(ResistDemage,<=,0.0)
+        ]
+";
+
+
         var skillInfo = FormulaConstructor.SkillConstructor(formulaStr);
         var skillInfo2 = FormulaConstructor.SkillConstructor(formulaStr2);
         var skillInfo3 = FormulaConstructor.SkillConstructor(formulaStr3);
         var skillInfo4 = FormulaConstructor.SkillConstructor(formulaStr4);
         var skillInfo5 = FormulaConstructor.SkillConstructor(formulaStr5);
-        var buffInfo1 = FormulaConstructor.BuffConstructor(formulaStr5);
+        var skillInfo7 = FormulaConstructor.SkillConstructor(formulaStr7);
+        var buffInfo1 = FormulaConstructor.BuffConstructor(buffStr1);
+        var buffInfo2 = FormulaConstructor.BuffConstructor(buffStr2);
+
         SkillManager.Single.AddSkillInfo(skillInfo);
         SkillManager.Single.AddSkillInfo(skillInfo2);
         SkillManager.Single.AddSkillInfo(skillInfo3);
         SkillManager.Single.AddSkillInfo(skillInfo4);
         SkillManager.Single.AddSkillInfo(skillInfo5);
+        SkillManager.Single.AddSkillInfo(skillInfo7);
+        BuffManager.Single.AddBuffInfo(buffInfo1);
+        BuffManager.Single.AddBuffInfo(buffInfo2);
+
+        // 启动TriggerTicker
+        TriggerTicker.Single.Start();
+
         Debug.Log(skillInfo5.GetReplacedDescription(1));
-        Debug.Log(buffInfo1.GetReplacedDescription(1));
+        //Debug.Log(buffInfo1.GetReplacedDescription(1));
         // 设定帧数
         Application.targetFrameRate = 60;
         mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
@@ -197,6 +272,52 @@ public class AstarTest : MonoBehaviour {
         ClusterManager.Single.Init(loadMapPos.x + LoadMap.MapWidth * LoadMap.UnitWidth, loadMapPos.z + LoadMap.MapHeight * LoadMap.UnitWidth, MapWidth, MapHeight, UnitWidth, null);
         InitMapInfo();
         DisplayerManager.AutoInstance();
+
+        // 测试
+        //var data = new VOBase();
+        //data.CurrentHP = 100;
+        //var changeData = new VOBase();
+        //changeData.CurrentHP = 100;
+        //var property = data.GetType().GetProperty("CurrentHP");
+        //// TODO 测试
+        //property.SetValue(data, Convert.ChangeType(10, property.PropertyType), null);
+        //Debug.Log(data.CurrentHP);
+        // 测试获取有特性的属性
+        //var propertyList = typeof(VOBase).GetProperties().Where((property) =>
+        //{
+        //    Debug.Log(property.Name);
+        //    if (property.GetCustomAttributes(typeof(SkillAddition), false).Any())
+        //    {
+        //        return true;
+        //    }
+        //    return false;
+        //});
+        //Debug.Log(propertyList.Count());
+        //foreach (var property in propertyList)
+        //{
+        //    ChangeDataType changeDataType = ChangeDataType.Absolute;
+        //    // 读取赋值类型, 如果没有则默认使用绝对值
+        //    // 修改float类型属性
+        //    if (property.PropertyType == typeof(float))
+        //    {
+        //        var sourceValue = Convert.ToSingle(property.GetValue(data, null));
+        //        var plusValue = Convert.ToSingle(property.GetValue(changeData, null)) * (changeDataType == ChangeDataType.Absolute ? 1 : sourceValue);
+        //        property.SetValue(data, sourceValue + plusValue, null);
+        //    }
+        //    // 修改bool类型属性
+        //    else if (property.PropertyType == typeof(bool))
+        //    {
+        //        property.SetValue(data, Convert.ToBoolean(property.GetValue(changeData, null)), null);
+        //    }
+        //    // 修改int,short,long类型属性
+        //    else if (property.PropertyType == typeof(long) || property.PropertyType == typeof(short) || property.PropertyType == typeof(int))
+        //    {
+        //        var sourceValue = Convert.ToInt64(property.GetValue(data, null));
+        //        var plusValue = Convert.ToInt64(property.GetValue(changeData, null)) * (changeDataType == ChangeDataType.Absolute ? 1 : sourceValue);
+        //        property.SetValue(data, Convert.ChangeType((sourceValue + plusValue), property.PropertyType), null);
+        //    }
+        //}
+        //Debug.Log(data.CurrentHP);
     }
     
     void Update()
@@ -204,6 +325,9 @@ public class AstarTest : MonoBehaviour {
         // 控制
         Control();
         Scan();
+        // 显示数据
+        Log();
+        CheckTrigger();
     }
 
 
@@ -235,7 +359,7 @@ public class AstarTest : MonoBehaviour {
             if (hit.collider != null && hit.collider.name.Equals(LoadMap.MapPlane.name))
             {
                
-                SkillManager.Single.DoSkillNum(1005, new FormulaParamsPacker()
+                SkillManager.Single.DoSkillNum(1007, new FormulaParamsPacker()
                 {
                     StartPos = new Vector3(hit.point.x, 0, hit.point.z),
                     TargetPos = new Vector3(hit.point.x - 40, 0, hit.point.z + 40),
@@ -342,6 +466,124 @@ public class AstarTest : MonoBehaviour {
         DrawCloseMap(AStarPathFinding.closePathMap);
     }
 
+
+    public void Log()
+    {
+        foreach (var item in itemList)
+        {
+            if (item is ClusterData)
+            {
+                Debug.Log(item.AllData.MemberData.CurrentHP);
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// 检测当前单位的触发事件
+    /// </summary>
+    private void CheckTrigger()
+    {
+        if (scaner == null)
+        {
+            return;
+        }
+        var alldata = scaner.AllData;
+        if (alldata.MemberData != null && alldata.SkillInfoList != null)
+        {
+            // 触发当前单位的所有事件
+            SkillManager.Single.SetEachAction(alldata.MemberData.ObjID, (type1, type2, trigger) =>
+            {
+                // 触发skill类
+                SkillManager.Single.CheckAndDoSkillInfo(alldata.SkillInfoList, trigger);
+                // 触发buff类
+                BuffManager.Single.CheckAndDoBuffInfo(alldata.BuffInfoList, trigger);
+            },
+            true);
+
+            // 结算技能伤害/治疗
+            SettlementDamageOrCure();
+        }
+    }
+
+    /// <summary>
+    /// 结算当前单位的血量
+    /// </summary>
+    private void SettlementDamageOrCure()
+    {
+        var alldata = scaner.AllData;
+        var isOneHealth = false;
+        if (alldata.MemberData != null && alldata.SkillInfoList != null)
+        {
+            var demage = 0f;
+            var cure = 0f;
+
+            // 先计算治疗量
+            var cureList = SkillManager.Single.GetSkillTriggerDataList(alldata.MemberData.ObjID, TriggerLevel1.Fight, TriggerLevel2.BeCure);
+            if (cureList != null && cureList.Count > 0)
+            {
+                // 计算治疗量总和
+                cure += cureList.Sum(attackMember => attackMember.HealthChangeValue);
+            }
+
+            // 再计算伤害量
+            // 获取被击列表
+            var attackList = SkillManager.Single.GetSkillTriggerDataList(alldata.MemberData.ObjID, TriggerLevel1.Fight, TriggerLevel2.BeAttack);
+            // 检测是否被击
+            if (attackList != null && attackList.Count > 0)
+            {
+                // 计算血量变动总和
+                // 这里返回的都是负值所以使用+=
+                demage += attackList.Sum(attackMember => attackMember.HealthChangeValue);
+
+                // 如果单位死亡在抛出一个死亡事件
+                // 检测致死攻击
+                if (alldata.MemberData.CurrentHP - demage < Utils.ApproachZero)
+                {
+                    // 检测最后一个
+                    var lastHitMember = attackList[attackList.Count - 1];
+                    // 并判断该伤害是否致死, 如果不致死则生命值设置为1
+                    if (lastHitMember.IsNotLethal)
+                    {
+                        isOneHealth = true;
+                    }
+                    else
+                    {
+                        // 抛出致死攻击事件
+                        SkillManager.Single.SetTriggerData(new TriggerData()
+                        {
+                            HealthChangeValue = lastHitMember.HealthChangeValue,
+                            ReceiveMember = lastHitMember.ReceiveMember,
+                            ReleaseMember = lastHitMember.ReleaseMember,
+                            TypeLevel1 = TriggerLevel1.Fight,
+                            TypeLevel2 = TriggerLevel2.LethalHit
+                        });
+                    }
+                }
+
+
+                // 如果有伤害吸收则将伤害计算到技能的伤害吸收中
+                if (demage < Utils.ApproachZero)
+                {
+                    // 检测是否有伤害吸收的buff/skill
+                    // 触发吸收伤害事件
+                }
+
+                // 结算血量变动
+                if (isOneHealth)
+                {
+                    // 收到非致死超过血量的伤害, 生命值设置为1
+                    scaner.AllData.MemberData.CurrentHP = 1;
+                }
+                else
+                {
+                    // 正常扣血
+                    scaner.AllData.MemberData.CurrentHP += cure + demage;
+                }
+            }
+        }
+    }
+
     /// <summary>
     /// 初始化
     /// </summary>
@@ -436,46 +678,6 @@ public class AstarTest : MonoBehaviour {
     //    return map;
     //}
 
-
-    /// <summary>
-    /// TODO 解码地图数据
-    /// </summary>
-    /// <param name="mapInfoJson">地图数据json</param>
-    /// <returns>地图数据数组</returns>
-    private int[][] DeCodeInfo(string mapInfoJson)
-    {
-        if (string.IsNullOrEmpty(mapInfoJson))
-        {
-            return null;
-        }
-        // 读出数据
-        var mapLines = mapInfoJson.Split('\n');
-
-        int[][] mapInfo = new int[mapLines.Length - 1][];
-        for (var row = 0; row < mapLines.Length; row++)
-        {
-            var line = mapLines[row];
-            if (string.IsNullOrEmpty(line))
-            {
-                continue;
-            }
-            var cells = line.Split(',');
-            // Debug.Log(line);
-            mapInfo[row] = new int[cells.Length];
-            for (int col = 0; col < cells.Length; col++)
-            {
-                if (string.IsNullOrEmpty(cells[col].Trim()))
-                {
-                    continue;
-                }
-                //Debug.Log(cells[col]);
-                mapInfo[row][col] = int.Parse(cells[col]);
-            }
-        }
-
-        return mapInfo;
-    }
-
     /// <summary>
     /// 集群功能
     /// 组建集群开始根据路径点移动
@@ -515,12 +717,12 @@ public class AstarTest : MonoBehaviour {
             };
             //school.GroupId = 1;
             // TODO 物理信息中一部分来自于数据
-            school.PhysicsInfo.MaxSpeed = 10;
+            school.MaxSpeed = 10;
             school.RotateSpeed = 10;
             school.transform.localPosition = new Vector3((i % 3) * 2 + start.x, start.y, i / 3 * 2 + start.z);
             school.name = "item" + i;
             school.TargetPos = target;
-            school.Diameter = (i) % 5 + 1;
+            school.Diameter = 5;
             school.PushTargetList(Utils.NumToPostionByList(LoadMap.transform.position, cloneList, UnitWidth, MapWidth, MapHeight));
             //school.Moveing = (a) => { Debug.Log(a.name + "Moving"); };
 
@@ -551,8 +753,14 @@ public class AstarTest : MonoBehaviour {
             fightData.DistanceMaxWeight = 0;
             fightData.DistanceMinWeight = 10;
             school.AllData.SelectWeightData = fightData;
-            school.AllData.MemberData.CurrentHP = 10;
+            school.AllData.MemberData.CurrentHP = 99;
             school.AllData.MemberData.TotalHp = 100;
+
+            // 创建测试技能
+            school.AllData.SkillInfoList=new List<SkillInfo>()
+            {
+                
+            };
 
             itemList.Add(school);
             ClusterManager.Single.Add(school);

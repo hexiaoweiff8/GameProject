@@ -26,12 +26,6 @@ public class SkillInfo : SkillBase
     /// </summary>
     public int ReleaseTime { get; set; }
 
-
-    /// <summary>
-    /// 每隔TickTime执行一次
-    /// </summary>
-    public float TickTime { get; set; }
-
     /// <summary>
     /// 描述
     /// </summary>
@@ -78,15 +72,15 @@ public class SkillInfo : SkillBase
         return actionFormulaItem;
     }
 
-    public IFormulaItem GetAttachFormulaItem()
-    {
-        return attachFormulaItem;
-    }
+    //public IFormulaItem GetAttachFormulaItem()
+    //{
+    //    return attachFormulaItem;
+    //}
 
-    public IFormulaItem GetDetachFormulaItem()
-    {
-        return detachFormulaItem;
-    }
+    //public IFormulaItem GetDetachFormulaItem()
+    //{
+    //    return detachFormulaItem;
+    //}
 
     /// <summary>
     /// 获取行为链
@@ -95,41 +89,17 @@ public class SkillInfo : SkillBase
     /// <returns>行为链</returns>
     public IFormula GetFormula(FormulaParamsPacker paramsPacker)
     {
+        IFormula result = null;
         if (paramsPacker == null)
         {
             throw new Exception("参数封装为空.");
         }
-        IFormula result = null;
-
         if (actionFormulaItem == null)
         {
-            return null;
+            return result;
         }
-        // 循环构建行为链构造器
-        var tmpItem = actionFormulaItem;
-        // 数据列表放入packer中
-        paramsPacker.DataList = DataList;
-        // 技能ID放入packer中
-        paramsPacker.SkillNum = Num;
-        while (tmpItem != null)
-        {
-            if (result != null)
-            {
-                result = result.After(tmpItem.GetFormula(paramsPacker));
-            }
-            else
-            {
-                result = tmpItem.GetFormula(paramsPacker);
-            }
-            tmpItem = tmpItem.NextFormulaItem;
-        }
+        result = GetIFormula(paramsPacker, actionFormulaItem);
 
-        // 构造器不为空
-        if (result != null)
-        {
-            // 获取构造器链head
-            result = result.GetFirst();
-        }
         return result;
     }
 

@@ -327,7 +327,7 @@ public class TestTargetSelecter : MonoBehaviour
             //    MoveSpeed = 60
             //};
             // TODO 物理信息中一部分来自于数据
-            member.PhysicsInfo.MaxSpeed = 10;
+            member.MaxSpeed = 10;
             member.RotateSpeed = 10;
             member.transform.localPosition = new Vector3((i % 3) * 2 + x, 0, i / 3 * 2 + y);
             member.name = "item" + i;

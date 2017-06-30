@@ -26,6 +26,9 @@ public static class FormulaConstructor
         {"Pause", typeof(PauseFormulaItem)},
         {"Move", typeof(MoveFormulaItem)},
         {"If", typeof(IfFormulaItem)},
+        {"Buff", typeof(BuffFormulaItem)},
+        {"HealthChange", typeof(HealthChangeFormulaItem)},
+        {"ResistDemage", typeof(ResistDemageFormulaItem)},
     };
 
 
@@ -196,6 +199,8 @@ public static class FormulaConstructor
 
     // -----------------结算--------------------
     // Calculate 结算                   参数 是否等待完成,伤害或治疗(0,1),伤害/治疗值
+    // HealthChange 生命值变动          参数 是否等待完成,生命值变动类型(0固定值,1百分比), 伤害/治疗(0伤害, 1治疗), 目标(0 释放者自己,1 选定的目标单位), 伤害/治疗值(如果是百分比的话这里填1为秒杀100%, 填0.01位1%)
+    // ResistDemage 伤害吸收            参数 是否等待完成,吸收量,吸收百分比(0-1),是否吸收过量伤害
 
     // -----------------技能--------------------
     // Skill 释放技能                   参数 是否等待完成,技能编号
@@ -206,6 +211,10 @@ public static class FormulaConstructor
     // -----------------条件选择----------------
     // If 条件选择                      参数 是否等待完成,条件
     // --HealthScope 血量范围选择       参数 是否等待完成,血量下限(最小0), 血量上限(最大100)
+    
+    // -----------------操作属性----------------
+    // ChangeData(属性名称(对应类里的属性名),变更值, 数据变更类型(0:绝对值(加), 1: 百分比(乘)))
+    // 
     // 
 
     // -----------------数据--------------------
@@ -247,6 +256,10 @@ public static class FormulaConstructor
             IFormulaItem detachFormulaItem = new PauseFormulaItem();
             IFormulaItem tmpItem = null;
 
+            var isAction = false;
+            var isAttach = false;
+            var isDetach = false;
+
             // 解析字符串
             // 根据对应行为列表创建Formula
             var infoLines = info.Split('\n');
@@ -280,20 +293,31 @@ public static class FormulaConstructor
                     // 创建新技能
                     result = new BuffInfo(buffId);
                 }
-                else if (line.StartsWith("Action"))
+                else if (line.Equals("Action"))
                 {
                     // buff触发时行为
-                    tmpItem = actionFormulaItem;
+                    //tmpItem = actionFormulaItem;
+                    isAction = true;
+                    isAttach = false;
+                    isDetach = false;
                 }
-                else if (line.StartsWith("Attach"))
+                else if (line.Equals("Attach"))
                 {
                     // buff 创建时行为
-                    tmpItem = attachFormulaItem;
+                    //tmpItem = attachFormulaItem;
+
+                    isAction = false;
+                    isAttach = true;
+                    isDetach = false;
                 }
-                else if (line.StartsWith("Detach"))
+                else if (line.Equals("Detach"))
                 {
                     // buff 销毁时行为
-                    tmpItem = detachFormulaItem;
+                    //tmpItem = detachFormulaItem;
+
+                    isAction = false;
+                    isAttach = false;
+                    isDetach = true;
                 }
                 else if (line.StartsWith("{"))
                 {
@@ -302,7 +326,26 @@ public static class FormulaConstructor
 
                     // 将上级FormulaItem push进堆栈
                     stack.Push(tmpItem);
-                    tmpItem = null;
+                    // 如果是第一级的则根据不同行为分派不同formulaItem
+                    if (stackLevel == 1)
+                    {
+                        if (isAttach)
+                        {
+                            tmpItem = attachFormulaItem;
+                        }
+                        else if (isAction)
+                        {
+                            tmpItem = actionFormulaItem;
+                        }
+                        else if (isDetach)
+                        {
+                            tmpItem = detachFormulaItem;
+                        }
+                    }
+                    else
+                    {
+                        tmpItem = null;
+                    }
                 }
                 else if (line.StartsWith("}"))
                 {
@@ -403,13 +446,17 @@ public static class FormulaConstructor
         // 是否为增益buff
         IsBeneficial(true)
         // 调整值
-        ChangeData
+        ChangeData(属性名称(对应类里的属性名),变更值, 数据变更类型(0:绝对值(加), 1: 百分比(乘)))
         // 数值变更类型 0: 绝对值(加), 1: 百分比(乘)
-        ChangeDataType(0)
+        // ChangeDataType(0)
         // buff 存在状态
         ExistType(0)
         // 是否死亡消失
-        IsDeadDisappear(1)
+        IsDeadDisappear(true)
+        // 是否不致死 默认致死
+        IsNotLethal(true)
+        // detach条件 key为每个节点存储在技能中的数据, 操作符判断相等与大小, 值
+        DetachQualified(key,<,10)
      
         Description(交换空间撒很快就阿萨德阖家安康收到货%0, %1)
         // 数据
@@ -523,41 +570,70 @@ public static class FormulaConstructor
             {
                 case "CDTime":
                 {
-                    skillInfo.CDTime = Convert.ToSingle(line.Substring(start + 1, length));
+                    skillInfo.CDTime = Convert.ToSingle(line.Substring(start + 1, length).Trim());
                 }
                     break;
                 case "CDGroup":
                 {
-                    skillInfo.CDGroup = Convert.ToInt32(line.Substring(start + 1, length));
+                    skillInfo.CDGroup = Convert.ToInt32(line.Substring(start + 1, length).Trim());
                 }
-                    break;
+                break;
+                case "ChangeData":
+                {
+                    // 使用反射获得数据
+                    skillInfo.ChangeData = new VOBase();
+                    // 获取值
+                    var values = line.Substring(start + 1, end - start - 1).Split(',');
+                    // 属性名称
+                    var propertyName = values[0];
+                    // 属性值
+                    var propertyValue = values[1];
+                    // 属性值类型
+                    var propertyType = (ChangeDataType)Enum.Parse(typeof(ChangeDataType), values[2]);
+                    // 反射获取类中的属性
+                    var property = skillInfo.ChangeData.GetType().GetProperty(propertyName);
+                    if (property == null)
+                    {
+                        throw new Exception("属性不存在, 请检查是否正确, 区分大小写:" + propertyName);
+                    }
+                    // 如果该属性不可以被控制报错
+                    if (!property.GetCustomAttributes(typeof(SkillAddition), false).Any())
+                    {
+                        throw new Exception("该属性不可被技能控制:" + propertyName);
+                    }
+                    // 设置属性值
+                    property.SetValue(skillInfo.ChangeData, Convert.ChangeType(propertyValue, property.PropertyType), null);
+                    // 设置该属性的附加类型
+                    skillInfo.ChangeDataTypeDic.Add(propertyName, propertyType);
+                }
+                break;
                 case "ReleaseTime":
                 {
-                    skillInfo.ReleaseTime = Convert.ToInt32(line.Substring(start + 1, length));
+                    skillInfo.ReleaseTime = Convert.ToInt32(line.Substring(start + 1, length).Trim());
                 }
                     break;
                 case "TriggerLevel1":
                 {
                     // 技能触发事件level1
-                    var triggerType = (TriggerLevel1) Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+                    var triggerType = (TriggerLevel1)Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
                     skillInfo.TriggerLevel1 = triggerType;
                 }
                     break;
                 case "TriggerLevel2":
                 {
                     // 技能触发事件level2
-                    var triggerType = (TriggerLevel2) Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+                    var triggerType = (TriggerLevel2)Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
                     skillInfo.TriggerLevel2 = triggerType;
                 }
-                    break;
+                break;
                 case "Description":
                 {
-                    skillInfo.Description = line.Substring(start + 1, end - start - 1);
+                    skillInfo.Description = line.Substring(start + 1, end - start - 1).Trim();
                 }
                     break;
                 case "Icon":
                 {
-                    skillInfo.Icon = line.Substring(start + 1, end - start - 1);
+                    skillInfo.Icon = line.Substring(start + 1, end - start - 1).Trim();
                 }
                     break;
             }
@@ -577,7 +653,7 @@ public static class FormulaConstructor
 
 
     /// <summary>
-    /// 解析数据
+    /// 解析buff数据
     /// </summary>
     /// <param name="buffInfo">buff类</param>
     /// <param name="line">数据行</param>
@@ -602,78 +678,134 @@ public static class FormulaConstructor
             {
                 case "BuffTime":
                     {
-                        buffInfo.BuffTime = Convert.ToSingle(line.Substring(start + 1, length));
+                        buffInfo.BuffTime = Convert.ToSingle(line.Substring(start + 1, length).Trim());
                     }
                     break;
                 case "TickTime":
                     {
-                        buffInfo.TickTime = Convert.ToInt32(line.Substring(start + 1, length));
+                        buffInfo.TickTime = Convert.ToSingle(line.Substring(start + 1, length).Trim());
                     }
                     break;
                 case "BuffType":
                     {
-                        var buffType = (BuffType)Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+                        var buffType = (BuffType)Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
                         buffInfo.BuffType = buffType;
                     }
                     break;
                 case "TriggerLevel1":
                     {
                         // 技能触发事件level1
-                        var triggerType = (TriggerLevel1)Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+                        var triggerType = (TriggerLevel1)Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
                         buffInfo.TriggerLevel1 = triggerType;
                     }
                     break;
                 case "TriggerLevel2":
                     {
                         // 技能触发事件level2
-                        var triggerType = (TriggerLevel2)Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+                        var triggerType = (TriggerLevel2)Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
                         buffInfo.TriggerLevel2 = triggerType;
+                    }
+                    break;
+                case "DetachTriggerLevel1":
+                    {
+                        // buff Detach触发条件level1
+                        var triggerType = (TriggerLevel1)Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
+                        buffInfo.DetachTriggerLevel1 = triggerType;
+                    }
+                    break;
+                case "DetachTriggerLevel2":
+                    {
+                        // buff Detach触发条件level2
+                        var triggerType = (TriggerLevel2)Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
+                        buffInfo.DetachTriggerLevel2 = triggerType;
                     }
                     break;
                 case "BuffLevel":
                     {
-                        buffInfo.BuffLevel = Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+                        // buff优先级
+                        buffInfo.BuffLevel = Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
+                    }
+                    break;
+                case "BuffGroup":
+                    {
+                        // buff组
+                        buffInfo.BuffGroup = Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
                     }
                     break;
                 case "IsBeneficial":
                     {
-                        buffInfo.IsBeneficial = Convert.ToBoolean(line.Substring(start + 1, end - start - 1));
+                        buffInfo.IsBeneficial = Convert.ToBoolean(line.Substring(start + 1, end - start - 1).Trim());
                     }
                     break;
                 case "ChangeData":
                     {
-                        // TODO 使用反射获得数据
-                        //var triggerType = (SkillTriggerLevel2)Convert.ToInt32(line.Substring(start + 1, end - start - 1));
-                        //buffInfo.TriggerLevel2 = triggerType;
+                        // 使用反射获得数据
+                        buffInfo.ChangeData = new VOBase();
+                        // 获取值
+                        var values = line.Substring(start + 1, end - start - 1).Split(',');
+                        // 属性名称
+                        var propertyName = values[0];
+                        // 属性值
+                        var propertyValue = values[1];
+                        // 属性值类型
+                        var propertyType = (ChangeDataType)Enum.Parse(typeof(ChangeDataType), values[2]);
+                        // 反射获取类中的属性
+                        var property = buffInfo.ChangeData.GetType().GetProperty(propertyName);
+                        if (property == null)
+                        {
+                            throw new Exception("属性不存在, 请检查是否正确, 区分大小写:" + propertyName);
+                        }
+                        // 如果该属性不可以被控制报错
+                        if (!property.GetCustomAttributes(typeof (SkillAddition), false).Any())
+                        {
+                            throw new Exception("该属性不可被技能控制:" + propertyName);
+                        }
+                        // 设置属性值
+                        property.SetValue(buffInfo.ChangeData, Convert.ChangeType(propertyValue, property.PropertyType), null);
+                        // 设置该属性的附加类型
+                        buffInfo.ChangeDataTypeDic.Add(propertyName, propertyType);
                     }
                     break;
-                case "ChangeDataType":
+                //case "ExistType":
+                //    {
+                //        // buff存在状态
+                //        buffInfo.ExistType = (BuffExistType)Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
+                //    }
+                //    break;
+                case "DetachQualified":
                     {
-                        // 数据变更类型
-                        var changeDataType = (ChangeDataType)Convert.ToInt32(line.Substring(start + 1, end - start - 1));
-                        buffInfo.ChangeDataType = changeDataType;
-                    }
-                    break;
-                case "ExistType":
-                    {
-                        // buff存在状态
-                        buffInfo.ExistType = (BuffExistType)Convert.ToInt32(line.Substring(start + 1, end - start - 1));
+                        // buff的Detach条件
+                        var param = line.Substring(start + 1, end - start - 1).Trim().Split(',');
+                        var key = param[0];
+                        var op = param[1];
+                        var value = param[2];
+                        buffInfo.DetachQualifiedKeyList.Add(key);
+                        buffInfo.DetachQualifiedOptionList.Add(op);
+                        buffInfo.DetachQualifiedValueList.Add(value);
                     }
                     break;
                 case "IsDeadDisappear":
                     {
                         // buff存在状态
-                        buffInfo.IsDeadDisappear = Convert.ToBoolean(line.Substring(start + 1, end - start - 1));
+                        buffInfo.IsDeadDisappear = Convert.ToBoolean(line.Substring(start + 1, end - start - 1).Trim());
+                    }
+                    break;
+                case "IsNotLethal":
+                    {
+                        // buff是否不致死
+                        buffInfo.IsNotLethal = Convert.ToBoolean(line.Substring(start + 1, end - start - 1).Trim());
                     }
                     break;
                 case "Description":
                     {
-                        buffInfo.Description = line.Substring(start + 1, end - start - 1);
+                        // buff说明
+                        buffInfo.Description = line.Substring(start + 1, end - start - 1).Trim();
                     }
                     break;
                 case "Icon":
                     {
-                        buffInfo.Icon = line.Substring(start + 1, end - start - 1);
+                        // buff Icon
+                        buffInfo.Icon = line.Substring(start + 1, end - start - 1).Trim();
                     }
                     break;
             }
@@ -737,13 +869,13 @@ public static class FormulaConstructor
 /// </summary>
 public enum TriggerLevel1
 {
-    None = 0,   // 无触发条件
-    Scope,      // 范围内触发
-    Health,     // 血量触发(血量低于或高于XX触发)
-    Fight,      // 战斗行为触发(攻击, 被攻击, 闪避...)
-    Time,       // 时间触发(保持某状态一定时间)
-    Buff,       // Buff触发(有正面Buff时或负面Buff时, 或指定Buff时触发)
-    All         // 范围全地图触发(地方下兵或某数量大于1时触发)
+    None = 0,       // 无触发条件
+    Scope = 1,      // 范围内触发
+    Health = 2,     // 血量触发(血量低于或高于XX触发)
+    Fight = 3,      // 战斗行为触发(攻击, 被攻击, 闪避...)
+    Time = 4,       // 时间触发(保持某状态一定时间)
+    Buff = 5,       // Buff触发(有正面Buff时或负面Buff时, 或指定Buff时触发)
+    All = 6         // 范围全地图触发(地方下兵或某数量大于1时触发)
 
 }
 
@@ -752,32 +884,31 @@ public enum TriggerLevel1
 /// </summary>
 public enum TriggerLevel2
 {
-    None = 0,               // 无触发条件
-    Enemy,                  // 有敌方单位
-    Friend,                 // 有友方单位
-    NotFullHealthFriend,    // 有不满血友方单位
-    FriendDeath,            // 有友方单位死亡
-    EnemyDeath,             // 有敌方单位死亡
-    EnemyHide,              // 有敌方隐形单位
+    None = 0,                   // 无触发条件
+    Enemy = 1,                  // 有敌方单位
+    Friend = 2,                 // 有友方单位
+    NotFullHealthFriend = 3,    // 有不满血友方单位
+    FriendDeath = 4,            // 有友方单位死亡
+    EnemyDeath = 5,             // 有敌方单位死亡
+    EnemyHide = 6,              // 有敌方隐形单位
 
 
-    HealthScope,            // 血量在一定范围内
-    Attack,                 // 攻击时
-    Hit,                    // 命中时
-    BeAttack,               // 被攻击时
-    BeCure,                 // 被治疗时
-    Dodge,                  // 闪避时
-    Enter,                  // 入场时
-    EnterEnd,               // 入场结束时
-    Death,                  // 死亡时
-    FatalHit,               // 受到致死攻击时
+    HealthScope = 7,            // 血量在一定范围内
+    Attack = 8,                 // 攻击时
+    Hit = 9,                    // 命中时
+    BeAttack = 10,              // 被攻击时
+    BeCure = 11,                // 被治疗时
+    Absorption = 12,            // 伤害吸收时
+    Dodge = 13,                 // 闪避时
+    Enter = 14,                 // 入场时
+    EnterEnd = 15,              // 入场结束时
+    Death = 16,                 // 死亡时
+    LethalHit = 17,             // 受到致死攻击时
 
-    TickTime,               // 每XX秒触发一次
-    SafeTime,               // 安全XX时长时
-    ClearScope,             // 范围内XX时长无敌人时
+    TickTime = 18,              // 每XX秒触发一次
+    SafeTime = 19,              // 安全XX时长时
+    ClearScope = 20,            // 范围内XX时长无敌人时
 
-    BuffDown,               // XXBuff消失时
-    TakeBuffDie,            // 带XXBuff死亡时
-
-
+    BuffDown = 21,              // XXBuff消失时
+    TakeBuffDie = 22,           // 带XXBuff死亡时
 }

@@ -137,6 +137,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Editor\BaseScriptEditor.cs" />
+    <Compile Include="Assets\Editor\BaseTriggerScriptEditor.cs" />
+    <Compile Include="Assets\Editor\BuffScriptEditor.cs" />
+    <Compile Include="Assets\Editor\BuffTriggerScriptEditor.cs" />
     <Compile Include="Assets\Editor\SkillScriptEditor.cs" />
     <Compile Include="Assets\Editor\SkillTriggerScriptEditor.cs" />
     <Compile Include="Assets\QKLibs\Asset_EasyTouch\EasyTouchBundle\EasyTouch\Plugins\Editor\EasyTouchInspector.cs" />
@@ -428,6 +432,7 @@
     <None Include="Assets\Resources\sdata_template.txt" />
     <None Include="Assets\StreamingAssets\Android\files.txt" />
     <None Include="Assets\StreamingAssets\Android\lua\pack_script\pk_script\_tmp.txt" />
+    <None Include="Assets\StreamingAssets\Script10000.txt" />
     <None Include="Assets\StreamingAssets\SkillScript10000.txt" />
     <None Include="Assets\StreamingAssets\SkillScript10001.txt" />
     <None Include="Assets\StreamingAssets\SkillScript10002.txt" />

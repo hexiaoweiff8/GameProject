@@ -41,6 +41,39 @@ public class HurtResult
     }
 
     /// <summary>
+    /// 计算技能伤害/治疗
+    /// </summary>
+    /// <param name="target">技能目标</param>
+    /// <param name="type">伤害或治疗</param>
+    /// <param name="unitType">伤害/治疗值类型</param>
+    /// <param name="value">具体值, 必须大于等于0</param>
+    /// <returns>伤害/治疗具体量</returns>
+    public static float GetHurtForSkill(DisplayOwner target, DemageOrCure type, HealthChangeType unitType, float value)
+    {
+        if (target == null || target.ClusterData == null || target.ClusterData.AllData.MemberData == null)
+        {
+            throw new Exception("目标对象为空.");
+        }
+        if (value < 0)
+        {
+            throw new Exception("伤害/治疗值不能为负数.");
+        }
+        var result = value;
+        if (unitType == HealthChangeType.Percentage)
+        {
+            result = target.ClusterData.AllData.MemberData.TotalHp*value;
+        }
+
+        // 如果是伤害 则乘-1
+        if (type == DemageOrCure.Demage)
+        {
+            result *= -1;
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// 判断是否命中
     /// </summary>
     /// <param name="active">攻击方</param>

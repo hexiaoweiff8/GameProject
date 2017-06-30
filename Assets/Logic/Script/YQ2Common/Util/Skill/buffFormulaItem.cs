@@ -23,6 +23,33 @@ public class BuffFormulaItem : AbstractFormulaItem
 
 
     /// <summary>
+    /// 初始化
+    /// </summary>
+    /// <param name="array">数据数组</param>
+    public BuffFormulaItem(string[] array)
+    {
+        if (array == null)
+        {
+            throw new Exception("数据列表为空");
+        }
+
+        var argsCount = 2;
+        // 解析参数
+        if (array.Length < argsCount)
+        {
+            throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
+        }
+
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
+        var buffNum = GetDataOrReplace<int>("BuffNum", array, 1, ReplaceDic);
+
+        FormulaType = formulaType;
+        BuffNum = buffNum;
+    }
+
+
+
+    /// <summary>
     /// 生成buff挂载行为
     /// </summary>
     /// <param name="paramsPacker">数据</param>
@@ -49,12 +76,18 @@ public class BuffFormulaItem : AbstractFormulaItem
             throw new Exception(errorMsg);
         }
 
+        // 替换数据
+        ReplaceData(paramsPacker);
         // 数据本地化
         var myBuffTarget = BuffTarget;
         var myBuffNum = BuffNum;
         var targetDisplayOwner = myBuffTarget == 0 ? paramsPacker.ReleaseMember : paramsPacker.ReceiverMenber;
         // 创建新buff
-        var buffInfo = BuffManager.Instance().CreateBuffInfo(myBuffNum, targetDisplayOwner, paramsPacker.ReleaseMember);
+        var buffInfo = BuffManager.Single.CreateBuffInfo(myBuffNum, targetDisplayOwner, paramsPacker.ReleaseMember);
+
+        // 写入数据
+
+
         // buff 的释放者
         buffInfo.ReleaseMember = paramsPacker.ReleaseMember;
         if (buffInfo == null)
@@ -64,7 +97,9 @@ public class BuffFormulaItem : AbstractFormulaItem
         result = new Formula((callback) =>
         {
             // 向目标身上挂载buff
-            BuffManager.Instance().DoBuff(buffInfo, BuffDoType.Attach);
+            // 并执行buffAttach
+            BuffManager.Single.DoBuff(buffInfo, BuffDoType.Attach, FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(buffInfo.ReleaseMember, buffInfo.ReceiveMember, buffInfo, 1, buffInfo.IsNotLethal));
+            callback();
         },
         FormulaType);
 

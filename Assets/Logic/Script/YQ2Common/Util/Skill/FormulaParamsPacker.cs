@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 using UnityEngine;
 
 
@@ -41,6 +42,22 @@ public class FormulaParamsPacker
     /// 技能接受单位
     /// </summary>
     public DisplayOwner ReceiverMenber { get; set; }
+
+    /// <summary>
+    /// 当前技能
+    /// </summary>
+    [NotNull]
+    public SkillBase Skill { get; set; }
+
+    /// <summary>
+    /// 触发数据
+    /// </summary>
+    public TriggerData TriggerData { get; set; }
+
+    /// <summary>
+    /// 是否不致死
+    /// </summary>
+    public bool IsNotLethal { get; set; }
 
 
     /// <summary>

@@ -73,25 +73,25 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
         }
     }
 
-    /// <summary>
-    /// 物理信息
-    /// </summary>
-    public virtual PhysicsInfo PhysicsInfo
-    {
-        get
-        {
-            if (physicsInfo == null)
-            {
-                physicsInfo = new PhysicsInfo();
-                physicsInfo.MaxSpeed = AllData.MemberData.MoveSpeed;
-            }
-            if (physicsInfo.Quality < Utils.ApproachZero)
-            {
-                physicsInfo.Quality = Diameter * Diameter;
-            }
-            return physicsInfo;
-        }
-    }
+    ///// <summary>
+    ///// 物理信息
+    ///// </summary>
+    //public virtual PhysicsInfo PhysicsInfo
+    //{
+    //    get
+    //    {
+    //        if (physicsInfo == null)
+    //        {
+    //            physicsInfo = new PhysicsInfo();
+    //            physicsInfo.MaxSpeed = AllData.MemberData.MoveSpeed;
+    //        }
+    //        if (physicsInfo.Quality < Utils.ApproachZero)
+    //        {
+    //            physicsInfo.Quality = Diameter * Diameter;
+    //        }
+    //        return physicsInfo;
+    //    }
+    //}
 
 
     /// <summary>
@@ -105,8 +105,6 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
             AllData.MemberData.SpaceSet = value < 0 ? 1 : value;
             // 更新图形空间值
             CollisionGraphics.SetGraphicsSpaceSet(MyCollisionGraphics, value * 0.5f);
-            // 质量 = 直径平方
-            physicsInfo.Quality = AllData.MemberData.SpaceSet * AllData.MemberData.SpaceSet;
         }
     }
 
@@ -208,10 +206,39 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
     }
 
 
+    ///// <summary>
+    ///// 物理信息
+    ///// </summary>
+    //protected PhysicsInfo physicsInfo = new PhysicsInfo();
+
     /// <summary>
-    /// 物理信息
+    /// 物体质量
     /// </summary>
-    protected PhysicsInfo physicsInfo = new PhysicsInfo();
+    public float Quality {
+        get
+        {
+            if (quality < Utils.ApproachZero)
+            {
+                quality = Diameter*Diameter;
+            }
+            return quality; 
+        }
+        set { quality = value; }
+    }
+
+    /// <summary>
+    /// 速度方向
+    /// </summary>
+    public Vector3 SpeedDirection { get; set; }
+
+    /// <summary>
+    /// 最大移动速度
+    /// </summary>
+    public float MaxSpeed
+    {
+        get { return AllData.MemberData.MoveSpeed; }
+        set { AllData.MemberData.MoveSpeed = value; }
+    }
 
     /// <summary>
     /// 所有数据持有
@@ -242,6 +269,11 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
     /// 当前位置y
     /// </summary>
     private float y = 0f;
+
+    /// <summary>
+    /// 物体质量
+    /// </summary>
+    private float quality = 0;
 
     ///// <summary>
     ///// 单元直径
@@ -329,104 +361,104 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
 
 
 
-/// <summary>
-/// 集群物理信息
-/// </summary>
-public class PhysicsInfo
-{
+///// <summary>
+///// 集群物理信息
+///// </summary>
+//public class PhysicsInfo
+//{
 
-    /// <summary>
-    /// 物理动量
-    /// 动量 = 质量 * 速度
-    /// 最大动量 = 质量 * 最大速度
-    /// </summary>
-    public float Momentum
-    {
-        get { return SpeedDirection.magnitude * Quality; }
-        //set
-        //{
-        //    momentum = value;
-        //}
-    }
+//    /// <summary>
+//    /// 物理动量
+//    /// 动量 = 质量 * 速度
+//    /// 最大动量 = 质量 * 最大速度
+//    /// </summary>
+//    public float Momentum
+//    {
+//        get { return SpeedDirection.magnitude * Quality; }
+//        //set
+//        //{
+//        //    momentum = value;
+//        //}
+//    }
 
-    /// <summary>
-    /// 速度方向
-    /// </summary>
-    public Vector3 SpeedDirection
-    {
-        get { return speedDirection; }
-        set { speedDirection = value; }
-    }
+//    /// <summary>
+//    /// 速度方向
+//    /// </summary>
+//    public Vector3 SpeedDirection
+//    {
+//        get { return speedDirection; }
+//        set { speedDirection = value; }
+//    }
 
-    ///// <summary>
-    ///// 动向方向
-    ///// </summary>
-    //public Vector3 Direction
-    //{
-    //    get { return direction; }
-    //    set { direction = value.normalized; }
-    //}
+//    ///// <summary>
+//    ///// 动向方向
+//    ///// </summary>
+//    //public Vector3 Direction
+//    //{
+//    //    get { return direction; }
+//    //    set { direction = value.normalized; }
+//    //}
 
-    /// <summary>
-    /// 物体质量
-    /// </summary>
-    public float Quality
-    {
-        get { return quality; }
-        set { quality = value; }
-    }
+//    /// <summary>
+//    /// 物体质量
+//    /// </summary>
+//    public float Quality
+//    {
+//        get { return quality; }
+//        set { quality = value; }
+//    }
 
-    /// <summary>
-    /// 移动速度
-    /// </summary>
-    //public float Speed
-    //{
-    //    get { return Momentum.magnitude / Quality; }
-    //    //set {
-    //    //    //speed = value > maxSpeed ? maxSpeed : value;
-    //    //    speed = value;
-    //    //}
-    //}
+//    /// <summary>
+//    /// 移动速度
+//    /// </summary>
+//    //public float Speed
+//    //{
+//    //    get { return Momentum.magnitude / Quality; }
+//    //    //set {
+//    //    //    //speed = value > maxSpeed ? maxSpeed : value;
+//    //    //    speed = value;
+//    //    //}
+//    //}
 
-    /// <summary>
-    /// 最大速度
-    /// </summary>
-    public float MaxSpeed
-    {
-        get { return maxSpeed; }
-        set { maxSpeed = value; }
-    }
+//    /// <summary>
+//    /// 最大速度
+//    /// </summary>
+//    public float MaxSpeed
+//    {
+//        get { return maxSpeed; }
+//        set { maxSpeed = value; }
+//    }
 
-    ///// <summary>
-    ///// 动量
-    ///// </summary>
-    //private Vector3 momentum;
+//    ///// <summary>
+//    ///// 动量
+//    ///// </summary>
+//    //private Vector3 momentum;
 
-    /// <summary>
-    /// 速度方向
-    /// </summary>
-    private Vector3 speedDirection;
+//    /// <summary>
+//    /// 速度方向
+//    /// </summary>
+//    private Vector3 speedDirection;
 
-    ///// <summary>
-    ///// 动量方向
-    ///// </summary>
-    //private Vector3 direction;
+//    ///// <summary>
+//    ///// 动量方向
+//    ///// </summary>
+//    //private Vector3 direction;
 
-    /// <summary>
-    /// 质量
-    /// </summary>
-    private float quality = 1;
+//    /// <summary>
+//    /// 质量
+//    /// </summary>
+//    private float quality = 1;
 
-    /// <summary>
-    /// 速度
-    /// </summary>
-    //private float speed = 0;
+//    /// <summary>
+//    /// 速度
+//    /// </summary>
+//    //private float speed = 0;
 
-    /// <summary>
-    /// 最大速度
-    /// </summary>
-    private float maxSpeed = 10;
-}
+//    /// <summary>
+//    /// 最大速度
+//    /// </summary>
+//    private float maxSpeed = 10;
+//}
 
 
 /// <summary>

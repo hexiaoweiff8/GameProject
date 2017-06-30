@@ -4,15 +4,6 @@
 /// </summary>
 public class TriggerData
 {
-    /// <summary>
-    /// 数据触发类型-技能
-    /// </summary>
-    public const int TriggerDataTypeSkill = 0;
-
-    /// <summary>
-    /// 数据触发类型-buff
-    /// </summary>
-    public const int TriggerDataTypeBuff = 1;
 
     /// <summary>
     /// 释放技能单位
@@ -35,15 +26,42 @@ public class TriggerData
     public TriggerLevel2 TypeLevel2 { get; set; }
 
     /// <summary>
-    /// 伤害量
+    /// 伤害/治疗量
+    /// 如果是伤害则会返回当前值的负值
     /// </summary>
-    public float HealthChangeValue { get; set; }
+    public float HealthChangeValue
+    {
+        get
+        {
+            if (TypeLevel2 == TriggerLevel2.BeAttack)
+            {
+                return -healthChangeValue;
+            }
+            return healthChangeValue;
+        }
+        set { healthChangeValue = value; }
+    }
+
+    ///// <summary>
+    ///// 触发类型
+    ///// 0: 技能
+    ///// 1: buff
+    ///// </summary>
+    //public int TriggerDataType { get; set; }
 
     /// <summary>
-    /// 触发类型
-    /// 0: 技能
-    /// 1: buff
+    /// 是否buff造成的事件
     /// </summary>
-    public int TriggerDataType { get; set; }
+    public bool IsBuff { get; set; }
+
+    /// <summary>
+    /// 是否不致死
+    /// </summary>
+    public bool IsNotLethal { get; set; }
+
+    /// <summary>
+    /// 生命值变动量
+    /// </summary>
+    private float healthChangeValue = 0f;
 
 }

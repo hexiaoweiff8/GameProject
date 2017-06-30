@@ -270,14 +270,20 @@ public class DataManager : MonoEX.Singleton<DataManager>
         }
 
         // 加载并设置技能
-        displayOwner.ClusterData.AllData.SkillInfoList = SkillManager.Single.LoadSkillInfoList(new List<int>()
+        displayOwner.ClusterData.AllData.SkillInfoList = SkillManager.Single.CreateSkillInfoList(new List<int>()
                 {
                     soldier.Skill1,
                     soldier.Skill2,
                     soldier.Skill3,
                     soldier.Skill4,
                     soldier.Skill5,
-                });
+                },
+                displayOwner);
+        // 创建单位是将技能属性(如果有)附加到单位上
+        foreach (var skill in displayOwner.ClusterData.AllData.SkillInfoList)
+        {
+            SkillManager.Single.AttachSkillAttribute(skill, displayOwner.ClusterData.AllData.MemberData);
+        }
 
         return displayOwner;
     }

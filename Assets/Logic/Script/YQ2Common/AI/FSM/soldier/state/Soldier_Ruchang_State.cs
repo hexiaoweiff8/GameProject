@@ -48,23 +48,27 @@ public class Soldier_Ruchang_State : SoldierFSMState
                 break;
         }
 
-
-        var alldata = fsm.Display.ClusterData.AllData;
-        // 入场检测技能
-        if (alldata != null && alldata.SkillInfoList != null)
+        // 抛出入场事件
+        SkillManager.Single.SetTriggerData(new TriggerData()
         {
-            SkillManager.Single.CheckAndDoSkillInfo(alldata.SkillInfoList, fsm.Display, fsm.EnemyTarget, TriggerLevel1.Fight, TriggerLevel2.Enter);
-        }
+            ReleaseMember = fsm.Display,
+            ReceiveMember = fsm.Display,
+            TypeLevel1 = TriggerLevel1.Fight,
+            TypeLevel2 = TriggerLevel2.Enter
+        });
 
         Globals.Instance.StartCoroutine(_waitFor(DeployTime, () =>
         {
             fsm.IsCanRun = true;
 
-            // 入场结束检测技能
-            if (alldata != null && alldata.SkillInfoList != null)
+            // 抛出入场结束事件
+            SkillManager.Single.SetTriggerData(new TriggerData()
             {
-                SkillManager.Single.CheckAndDoSkillInfo(alldata.SkillInfoList, fsm.Display, fsm.EnemyTarget, TriggerLevel1.Fight, TriggerLevel2.EnterEnd);
-            }
+                ReleaseMember = fsm.Display,
+                ReceiveMember = fsm.Display,
+                TypeLevel1 = TriggerLevel1.Fight,
+                TypeLevel2 = TriggerLevel2.EnterEnd
+            });
         }));
     }
 

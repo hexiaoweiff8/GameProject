@@ -147,7 +147,10 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
                     var graphics = new RectGraphics(new Vector2(pos.x, pos.z), Width, mySpeed, rotation * dir);
                     Utils.DrawGraphics(graphics, Color.white);
                     // 搜索当前节范围内的单位
-                    tmpPackerList = FormulaParamsPackerFactroy.Single.GetFormulaParamsPackerList(graphics, paramsPacker.StartPos, myTargetCamps, 
+                    tmpPackerList = FormulaParamsPackerFactroy.Single.GetFormulaParamsPackerList(graphics, 
+                        paramsPacker.StartPos, 
+                        myTargetCamps,
+                        paramsPacker.Skill,
                         paramsPacker.TargetMaxCount);
 
                     // 执行子技能
