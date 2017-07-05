@@ -103,7 +103,7 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
         var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
         var targetCount = GetDataOrReplace<int>("TargetCount", array, 1, ReplaceDic);
         var receivePos = GetDataOrReplace<int>("ReceivePos", array, 2, ReplaceDic);
-        var scopeType = GetDataOrReplace<GraphicType>("ScopeType", array, 4, ReplaceDic);
+        var scopeType = GetDataOrReplace<GraphicType>("ScopeType", array, 3, ReplaceDic);
         var targetTypeCamps = GetDataOrReplace<TargetCampsType>("TargetCamps", array, 4, ReplaceDic);
 
         //float[] scopeArgs = new float[3];
@@ -180,7 +180,7 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
                 paramsPacker.Skill,
                 paramsPacker.TargetMaxCount);
             // 排除不可选择目标
-            for (var i = 0; i < packerList.Count; i++)
+            for (var i = 0; packerList != null && i < packerList.Count; i++)
             {
                 var nowPacker = packerList[i];
                 if (!TargetSelecter.CouldSelectTarget(nowPacker.ReceiverMenber.ClusterData, clusterData))

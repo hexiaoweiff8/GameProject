@@ -1,26 +1,56 @@
 local class = require("common/middleclass")
-ui_tips = class("ui_tips", wnd_base)
+ui_tips = class("ui_tips")
 
-function ui_tips:OnShowDone()
-    print("ui_tips!!!!!!")
-    self.tipsLabel = self.transform:Find("Label").gameObject
-    local animTime = self.transform:GetComponent("Animation").clip.length
-    self.tipsLabel.transform:GetComponent("UILabel").text = tipsText
-    self.gameObject:SetActive(true)
-    local time = 0
-    startTimer(3,function()
-        time = time + Time.deltaTime
-            if time > 3 then 
-                self:animOverCallBack()
-                allTimeTickerTb["tipsTimer"]:Stop()
-            end
-        end,nil,"tipsTimer")
-end 
-
-function ui_tips:animOverCallBack()
-    print("onend")
-    self.gameObject:SetActive(false)
-    ui_manager:DestroyWB(self)
+local tipsLabel = nil
+local tip = nil
+---
+---初始化tips提示组件
+---
+function ui_tips:initialize()
+    self.tipsPanel = GameObjectExtension.InstantiateFromPacket("ui_tips", "ui_tips",  self.gameObject)
+    tip = self.tipsPanel.transform:Find("tip").gameObject
+    tipsLabel = self.tipsPanel.transform:Find("tip/Label").gameObject
+    tip:SetActive(false)
 end
 
-return ui_tips
+---
+---显示tip组件，播放相应的动画
+---
+function ui_tips:show( tipsCode )
+    if tip.activeSelf then
+        return 
+    end
+
+    tipsLabel.transform:GetComponent("UILabel").text = tipsCode
+    tip:SetActive(true)
+
+    local sq = DG.Tweening.DOTween.Sequence()
+    local sq1 = DG.Tweening.DOTween.Sequence()
+    local tweener_move = tip.transform:DOMove(Vector3(0, 0.5, 0), 1, false)
+    local tweener_fadeIn = DG.Tweening.DOTween.ToAlpha(
+    function ()
+        return tip.transform:GetComponent("UIWidget").color
+    end,
+    function (color)
+        tip.transform:GetComponent("UIWidget").color = color
+    end, 1, 1)
+    local tweener_fadeOut = DG.Tweening.DOTween.ToAlpha(
+    function ()
+        return tip.transform:GetComponent("UIWidget").color
+    end,
+    function (color)
+        tip.transform:GetComponent("UIWidget").color = color
+    end, 0, 1)
+    sq:Append(tweener_move)
+    sq:Join(tweener_fadeIn)
+    sq1:SetDelay(2.5)
+    sq1:Append(tweener_fadeOut)
+    tweener_fadeOut:OnComplete(
+    function ()
+        print("compelete")
+        tip.transform.localPosition = Vector3(0, 0, 0)
+        tip:SetActive(false)
+    end)
+end
+
+return wnd_tips

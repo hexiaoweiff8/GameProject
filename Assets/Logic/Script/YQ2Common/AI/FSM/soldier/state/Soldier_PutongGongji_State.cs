@@ -35,7 +35,7 @@ public class Soldier_PutongGongji_State : SoldierFSMState
 
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
-        //Debug.Log("普通攻击:" + fsm.Display.GameObj.name);
+        Debug.Log("普通攻击:" + fsm.Display.GameObj.name);
         _fireTick = fsm.Display.ClusterData.AllData.MemberData.AttackRate1;
         _fireTimer = new Timer(_fireTick,true);
         _fireTimer.OnCompleteCallback(() => { fire(fsm); }).Start();

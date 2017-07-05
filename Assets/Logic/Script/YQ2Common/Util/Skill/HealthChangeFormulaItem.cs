@@ -28,7 +28,7 @@ public class HealthChangeFormulaItem : AbstractFormulaItem
     public int HealthChangeTarget { get; set; }
 
     /// <summary>
-    /// 生病之变动量
+    /// 生命值变动量
     /// </summary>
     public float Value { get; set; }
 
@@ -113,9 +113,14 @@ public class HealthChangeFormulaItem : AbstractFormulaItem
         // 创建行为节点
         result = new Formula((callback) =>
         {
+            // 验证数据
+            if (targetDisPlayOwner.ClusterData == null)
+            {
+                return;
+            }
             // 计算伤害/治疗量
             var changeValue = HurtResult.GetHurtForSkill(targetDisPlayOwner, myDemageOrCure, myHealthChageType, myValue);
-            targetDisPlayOwner.ClusterData.AllData.MemberData.CurrentHP += changeValue;
+            // targetDisPlayOwner.ClusterData.AllData.MemberData.CurrentHP += changeValue;
             // 创建伤害/治疗事件
             SkillManager.Single.SetTriggerData(new TriggerData()
             {

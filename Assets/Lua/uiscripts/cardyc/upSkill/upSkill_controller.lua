@@ -64,7 +64,6 @@ function upSkill_controller:show_SkillItem_UpPanel(index)
         end
         isInitSUpLayer = true
     end
-
     skillInfoItem:refresh(data.skill_ID_Table[index], data.skill_Lv_Table[index], data.starLv, index)
 
     view.skillInfoP_lv_Lab.transform:GetComponent("UILabel").text 
@@ -73,43 +72,45 @@ function upSkill_controller:show_SkillItem_UpPanel(index)
         = string.format("[f15c03]%d[-]/%d",data.skill_Lv_Table[index],Const.MAX_SKILL_LV)--当前技能/技能总级
     view.skillInfoP_sdes_Lab.transform:GetComponent("UILabel").text 
         = skillUtil:getskillDesByID(data.skill_ID_Table[index])
-    view.skillInfoP_btn_unlock_Label.transform:GetComponent("UILabel").text
-        = string.format(stringUtil:getString(20049),index) 
+    view.skillInfoPanel:SetActive(true)
         
-    local skcost = skillUtil:getUpSkillNeedPoints(data.skill_Lv_Table[index] + 1)--获取升级消耗技能点
-    view.skillInfoP_costLab.transform:GetComponent("UILabel").text = skcost
-    view.skillInfoP_costLab.transform:GetComponent("UILabel").color = COLOR.White
-    if skcost > data.totalSkPt then--判断是否足够升级，设置颜色
-        view.skillInfoP_costLab.transform:GetComponent("UILabel").color = COLOR.Red
-    end
-
-    UIEventListener.Get(view.skillInfoP_btn_unlock).onClick = function()
-        print("尚未解锁！！！！！")
-    end 
-    UIEventListener.Get(view.skillInfoP_btn_upLv).onClick = function()
-        upSkill_controller:skillItem_Up_CallBack(index)
-    end 
-    --技能升级按钮显示
-    view.skillInfoP_btn_unlock:SetActive(true)
-    view.skillInfoP_btn_upLv:SetActive(false)
-    view.skillInfoP_maxSkillLv:SetActive(false)
-    if index <= data.starLv then
-        view.skillInfoP_btn_unlock:SetActive(false)
-        view.skillInfoP_btn_upLv:SetActive(true)
-    end
     --判断是否达到最大技能等级
-    if data.skill_Lv_Table[index] >= Const.MAX_STAR_LV then 
+    if data.skill_Lv_Table[index] >= Const.MAX_SKILL_LV then 
         view.skillInfoP_btn_unlock:SetActive(false)
         view.skillInfoP_btn_upLv:SetActive(false) 
         view.skillInfoP_maxSkillLv:SetActive(true)
+        return
     end
-    view.skillInfoPanel:SetActive(true)
+    view.skillInfoP_maxSkillLv:SetActive(false) --未达最大等级，关闭最大等级提示
+    
+    
+    --如果技能已经解锁，显示升级按钮，设置所需要的技能点数
+    if index <= data.starLv then
+        local skcost = skillUtil:getUpSkillNeedPoints(data.skill_Lv_Table[index] + 1)--获取升级消耗技能点
+        view.skillInfoP_costLab.transform:GetComponent("UILabel").text = skcost
+        view.skillInfoP_costLab.transform:GetComponent("UILabel").color = COLOR.White
+        if skcost > data.totalSkPt then--判断是否足够升级，设置颜色
+            view.skillInfoP_costLab.transform:GetComponent("UILabel").color = COLOR.Red
+        end
+        UIEventListener.Get(view.skillInfoP_btn_upLv).onClick = function()
+            upSkill_controller:skillItem_Up_CallBack(index)
+        end 
+        view.skillInfoP_btn_unlock:SetActive(false)
+        view.skillInfoP_btn_upLv:SetActive(true)
+        return
+    end
+
+    --技能尚未解锁时，提示技能解锁条件
+    view.skillInfoP_btn_upLv:SetActive(false)
+    view.skillInfoP_btn_unlock:SetActive(true)
+    view.skillInfoP_btn_unlock_Label.transform:GetComponent("UILabel").text
+        = string.format(stringUtil:getString(20049),index) 
 end
 
 --点击技能升级按钮
 function upSkill_controller:skillItem_Up_CallBack(index)
     if data:isCan_UpSkill(index) ~= 0 then
-        ui_manager:ShowWB(WNDTYPE.ui_tips)
+        tips:show( tipsText )
         return
     end
     UpSkillIndex = index

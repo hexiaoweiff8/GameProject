@@ -26,7 +26,8 @@ function ItemSlot:initialize(parent, positon ,index, func)
 end
 
 --刷新物品插槽
-function ItemSlot:refresh(haveItemsNum, needItemsNum, state)
+function ItemSlot:refresh(itemId, haveItemsNum, needItemsNum, state)
+    self.itemhead_itemSp.transform:GetComponent("UISprite").spriteName = itemUtil:getItemIcon(itemId)
     self.itemhead_numLab.transform:GetComponent("UILabel").text = string.format("%d/%d",haveItemsNum,needItemsNum)    
     self.itemhead_Sprite:SetActive(false)
     self.itemhead_lockSp:SetActive(true)

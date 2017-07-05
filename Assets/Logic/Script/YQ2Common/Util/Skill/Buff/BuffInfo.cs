@@ -19,6 +19,11 @@ public class BuffInfo : SkillBase
     public BuffType BuffType { get; set; }
 
     /// <summary>
+    /// buff等级
+    /// </summary>
+    public int BuffRank { get; set; }
+
+    /// <summary>
     /// buff的的优先级
     /// 高等级的buff会覆盖低等级的buff
     /// 反之不会
@@ -236,16 +241,16 @@ public class BuffInfo : SkillBase
             return result;
         }
         result = GetIFormula(paramsPacker, detachFormulaItem);
-        if (result != null)
-        {
-            result.After(new Formula((callback) =>
-            {
-                Debug.Log("删除buff:" + addtionId);
-                // 执行结束删除当前buff的具体实现引用
-                BuffManager.Single.DelBuffInstance(AddtionId);
-                callback();
-            }));
-        }
+        //if (result != null)
+        //{
+        //    result.After(new Formula((callback) =>
+        //    {
+        //        Debug.Log("删除buff:" + addtionId);
+        //        // 执行结束删除当前buff的具体实现引用
+        //        BuffManager.Single.DelBuffInstance(AddtionId);
+        //        callback();
+        //    }));
+        //}
         return result;
     }
 
@@ -318,10 +323,10 @@ public class BuffInfo : SkillBase
             var op = DetachQualifiedOptionList[i];
             var value = DetachQualifiedValueList[i];
             // 判断类型
-            if (value.IndexOf(".", StringComparison.Ordinal) > 0)
+            if (value.IndexOf("f", StringComparison.Ordinal) > 0)
             {
                 // float
-                result = Utils.GetCompare<float>(op)(SkillDataScope.GetFloat(key).Value, Convert.ToSingle(value));
+                result = Utils.GetCompare<float>(op)(SkillDataScope.GetFloat(key).Value, Convert.ToSingle(value.Replace("f","")));
             }
             else if (value.EndsWith("L"))
             {

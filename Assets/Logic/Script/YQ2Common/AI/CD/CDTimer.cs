@@ -12,9 +12,20 @@ using Util;
 public class CDTimer : Singleton<CDTimer>
 {
     /// <summary>
+    /// 公共cd时间
+    /// </summary>
+    public float PublicCDTime = 1;
+
+
+    /// <summary>
     /// CD对应列表
     /// </summary>
     private Dictionary<long, float> cdDic = new Dictionary<long, float>(); 
+
+    /// <summary>
+    /// cd组列表
+    /// </summary>
+    private Dictionary<long, float> cdGroupDic = new Dictionary<long, float>(); 
 
     ///// <summary>
     ///// 判断该单位的ID是否
@@ -33,11 +44,22 @@ public class CDTimer : Singleton<CDTimer>
     /// <summary>
     /// 技能是否CD
     /// </summary>
-    /// <param name="addtionId">技能唯一ID</param>
+    /// <param name="skillId">技能Num</param>
+    /// <param name="objId">单位唯一ID</param>
+    /// <param name="cdGroup">cd组</param>
     /// <returns></returns>
-    public bool IsInCD(long addtionId)
+    public bool IsInCD(int skillId, int objId, int cdGroup)
     {
-        return cdDic.ContainsKey(addtionId);
+        var keyForCD = Utils.GetKey(objId, skillId);
+        if (cdGroup < 0)
+        {
+            return cdDic.ContainsKey(keyForCD);
+        }
+        else
+        {
+            var key = Utils.GetKey(objId, cdGroup);
+            return cdDic.ContainsKey(keyForCD) || cdGroupDic.ContainsKey(key);
+        }
     }
 
     ///// <summary>
@@ -67,21 +89,55 @@ public class CDTimer : Singleton<CDTimer>
     /// <summary>
     /// 设置技能进cd状态
     /// </summary>
-    /// <param name="addtionId">技能唯一ID</param>
+    /// <param name="skillId">技能唯一ID</param>
+    /// <param name="objId">单位唯一ID</param>
     /// <param name="cdTime">cd时间</param>
+    /// <param name="cdGroup">cd分组</param>
     /// <param name="callback">cd结束回调</param>
-    public void SetInCD(long addtionId, float cdTime, Action callback = null)
+    public void SetInCD(int skillId, float cdTime, int objId = -1, int cdGroup = -1, Action callback = null)
     {
-        cdDic.Add(addtionId, Time.realtimeSinceStartup);
-        Timer timer = new Timer(cdTime);
+        var keyForCD = Utils.GetKey(objId, skillId);
+        // 设置cd
+        if (!cdDic.ContainsKey(keyForCD))
+        {
+            cdDic.Add(keyForCD, Time.realtimeSinceStartup);
+        }
+        else
+        {
+            cdDic[keyForCD] = Time.realtimeSinceStartup;
+        }
+
+        var timer = new Timer(cdTime);
         // 时间到消除CD
         timer.OnCompleteCallback(() =>
         {
-            cdDic.Remove(addtionId);
+            cdDic.Remove(keyForCD);
             if (callback != null)
             {
                 callback();
             }
+        }).Start();
+
+
+        if (cdGroup < 0 || objId < 0)
+        {
+            return;
+        }
+        var key = Utils.GetKey(objId, cdGroup);
+        // 设置该组公共cd
+        if (!cdGroupDic.ContainsKey(key))
+        {
+            cdGroupDic.Add(key, Time.realtimeSinceStartup);
+        }
+        else
+        {
+            cdGroupDic[key] = Time.realtimeSinceStartup;
+        }
+        timer = new Timer(PublicCDTime);
+        timer.OnCompleteCallback(() =>
+        {
+            // 时间到消除CD
+            cdGroupDic.Remove(key);
         }).Start();
     }
 }

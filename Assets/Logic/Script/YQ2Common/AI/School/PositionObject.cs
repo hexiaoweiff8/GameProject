@@ -322,6 +322,24 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
     }
 
     /// <summary>
+    /// 清除数据
+    /// </summary>
+    public void Clear()
+    {
+        // 清除运行中的技能
+        foreach (var skillInfo in AllData.SkillInfoList)
+        {
+            TriggerTicker.Single.Remove(skillInfo.AddtionId);
+        }
+        // 清除运行中的Buff
+        foreach (var buffInfo in AllData.BuffInfoList)
+        {
+            TriggerTicker.Single.Remove(buffInfo.AddtionId);
+        }
+        
+    }
+
+    /// <summary>
     /// 返回位置图形
     /// </summary>
     /// <returns>方形图形</returns>

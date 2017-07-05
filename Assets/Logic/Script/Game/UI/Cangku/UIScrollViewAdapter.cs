@@ -64,7 +64,7 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
     private bool EnableMultiLine;//多行多列
     [SerializeField]
     public int _spacing_row, _spacing_line;//行间距/列间距
-    private int _itemsVisible_row, _itemsVisible_line;//每行每列可显示的总数
+    public int _itemsVisible_row, _itemsVisible_line;//每行每列可显示的总数
 
     private UIPanel _viewport;//视口范围控件
 
@@ -72,7 +72,7 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
 
     private float _spacing;//列表项间距，单行或单列
 
-    private List<UIScrollViewItemBase> _itemsList;//列表项数组
+    public List<UIScrollViewItemBase> _itemsList;//列表项数组
 
     private float _itemSize;//列表项占大小
     private Vector2 _itemSize_ml;//列表项占大小,EnableMultiLine == true
@@ -170,10 +170,21 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
 
         int itemsToInstantiate = EnableMultiLine ? _itemsVisible_row * _itemsVisible_line : _itemsVisible;
 
-        if (itemsToInstantiate < items)
-            itemsToInstantiate *= 2;
-        else 
+        if (itemsToInstantiate > items || (items >= itemsToInstantiate && items <= 2 * itemsToInstantiate))
+        {
             itemsToInstantiate = items;
+            //每行项目数不满的时候，补齐行
+            if (itemsToInstantiate % _itemsVisible_row != 0)
+                itemsToInstantiate += Mathf.CeilToInt((float)itemsToInstantiate / (float)_itemsVisible_row) * _itemsVisible_row - itemsToInstantiate;
+            //print("total:"+ items);
+            //print("gen:"+ itemsToInstantiate);
+            //print("itemsToInstantiate / _itemsVisible_row = " + (float)(itemsToInstantiate / _itemsVisible_row));
+            //print("itemsToInstantiate = " + itemsToInstantiate);
+            //print("_itemsVisible_row = " + _itemsVisible_row);
+            //print("Mathf.CeilToInt(itemsToInstantiate / _itemsVisible_row) = " + Mathf.CeilToInt(itemsToInstantiate / _itemsVisible_row));
+        }
+        else
+            itemsToInstantiate *= 2;
 
         _itemsList = new List<UIScrollViewItemBase>();
 
@@ -314,7 +325,7 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
 
         float position_x = 0, position_y = 0;
 
-        position_x = (index % (_itemsVisible_line + 1)) * (dimension.y + _spacing_line);
+        position_x = (index % _itemsVisible_line) * (dimension.y + _spacing_line);
         position_y = Mathf.FloorToInt(index / (_itemsVisible_row)) * (dimension.x + _spacing_row);
 
         switch (_scrollOrientation)

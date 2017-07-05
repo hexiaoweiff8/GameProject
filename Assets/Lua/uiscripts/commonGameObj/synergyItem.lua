@@ -21,8 +21,6 @@ function SynergyItem:initialize(parent,index,func)
 
     self.synergyItem.transform.localPosition = Vector3(0, 180-104*(index-1))
 
-    --设置图集
-    -- self.synergyItem_Sp.transform:GetComponent("UISprite").atlas = TestAtlas
 
     UIEventListener.Get(self.synergyItem).onClick = function()
         func(_,index)

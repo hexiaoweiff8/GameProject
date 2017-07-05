@@ -97,6 +97,8 @@ public class SoldierFSMControl{
         var alldata = fsm.Display.ClusterData.AllData;
         if (alldata.MemberData != null && alldata.SkillInfoList != null)
         {
+            // 结算技能伤害/治疗
+            SettlementDamageOrCure();
             // 触发当前单位的所有事件
             SkillManager.Single.SetEachAction(alldata.MemberData.ObjID, (type1, type2, trigger) =>
             {
@@ -104,11 +106,10 @@ public class SoldierFSMControl{
                 SkillManager.Single.CheckAndDoSkillInfo(alldata.SkillInfoList, trigger);
                 // 触发buff类
                 BuffManager.Single.CheckAndDoBuffInfo(alldata.BuffInfoList, trigger);
+
+                // 结算伤害
             },
             true);
-
-            // 结算技能伤害/治疗
-            SettlementDamageOrCure();
         }
     }
 
@@ -184,7 +185,7 @@ public class SoldierFSMControl{
                 else
                 {
                     // 正常扣血
-                    fsm.Display.ClusterData.AllData.MemberData.CurrentHP += cure + demage;
+                    fsm.Display.ClusterData.AllData.MemberData.CurrentHP += cure - demage;
                 }
                 // 刷新血条
                 fsm.Display.RanderControl.SetBloodBarValue();

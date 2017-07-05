@@ -9,12 +9,13 @@ local isInitGainLayer  = false      --是否初始化获得方式界面
 local isSlotInit = false            --是否初始化物品插槽
 local isInitAmSLayer = false        --是否初始化晋升成功界面
 local isEquipAll = false            --判断是否激活全部插槽
-
+local isinitDetail = false          --是否初始化卡牌信息界面
 
 local itemSlots = {}
 
 local success_cardhead_left
 local success_cardhead_right
+local detail_cardhead
 local CardIndex
 function information_controller:init( args )
     -- body
@@ -38,22 +39,30 @@ end
 
 --初始化卡牌信息部分
 function information_controller:init_InformationPanel()
-    view.infoP_healthL.transform:GetComponent("UILabel").text 
-        = string.format( "%d", cardUtil:getCardProperty("HP", data.cardId, data.cardLv))
-    view.infoP_damagePSecondL.transform:GetComponent("UILabel").text 
-        = string.format( "%d", cardUtil:getCardProperty("HP", data.cardId, data.cardLv))
-    view.infoP_attackL.transform:GetComponent("UILabel").text 
-        = string.format( "%d", cardUtil:getCardProperty("Attack1", data.cardId, data.cardLv))
-    view.infoP_teamL.transform:GetComponent("UILabel").text 
-        = string.format( "%d", cardUtil:getCardProperty("HP", data.cardId, data.cardLv))
-    view.infoP_defenceL.transform:GetComponent("UILabel").text 
-        = string.format( "%d", cardUtil:getCardProperty("Defence", data.cardId, data.cardLv))
-    view.infoP_aimGeneralTypeL.transform:GetComponent("UILabel").text 
-        = string.format( "%s", stringUtil:getString(20720 + cardUtil:getCardProperty("AimGeneralType", data.cardId, data.cardLv)))
-    view.infoP_shotDistanceL.transform:GetComponent("UILabel").text 
-        = string.format( "%d", cardUtil:getCardProperty("HP", data.cardId, data.cardLv))
-    view.infoP_attackTypeL.transform:GetComponent("UILabel").text 
-        = string.format( "%s", stringUtil:getString(20750 + cardUtil:getCardProperty("AttackType", data.cardId, data.cardLv)))
+
+    local propsName = {
+        "HP", "HP",
+        "Attack1", "HP",
+        "Defence", "AimGeneralType",
+        "HP", "AttackType",
+    }
+    for i = 1, #view.propertyTbl do 
+        local propertyValue
+        if propsName[i] == "AimGeneralType" then
+            propertyValue = string.format( "%s", stringUtil:getString(20720 + cardUtil:getCardProperty("AimGeneralType", data.cardId, data.cardLv)))
+        elseif propsName[i] == "AttackType" then
+            propertyValue = string.format( "%s", stringUtil:getString(20750 + cardUtil:getCardProperty("AttackType", data.cardId, data.cardLv)))
+        else
+            propertyValue = string.format( "%d", cardUtil:getCardProperty(propsName[i], data.cardId, data.cardLv))
+        end
+        view.propertyTbl[i].transform:GetComponent("UILabel").text = propertyValue
+        UIEventListener.Get(view.propertyTbl[i]).onPress = function(a, b)
+            view.infoP_propTip.transform.position = a.transform.position
+            view.infoP_propTipLab.transform:GetComponent("UILabel").text = stringUtil:getString(20002 + i)
+            view.infoP_propTip:SetActive(b)
+        end
+    end 
+   
 end
 --初始化克制关系部分
 function information_controller:init_suppressPanel()
@@ -74,6 +83,82 @@ function information_controller:init_suppressPanel()
 
 
 end
+
+
+function information_controller:show_cardDetailPanel(CurrentTab)
+    -- body
+    
+    local propsName = {
+                            "Name", 
+                            "AimGeneralType",
+                            "DeployTime", 
+            "GeneralType",  "ArmyType",
+            "Attack1",      "Attack2",
+            "Clipsize1",    "Clipsize2",
+            "AttackRate1",  "AttackRate2",
+            "ReloadTime1",  "ReloadTime1",
+            "Accuracy",     "SpaceSet",
+            "SpreadRange",  "Defence",
+            "HP",           "MoveSpeed",
+            "Dodge",        "Hit",
+            "AntiArmor",    "Armor",
+            "AntiCrit",     "Crit",
+            "CritDamage",   "BulletType",
+            "BulletModel",  "MuzzleFlash",
+            "SightRange",   "IsHide",
+            "IsAntiHide",   "LifeTime",
+        }
+    if not isinitDetail then 
+        view:init_cardDetailView()
+        detail_cardhead = CardHead(view.scrollView, Vector3(-90,-75,0))
+        isinitDetail = true
+    end
+    detail_cardhead:refresh(data.cardId, data.cardLv, data.starLv)
+    for i = 1, #propsName do 
+        local propertyValue
+        if propsName[i] == "AimGeneralType" then
+            propertyValue = string.format( "%s", stringUtil:getString(20720 + cardUtil:getCardProperty("AimGeneralType", data.cardId, data.cardLv)))
+        elseif propsName[i] == "AttackType" then
+            propertyValue = string.format( "%s", stringUtil:getString(20750 + cardUtil:getCardProperty("AttackType", data.cardId, data.cardLv)))
+        else
+            propertyValue = string.format( "%s", cardUtil:getCardProperty(propsName[i], data.cardId, data.cardLv))
+        end
+        view.cardDetailTbl[i] = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "propertyItem", view.scrollView).gameObject
+        if i <= 3 then 
+            view.cardDetailTbl[i].transform.localPosition = Vector3(75, 25-50*i, 0)
+        else
+            if i % 2==0 then 
+                view.cardDetailTbl[i].transform.localPosition = Vector3(-150, 25-50*((i-4)/2+4), 0)
+            else
+                view.cardDetailTbl[i].transform.localPosition = Vector3(75, 25-50*((i-3)/2+3), 0)
+            end 
+        end
+        
+        view.cardDetailTbl[i].transform:Find("value"):GetComponent("UILabel").text = propertyValue
+        UIEventListener.Get(view.cardDetailTbl[i].transform:Find("value").gameObject).onPress = function(a, b)
+            view.cardDetail_Tip.transform.position = a.transform.position
+            view.cardDetail_TipLab.transform:GetComponent("UILabel").text = "属性"..i
+            view.cardDetail_Tip:SetActive(b)
+        end
+    end 
+
+    if #propsName%2 == 0 then 
+        view.scrollView.transform:GetComponent("BoxCollider").center = Vector3(0,-25*((#propsName-4)/2+4),0)
+        view.scrollView.transform:GetComponent("BoxCollider").size = Vector3(440,50*((#propsName-4)/2+4),0)
+    else
+        view.scrollView.transform:GetComponent("BoxCollider").center = Vector3(0,-25*((#propsName-3)/2+3),0)
+        view.scrollView.transform:GetComponent("BoxCollider").size = Vector3(440,50*((#propsName-3)/2+3),0)
+    end 
+    UIEventListener.Get(view.cardDetail_maskPanel).onClick = function()
+        view.cardDetail:SetActive(false) 
+        CurrentTab:SetActive(true)
+    end
+    view.cardDetail:SetActive(true) 
+    CurrentTab:SetActive(false)
+    view.scrollView.transform:GetComponent("UIScrollView"):ResetPosition()
+end
+
+
 --初始化卡牌进阶部分
 function information_controller:init_upQualityPanel()
     -- 判断卡牌的阶品否已达最大
@@ -90,7 +175,11 @@ function information_controller:init_upQualityPanel()
         if not isSlotInit then
             itemSlots[i] = ItemSlot(view.upQuality_Panel, position, i, self.showItemInfoPanel)
         end
-        itemSlots[i]:refresh(data.upQualityHaveItems[i].num, data.upQualityNeedItems[i].num, data.slotState[i])
+        itemSlots[i]:refresh(
+            qualityUtil:getItemID(i,data.cardId,data.qualityLv)
+            , data.upQualityHaveItems[i].num
+            , data.upQualityNeedItems[i].num
+            , data.slotState[i])
     end
     isSlotInit = true
 
@@ -238,7 +327,7 @@ end
 function information_controller:upQualityBtn_onclick()
     --判断是否可以进阶
     if data:isCan_UpQuality() ~= 0 then
-        ui_manager:ShowWB(WNDTYPE.ui_tips)
+        tips:show( tipsText )
         return
     end
     --向服务器发送卡牌进阶消息消息
@@ -263,7 +352,7 @@ function information_controller:equipAllCallBack()
     end
     --提示：没有可激活插槽
     tipsText = stringUtil:getString(20106)
-    ui_manager:ShowWB(WNDTYPE.ui_tips)
+    tips:show( tipsText )
 end
 --根据插槽index装备物品
 function information_controller:equipSlotByIndex(index)

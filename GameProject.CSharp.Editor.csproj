@@ -432,7 +432,13 @@
     <None Include="Assets\Resources\sdata_template.txt" />
     <None Include="Assets\StreamingAssets\Android\files.txt" />
     <None Include="Assets\StreamingAssets\Android\lua\pack_script\pk_script\_tmp.txt" />
-    <None Include="Assets\StreamingAssets\Script10000.txt" />
+    <None Include="Assets\StreamingAssets\BuffScript100001.txt" />
+    <None Include="Assets\StreamingAssets\BuffScript1007.txt" />
+    <None Include="Assets\StreamingAssets\BuffScript1008.txt" />
+    <None Include="Assets\StreamingAssets\BuffScript2222.txt" />
+    <None Include="Assets\StreamingAssets\Script100001.txt" />
+    <None Include="Assets\StreamingAssets\Script10011.txt" />
+    <None Include="Assets\StreamingAssets\Script1009.txt" />
     <None Include="Assets\StreamingAssets\SkillScript10000.txt" />
     <None Include="Assets\StreamingAssets\SkillScript10001.txt" />
     <None Include="Assets\StreamingAssets\SkillScript10002.txt" />
@@ -443,6 +449,8 @@
     <None Include="Assets\StreamingAssets\SkillScript1003.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1004.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1005.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript1112.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript1113.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
 </Project>

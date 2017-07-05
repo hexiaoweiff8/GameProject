@@ -3,21 +3,24 @@ local information_model = {}
 --获取数据库信息
 function information_model:getDatas(cardIndex)
     print("================information_model:getDatas============start===========")
-    if currencyTbl == nil or cardTbl == nil or userRoleTbl == nil  then
+    local _userRoleTbl = userModel:getUserRoleTbl()
+    local _cardTbl = cardModel:getCardTbl()
+    local _currencyTbl = currencyModel:getCurrentTbl()
+    if _currencyTbl == nil or _cardTbl == nil or _userRoleTbl == nil  then
         return false
     end 
-    if not cardTbl[cardIndex] then
+    if not _cardTbl[cardIndex] then
         return false
     end 
-    self.goldNum = currencyTbl["gold"] --金币
-    self.badgeNum = currencyTbl["coin"] --兵牌
-    self.itemList = userRoleTbl["item"]      
-    self.cardId =cardTbl[cardIndex].id
-    self.cardLv =cardTbl[cardIndex].lv
-    self.starLv =cardTbl[cardIndex].star
-    self.qualityLv = cardTbl[cardIndex].rlv
-    self.synergyLvTbl = cardTbl[cardIndex].team--协同表
-    self.slotState = cardTbl[cardIndex].slot
+    self.goldNum = _currencyTbl["gold"] --金币
+    self.badgeNum = _currencyTbl["coin"] --兵牌
+    self.itemList = _userRoleTbl["item"]
+    self.cardId = _cardTbl[cardIndex].id
+    self.cardLv = _cardTbl[cardIndex].lv
+    self.starLv = _cardTbl[cardIndex].star
+    self.qualityLv = _cardTbl[cardIndex].rlv
+    self.synergyLvTbl = _cardTbl[cardIndex].team--协同表
+    self.slotState = _cardTbl[cardIndex].slot
     self:init_upQualityItems()
     print("================information_model:getDatas============end===========")
     return true

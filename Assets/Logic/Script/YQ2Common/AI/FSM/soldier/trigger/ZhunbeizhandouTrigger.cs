@@ -65,7 +65,7 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger
         var result = false;
 
         // TODO 使用技能目标选择
-        var myObjid = fsm.Display.MFAModelRender.ObjId;
+        //var myObjid = fsm.Display.MFAModelRender.ObjId;
 
         // 判断主动技能是否可释放, 可释放则释放技能, 否则普通攻击
         var skillInfoList = fsm.Display.ClusterData.AllData.SkillInfoList;
@@ -101,7 +101,7 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger
                 // TODO 按照技能释放Enum来获取能够释放的技能
                 // 触发一个目标是敌人的技能
                 // 技能没有在CD中
-                if (CDTimer.Instance().IsInCD(skill.AddtionId))
+                if (CDTimer.Instance().IsInCD(skill.Num, fsm.Display.ClusterData.AllData.MemberData.ObjID.ID, skill.CDGroup))
                 {
                     continue;
                 }

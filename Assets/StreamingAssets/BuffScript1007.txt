@@ -1,0 +1,15 @@
+BuffNum(1007)
+        Action
+        {
+            HealthChange(1,0,0,0,1)
+        }
+
+        [
+            TickTime(1)
+            BuffTime(10)
+            TriggerLevel1(4)
+            TriggerLevel2(18)
+            BuffLevel(1)
+            BuffGroup(1)
+            ChangeData(CurrentHP,100,0)
+        ]

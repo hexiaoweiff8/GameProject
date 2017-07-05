@@ -158,7 +158,7 @@ public class AstarTest : MonoBehaviour {
 ";
         string formulaStr4 = @"SkillNum(1004)
 {
-        Move(1, 3, 0)
+        Move(1, 3, false)
 }";
         string formulaStr5 = @"SkillNum(1005)
     {
@@ -197,12 +197,16 @@ public class AstarTest : MonoBehaviour {
                     Buff(1,1007)
                     Buff(1,1008)
                     //PointToObj(1,test/TrailPrj,10,0,10,1,10),
-                    Point(1,test/ExplordScope,1,%1,10,1,10),   
+                    //Point(1,test/ExplordScope,1,%1,10,1,10),   
                 }
             }
         }
 
         [
+            CDTime(1)
+            CDGroup(2)
+            Icon(test/Icon1)
+            ReleaseTime(10)
             TriggerLevel1(1)
             TriggerLevel2(1)
             Description(哟哦哦{%0},哦哟哦哟{%1})
@@ -230,6 +234,9 @@ public class AstarTest : MonoBehaviour {
         Action
         {
             ResistDemage(1,3,1,true)
+            {
+                Point(1,test/ExplordScope,0,3,10,1,10),  
+            }
         }
         [
             BuffTime(10)
@@ -237,7 +244,7 @@ public class AstarTest : MonoBehaviour {
             TriggerLevel2(10)
             DetachTriggerLevel1(3)
             DetachTriggerLevel2(10)
-            DetachQualified(ResistDemage,<=,0.0)
+            DetachQualified(ResistDemage,<=,0.0f)
         ]
 ";
 

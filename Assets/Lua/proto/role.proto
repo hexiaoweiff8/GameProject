@@ -7,6 +7,7 @@ message Currency{
     required int32 expPool      =4;
     required int32 coin         =5;
     required int32 tili         =6;
+    required int32 power        =7;
 };
 
 
@@ -32,13 +33,13 @@ message Item{
 
 message RemakeItem{
     required int32 id			=1;
-    required int32 val			=2;
+    required float val			=2;
 };
 
 
 message SndAttr{
     required int32 id			=1;
-    required int32 val			=2;
+    required float val			=2;
     required int32 isRemake		=3;
     repeated RemakeItem remake	=4;
 };
@@ -68,6 +69,26 @@ message Sci{
 };
 
 
+message Rewardfrm{
+    required string type        =1;
+    required string name        =2;
+    required int32  num         =3;
+    optional int32  ex          =4[default=0];
+};
+
+
+message Mail{
+    required string _id         =1;
+    required string title       =2;
+    required string sender      =3;
+    required int32 receiver     =4;
+    required string content     =5;
+    repeated Rewardfrm rewards = 6;
+    required int32 time         =7;
+    required string way         =8;
+};
+
+
 message Role{
     required int32 uId			=1;
     required int32 hostId		=2;
@@ -83,4 +104,5 @@ message Role{
     repeated Equip equip        =12;
     optional OpFields opFields  =13;
     repeated Sci sci            =14;
+    repeated int32 fitEquip     =15;
 }

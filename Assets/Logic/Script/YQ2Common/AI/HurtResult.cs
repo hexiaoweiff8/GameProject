@@ -64,12 +64,6 @@ public class HurtResult
             result = target.ClusterData.AllData.MemberData.TotalHp*value;
         }
 
-        // 如果是伤害 则乘-1
-        if (type == DemageOrCure.Demage)
-        {
-            result *= -1;
-        }
-
         return result;
     }
 

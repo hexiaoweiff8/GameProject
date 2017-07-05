@@ -9,10 +9,13 @@ skillUtil = class("skillUtil")
     根据卡牌的信息获取技能ID
     cardId  卡牌id
     cardLv  卡牌等级
-    index   开牌技能的index（卡牌的第几个技能）
+    index   开牌技能的index（卡牌的第几个技能或者卡牌星级）
 ]]
 function skillUtil:getSkillIDByCard( cardId, cardLv, index )
     -- body
+    if index > 5 then 
+        return
+    end 
     local uid = tonumber(string.format("%d%.3d", cardId, cardLv))--通过卡牌id和卡牌等级联合获取
     return sdata_armybase_data:GetFieldV("Skill"..index, uid)
 end

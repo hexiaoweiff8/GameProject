@@ -107,8 +107,9 @@ public class BuffManager
     /// <param name="buffId">buffID</param>
     /// <param name="receive">buff的接受者</param>
     /// <param name="release">buff的释放者</param>
+    /// <param name="buffRank">Buff等级</param>
     /// <returns></returns>
-    public BuffInfo CreateBuffInfo(int buffId, DisplayOwner receive, DisplayOwner release)
+    public BuffInfo CreateBuffInfo(int buffId, DisplayOwner receive, DisplayOwner release, int buffRank = 1)
     {
         BuffInfo result = null;
 
@@ -147,6 +148,7 @@ public class BuffManager
         buffInstanceDic.Add(result.AddtionId, result);
         result.ReceiveMember = receive;
         result.ReleaseMember = release;
+        result.BuffRank = buffRank;
         return result;
     }
 
@@ -207,7 +209,8 @@ public class BuffManager
             DetachTriggerLevel2 = buffInfo.DetachTriggerLevel2,
             DetachQualifiedKeyList = buffInfo.DetachQualifiedKeyList,
             DetachQualifiedOptionList = buffInfo.DetachQualifiedOptionList,
-            DetachQualifiedValueList = buffInfo.DetachQualifiedValueList
+            DetachQualifiedValueList = buffInfo.DetachQualifiedValueList,
+            BuffRank =  buffInfo.BuffRank
         };
         result.AddActionFormulaItem(buffInfo.GetActionFormulaItem());
         result.AddAttachFormulaItem(buffInfo.GetAttachFormulaItem());
@@ -326,7 +329,7 @@ public class BuffManager
                 break;
 
             case BuffDoType.Detach:
-                Debug.Log("Buff Detach");
+                Debug.Log("Buff Detach:" + buffInfo.AddtionId);
                 buffInfo.ReceiveMember.ClusterData.AllData.BuffInfoList.Remove(buffInfo);
                 formula = buffInfo.GetDetachFormula(paramsPacker);
                 // 检查TriggerTicker中是否有该buff, 如果有则删除
@@ -349,12 +352,12 @@ public class BuffManager
     /// <param name="packer">技能数据包</param>
     public void DoBuffInfo([NotNull] BuffInfo buffInfo, [NotNull] FormulaParamsPacker packer)
     {
-        //var objId = packer.ReleaseMember.ClusterData.AllData.MemberData.ObjID.ID;
+        var objId = packer.ReleaseMember.ClusterData.AllData.MemberData.ObjID.ID;
         //var buffNum = buffInfo.Num;
         // 技能是否在CD
-        if (!CDTimer.Instance().IsInCD(buffInfo.AddtionId))
+        if (!CDTimer.Instance().IsInCD(buffInfo.Num, objId, buffInfo.BuffGroup))
         {
-            CDTimer.Instance().SetInCD(buffInfo.AddtionId, 1);
+            CDTimer.Instance().SetInCD(buffInfo.Num, 1, objId, buffInfo.BuffGroup);
             // 技能CDGroup
             // 技能可释放次数-暂时不做
 
@@ -404,7 +407,7 @@ public class BuffManager
             return true;
         }
         // 是否存在同组buff且不高于新buff的level的buff
-        var replaceBuff = sameGroupBuffList.FirstOrDefault(tmpBuff => tmpBuff.BuffLevel < buffInfo.BuffLevel);
+        var replaceBuff = sameGroupBuffList.FirstOrDefault(tmpBuff => tmpBuff.BuffLevel <= buffInfo.BuffLevel && tmpBuff.BuffRank <= buffInfo.BuffRank);
         if (replaceBuff == null)
         {
             Debug.Log("buff互斥");

@@ -93,7 +93,7 @@ end
 function upSoldier_controller:soldier_Up_CallBack()
     --判断是否可以刷新界面
     if data:isCan_UpSoldier() ~= 0 then
-        ui_manager:ShowWB(WNDTYPE.ui_tips)
+        tips:show( tipsText )
         return
     end
     --发消息,提升等级,刷新界面

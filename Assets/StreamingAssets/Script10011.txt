@@ -1,0 +1,23 @@
+SkillNum(10011)
+Action
+{
+	PointToPoint(1, test/TrailPrb, 0, 1, 10, 0, 1,1,1);
+	PointToObj(1, test/TrailPrb, 100, 0, 1,1,1);
+	Point(1, test/Exprold, 0, 3, 1,1,1);
+	CollisionDetection(1, -1, 1, 0, 2, 10,0,0);
+	{
+	PointToPoint(1, test/TeailPrb, 0, 1, 10, 0, 1,1,1);
+	}
+	SlideCollisionDetection(1, 10, 100, 20, 100, 2);
+	{
+	PointToObj(1, test/TrailPrb, 100, 0, 1,1,1);
+	}
+	Buff(1, 1007);
+	Skill(1, 10000);
+	If(1, 0, Health, 0_100);
+	{
+	HealthChange(1, 0, 0, 1, 100);
+	}
+}
+[
+]

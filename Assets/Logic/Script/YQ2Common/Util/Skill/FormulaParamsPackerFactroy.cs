@@ -75,6 +75,8 @@ public class FormulaParamsPackerFactroy
             TargetMaxCount = targetMaxCount,
             IsNotLethal = isNotLethal,
             Skill = skill,
+            StartPos = startObj != null ? startObj.ClusterData.transform.position : Vector3.zero,
+            TargetPos = targetObj != null ? targetObj.ClusterData.transform.position : Vector3.zero,
         };
 
         return result;
@@ -325,6 +327,10 @@ public class FormulaParamsPackerFactroy
         to.SkillNum = from.SkillNum;
         to.ReleaseMember = from.ReleaseMember;
         to.IsNotLethal = from.IsNotLethal;
+        to.TargetMaxCount = from.TargetMaxCount;
+        to.TriggerData = from.TriggerData;
+        if (to.ReleaseMember.ClusterData != null)
+        to.StartPos = to.ReleaseMember.ClusterData.transform.position;
         return to;
     }
 

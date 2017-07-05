@@ -406,4 +406,10 @@ public class VOBase
         Skill4 = data.Skill4;
         Skill5 = data.Skill5;
     }
+
+
+    public override string ToString()
+    {
+        return "HP:" + _currentHP + ", TotalHP" + _totalHP;
+    }
 }

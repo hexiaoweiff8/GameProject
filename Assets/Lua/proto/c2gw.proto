@@ -1,4 +1,5 @@
 syntax = "proto2";
+import "role.proto";
 
 
 message LoginGame {
@@ -10,6 +11,10 @@ message LoginGame {
 message RegisterRole {
     required string userName    =1;
     optional int32  hostId      =2;
+    required string mac         =3;
+    required string idfa        =4;
+    required string googleId    =5;
+    required string chlId       =6;
 }
 
 
@@ -90,9 +95,31 @@ message SciSpeed {
     required int32 sciId        =1;
 }
 
+
 message CardUnionLvlup {
     required int32 cardId       =1;
     required int32 unionId      =2;
+}
+
+
+message GetMailReward {
+    required string id          =1;
+}
+
+
+message EquipFit {
+    repeated int32 lst          =1;
+}
+
+
+message SellItem {
+    repeated Item item          =1;
+}
+
+
+message SellEquip {
+    required int32  sellType    =1;
+    repeated int32  equip       =2;
 }
 
 

@@ -159,7 +159,7 @@ end
 function upSynergy_controller:upSynergyP_btnOk_onClicked(index)
     --判断当前是否可以协同升级
     if data:isCan_UpSynergy(index) ~= 0 then
-        ui_manager:ShowWB(WNDTYPE.ui_tips)
+        tips:show( tipsText )
         return 
     end
     UpSynergyIndex = index

@@ -17,8 +17,19 @@ public class SkillScriptEditor : BaseScriptEditor
     /// <summary>
     /// 文件名称
     /// </summary>
-    protected new string FileName = "SkillScript";
+    public override string FileName
+    {
+        get { return "SkillScript"; }
+    }
 
+
+    /// <summary>
+    /// 脚本起始内容
+    /// </summary>
+    public override string NumStart
+    {
+        get { return "Skill"; }
+    }
 
     /// <summary>
     /// GUI绘制
@@ -172,6 +183,18 @@ public class SkillScriptEditor : BaseScriptEditor
         if (GUILayout.Button("技能可释放次数"))
         {
             SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.ReleaseTime, this.position);
+        }
+        if (GUILayout.Button("触发事件Level1"))
+        {
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.TriggerLevel1, this.position);
+        }
+        if (GUILayout.Button("触发事件Level2"))
+        {
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.TriggerLevel2, this.position);
+        }
+        if (GUILayout.Button("数据修正"))
+        {
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.ChangeData, this.position);
         }
         if (GUILayout.Button("技能描述"))
         {

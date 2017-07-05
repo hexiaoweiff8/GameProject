@@ -33,10 +33,6 @@ public class TriggerData
     {
         get
         {
-            if (TypeLevel2 == TriggerLevel2.BeAttack)
-            {
-                return -healthChangeValue;
-            }
             return healthChangeValue;
         }
         set { healthChangeValue = value; }
@@ -58,6 +54,11 @@ public class TriggerData
     /// 是否不致死
     /// </summary>
     public bool IsNotLethal { get; set; }
+
+    /// <summary>
+    /// 伤害是否被吸收
+    /// </summary>
+    public bool IsAbsorption { get; set; }
 
     /// <summary>
     /// 生命值变动量

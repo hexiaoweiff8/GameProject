@@ -8,14 +8,18 @@ function information_view:init_view(arg)
      --卡牌信息部分
     -- refresh information body
     self.information_Panel = self.informationBody_Panel.transform:Find("information_panel").gameObject
-    self.infoP_healthL = self.information_Panel.transform:Find("property/health/value").gameObject--生命
-    self.infoP_damagePSecondL = self.information_Panel.transform:Find("property/damagePSecond/value").gameObject--秒伤
-    self.infoP_attackL = self.information_Panel.transform:Find("property/attack/value").gameObject--火力
-    self.infoP_teamL = self.information_Panel.transform:Find("property/team/value").gameObject--队伍
-    self.infoP_defenceL = self.information_Panel.transform:Find("property/defence/value").gameObject--防御
-    self.infoP_aimGeneralTypeL = self.information_Panel.transform:Find("property/aimGeneralType/value").gameObject--目标
-    self.infoP_shotDistanceL = self.information_Panel.transform:Find("property/shotDistance/value").gameObject--射程
-    self.infoP_attackTypeL = self.information_Panel.transform:Find("property/attackType/value").gameObject--范围
+    self.propertyTbl={} --注意顺序
+    table.insert( self.propertyTbl, self.information_Panel.transform:Find("property/health/value").gameObject )--生命
+    table.insert( self.propertyTbl, self.information_Panel.transform:Find("property/damagePSecond/value").gameObject )--秒伤
+    table.insert( self.propertyTbl, self.information_Panel.transform:Find("property/attack/value").gameObject )--火力
+    table.insert( self.propertyTbl, self.information_Panel.transform:Find("property/team/value").gameObject )--队伍
+    table.insert( self.propertyTbl, self.information_Panel.transform:Find("property/defence/value").gameObject )--防御
+    table.insert( self.propertyTbl, self.information_Panel.transform:Find("property/aimGeneralType/value").gameObject )--目标
+    table.insert( self.propertyTbl, self.information_Panel.transform:Find("property/shotDistance/value").gameObject )--射程
+    table.insert( self.propertyTbl, self.information_Panel.transform:Find("property/attackType/value").gameObject )--范围
+    self.infoP_propTip = self.information_Panel.transform:Find("property/propTip").gameObject
+    self.infoP_propTipLab = self.information_Panel.transform:Find("property/propTip/lab").gameObject
+
 
     --兵种克制
     self.suppressPanel = self.information_Panel.transform:Find("suppressPanel").gameObject
@@ -40,6 +44,16 @@ function information_view:init_view(arg)
     self.upQualityP_Cost_Lab = self.upQuality_Panel.transform:Find("upQuality_Cost/cost_Lab").gameObject
     self.maxUpQuality_Panel = self.informationBody_Panel.transform:Find("maxQuality_panel").gameObject
     self.maxUpQualityP_Lab = self.maxUpQuality_Panel.transform:Find("maxQuality_label").gameObject
+end
+
+function information_view:init_cardDetailView()
+    self.cardDetail = view.transform:Find("right/cardDetail").gameObject
+    self.scrollView = self.cardDetail.transform:Find("property").gameObject
+    self.cardDetail_Tip = self.cardDetail.transform:Find("property/propTip").gameObject
+    self.cardDetail_TipLab = self.cardDetail.transform:Find("property/propTip/lab").gameObject
+    self.cardDetailTbl={}
+    self.cardDetail_maskPanel = self.cardDetail.transform:Find("MaskPanle").gameObject
+
 end
 
 

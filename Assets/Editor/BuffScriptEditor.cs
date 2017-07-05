@@ -20,7 +20,18 @@ public class BuffScriptEditor : BaseScriptEditor
     /// <summary>
     /// 文件名称
     /// </summary>
-    protected new string FileName = "BuffScript";
+    public override string FileName
+    {
+        get { return "BuffScript"; } 
+    }
+
+    /// <summary>
+    /// 脚本起始内容
+    /// </summary>
+    public override string NumStart
+    {
+        get { return "Buff"; } 
+    }
 
     /// <summary>
     /// GUI刷新
@@ -179,6 +190,10 @@ public class BuffScriptEditor : BaseScriptEditor
         {
             BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.Description, this.position);
         }
+        if (GUILayout.Button("数据修正"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.ChangeData, this.position);
+        }
         if (GUILayout.Button("BuffIcon路径"))
         {
             BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.Icon, this.position);
@@ -187,9 +202,21 @@ public class BuffScriptEditor : BaseScriptEditor
         {
             BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.BuffTime, this.position);
         }
+        if (GUILayout.Button("Buff TickTime"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.TickTime, this.position);
+        }
         if (GUILayout.Button("Buff类型"))
         {
             BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.BuffType, this.position);
+        }
+        if (GUILayout.Button("Buff触发事件1"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.TriggerLevel1, this.position);
+        }
+        if (GUILayout.Button("Buff触发事件2"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.TriggerLevel2, this.position);
         }
         if (GUILayout.Button("Buff Detach触发事件1"))
         {
@@ -267,7 +294,7 @@ public class BuffScriptEditor : BaseScriptEditor
                 }
 
                 // 如果是Buff描述开始
-                if (line.StartsWith("SkillNum"))
+                if (line.StartsWith("BuffNum"))
                 {
                     // 读取Buff号
                     var start = line.IndexOf("(", StringComparison.Ordinal);

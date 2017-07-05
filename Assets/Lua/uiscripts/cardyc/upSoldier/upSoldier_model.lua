@@ -4,18 +4,20 @@ local upSoldier_model={}
 --获取数据库信息
 function upSoldier_model:getDatas(cardIndex)
     print("================upSoldier_model:getDatas============start===========")
-    if currencyTbl == nil or cardTbl == nil or userRoleTbl == nil  then
+    local _currencyTbl = currencyModel:getCurrentTbl()
+    local _cardTbl = cardModel:getCardTbl()
+    if _currencyTbl == nil or _cardTbl == nil then
         return false
     end 
-    if not cardTbl[cardIndex] then
+    if not _cardTbl[cardIndex] then
         return false
     end 
-    self.badgeNum = currencyTbl["coin"] --兵牌
-    self.cardId =cardTbl[cardIndex].id
-    self.cardLv =cardTbl[cardIndex].lv
-    self.starLv =cardTbl[cardIndex].star
-    self.soldierLv = cardTbl[cardIndex].slv
-    self.cardFragment = cardTbl[cardIndex].num
+    self.badgeNum = _currencyTbl["coin"] --兵牌
+    self.cardId =_cardTbl[cardIndex].id
+    self.cardLv =_cardTbl[cardIndex].lv
+    self.starLv =_cardTbl[cardIndex].star
+    self.soldierLv = _cardTbl[cardIndex].slv
+    self.cardFragment = _cardTbl[cardIndex].num
     print("================upSoldier_model:getDatas============end===========")
     return true
     

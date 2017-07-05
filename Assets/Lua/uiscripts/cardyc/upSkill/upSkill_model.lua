@@ -4,19 +4,21 @@ local upSkill_model={}
 --获取数据库信息
 function upSkill_model:getDatas(cardIndex)
     print("================upSkill_model:getDatas============start===========")
-    if currencyTbl == nil or cardTbl == nil or userRoleTbl == nil  then
+    local _currencyTbl = currencyModel:getCurrentTbl()
+    local _cardTbl = cardModel:getCardTbl()
+    if _currencyTbl == nil or _cardTbl == nil then
         return false
     end 
-    if not cardTbl[cardIndex] then
+    if not _cardTbl[cardIndex] then
         return false
-    end 
-    self.badgeNum = currencyTbl["coin"] --兵牌
-    self.totalSkPt = currencyTbl["skillpt"] --技能点
-    self.cardId =cardTbl[cardIndex].id
-    self.cardLv =cardTbl[cardIndex].lv
-    self.starLv =cardTbl[cardIndex].star
-    self.qualityLv = cardTbl[cardIndex].rlv
-    self.skill_Lv_Table = cardTbl[cardIndex].skill
+    end
+    self.badgeNum = _currencyTbl.coin --兵牌
+    self.totalSkPt = _currencyTbl.skillpt --技能点
+    self.cardId =_cardTbl[cardIndex].id
+    self.cardLv =_cardTbl[cardIndex].lv
+    self.starLv =_cardTbl[cardIndex].star
+    self.qualityLv = _cardTbl[cardIndex].rlv
+    self.skill_Lv_Table = _cardTbl[cardIndex].skill
     self:init_skillIDTable()
     print("================upSkill_model:getDatas============end===========")
     return true

@@ -3,18 +3,20 @@ local upSynergy_model = {}
 --获取数据库信息
 function upSynergy_model:getDatas(cardIndex)
     print("================upSynergy_model:getDatas============start===========")
-    if currencyTbl == nil or cardTbl == nil or userRoleTbl == nil  then
+    local _currencyTbl = currencyModel:getCurrentTbl()
+    local _cardTbl = cardModel:getCardTbl()    
+    if _currencyTbl == nil or _cardTbl == nil then
         return false
     end 
-    if not cardTbl[cardIndex] then
+    if not _cardTbl[cardIndex] then
         return false
     end 
-    self.goldNum = currencyTbl["gold"] --金币
-    self.badgeNum = currencyTbl["coin"] --兵牌
-    self.cardId =cardTbl[cardIndex].id
-    self.cardLv =cardTbl[cardIndex].lv
-    self.starLv =cardTbl[cardIndex].star
-    self.synergyLvTbl = cardTbl[cardIndex].team--协同表
+    self.goldNum = _currencyTbl["gold"] --金币
+    self.badgeNum = _currencyTbl["coin"] --兵牌
+    self.cardId =_cardTbl[cardIndex].id
+    self.cardLv =_cardTbl[cardIndex].lv
+    self.starLv =_cardTbl[cardIndex].star
+    self.synergyLvTbl = _cardTbl[cardIndex].team--协同表
     self:init_synergyIDTbl()
     self:init_synergyStateTbl()
     print("================upSynergy_model:getDatas============end===========")
@@ -57,7 +59,7 @@ end
 
 function upSynergy_model:isCan_UpSynergy(index)
     local isCardCan = false
-    for k,v in ipairs(cardTbl) do 
+    for k,v in ipairs(cardModel:getCardTbl()) do
         if self.synergyIDTbl[index] == v.id then 
             if v.star < synergyUtil:getRequireCardStar(self.synergyIDTbl[index],index) then 
                 print("协同---卡牌星级不足！！！")
@@ -108,7 +110,7 @@ end
 
 --获取卡牌对象
 function upSynergy_model:getCardByID(cardId)
-    for k,v in ipairs(cardTbl) do
+    for k,v in ipairs(cardModel:getCardTbl()) do
         if v.id == cardId then
             return v
         end

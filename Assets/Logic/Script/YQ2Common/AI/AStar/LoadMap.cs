@@ -119,6 +119,11 @@ public class LoadMap : MonoBehaviour
         Single = this;
     }
 
+    void Awake()
+    {
+        Start();
+    }
+
     void Update()
     {
         // 画格子

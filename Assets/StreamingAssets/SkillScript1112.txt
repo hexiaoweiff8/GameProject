@@ -1,0 +1,15 @@
+SkillNum(1112)
+Action
+{
+	//PointToObj(1, test/TrailPrj, 10, 0, 1,1,1);
+	Buff(1, 2222, 0);
+	//Point(1,test/ExplordScope,1,0,3,10,1,10);
+	//CollisionDetection(0, -1, 1, 0, -1, 50, 0, 0)
+	//{
+	//	Skill(1, 1113, 1)
+	//}
+	//HealthChange(1, 0, 0, 1, 20);
+}
+[
+	CDTime(2);
+]

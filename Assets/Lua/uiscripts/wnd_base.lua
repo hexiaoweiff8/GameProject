@@ -30,7 +30,7 @@ wnd_base_type =
         ABOVE_TUTORIAL = 8,
     }
 	
-local wndDepth = {2, 10, 250, 10000, 750, 1000, 1250, 1500}
+local wndDepth = {2, 10, 250, 500, 750, 1000, 1250, 1500}
 
 wnd_base = class("wnd_base")
 function wnd_base:initialize(_wnd_base_id)

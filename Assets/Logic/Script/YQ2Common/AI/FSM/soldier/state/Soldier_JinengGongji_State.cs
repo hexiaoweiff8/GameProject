@@ -11,7 +11,7 @@ public class Soldier_JinengGongji_State : SoldierFSMState
 
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
-        //Debug.Log("技能攻击:" + fsm.Display.GameObj.name);
+        Debug.Log("技能攻击:" + fsm.Display.GameObj.name);
         // 单位转向目标
         var clusterData = fsm.Display.ClusterData as ClusterData;
         if (clusterData != null)

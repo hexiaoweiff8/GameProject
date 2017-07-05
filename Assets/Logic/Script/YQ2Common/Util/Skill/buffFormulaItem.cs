@@ -33,7 +33,7 @@ public class BuffFormulaItem : AbstractFormulaItem
             throw new Exception("数据列表为空");
         }
 
-        var argsCount = 2;
+        var argsCount = 3;
         // 解析参数
         if (array.Length < argsCount)
         {
@@ -42,9 +42,11 @@ public class BuffFormulaItem : AbstractFormulaItem
 
         var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
         var buffNum = GetDataOrReplace<int>("BuffNum", array, 1, ReplaceDic);
+        var buffTarget = GetDataOrReplace<int>("BuffTarget", array, 2, ReplaceDic);
 
         FormulaType = formulaType;
         BuffNum = buffNum;
+        BuffTarget = buffTarget;
     }
 
 

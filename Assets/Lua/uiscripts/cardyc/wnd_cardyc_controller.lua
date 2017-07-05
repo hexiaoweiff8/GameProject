@@ -12,16 +12,16 @@ local upLevel = require("uiscripts/cardyc/upLevel/upLevel_controller")
 local upStar = require("uiscripts/cardyc/upStar/upStar_controller")
 
 require("uiscripts/tabsControl")
---显示界面
-local TABLE_INDEX={
-    INFORMATION =1,
-    SKILL =2,
-    SOLDIER =3,
-    SYNERGY =4
-}
-local cardIndex = 1
-function wnd_cardyc_controller:OnShowDone()
 
+
+
+
+local cardIndex = 1
+local currentTab = 0
+local tabBtn
+local tabPanel
+local tabControl
+function wnd_cardyc_controller:OnShowDone()
     --初始化view
     view:init_view(self)
     view:getView()
@@ -70,38 +70,38 @@ function wnd_cardyc_controller:refresh_leftCard_Data()
            star:SetActive(false)
        end
     end
-    UIEventListener.Get(view.btn_upLevel).onPress = function(btn_upLevel, args)
-        if args then
-            upLevel:show_UpLevel_Layer(cardIndex)
+    
+
+    UIEventListener.Get(view.btn_detail).onClick = function()
+        currentTab = tabControl:getCurrentPanelIndex()
+        information_controller:show_cardDetailPanel(tabPanel[currentTab])
+    end
+
+
+    UIEventListener.Get(view.btn_upLevel).onClick = function()
+        upLevel:show_UpLevel_Layer(cardIndex)
+    end
+    UIEventListener.Get(view.btn_upStar).onClick = function()
+        upStar:show_UpStar_Layer(cardIndex) 
+    end
+    UIEventListener.Get(view.btn_left).onClick = function()
+        if cardIndex > 1 then
+            cardIndex = cardIndex - 1
+            self:refresh()
+        else
+            --无更多卡牌
+            tipsText = stringUtil:getString(20701)
+            tips:show( tipsText )
         end
     end
-    UIEventListener.Get(view.btn_upStar).onPress = function(btn_upStar, args)
-        if args then
-            upStar:show_UpStar_Layer(cardIndex)
-        end
-    end
-    UIEventListener.Get(view.btn_left).onPress = function(btn_left, args)
-        if args then
-            if cardIndex > 1 then
-                cardIndex = cardIndex - 1
-                self:refresh()
-            else
-                --无更多卡牌
-                tipsText = stringUtil:getString(20701)
-                ui_manager:ShowWB(WNDTYPE.ui_tips)
-            end
-        end
-    end
-    UIEventListener.Get(view.btn_right).onPress = function(btn_right, args)
-        if args then
-            if cardIndex < data:getCardNum() then
-                cardIndex = cardIndex + 1
-                self:refresh()
-            else
-                --无更多卡牌
-                tipsText = stringUtil:getString(20701)
-                ui_manager:ShowWB(WNDTYPE.ui_tips)
-            end
+    UIEventListener.Get(view.btn_right).onClick = function()
+        if cardIndex < data:getCardNum() then
+            cardIndex = cardIndex + 1
+            self:refresh()
+        else
+            --无更多卡牌
+            tipsText = stringUtil:getString(20701)
+            tips:show( tipsText )
         end
     end
 end
@@ -118,12 +118,12 @@ end
 --tab切换部分
 function wnd_cardyc_controller:init_tabPanel()
     print("init_tabs")
-    local tabBtn = {view.btn_information,view.btn_skill,view.btn_soldier,view.btn_synergy}
+    tabBtn = {view.btn_information,view.btn_skill,view.btn_soldier,view.btn_synergy}
     for i=1,#tabBtn do
         tabBtn[i].transform:Find("lab"):GetComponent("UILabel").text = stringUtil:getString(20019+i)
     end
-    local tabPanel = {view.informationBody_Panel,view.skillPanel,view.soldierPanel,view.synergyPanel}
-    local tabC1=tabsControl(tabBtn, tabPanel)
+    tabPanel = {view.informationBody_Panel,view.skillPanel,view.soldierPanel,view.synergyPanel}
+    tabControl=tabsControl(tabBtn, tabPanel)
 end
 
 

@@ -15,6 +15,8 @@ function Config_Manager:LoadConfig()
     sdata_equip_data = luacsv.new(require("pk_tabs/equip_c"))
     --读取属性名数据表
     sdata_attribute_data = luacsv.new(require("pk_tabs/attribute_c"))
+    --读取装备属性成长值表
+    sdata_attributeplan_data = luacsv.new(require("pk_tabs/attributeplan_c"))
     --读取装备套装数据表
     sdata_equipsuit_data = luacsv.new(require("pk_tabs/equipsuit_c"))
     --读取装备属性方案数据表
@@ -64,9 +66,11 @@ function Config_Manager:LoadConfig()
     --手选宝箱表
     sdata_selectchest_data = luacsv.new(require("pk_tabs/selectchest_c"))
     --仓库物品表
-    sdata_cangku_data = luacsv.new(require("pk_tabs/item_c"))
+    sdata_item_data = luacsv.new(require("pk_tabs/item_c"))
     --仓库页卡标签表
-    sdata_tab_data = luacsv.new(require("pk_tabs/pack_c"))
+    sdata_pack_data = luacsv.new(require("pk_tabs/pack_c"))
+    --装备强化所需能量表
+    sdata_equippower_data = luacsv.new(require("pk_tabs/equippower_c")) 
     
     -----------------------------------C#需要调用的配置表在以下位置添加---------------------------------------
     SDataUtils.setData("armyaim_c", sdata_armyaim_data.mData.head, sdata_armyaim_data.mData.body)

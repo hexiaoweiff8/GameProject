@@ -37,9 +37,11 @@ public class PauseFormulaItem : AbstractFormulaItem
     /// <returns>暂停行为节点</returns>
     public override IFormula GetFormula(FormulaParamsPacker paramsPacker)
     {
+        IFormula result = null;
         // 数据本地化
         var myCheckTime = CheckTime;
-        return new Formula((callback) =>
+        
+        result = new Formula((callback) =>
         {
             //Debug.Log("Pause");
             var timer = new Timer(myCheckTime);
@@ -63,5 +65,21 @@ public class PauseFormulaItem : AbstractFormulaItem
             timer.OnCompleteCallback(completeCallback);
             timer.Start();
         }, FormulaType);
+
+        return result;
     }
+
+    ///// <summary>
+    ///// 检查数据是否合法
+    ///// </summary>
+    ///// <param name="paramsPacker"></param>
+    ///// <returns></returns>
+    //private bool CheckData(FormulaParamsPacker paramsPacker)
+    //{
+    //    if (paramsPacker.ReceiverMenber.ClusterData == null || paramsPacker.ReleaseMember.ClusterData == null)
+    //    {
+    //        return false;
+    //    }
+    //    return true;
+    //}
 }

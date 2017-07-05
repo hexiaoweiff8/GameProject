@@ -79,6 +79,12 @@ public class ResistDemageFormulaItem : AbstractFormulaItem
         var mySkill = paramsPacker.Skill;
         var myTrigger = paramsPacker.TriggerData;
 
+        result = new Formula((callback) =>
+        {
+
+        },
+        myFormulaType);
+
         Debug.Log("构造伤害吸收行为");
         if (mySkill.SkillDataScope.GetFloat("ResistDemage") == null)
         {
@@ -86,43 +92,64 @@ public class ResistDemageFormulaItem : AbstractFormulaItem
             mySkill.SkillDataScope.SetFloat("ResistDemage", myResistDemage);
             mySkill.SkillDataScope.SetFloat("AllResistDemage", myResistDemage);
         }
+        Debug.Log("当前生命值变动量:" + myTrigger.HealthChangeValue);
 
-        result = new Formula((callback) =>
+        // 无伤害可吸收
+        if (myTrigger.HealthChangeValue <= 0)
         {
-            Debug.Log("当前生命值变动量:" + myTrigger.HealthChangeValue);
-            if (myTrigger.HealthChangeValue <= 0)
+            return result;
+        }
+        var nowCouldResistDemage = mySkill.SkillDataScope.GetFloat("ResistDemage");
+        // 伤害吸收结束
+        if (nowCouldResistDemage <= 0)
+        {
+            return result;
+        }
+        var needResistDemage = myTrigger.HealthChangeValue * myResistPercentage;
+        var absNeedRessitDemage = Math.Abs(needResistDemage);
+        if (nowCouldResistDemage != null)
+        {
+            if (absNeedRessitDemage > nowCouldResistDemage)
             {
-                return;
-            }
-            var nowCouldResistDemage = mySkill.SkillDataScope.GetFloat("ResistDemage");
-            var needResistDemage = myTrigger.HealthChangeValue * myResistPercentage;
-            var absNeedRessitDemage = Math.Abs(needResistDemage);
-            if (nowCouldResistDemage != null)
-            {
-                if (absNeedRessitDemage > nowCouldResistDemage)
+                if (myIsResistOverflowDemage)
                 {
-                    if (myIsResistOverflowDemage)
-                    {
-                        myTrigger.HealthChangeValue = 0;
-                    }
-                    else
-                    {
-                        myTrigger.HealthChangeValue -= nowCouldResistDemage.Value;
-                    }
-                    // 清空伤害吸收
-                    mySkill.SkillDataScope.SetFloat("ResistDemage", 0);
+                    myTrigger.HealthChangeValue = 0;
                 }
                 else
                 {
-                    Debug.Log("吸收伤害");
-                    myTrigger.HealthChangeValue -= needResistDemage;
-                    nowCouldResistDemage -= absNeedRessitDemage;
-                    // 设置剩余伤害量
-                    mySkill.SkillDataScope.SetFloat("ResistDemage", nowCouldResistDemage.Value);
+                    myTrigger.HealthChangeValue -= nowCouldResistDemage.Value;
+                }
+                // 清空伤害吸收
+                mySkill.SkillDataScope.SetFloat("ResistDemage", 0);
+            }
+            else
+            {
+                Debug.Log("吸收伤害");
+                myTrigger.HealthChangeValue -= needResistDemage;
+                nowCouldResistDemage -= absNeedRessitDemage;
+
+                Debug.Log("剩余伤害:" + myTrigger.HealthChangeValue);
+                // 设置剩余伤害量
+                mySkill.SkillDataScope.SetFloat("ResistDemage", nowCouldResistDemage.Value);
+            }
+
+            // 判断是否到达伤害吸收上限
+            if (nowCouldResistDemage == 0)
+            {
+                // 执行子级技能
+                if (SubFormulaItem != null)
+                {
+                    var packer = new FormulaParamsPacker();
+                    FormulaParamsPackerFactroy.Single.CopyPackerData(paramsPacker, packer);
+                    var subSkill = new SkillInfo(packer.SkillNum);
+                    subSkill.DataList = packer.DataList;
+                    subSkill.AddActionFormulaItem(SubFormulaItem);
+                    SkillManager.Single.DoShillInfo(subSkill, packer, true);
                 }
             }
-        },
-        myFormulaType);
+            // 伤害被吸收
+            myTrigger.IsAbsorption = true;
+        }
 
         return result;
     }

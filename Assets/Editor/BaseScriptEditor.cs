@@ -19,7 +19,18 @@ public abstract class BaseScriptEditor : EditorWindow
     /// 文件名称
     /// 需重载
     /// </summary>
-    protected string FileName = "Script";
+    public virtual string FileName
+    {
+        get { return "Script"; } 
+    }
+
+    /// <summary>
+    /// 脚本起始内容
+    /// </summary>
+    public virtual string NumStart
+    {
+        get { return ""; }
+    }
 
     /// <summary>
     /// 被选择的行为脚本index
@@ -223,7 +234,7 @@ public abstract class BaseScriptEditor : EditorWindow
     public void SaveScript()
     {
         string content = String.Empty;
-        content += string.Format("SkillNum({0})", Num);
+        content += string.Format(NumStart + "Num({0})", Num);
 
         // 行为内容
         content += "\r\nAction\r\n{\r\n";

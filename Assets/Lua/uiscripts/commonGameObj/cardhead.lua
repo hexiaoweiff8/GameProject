@@ -14,7 +14,10 @@ function CardHead:initialize(parent, positon)
     self.cardhead_starPanel = self.cardhead.transform:Find("StarPanel").gameObject   
 
     --计算父对象深度
-    local depthNum = parent.transform:GetComponent("UIWidget").depth
+    local depthNum = 1
+    if parent.transform:GetComponent("UIWidget") then 
+        depthNum = parent.transform:GetComponent("UIWidget").depth
+    end 
     --初始化卡牌头像显示信息
     self.cardhead.transform.localPosition = positon
     --设置图集

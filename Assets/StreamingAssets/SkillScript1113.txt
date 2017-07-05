@@ -1,0 +1,6 @@
+SkillNum(1113)
+Action
+{
+	PointToObj(1, test/TrailPrj, 10, 0, 1,1,1);
+	HealthChange(1, 0, 0, 1, 20);
+}

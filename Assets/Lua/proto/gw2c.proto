@@ -14,7 +14,6 @@ message EquipLvlup {
 
 message EquipLock {
     required  Equip  equip          =1;
-    required  Currency currency     =2;
 }
 
 message EquipRepair {
@@ -83,6 +82,30 @@ message SciSpeed {
 message CardUnionLvlup {
     required  Card  card            =1;
     required  Currency currency     =2;
+}
+
+message GetMailList {
+    repeated Mail mails             =1;
+}
+
+message GetMailReward {
+    repeated Card card              =1;
+    repeated Equip equip            =2;
+    required Currency currency      =3;
+    repeated Item item              =4;
+}
+
+message EquipFit {
+    repeated int32 lst              =1;
+}
+
+message SellItem {
+    repeated Item item              =1;
+    required Currency currency      =2;
+}
+
+message SellEquip {
+    required Currency currency      =1;
 }
 
 

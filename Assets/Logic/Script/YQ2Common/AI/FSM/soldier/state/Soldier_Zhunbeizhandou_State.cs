@@ -15,6 +15,8 @@ public class Soldier_Zhunbeizhandou_State : SoldierFSMState
     /// <param name="fsm"></param>
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
+
+        Debug.Log("准备战斗状态:" + fsm.Display.GameObj.name);
         if (fsm.IsCanInPutonggongji || fsm.IsCanInJinenggongji)
         {
             //var myself = fsm.Display.RanderControl;

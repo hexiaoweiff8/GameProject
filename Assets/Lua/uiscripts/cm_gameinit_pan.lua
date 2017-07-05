@@ -6,8 +6,12 @@ require "common/protocal"
 require "manager/Config_Manager"
 require("uiscripts/equipP")
 require("uiscripts/kejiP")
-require("uiscripts/cardyc/cardycP")
 require("uiscripts/Const")
+require("uiscripts/commonModel/card_Model")
+require("uiscripts/commonModel/user_Model")
+require("uiscripts/commonModel/currency_Model")
+require("uiscripts/commonModel/publicEquip_Model")
+
 --引用工具类
 require("uiscripts/Util/stringUtil")
 require("uiscripts/Util/cardUtil")
@@ -18,14 +22,14 @@ require("uiscripts/Util/skillUtil")
 require("uiscripts/Util/starUtil")
 require("uiscripts/Util/itemUtil")
 require("uiscripts/Util/qualityUtil")
+require("uiscripts/Util/publicEquip_Util")
+
 
 
 gameinit = classWC()
 -- 单例
 GameInit = nil
 
---tips信息显示的内容
-tipsText = nil
 
 WNDTYPE = {
     None = "None",
@@ -37,11 +41,11 @@ WNDTYPE = {
     ui_quitGame = "ui_quitGame",
     quiteEnsure_ui = "ui_quiteensure",
     ui_equip = "ui_equip",
+    ui_equip2 = "ui_equip2",
     ui_chongzhu = "ui_chongzhu",
     ui_keji_jiasu = "ui_keji_jiasu",
     ui_kejitree = "ui_kejitree",
     Cardyc = "ui_cardyc",
-    ui_tips = "ui_tips",
     Cangku = "ui_cangku",
 }
 UiDefine = luacsv.new(require("pk_tabs/UiDefine"))
@@ -57,12 +61,12 @@ gameinit.wndlist = {
     {name = WNDTYPE.ui_quitGame, cm = "uiscripts/ui_quitGame"},
     {name = WNDTYPE.quiteEnsure_ui, cm = "uiscripts/ui_pause"},
     {name = WNDTYPE.Prefight, cm = "uiscripts/wnd_prefight"},
+    {name = WNDTYPE.ui_equip2, cm = "uiscripts/myEquip/equip_controller"},
     {name = WNDTYPE.ui_equip, cm = "uiscripts/ui_equip"},
     {name = WNDTYPE.ui_chongzhu, cm = "uiscripts/ui_chongzhu"},
     {name = WNDTYPE.ui_keji_jiasu, cm = "uiscripts/ui_keji_jiasu"},
     {name = WNDTYPE.ui_kejitree, cm = "uiscripts/ui_kejitree"},
     {name = WNDTYPE.Cardyc, cm = "uiscripts/cardyc/wnd_cardyc_controller"},
-    {name = WNDTYPE.ui_tips,cm = "uiscripts/ui_tips"},
     {name = WNDTYPE.Cangku, cm = "uiscripts/cangku/wnd_cangku_controller"},
 }
 _all_Reg_Wnd_list = {}

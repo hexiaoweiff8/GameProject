@@ -157,6 +157,8 @@ public class ClusterManager : ILoopItem
     /// <param name="member">被删除对象</param>
     public void Remove(PositionObject member)
     {
+        // 将member中的数据清除
+        member.Clear();
         targetList.Remove(member);
     }
 
@@ -234,6 +236,14 @@ public class ClusterManager : ILoopItem
         //{
         //    GroupList.Clear();
         //}
+        // 清除数据
+        if (targetList != null)
+        {
+            foreach (var item in targetList.List)
+            {
+                item.Clear();
+            }
+        }
         if (targetList != null)
         {
             targetList.Clear();

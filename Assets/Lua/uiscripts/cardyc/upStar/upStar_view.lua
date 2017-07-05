@@ -9,7 +9,10 @@ function upStar_view:init_UpStarPanel()
     -- body 
     self.upStarPanel = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "upStarPanel",  self.gameObject)
     self.upStarP_skillPanel = self.upStarPanel.transform:Find("skillPanel").gameObject
-    self.upStarP_skillP_NameLab = self.upStarPanel.transform:Find("skillPanel"):Find("skillNameLab").gameObject
+    self.upStarP_skillP_NameLab = self.upStarPanel.transform:Find("skillPanel/skillNameLab").gameObject
+    self.upStarP_skillP_skillInfo = self.upStarPanel.transform:Find("skillPanel/skillInfo").gameObject
+    self.upStarP_skillP_skillDes = self.upStarPanel.transform:Find("skillPanel/skillInfo/des").gameObject
+    
 
     self.upStarP_badgeLab = self.upStarPanel.transform:Find("costNameLab_1").gameObject
     self.upStarP_badgeSp = self.upStarPanel.transform:Find("costSp_1").gameObject

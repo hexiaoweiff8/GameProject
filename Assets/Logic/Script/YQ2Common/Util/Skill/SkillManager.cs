@@ -54,6 +54,11 @@ public class SkillManager
     private static IDictionary<ObjectID, IDictionary<TriggerLevel1, IDictionary<TriggerLevel2, List<TriggerData>>>>
         triggerList = new Dictionary <ObjectID, IDictionary<TriggerLevel1, IDictionary<TriggerLevel2, List<TriggerData>>>>();
 
+    /// <summary>
+    /// 事件缓存
+    /// </summary>
+    private IList<TriggerData> tmpList= new List<TriggerData>();  
+
     ///// <summary>
     ///// 攻击者列表[被攻击者ID, 攻击者列表]
     ///// </summary>
@@ -79,47 +84,48 @@ public class SkillManager
     /// <summary>
     /// 加载并创建技能实例
     /// </summary>
-    /// <param name="skillId">技能ID 必须为>0的整数</param>
+    /// <param name="skillNum">技能ID 必须为>0的整数</param>
     /// <returns>技能实例</returns>
-    public SkillInfo CreateSkillInfo(int skillId)
+    public SkillInfo CreateSkillInfo(int skillNum)
     {
-        return CreateSkillInfo(skillId, null);
+        return CreateSkillInfo(skillNum, null);
     }
 
     /// <summary>
     /// 加载并创建技能实例
     /// TODO 需要判断当前运行状态, 并添加包加载方式
     /// </summary>
-    /// <param name="skillId">技能ID</param>
+    /// <param name="skillNum">技能ID</param>
     /// <param name="skillHolder">技能持有单位</param>
     /// <returns>技能实例</returns>
-    public SkillInfo CreateSkillInfo(int skillId, DisplayOwner skillHolder = null)
+    public SkillInfo CreateSkillInfo(int skillNum, DisplayOwner skillHolder = null)
     {
         SkillInfo result = null;
 
         // 验证技能ID的有效性
-        if (skillId > 0)
+        if (skillNum <= 0)
         {
-            // 检查缓存
-            if (SkillInfoDic.ContainsKey(skillId))
+            return null;
+        }
+        // 检查缓存
+        if (SkillInfoDic.ContainsKey(skillNum))
+        {
+            // 复制技能数据
+            result = SkillInfoDic[skillNum];
+        }
+        else
+        {
+            // 检测文件是否存在
+            var file = new FileInfo(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "SkillScript" + skillNum + ".txt");
+            if (file.Exists)
             {
-                // 复制技能数据
-                result = SkillInfoDic[skillId];
-            }
-            else
-            {
-                // 检测文件是否存在
-                var file = new FileInfo(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "SkillScript" + skillId + ".txt");
-                if (file.Exists)
+                // 加载文件内容
+                var skillTxt = Utils.LoadFileInfo(file);
+                if (!string.IsNullOrEmpty(skillTxt))
                 {
-                    // 加载文件内容
-                    var skillTxt = Utils.LoadFileInfo(file);
-                    if (!string.IsNullOrEmpty(skillTxt))
-                    {
-                        result = FormulaConstructor.SkillConstructor(skillTxt);
-                        // 将其放入缓存
-                        AddSkillInfo(result);
-                    }
+                    result = FormulaConstructor.SkillConstructor(skillTxt);
+                    // 将其放入缓存
+                    AddSkillInfo(result);
                 }
             }
         }
@@ -241,21 +247,21 @@ public class SkillManager
         {
             throw new Exception("方程式对象为空.");
         }
+        // 子级技能没有cd
         if (isSubSkill)
         {
             DoFormula(skillInfo.GetFormula(packer));
         }
         else
         {
-            //var objId = packer.ReleaseMember.ClusterData.AllData.MemberData.ObjID.ID;
+            var objId = packer.ReleaseMember.ClusterData.AllData.MemberData.ObjID.ID;
             //var skillNum = skillInfo.Num;
             // 技能是否在CD
-            if (!CDTimer.Instance().IsInCD(skillInfo.AddtionId))
+            if (!CDTimer.Instance().IsInCD(skillInfo.Num, objId, skillInfo.CDGroup))
             {
-                CDTimer.Instance().SetInCD(skillInfo.AddtionId, 1);
+                CDTimer.Instance().SetInCD(skillInfo.Num, skillInfo.CDTime, objId, skillInfo.CDGroup);
                 // 技能CDGroup
                 // 技能可释放次数-暂时不做
-
                 DoFormula(skillInfo.GetFormula(packer));
             }
             // 否则技能在CD中不能释放
@@ -271,12 +277,13 @@ public class SkillManager
     /// <param name="isSubSkill">是否为子技能</param>
     public void DoSkillNum(int skillNum, FormulaParamsPacker packer, bool isSubSkill = false)
     {
-        if (!SkillInfoDic.ContainsKey(skillNum))
-        {
-            throw new Exception("技能ID不存在:" + skillNum);
-        }
+        //if (!SkillInfoDic.ContainsKey(skillNum))
+        //{
+        //    throw new Exception("技能ID不存在:" + skillNum);
+        //}
+
         // 创建新的技能实例
-        var skillInfo = CopySkillInfo(SkillInfoDic[skillNum]);
+        var skillInfo = CreateSkillInfo(skillNum, packer.ReleaseMember);
         DoShillInfo(skillInfo, packer, isSubSkill);
     }
 
@@ -309,7 +316,7 @@ public class SkillManager
     /// <returns></returns>
     public bool ContainsInstanceSkillId(long skillAddtionId)
     {
-        return SkillInfoDic.ContainsKey(skillAddtionId);
+        return skillInstanceDic.ContainsKey(skillAddtionId);
     }
 
     /// <summary>
@@ -366,7 +373,8 @@ public class SkillManager
     public void CheckAndDoSkillInfo(IList<SkillInfo> skillsList, TriggerData triggerData)
     {
         // 如果攻击时触发
-        foreach (var skill in skillsList.Where(skill => skill != null && skill.TriggerLevel1 == triggerData.TypeLevel1 && skill.TriggerLevel2 == triggerData.TypeLevel2))
+        foreach (var skill in skillsList.Where(
+                skill => skill != null && skill.TriggerLevel1 == triggerData.TypeLevel1 &&  skill.TriggerLevel2 == triggerData.TypeLevel2).ToArray())
         {
             var paramsPacker = FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(skill, triggerData.ReleaseMember,
                 triggerData.ReceiveMember);
@@ -427,6 +435,11 @@ public class SkillManager
                 topNode = topNode.NextFormula;
 
             } while (topNode != null && topNode.CanMoveNext);
+            // 如果完成回调不为空则回调
+            //if (compeletCallback != null)
+            //{
+            //    compeletCallback();
+            //}
         }
     }
 
@@ -443,6 +456,8 @@ public class SkillManager
             return;
         }
 
+        // 放入缓存
+        //tmpList.Add(triggerData);
         var objId = triggerData.ReleaseMember.ClusterData.AllData.MemberData.ObjID;
         if (!triggerList.ContainsKey(objId))
         {
@@ -475,7 +490,7 @@ public class SkillManager
                 var dicLevel2 = dicLevel1[triggerData.TypeLevel1];
                 if (!dicLevel2.ContainsKey(triggerData.TypeLevel2))
                 {
-                    dicLevel2.Add(triggerData.TypeLevel2, new List<TriggerData>() {triggerData});
+                    dicLevel2.Add(triggerData.TypeLevel2, new List<TriggerData>() { triggerData });
                 }
                 else
                 {
@@ -608,149 +623,66 @@ public class SkillManager
                     }
                 }
             }
+            //PushListToTrigger();
         }
     }
 
 
-    ///// <summary>
-    ///// 设置伤害
-    ///// </summary>
-    ///// <param name="beHurtMember">被伤害单位</param>
-    ///// <param name="attackMember">攻击单位</param>
-    ///// <param name="hurt">造成的伤害</param>
-    //public  void SetDamage(DisplayOwner beHurtMember, DisplayOwner attackMember, float hurt)
-    //{
-    //    // 验证数据
-    //    if (beHurtMember == null || attackMember == null)
-    //    {
-    //        return;
-    //    }
-    //    var objId = beHurtMember.ClusterData.MemberData.ObjID;
-    //    // 保存攻击对象
-    //    if (!hitList.ContainsKey(objId))
-    //    {
-    //        hitList.Add(objId, new List<DisplayOwner>()
-    //        {
-    //            attackMember
-    //        });
-    //    }
-    //    else
-    //    {
-    //        hitList[objId].Add(attackMember);
-    //    }
-    //    // 保存伤害
-    //    if (!damageList.ContainsKey(objId))
-    //    {
-    //        damageList.Add(objId, hurt);
-    //    }
-    //    else
-    //    {
-    //        damageList[objId] += hurt;
-    //    }
-    //}
 
-    ///// <summary>
-    ///// 获得该单位所受伤害
-    ///// </summary>
-    ///// <param name="objId"></param>
-    ///// <returns></returns>
-    //public  float GetDemage(ObjectID objId)
-    //{
-    //    var result = 0f;
-
-    //    if (objId != null && damageList.ContainsKey(objId))
-    //    {
-    //        result = damageList[objId];
-    //    }
-
-    //    return result;
-    //}
-
-
-    //public  IList<DisplayOwner> GetAttackMemberList(ObjectID objId)
-    //{
-    //    IList<DisplayOwner> result = null;
-
-    //    if (objId != null && hitList.ContainsKey(objId))
-    //    {
-    //        result = hitList[objId];
-    //    }
-
-    //    return result;
-    //}
-
-    ///// <summary>
-    ///// 清空一个单位的伤害列表
-    ///// </summary>
-    ///// <param name="objId">被清空单位</param>
-    //public  void ClearOneDamageList(ObjectID objId)
-    //{
-    //    if (objId == null)
-    //    {
-    //        return;
-    //    }
-    //    if (hitList.ContainsKey(objId))
-    //    {
-    //        hitList[objId].Clear();
-    //    }
-    //    if (damageList.ContainsKey(objId))
-    //    {
-    //        damageList[objId] = 0f;
-    //    }
-    //}
-
-    ///// <summary>
-    ///// 清空所有单位的伤害列表
-    ///// </summary>
-    //public  void ClearAllDamageList()
-    //{
-    //    hitList.Clear();
-    //    damageList.Clear();
-    //}
-
-    ///// <summary>
-    ///// 设置闪避
-    ///// </summary>
-    ///// <param name="objId">闪避者ID</param>
-    //public  void SetDodge(ObjectID objId)
-    //{
-    //    if (objId == null)
-    //    {
-    //        return;
-    //    }
-    //    dodgeList.Add(objId);
-    //}
-
-    ///// <summary>
-    ///// 是否闪避
-    ///// </summary>
-    ///// <param name="objId">闪避者ID</param>
-    ///// <returns>是否闪避</returns>
-    //public  bool HasDodge(ObjectID objId)
-    //{
-    //    return dodgeList.Contains(objId);
-    //}
-
-    ///// <summary>
-    ///// 删除一个闪避单位
-    ///// </summary>
-    ///// <param name="objId">被删除ObjId</param>
-    //public  void ClearOneDodge(ObjectID objId)
-    //{
-    //    if (objId == null)
-    //    {
-    //        return;
-    //    }
-    //    dodgeList.Remove(objId);
-    //}
-
-    ///// <summary>
-    ///// 清空闪避列表
-    ///// </summary>
-    //public  void ClearAllDodge()
-    //{
-    //    dodgeList.Clear();
-    //}
+    /// <summary>
+    /// 将缓存中的事件压入列表
+    /// </summary>
+    private void PushListToTrigger()
+    {
+        if (tmpList.Count > 0)
+        {
+            foreach (var triggerData in tmpList)
+            {
+                var objId = triggerData.ReleaseMember.ClusterData.AllData.MemberData.ObjID;
+                if (!triggerList.ContainsKey(objId))
+                {
+                    triggerList.Add(objId,
+                        new Dictionary<TriggerLevel1, IDictionary<TriggerLevel2, List<TriggerData>>>()
+                {
+                    {
+                        triggerData.TypeLevel1, new Dictionary<TriggerLevel2, List<TriggerData>>()
+                        {
+                            {triggerData.TypeLevel2, new List<TriggerData>() {triggerData}}
+                        }
+                    }
+                });
+                }
+                else
+                {
+                    var dicLevel1 = triggerList[objId];
+                    if (!dicLevel1.ContainsKey(triggerData.TypeLevel1))
+                    {
+                        dicLevel1.Add(triggerData.TypeLevel1,
+                            new Dictionary<TriggerLevel2, List<TriggerData>>()
+                    {
+                        {
+                            triggerData.TypeLevel2, new List<TriggerData>() {triggerData}
+                        }
+                    });
+                    }
+                    else
+                    {
+                        var dicLevel2 = dicLevel1[triggerData.TypeLevel1];
+                        if (!dicLevel2.ContainsKey(triggerData.TypeLevel2))
+                        {
+                            dicLevel2.Add(triggerData.TypeLevel2, new List<TriggerData>() { triggerData });
+                        }
+                        else
+                        {
+                            dicLevel2[triggerData.TypeLevel2].Add(triggerData);
+                        }
+                    }
+                }
+            }
+            tmpList.Clear();
+        }
+        
+    }
 
     // ------------------------------------技能事件检测-----------------------------------
 }

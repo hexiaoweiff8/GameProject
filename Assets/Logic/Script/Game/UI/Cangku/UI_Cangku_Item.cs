@@ -23,6 +23,7 @@ public class UI_Cangku_Item : UIScrollViewItemBase
 
     public UISprite sIcon;//显示在列表中的Item的Icon
     public UISprite sIconFrame;//列表项边框，用于表现道具/装备的'品质'
+    public UISprite sIconSelectFrame;//列表项选择框，用于表示Item是否被选中
 
     public UISprite sCompositeMark;//可合成标记
     public UISprite sSelected;//被选中标记
@@ -44,10 +45,10 @@ public class UI_Cangku_Item : UIScrollViewItemBase
 
             sIcon = _cItem.transform.parent.GetChild(0).GetComponent<UISprite>();
             sIconFrame = _cItem.transform.parent.GetChild(1).GetComponent<UISprite>();
+            sIconSelectFrame = _cItem.transform.parent.GetChild(2).GetComponent<UISprite>();
 
             sCompositeMark = _cItem.transform.GetChild(0).GetComponent<UISprite>();
-            sSelected = _cItem.transform.GetChild(1).GetComponent<UISprite>();
-            tItemCount = _cItem.transform.GetChild(2).GetChild(0).GetComponent<UILabel>();
+            tItemCount = _cItem.transform.GetChild(1).GetComponent<UILabel>();
         }
     }
     public GameObject cEquipment
@@ -59,18 +60,19 @@ public class UI_Cangku_Item : UIScrollViewItemBase
             tEquipmentLevel = _cEquipment.transform.GetChild(0).GetChild(0).GetComponent<UILabel>();
             sEquipped = _cEquipment.transform.GetChild(1).GetComponent<UISprite>();
             sLocked = _cEquipment.transform.GetChild(2).GetComponent<UISprite>();
+            sSelected = _cEquipment.transform.GetChild(3).GetComponent<UISprite>();
         }
     }
 
     #region SpriteName
-    private const string KE_PIN_HE_SUI_PIAN = "quanbu_tubiao_kepinhesuipian";
-    private const string BU_KE_PIN_HE_SUI_PIAN = "quanbu_tubiao_bukepinhesuipian";
+    private const string KE_PIN_HE_SUI_PIAN = "cangku_tubiao_suipian_kehecheng";
+    private const string BU_KE_PIN_HE_SUI_PIAN = "cangku_tubiao_suipian_bukehecheng";
 
-    private const string SELECTED = "zhuangbei_tubiao_xuanzhongzhuangbei";
+    private const string SELECTED = "cangku_tubiao_gou";
     private const string SELECTED_ITEM = "zhuangbei_zhuangbeikuang_xuanzhong";
 
-    private const string EQUIPPED = "quanbu_tubiao_yizhuangbei";
-    private const string LOCKED = "quanbu_suoding_xiao";
+    private const string EQUIPPED = "cangku_tubiao_yizhuangbei";
+    private const string LOCKED = "cangku_tubiao_zhuangbeisuoding";
     #endregion
 
     public void setIcon(string spriteName)
@@ -94,6 +96,12 @@ public class UI_Cangku_Item : UIScrollViewItemBase
             sIconFrame.atlas = atlas;
 
         sIconFrame.spriteName = spriteName;
+    }
+    public void setIconSelectFrame(string spriteName)
+    {
+        if (sIconSelectFrame.atlas == null)
+            sIconSelectFrame.atlas = sIconFrame.atlas;
+        sIconSelectFrame.spriteName = spriteName;
     }
 
     public void setCompositeMark(bool show,bool KePinHe = false)
@@ -120,7 +128,7 @@ public class UI_Cangku_Item : UIScrollViewItemBase
     {
         if (!tItemCount.gameObject.activeInHierarchy)
             tItemCount.gameObject.SetActive(false);
-        tItemCount.text = count.ToString();
+        tItemCount.text = "x"+count.ToString();
     }
     /// <summary>
     /// 当可堆叠属性为1时，需要调用此函数，不显示Count组件

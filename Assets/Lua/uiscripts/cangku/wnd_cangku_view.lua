@@ -5,7 +5,6 @@ wnd_cangku_view = {
 
 	-- ui_cangku Component
 	Button_back,
-	Button_decomposition,
 
 	-- Panel (inc Panel.panel.gameObject)
 	Panel_Tab = {
@@ -13,16 +12,18 @@ wnd_cangku_view = {
 	},
 	Panel_depository = {
 		ListView,
-		Button_decomposition,
 	},
 	Panel_Detail_item = {
 		Label_name,
 		Item_count,
 		Item_icon,
+		Item_frame,
 		Label_tips,
 		Label_description,
 		Button_path,--途径按钮
 		Sprite_Container,--工具条背景
+		Label_Container,--出售金币控件
+		Label_sellCoins,--出售后所获得的金币数
 		Button_jian,
 		Button_jia,
 		Button_max,
@@ -31,6 +32,7 @@ wnd_cangku_view = {
 		Button_sale,
 	},
 	Panel_Detail_equipment = {
+		Button_decomposition,
 		Button_share,
 		Button_commander,
 		Item_icon,
@@ -39,6 +41,7 @@ wnd_cangku_view = {
 		Label_MainAttribute,-- 主属性
 		Label_ViceAttribute,-- 副属性
 		Label_SuitEffect,-- 套装影响
+		Label_plus_cost,-- 升级所需货币
 		Button_lock,
 		Button_unload,
 		Button_plus,
@@ -62,6 +65,10 @@ wnd_cangku_view = {
 	},
 	-- MessageBox
 	MessageBox = {
+		Toast = {
+			Label,
+			Sprite,
+		},
 		mBox = {
 			Label,
 			Button_back,
@@ -70,15 +77,19 @@ wnd_cangku_view = {
 			Button_back,
 			Button_confirm,
 			Label_tips,
+			Label_confirm_tips,
 			Label_cost,
 			Label_energy,
 		},
 		mBox_decomposition_detail_tips = {
 			Button_back,
 			Button_confirm,
+			Button_perfect,
 			Label_tips,
 			Label_tips_2,
-			Label_cost,
+			Label_confirm_tips,
+			Label_cost_normal,
+			Label_cost_perfect,
 			Label_energy_normal,
 			Label_energy_perfect,
 		},
@@ -120,36 +131,39 @@ local model = nil
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
 function wnd_cangku_view:initView(root)
-	local mself = self
 	self = root
 
 	model = self.model
 
+	--★测试用Atlas
+	items_Atlas = self.transform:Find("ui_cangku_Prefabs/items_Atlas").gameObject:GetComponent(typeof(UIAtlas))
+	equipment_Atlas = self.transform:Find("ui_cangku_Prefabs/equipment_Atlas").gameObject:GetComponent(typeof(UIAtlas))
+
 	--★ui_cangku Main
 	this.Button_back = self.transform:Find("Button_back").gameObject
-	this.Button_decomposition = self.transform:Find("Button_decomposition").gameObject
 
 	--★ui_cangku Panel_Tab
 	this.pButton_yeka = self.transform:Find("Panel_Tab/Widget_Tab/pButton").gameObject
-	this.pSprite_yekafengexian = self.transform:Find("Panel_Tab/Widget_Tab/pSprite").gameObject
 
 	--★ui_cangku Panel_depository	
 	this.Panel_depository = {
 		ListView = self.transform:Find("Panel_depository/ListView").gameObject,
-		Button_decomposition = self.transform:Find("Button_decomposition").gameObject,
 	}
 	this.Panel_depository.panel = self.transform:Find("Panel_depository").gameObject
 
 	--★ui_cangku Panel_Detail_item
 	this.Panel_Detail_item = {
-		Label_name = self.transform:Find("Panel_Detail_item/Widget_DetailContainer/Item_name/Label_name").gameObject,
+		Label_name = self.transform:Find("Panel_Detail_item/Widget_DetailContainer/Label_name").gameObject,
 		Item_count = self.transform:Find("Panel_Detail_item/Widget_DetailContainer/Item_count").gameObject,
 		Item_icon = self.transform:Find("Panel_Detail_item/Widget_DetailContainer/Item_icon").gameObject,
+		Item_frame = self.transform:Find("Panel_Detail_item/Widget_DetailContainer/Item_icon/Item_Frame").gameObject,
 		Label_tips = self.transform:Find("Panel_Detail_item/Widget_DetailContainer/Label_tips").gameObject,
 		Label_description = self.transform:Find("Panel_Detail_item/Widget_DetailContainer/Label_description").gameObject,
 		Button_path = self.transform:Find("Panel_Detail_item/Widget_DetailContainer/Button_path").gameObject,
 
 		Sprite_Container = self.transform:Find("Panel_Detail_item/Widget_DetailContainer/Sprite_Container").gameObject,
+		Label_Container = self.transform:Find("Panel_Detail_item/Widget_DetailContainer/Label_Container").gameObject,
+		Label_sellCoins = self.transform:Find("Panel_Detail_item/Widget_DetailContainer/Label_Container/Label_sellCoins").gameObject,
 		Button_jian = self.transform:Find("Panel_Detail_item/Widget_DetailContainer/Sprite_Container/Button_jian").gameObject,
 		Button_jia = self.transform:Find("Panel_Detail_item/Widget_DetailContainer/Sprite_Container/Button_jia").gameObject,
 		Button_max = self.transform:Find("Panel_Detail_item/Widget_DetailContainer/Sprite_Container/Button_max").gameObject,
@@ -160,18 +174,23 @@ function wnd_cangku_view:initView(root)
 	this.Panel_Detail_item.panel = self.transform:Find("Panel_Detail_item").gameObject
 
 	--★ui_cangku Panel_Detail_equipment	
+	equipDetail = require('uiscripts/commonGameObj/equipDetail')
+	equipDetail:initialize()
+
 	this.Panel_Detail_equipment = {
-		Button_share = self.transform:Find("Panel_Detail_equipment/Widget_DetailContainer/Sprite_share").gameObject,
-		Button_commander = self.transform:Find("Panel_Detail_equipment/Widget_DetailContainer/Sprite_commander").gameObject,
-		Item_icon = self.transform:Find("Panel_Detail_equipment/Widget_DetailContainer/Item_icon").gameObject,
-		Label_name = self.transform:Find("Panel_Detail_equipment/Widget_DetailContainer/Item_name/Label_name").gameObject,
-		Label_nextLevel = self.transform:Find("Panel_Detail_equipment/Widget_DetailContainer/Sprite_nextLevel/Label_nextLevel").gameObject,
-		Label_MainAttribute = self.transform:Find("Panel_Detail_equipment/Widget_DetailContainer/Label_MainAttribute").gameObject,
-		Label_ViceAttribute = self.transform:Find("Panel_Detail_equipment/Widget_DetailContainer/Label_ViceAttribute").gameObject,
-		Label_SuitEffect = self.transform:Find("Panel_Detail_equipment/Widget_DetailContainer/Label_SuitEffect").gameObject,
-		Button_lock = self.transform:Find("Panel_Detail_equipment/Widget_DetailContainer/Sprite_lock").gameObject,
-		Button_unload = self.transform:Find("Panel_Detail_equipment/Widget_DetailContainer/Sprite_unload").gameObject,
-		Button_plus = self.transform:Find("Panel_Detail_equipment/Widget_DetailContainer/Sprite_plus").gameObject,
+		Button_decomposition = equipDetail.btn_decomposition,
+		Button_share = equipDetail.btn_share,
+		Button_commander = equipDetail.btn_commander,
+		Item_icon = equipDetail.equipIcon,
+		Label_name = equipDetail.equipNameLab,
+		Label_nextLevel = equipDetail.lab_nextLevel,
+		Label_MainAttribute = equipDetail.lab_mainAttribute,
+		Label_ViceAttribute = equipDetail.lab_subAttribute,
+		Label_SuitEffect = equipDetail.lab_suitEffect,
+		Label_plus_cost = equipDetail.costLab,
+		Button_lock = equipDetail.btn_lock,
+		Button_unload = equipDetail.btn_loadOrNot,
+		Button_plus = equipDetail.btn_plus,
 	}
 	this.Panel_Detail_equipment.panel = self.transform:Find("Panel_Detail_equipment").gameObject
 
@@ -198,6 +217,12 @@ function wnd_cangku_view:initView(root)
 	--★ui_cangku MessageBox
 	this.MessageBox.panel = self.transform:Find("MessageBox").gameObject
 
+	this.MessageBox.Toast = {
+			Label = self.transform:Find("MessageBox/Toast/Label").gameObject,
+			Sprite = self.transform:Find("MessageBox/Toast/Sprite").gameObject,
+		}
+	this.MessageBox.Toast.panel = self.transform:Find("MessageBox/Toast").gameObject
+
 	this.MessageBox.mBox = {
 			Label = self.transform:Find("MessageBox/mBox/Label").gameObject,
 			Button_back = self.transform:Find("MessageBox/mBox/Button_back").gameObject,
@@ -208,6 +233,7 @@ function wnd_cangku_view:initView(root)
 			Button_back = self.transform:Find("MessageBox/mBox_decomposition_tips/Button_back").gameObject,
 			Button_confirm = self.transform:Find("MessageBox/mBox_decomposition_tips/Button_confirm").gameObject,
 			Label_tips = self.transform:Find("MessageBox/mBox_decomposition_tips/Label_tips").gameObject,
+			Label_confirm_tips = self.transform:Find("MessageBox/mBox_decomposition_tips/Label_confirm_tips").gameObject,
 			Label_cost = self.transform:Find("MessageBox/mBox_decomposition_tips/Sprite_cost/Label_cost").gameObject,
 			Label_energy = self.transform:Find("MessageBox/mBox_decomposition_tips/Container/Label_energy").gameObject,
 		}
@@ -216,9 +242,12 @@ function wnd_cangku_view:initView(root)
 	this.MessageBox.mBox_decomposition_detail_tips = {
 			Button_back = self.transform:Find("MessageBox/mBox_decomposition_detail_tips/").gameObject,
 			Button_confirm = self.transform:Find("MessageBox/mBox_decomposition_detail_tips/Button_confirm").gameObject,
+			Button_perfect = self.transform:Find("MessageBox/mBox_decomposition_detail_tips/Button_perfect").gameObject,
 			Label_tips = self.transform:Find("MessageBox/mBox_decomposition_detail_tips/Label_tips").gameObject,
 			Label_tips_2 = self.transform:Find("MessageBox/mBox_decomposition_detail_tips/Label_tips_2").gameObject,
-			Label_cost = self.transform:Find("MessageBox/mBox_decomposition_detail_tips/Sprite_cost/Label_cost").gameObject,
+			Label_confirm_tips = self.transform:Find("MessageBox/mBox_decomposition_detail_tips/Label_confirm_tips").gameObject,
+			Label_cost_normal = self.transform:Find("MessageBox/mBox_decomposition_detail_tips/Sprite_cost_normal/Label_cost_normal").gameObject,
+			Label_cost_perfect = self.transform:Find("MessageBox/mBox_decomposition_detail_tips/Sprite_cost_perfect/Label_cost_perfect").gameObject,
 			Label_energy_normal = self.transform:Find("MessageBox/mBox_decomposition_detail_tips/Container/Label_energy").gameObject,
 			Label_energy_perfect = self.transform:Find("MessageBox/mBox_decomposition_detail_tips/Container_2/Label_energy").gameObject,
 		}
@@ -254,7 +283,6 @@ function wnd_cangku_view:initCollider()
 	local colliders = {}
 
 	table.insert(colliders,this.Button_back)
-	table.insert(colliders,this.Button_decomposition)
 
 	for i = 1,model.DepositoryTab_Count do
 		table.insert(colliders,this.Panel_Tab.TabButtons[i])
@@ -269,6 +297,7 @@ function wnd_cangku_view:initCollider()
 	table.insert(colliders,this.Panel_Detail_item.Button_use)
 	table.insert(colliders,this.Panel_Detail_item.Button_sale)
 
+	table.insert(colliders,this.Panel_Detail_equipment.Button_decomposition)
 	table.insert(colliders,this.Panel_Detail_equipment.Button_share)
 	table.insert(colliders,this.Panel_Detail_equipment.Button_commander)
 	table.insert(colliders,this.Panel_Detail_equipment.Button_lock)
@@ -290,6 +319,7 @@ function wnd_cangku_view:initCollider()
 
 	table.insert(colliders,this.MessageBox.mBox_decomposition_detail_tips.Button_back)	
 	table.insert(colliders,this.MessageBox.mBox_decomposition_detail_tips.Button_confirm)
+	table.insert(colliders,this.MessageBox.mBox_decomposition_detail_tips.Button_perfect)
 
 	table.insert(colliders,this.MessageBox.mBox_chestBox.Button_back)
 	table.insert(colliders,this.MessageBox.mBox_chestBox.Button_confirm)
@@ -299,6 +329,8 @@ function wnd_cangku_view:initCollider()
 	table.insert(colliders,this.MessageBox.mBox_chestBox.Items.item_3)
 	table.insert(colliders,this.MessageBox.mBox_chestBox.Items.item_4)
 	table.insert(colliders,this.MessageBox.mBox_chestBox.Items.item_5)
+
+	table.insert(colliders,this.MessageBox.mBox.Button_back)
 
 	for index,button in pairs(colliders) do
 

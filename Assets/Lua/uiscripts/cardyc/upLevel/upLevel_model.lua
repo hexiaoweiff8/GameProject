@@ -4,19 +4,22 @@ local upLevel_model={}
 --获取数据库信息
 function upLevel_model:getDatas(cardIndex)
     print("================upLevel_model:getDatas============start===========")
-    if currencyTbl == nil or cardTbl == nil or userRoleTbl == nil  then
+    local _userRoleTbl = userModel:getUserRoleTbl()
+    local _cardTbl = cardModel:getCardTbl()
+    local _currencyTbl = currencyModel:getCurrentTbl()
+    if _currencyTbl == nil or _cardTbl == nil or _userRoleTbl == nil  then
         return false
     end 
-    if not cardTbl[cardIndex] then
+    if not _cardTbl[cardIndex] then
         return false
     end 
-    self.expPool = currencyTbl["expPool"]--经验池
-    self.userRoleLv= userRoleTbl["lv"]
+    self.expPool = _currencyTbl["expPool"]--经验池
+    self.userRoleLv= _userRoleTbl["lv"]
     self.userRoleLv= 80
-    self.cardId =cardTbl[cardIndex].id
-    self.cardLv =cardTbl[cardIndex].lv
-    self.starLv =cardTbl[cardIndex].star
-    self.cardExp  = cardTbl[cardIndex].exp
+    self.cardId =_cardTbl[cardIndex].id
+    self.cardLv =_cardTbl[cardIndex].lv
+    self.starLv =_cardTbl[cardIndex].star
+    self.cardExp  = _cardTbl[cardIndex].exp
     print("================upLevel_model:getDatas============end===========")
     return true
     

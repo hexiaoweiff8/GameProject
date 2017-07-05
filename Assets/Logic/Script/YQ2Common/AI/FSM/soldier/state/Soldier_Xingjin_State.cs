@@ -23,7 +23,7 @@ public class Soldier_Xingjin_State : SoldierFSMState
     /// <param name="fsm"></param>
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
-        //Debug.Log("行进:" + fsm.Display.GameObj.name);
+        Debug.Log("行进:" + fsm.Display.GameObj.name);
         base.DoBeforeEntering(fsm);
         fsm.Display.ClusterData.ContinueMove();
         clusterData = fsm.Display.ClusterData as ClusterData;

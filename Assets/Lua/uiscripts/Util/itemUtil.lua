@@ -11,7 +11,7 @@ itemUtil = class("itemUtil")
     itemID  物品ID
 ]]
 function itemUtil:getItemName(itemID)
-    return sdata_cangku_data:GetFieldV("Name", itemID)
+    return sdata_item_data:GetFieldV("Name", itemID)
 end
 
 --[[
@@ -19,7 +19,7 @@ end
     itemID  物品ID
 ]]
 function itemUtil:getItemIcon(itemID)
-    return sdata_cangku_data:GetFieldV("Icon", itemID)
+    return sdata_item_data:GetFieldV("Icon", itemID)
 end
 
 return itemUtil

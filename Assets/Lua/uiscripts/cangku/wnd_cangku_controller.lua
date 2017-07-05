@@ -1,4 +1,6 @@
-require('uiscripts/cangku/wnd_cangku_utils')
+require('uiscripts/cangku/util/deepcopy')
+require('uiscripts/cangku/util/shallowcopy')
+require('uiscripts/cangku/const/wnd_cangku_Const')
 wnd_cangku_controller = {
 
 	view,
@@ -6,6 +8,7 @@ wnd_cangku_controller = {
 	scrollViewController,
 
 	-- variable
+	_DecompositionPanelState = nil,--记录装备分解面板checkbox勾选状态
 	_selectedYekaButton,--记录已选择的页卡按钮
 	_currentPanel_right,--记录当前显示在右边的panel
 
@@ -13,19 +16,17 @@ wnd_cangku_controller = {
 	initTabButton,--初始化页卡按钮
 	initListener,--添加按钮事件
 
-	SelectYekaButton,--切换页卡
+	SelectYekaButton,--切换页卡功能
 
 	show,--显示，隐藏panel
 	hide,
 	showPanelByItemData,--通过Item数据决定显示何面板
 	showEquipmentDetailsPanel,--显示装备详细面板
 
-	reqData, --向服务器请求数据
-	recData, -- 接收数据存到Model中
-
 	processServData, -- 处理服务器数据
 	sortServData, -- 对服务器数据列表排序
 	mergeServData, -- 合并 装备/道具数据
+	updateServData, -- 更新model服务器数据
 }
 local class = require("common/middleclass")
 wnd_cangku_controller = class("wnd_cangku_controller",wnd_base)
@@ -35,46 +36,41 @@ local this = wnd_cangku_controller
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --function def
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-
 function wnd_cangku_controller:OnShowDone()
-
 	this.view = require("uiscripts/cangku/wnd_cangku_view")
 	this.model = require("uiscripts/cangku/wnd_cangku_model")
-	this.scrollViewController = require("uiscripts/cangku/wnd_cangku_ScrollView_controller")
+	this.scrollViewController = require("uiscripts/cangku/scrollview/wnd_cangku_ScrollView_controller")
 
 	this.view:initView(self)
-	this.model:initModel()
+	-- this.model:initModel()
 	this.scrollViewController:init(self)
 
 	this:initTabButton()
-
 	this.view:initCollider()
 	this:initListener()
 
-	this.view.Button_decomposition:SetActive(false)
-	this:hide(this.view.Panel_Detail_decomposition)
+	this.view.Panel_Detail_decomposition.panel:SetActive(false)
 	this:hide(this.view.Panel_Detail_item)
 	this:hide(this.view.Panel_Detail_equipment)
+	this.view.MessageBox.Toast.panel:SetActive(false)
 	this.view.MessageBox.mBox.panel:SetActive(false)
 	this.view.MessageBox.mBox_decomposition_tips.panel:SetActive(false)
 	this.view.MessageBox.mBox_decomposition_detail_tips.panel:SetActive(false)
 	this.view.MessageBox.mBox_chestBox.panel:SetActive(false)
 	this.view.MessageBox.panel:SetActive(true)
 	-- local tween = this.view.MessageBox.mBox.panel.transform:DOPunchScale(Vector3(1.5, 1.5, 0), 1, 1, 1)
-	
-	test()
 
-	print('load cangku Completed')
-
-	-- test()
-
+	-- 默认选中第一个按钮
+	this:SelectYekaButton(this.view.Panel_Tab.TabButtons[1])
 end
 ----------------------------------------------------------------
 --★Init
 function wnd_cangku_controller:initListener()
 
 	UIEventListener.Get(this.view.Button_back).onClick = function()
+			-- TODO: 仓库界面：返回按钮的实现
 			print('返回上一界面')
+			ui_toast:show('返回上一界面',1,nil)
 		end
 	-- 页卡
 	for i = 1,this.model.DepositoryTab_Count do
@@ -82,19 +78,8 @@ function wnd_cangku_controller:initListener()
 			this:SelectYekaButton(go)
 		end 
 	end
-	-- TODO 装备分解界面
-	local before_panel
-	UIEventListener.Get(this.view.Button_decomposition).onClick = function()
-			before_panel = this._currentPanel_right
-			this:show(this.view.Panel_Detail_decomposition)
-			this.scrollViewController._State_InDECOMPOSITION = true -- 改变标记
-			this:prepareDecompositionPanel()
-			this.scrollViewController:filterBy('Equip','Decomposition')
-			-- 默认选中品质1，2，3
-			this.scrollViewController:selectEquipmentByQuality(1)
-			this.scrollViewController:selectEquipmentByQuality(2)
-			this.scrollViewController:selectEquipmentByQuality(3)
-		end
+	
+	-- 装备分解界面
 	UIEventListener.Get(this.view.Panel_Detail_decomposition.Button_close).onClick = function()
 			this:hide(this.view.Panel_Detail_decomposition)
 			if before_panel ~= nil then
@@ -119,14 +104,14 @@ function wnd_cangku_controller:initListener()
 			else
 				_Quality = 6 end
 
-			if checkbox.spriteName == this.scrollViewController.cstr_SELECTED_CB then -- 如果已选中
+			if checkbox.spriteName == cstr.SELECTED_CB then -- 如果已选中
 				checkbox.spriteName = 'nil'
-				-- TODO 取消选中所有白色品质装备
-				this.scrollViewController:disselectEquipmentByQuality(_Quality)
+				-- DONE: 取消显示所有对应品质装备
+				this.scrollViewController:removeEquipmentShowByQuality(_Quality)
 			else
-				checkbox.spriteName = this.scrollViewController.cstr_SELECTED_CB
-				-- TODO 选中所有白色品质装备
-				this.scrollViewController:selectEquipmentByQuality(_Quality)
+				checkbox.spriteName = cstr.SELECTED_CB
+				-- DONE: 显示所有对应品质装备
+				this.scrollViewController:addEquipmentShowByQuality(_Quality)
 			end
 		end
 	UIEventListener.Get(this.view.Panel_Detail_decomposition.Checkbox.Button_white).onClick = Checkbox_OnCheck
@@ -135,15 +120,146 @@ function wnd_cangku_controller:initListener()
 	UIEventListener.Get(this.view.Panel_Detail_decomposition.Checkbox.Button_purple).onClick = Checkbox_OnCheck
 	UIEventListener.Get(this.view.Panel_Detail_decomposition.Checkbox.Button_golden).onClick = Checkbox_OnCheck
 	UIEventListener.Get(this.view.Panel_Detail_decomposition.Checkbox.Button_red).onClick = Checkbox_OnCheck
+	-- 确认分解逻辑
+	local OnConfirmDecomposition = function(_sellType,_Cost)
+		local diamondNum = 0  --currency.diamond (花钱充，花钱赠，免费送的和)
+	    for i,v in ipairs(this.model.serv_CurrencyInfo.diamond) do
+	    	diamondNum = diamondNum + v
+	    end
+		if (_sellType == 1 and {diamondNum} or {this.model.serv_CurrencyInfo.gold})[1] < _Cost then
+			print("当前钻石："..diamondNum)
+			print("当前金币："..this.model.serv_CurrencyInfo.gold)
+			this:showToast("货币不足，无法分解",1.5)
+			return
+		end
+
+		local _equipList = {}
+
+		for i = 1,#this.scrollViewController._selectedItems do
+			table.insert(_equipList,this.scrollViewController._selectedItems[i].id)
+		end
+		local on_10023_rec = function(body)
+			Event.RemoveListener("10023", on_10023_rec)
+			this:showToast("所选装备已分解.",2)
+			local gw2c = gw2c_pb.SellEquip()
+		    gw2c:ParseFromString(body)
+		    this:updateServData(gw2c.currency,nil)
+		    -- 从装备表中删除装备，并刷新界面
+		    this:removeEquipmentByIDList(_equipList)
+		    -- 隐藏Mbox
+		    if this.view.MessageBox.mBox_decomposition_tips.panel.activeInHierarchy then
+		    	this.view.MessageBox.mBox_decomposition_tips.panel:SetActive(false)
+		    end
+		    if this.view.MessageBox.mBox_decomposition_detail_tips.panel.activeInHierarchy then
+		    	this.view.MessageBox.mBox_decomposition_detail_tips.panel:SetActive(false)
+		    end
+		    this.scrollViewController._State_InDECOMPOSITION = false
+			this.model.decomposition_Equipment = {} -- 清空临时数据
+			this:SaveDecompositionPanelState()
+			this:LoadDecompositionPanelState()
+		end
+		Message_Manager:SendPB_10023(_sellType,_equipList,on_10023_rec)
+	end
+	-- 完美分解按钮，弹出提示框
+	local OnPerfectClick = function()
+
+		if #this.scrollViewController._selectedItems == 0 then
+			this:showToast("还没有选中任何要分解的装备",1.5)
+			return
+		end
+		
+		this.view.MessageBox.mBox_decomposition_tips.panel:SetActive(true)
+
+		local _Power = this.scrollViewController:calcTotalEquipmentDecomposeReturn()
+		local _Cost = this:calcDecomposePrice(_Power)
+
+		this.view.MessageBox.mBox_decomposition_tips.Label_tips:GetComponent("UILabel").text = 
+			sdata_UILiteral.mData.body[0xFE23][sdata_UILiteral.mFieldName2Index["Literal"]]
+		this.view.MessageBox.mBox_decomposition_tips.Label_energy:GetComponent("UILabel").text = '('.._Power
+		this.view.MessageBox.mBox_decomposition_tips.Label_cost:GetComponent("UILabel").text = _Cost
+
+		-- 分解装备中包含高品质装备时显示提示
+		this.view.MessageBox.mBox_decomposition_tips.Label_confirm_tips:GetComponent("UILabel").text =
+			sdata_UILiteral.mData.body[0xFE24][sdata_UILiteral.mFieldName2Index["Literal"]]
+		this.view.MessageBox.mBox_decomposition_tips.Label_confirm_tips:SetActive(false)
+		for i = 1,#this.scrollViewController._selectedItems do
+			if this.scrollViewController._selectedItems[i].rarity == 5 or this.scrollViewController._selectedItems[i].rarity == 6 then
+				this.view.MessageBox.mBox_decomposition_tips.Label_confirm_tips:SetActive(true)
+				break
+			end
+		end
+
+		UIEventListener.Get(this.view.MessageBox.mBox_decomposition_tips.Button_back).onClick = function()
+			this.view.MessageBox.mBox_decomposition_tips.panel:SetActive(false)
+		end
+		UIEventListener.Get(this.view.MessageBox.mBox_decomposition_tips.Button_confirm).onClick = function()
+			-- DONE: 提示框：完美分解按钮实现
+			OnConfirmDecomposition(1,_Cost)
+		end
+		-- DONE: 提示框：分解提示内容显示
+	end
+	UIEventListener.Get(this.view.Panel_Detail_decomposition.Button_decomposition_perfect).onClick = function()
+		OnPerfectClick()
+	end
+	-- 普通分解按钮，弹出详细提示框
+	UIEventListener.Get(this.view.Panel_Detail_decomposition.Button_decomposition_normal).onClick = function()
+
+		if #this.scrollViewController._selectedItems == 0 then
+			this:showToast("还没有选中任何要分解的装备",1.5)
+			return
+		end
+		
+		this.view.MessageBox.mBox_decomposition_detail_tips.panel:SetActive(true)
+
+		local _Power = this.scrollViewController:calcTotalEquipmentDecomposeReturn()
+		local _Cost = this:calcDecomposePrice(_Power)
+		local normalDec = _Power * 0.75
+		local perfectDec = _Power
+		
+		this.view.MessageBox.mBox_decomposition_detail_tips.Label_tips:GetComponent("UILabel").text = 
+			sdata_UILiteral.mData.body[0xFE21][sdata_UILiteral.mFieldName2Index["Literal"]]
+		this.view.MessageBox.mBox_decomposition_detail_tips.Label_tips_2:GetComponent("UILabel").text = 
+			sdata_UILiteral.mData.body[0xFE22][sdata_UILiteral.mFieldName2Index["Literal"]]
+		this.view.MessageBox.mBox_decomposition_detail_tips.Label_energy_normal:GetComponent("UILabel").text = '('..normalDec
+		this.view.MessageBox.mBox_decomposition_detail_tips.Label_energy_perfect:GetComponent("UILabel").text = '('..perfectDec
+		this.view.MessageBox.mBox_decomposition_detail_tips.Label_cost_perfect:GetComponent("UILabel").text = _Cost
+		this.view.MessageBox.mBox_decomposition_detail_tips.Label_cost_normal:GetComponent("UILabel").text = _Cost * cint.ExchangeRate
+
+		-- 分解装备中包含高品质装备时显示提示
+		this.view.MessageBox.mBox_decomposition_detail_tips.Label_confirm_tips:GetComponent("UILabel").text = 
+			sdata_UILiteral.mData.body[0xFE24][sdata_UILiteral.mFieldName2Index["Literal"]]
+		this.view.MessageBox.mBox_decomposition_detail_tips.Label_confirm_tips:SetActive(false)
+		for i = 1,#this.scrollViewController._selectedItems do
+			if this.scrollViewController._selectedItems[i].rarity == 5 or this.scrollViewController._selectedItems[i].rarity == 6 then
+				this.view.MessageBox.mBox_decomposition_detail_tips.Label_confirm_tips:SetActive(true)
+				break
+			end
+		end
+
+		UIEventListener.Get(this.view.MessageBox.mBox_decomposition_detail_tips.Button_back).onClick = function()
+			this.view.MessageBox.mBox_decomposition_detail_tips.panel:SetActive(false)
+		end
+		UIEventListener.Get(this.view.MessageBox.mBox_decomposition_detail_tips.Button_confirm).onClick = function()
+			-- DONE: 详细提示框：普通分解按钮实现
+			OnConfirmDecomposition(0,_Cost * cint.ExchangeRate)
+		end
+		UIEventListener.Get(this.view.MessageBox.mBox_decomposition_detail_tips.Button_perfect).onClick = function()
+			-- DONE: 详细提示框：完美分解按钮实现
+			this.view.MessageBox.mBox_decomposition_detail_tips.panel:SetActive(false)
+			OnPerfectClick()
+		end
+		-- DONE: 详细提示框：分解提示内容显示
+
+	end
 end
 
 function wnd_cangku_controller:initTabButton()
 
 	local Tabs = this.model.local_Tabs
 
-	local _spacing = this.view.pButton_yeka.transform.localPosition.y - this.view.pSprite_yekafengexian.transform.localPosition.y
+	local _spacing = this.view.pButton_yeka.transform:GetComponent(typeof(UIWidget)).localSize.y
 
-	local yeka,yekafengexian
+	local yeka
 
 	for i = 1,this.model.DepositoryTab_Count do
 		if i ~= 1 then
@@ -151,18 +267,13 @@ function wnd_cangku_controller:initTabButton()
 			yeka.name = Tabs[i]["Goods"]..'_'..Tabs[i]["Maintype"]
 			yeka.transform:SetParent(this.view.pButton_yeka.transform.parent)
 			yeka.transform.localScale = Vector3.one
-			yeka.transform.localPosition = Vector3(this.view.pButton_yeka.transform.localPosition.x,this.view.pButton_yeka.transform.localPosition.y - 2 * (i-1) * _spacing,this.view.pButton_yeka.transform.localPosition.z)
-			yeka:GetComponentInChildren(typeof(UILabel)).text = Tabs[i]["Goods"]..'_'..Tabs[i]["Maintype"]
-
-			yekafengexian = GameObject.Instantiate(this.view.pSprite_yekafengexian)
-			yekafengexian.transform:SetParent(this.view.pSprite_yekafengexian.transform.parent)
-			yekafengexian.transform.localScale = Vector3.one
-			yekafengexian.transform.localPosition = Vector3(this.view.pSprite_yekafengexian.transform.localPosition.x,this.view.pSprite_yekafengexian.transform.localPosition.y - 2 * (i-1) * _spacing,this.view.pSprite_yekafengexian.transform.localPosition.z)
+			yeka.transform.localPosition = Vector3(this.view.pButton_yeka.transform.localPosition.x,this.view.pButton_yeka.transform.localPosition.y - (i-1) * _spacing,this.view.pButton_yeka.transform.localPosition.z)
+			yeka:GetComponentInChildren(typeof(UILabel)).text = Tabs[i]["Text"]
 			
 			table.insert(this.view.Panel_Tab.TabButtons,yeka)
 		else 
 			this.view.pButton_yeka.name = Tabs[1]["Goods"]..'_'..Tabs[1]["Maintype"]
-			this.view.pButton_yeka:GetComponentInChildren(typeof(UILabel)).text = Tabs[1]["Goods"]..'_'..Tabs[1]["Maintype"]
+			this.view.pButton_yeka:GetComponentInChildren(typeof(UILabel)).text = Tabs[1]["Text"]
 
 			table.insert(this.view.Panel_Tab.TabButtons,this.view.pButton_yeka)		
 		end
@@ -189,25 +300,27 @@ function wnd_cangku_controller:SelectYekaButton(selectedButton)
 	end
 
 	selectedButton:GetComponent(typeof(UISprite)).atlas = mAtlas
-	selectedButton:GetComponent(typeof(UISprite)).spriteName = "tongyong_anniu_xuanzhong_rotate"
+	selectedButton:GetComponent(typeof(UISprite)).spriteName = cstr.SELECTED_YEKA
 
 	local start, e = string.find(selectedButton.name, '_')
 	local Goods = string.sub(selectedButton.name,1,start-1)
 	local Maintype = string.sub(selectedButton.name,e+1,string.len(selectedButton.name))
 
-	print("Goods = "..Goods)
-	print("Maintype = "..Maintype)
+	-- print("Goods = "..Goods.." Maintype = "..Maintype)
 
-	if Goods == 'Equip' then -- 显示装备分解按钮
-		this.view.Button_decomposition:SetActive(true)
-	else
-		this.view.Button_decomposition:SetActive(false)
+	-- if Goods == 'Equip' then -- 显示装备分解按钮
+	-- 	this.view.Button_decomposition:SetActive(true)
+	-- else
+	-- 	this.view.Button_decomposition:SetActive(false)
+	-- end
+	-- 如果在装备分解界面点击页卡，则退出装备分解状态
+	if this.scrollViewController._State_InDECOMPOSITION then
+		this:hide(this.view.Panel_Detail_decomposition)
 	end
 
 	this.scrollViewController:filterBy(Goods,Maintype)
 
 	this._selectedYekaButton = selectedButton
-
 end
 ----------------------------------------------------------------
 --★Control Panel show&hide
@@ -225,8 +338,11 @@ end
 function wnd_cangku_controller:hide(ui_cangku_panel)
 	if ui_cangku_panel.panel ~= nil then
 		ui_cangku_panel.panel:SetActive(false)
+
 		if ui_cangku_panel == this.view.Panel_Detail_decomposition then
 			this.scrollViewController._State_InDECOMPOSITION = false -- 隐藏装备分解界面时改变标记
+			this.model.decomposition_Equipment = {} -- 清空临时数据
+			this:SaveDecompositionPanelState()
 		end
 	end
 end
@@ -234,7 +350,7 @@ end
 function wnd_cangku_controller:showPanelByItemData(ItemData)
 	local _UseType = ItemData["UseType"]
 	local _Name = ItemData["Name"]
-	local _Des = ItemData["Des"]
+	local _Des = ((ItemData["Des"] == '-1') and {nil} or {ItemData["Des"]})[1] 
 	local _FunctionDes = ItemData["FunctionDes"]
 	local _Icon = ItemData["Icon"]
 	local _Quality = ItemData["Quality"]
@@ -246,15 +362,26 @@ function wnd_cangku_controller:showPanelByItemData(ItemData)
 		this.view.Panel_Detail_item.Button_path:SetActive(true)
 		this.view.Panel_Detail_item.Button_use:SetActive(false)
 		this.view.Panel_Detail_item.Button_sale:SetActive(false)
+		this.view.Panel_Detail_item.Label_Container:SetActive(false)
 
 		this.view.Panel_Detail_item.Label_name:GetComponent(typeof(UILabel)).text = _Name
-		this.view.Panel_Detail_item.Item_count:GetComponent(typeof(UILabel)).text = ItemData.num
-		this.view.Panel_Detail_item.Item_icon:GetComponent(typeof(UISprite)).spriteName = nil -- TODO 
+		this.view.Panel_Detail_item.Item_count:GetComponent(typeof(UILabel)).text = sdata_UILiteral.mData.body[0xFF01][sdata_UILiteral.mFieldName2Index["Literal"]]..ItemData.num
+		this.view.Panel_Detail_item.Item_icon:GetComponent(typeof(UISprite)).spriteName = _Icon -- DONE: 碎片详细面板:显示碎片的图标
+		this.view.Panel_Detail_item.Item_frame:GetComponent(typeof(UISprite)).spriteName = EquipUtil:getQualitySpriteStr(_Quality)
 		this.view.Panel_Detail_item.Label_tips:GetComponent(typeof(UILabel)).text = _Des
 		this.view.Panel_Detail_item.Label_description:GetComponent(typeof(UILabel)).text = _FunctionDes
-
+		-- 如果碎片达到可合成数量，则显示合成
+		local str1 = sdata_UILiteral.mData.body[0xFF02][sdata_UILiteral.mFieldName2Index["Literal"]]
+		local str2 = sdata_UILiteral.mData.body[0xFF03][sdata_UILiteral.mFieldName2Index["Literal"]]
+		if ItemData["ComposeNum"] == -1 then
+			this.view.Panel_Detail_item.Button_path:GetComponentInChildren(typeof(UILabel)).text = str1
+		else
+			this.view.Panel_Detail_item.Button_path:GetComponentInChildren(typeof(UILabel)).text = (ItemData.num >= ItemData["ComposeNum"] and {str2} or {str1})[1]
+		end
+	
 		UIEventListener.Get(this.view.Panel_Detail_item.Button_path).onClick = function()
-				-- TODO 添加途径按钮的实现
+				-- TODO: 碎片详细面板:添加途径/合成按钮的实现
+				print("途径/合成按钮")
 			end
 	end
 	if _UseType == 3 then -- 显示消耗品详细面板
@@ -263,15 +390,18 @@ function wnd_cangku_controller:showPanelByItemData(ItemData)
 		this.view.Panel_Detail_item.Button_path:SetActive(false)
 		this.view.Panel_Detail_item.Button_use:SetActive(true)
 		this.view.Panel_Detail_item.Button_sale:SetActive(false)
+		this.view.Panel_Detail_item.Label_Container:SetActive(false)
 				
 		this.view.Panel_Detail_item.Label_name:GetComponent(typeof(UILabel)).text = _Name
-		this.view.Panel_Detail_item.Item_count:GetComponent(typeof(UILabel)).text = ItemData.num
-		this.view.Panel_Detail_item.Item_icon:GetComponent(typeof(UISprite)).spriteName = nil -- TODO 
+		this.view.Panel_Detail_item.Item_count:GetComponent(typeof(UILabel)).text = sdata_UILiteral.mData.body[0xFF01][sdata_UILiteral.mFieldName2Index["Literal"]]..ItemData.num
+		this.view.Panel_Detail_item.Item_icon:GetComponent(typeof(UISprite)).spriteName = _Icon -- DONE: 消耗品详细面板：显示消耗品的图标
+		this.view.Panel_Detail_item.Item_frame:GetComponent(typeof(UISprite)).spriteName = EquipUtil:getQualitySpriteStr(_Quality)
 		this.view.Panel_Detail_item.Label_tips:GetComponent(typeof(UILabel)).text = _Des
 		this.view.Panel_Detail_item.Label_description:GetComponent(typeof(UILabel)).text = _FunctionDes
 		
 		UIEventListener.Get(this.view.Panel_Detail_item.Button_use).onClick = function()
-				-- TODO 添加使用按钮的实现
+				-- TODO: 消耗品详细面板：添加使用按钮的实现
+				print("使用按钮")
 			end	
 	end
 	if _UseType == 4 then -- 显示随机宝箱
@@ -280,66 +410,102 @@ function wnd_cangku_controller:showPanelByItemData(ItemData)
 		this.view.Panel_Detail_item.Button_sale:SetActive(false)
 		this.view.Panel_Detail_item.Button_path:SetActive(false)
 		this.view.Panel_Detail_item.Button_use:SetActive(true)
+		this.view.Panel_Detail_item.Label_Container:SetActive(false)
 
 		this.view.Panel_Detail_item.Label_name:GetComponent(typeof(UILabel)).text = _Name
-		this.view.Panel_Detail_item.Item_count:GetComponent(typeof(UILabel)).text = ItemData.num
-		this.view.Panel_Detail_item.Item_icon:GetComponent(typeof(UISprite)).spriteName = nil -- TODO 
+		this.view.Panel_Detail_item.Item_count:GetComponent(typeof(UILabel)).text = sdata_UILiteral.mData.body[0xFF01][sdata_UILiteral.mFieldName2Index["Literal"]]..ItemData.num
+		this.view.Panel_Detail_item.Item_icon:GetComponent(typeof(UISprite)).spriteName = _Icon -- DONE: 随机宝箱：显示随机宝箱的图标
+		this.view.Panel_Detail_item.Item_frame:GetComponent(typeof(UISprite)).spriteName = EquipUtil:getQualitySpriteStr(_Quality)
 		this.view.Panel_Detail_item.Label_tips:GetComponent(typeof(UILabel)).text = _Des
 		this.view.Panel_Detail_item.Label_description:GetComponent(typeof(UILabel)).text = _FunctionDes
 
 		UIEventListener.Get(this.view.Panel_Detail_item.Button_use).onClick = function()
-				-- TODO 添加使用按钮的实现
+				-- TODO: 随机宝箱：添加使用按钮的实现
+				print("使用按钮")
 			end
 	end
 	if _UseType == 5 then -- 显示手选宝箱
-		if this._currentPanel_right ~= nil then
-			this:hide(this._currentPanel_right)
-		end
-		this:show(this.view.MessageBox.mBox_chestBox)
-		
-		-- TODO 添加宝箱图标
-		this.view.MessageBox.mBox_chestBox.Items.item_1:GetComponent(typeof(UISprite)).spriteName = nil
-		this.view.MessageBox.mBox_chestBox.Items.item_2:GetComponent(typeof(UISprite)).spriteName = nil
-		this.view.MessageBox.mBox_chestBox.Items.item_3:GetComponent(typeof(UISprite)).spriteName = nil
-		this.view.MessageBox.mBox_chestBox.Items.item_4:GetComponent(typeof(UISprite)).spriteName = nil
-		this.view.MessageBox.mBox_chestBox.Items.item_5:GetComponent(typeof(UISprite)).spriteName = nil
-
-		UIEventListener.Get(this.view.MessageBox.mBox_chestBox.Button_back).onClick = function()
-				this:hide(this.view.MessageBox.mBox_chestBox)
-			end
-		UIEventListener.Get(this.view.MessageBox.mBox_chestBox.Button_confirm).onClick = function()
-				-- TODO 添加确认按钮的实现
-			end
-		-- TODO 添加宝箱按钮实现
-	end
-	if _UseType == 6 or _UseType == 7 then -- TODO 显示升阶材料面板
 		this:show(this.view.Panel_Detail_item)
 
 		this.view.Panel_Detail_item.Button_sale:SetActive(false)
 		this.view.Panel_Detail_item.Button_path:SetActive(false)
 		this.view.Panel_Detail_item.Button_use:SetActive(true)
+		this.view.Panel_Detail_item.Label_Container:SetActive(false)
 
 		this.view.Panel_Detail_item.Label_name:GetComponent(typeof(UILabel)).text = _Name
-		this.view.Panel_Detail_item.Item_count:GetComponent(typeof(UILabel)).text = ItemData.num
-		this.view.Panel_Detail_item.Item_icon:GetComponent(typeof(UISprite)).spriteName = nil -- TODO 
+		this.view.Panel_Detail_item.Item_count:GetComponent(typeof(UILabel)).text = sdata_UILiteral.mData.body[0xFF01][sdata_UILiteral.mFieldName2Index["Literal"]]..ItemData.num
+		this.view.Panel_Detail_item.Item_icon:GetComponent(typeof(UISprite)).spriteName = _Icon -- DONE: 随机宝箱：显示随机宝箱的图标
+		this.view.Panel_Detail_item.Item_frame:GetComponent(typeof(UISprite)).spriteName = EquipUtil:getQualitySpriteStr(_Quality)
+		this.view.Panel_Detail_item.Label_tips:GetComponent(typeof(UILabel)).text = _Des
+		this.view.Panel_Detail_item.Label_description:GetComponent(typeof(UILabel)).text = _FunctionDes
+
+		UIEventListener.Get(this.view.Panel_Detail_item.Button_use).onClick = function()
+				this:show(this.view.MessageBox.mBox_chestBox)
+		
+				-- DONE: 手选宝箱：添加宝箱图标
+				this.view.MessageBox.mBox_chestBox.Items.item_1:GetComponent(typeof(UISprite)).spriteName = _Icon
+				this.view.MessageBox.mBox_chestBox.Items.item_2:GetComponent(typeof(UISprite)).spriteName = _Icon
+				this.view.MessageBox.mBox_chestBox.Items.item_3:GetComponent(typeof(UISprite)).spriteName = _Icon
+				this.view.MessageBox.mBox_chestBox.Items.item_4:GetComponent(typeof(UISprite)).spriteName = _Icon
+				this.view.MessageBox.mBox_chestBox.Items.item_5:GetComponent(typeof(UISprite)).spriteName = _Icon
+
+				UIEventListener.Get(this.view.MessageBox.mBox_chestBox.Button_back).onClick = function()
+						this:hide(this.view.MessageBox.mBox_chestBox)
+					end
+				UIEventListener.Get(this.view.MessageBox.mBox_chestBox.Button_confirm).onClick = function()
+						-- TODO: 手选宝箱：添加确认按钮的实现
+						print("确认选择按钮")
+					end
+				-- TODO: 手选宝箱：添加宝箱按钮实现
+			end
+	end
+	if _UseType == 6 or _UseType == 7 then -- DONE: 显示升阶材料面板
+		this:show(this.view.Panel_Detail_item)
+
+		this.view.Panel_Detail_item.Button_sale:SetActive(false)
+		this.view.Panel_Detail_item.Button_path:SetActive(false)
+		this.view.Panel_Detail_item.Button_use:SetActive(false)
+		this.view.Panel_Detail_item.Label_Container:SetActive(false)
+
+		this.view.Panel_Detail_item.Label_name:GetComponent(typeof(UILabel)).text = _Name
+		this.view.Panel_Detail_item.Item_count:GetComponent(typeof(UILabel)).text = sdata_UILiteral.mData.body[0xFF01][sdata_UILiteral.mFieldName2Index["Literal"]]..ItemData.num
+		this.view.Panel_Detail_item.Item_icon:GetComponent(typeof(UISprite)).spriteName = _Icon -- DONE: 升阶材料界面：显示升阶材料的图标
+		this.view.Panel_Detail_item.Item_frame:GetComponent(typeof(UISprite)).spriteName = EquipUtil:getQualitySpriteStr(_Quality)
 		this.view.Panel_Detail_item.Label_tips:GetComponent(typeof(UILabel)).text = _Des
 		this.view.Panel_Detail_item.Label_description:GetComponent(typeof(UILabel)).text = _FunctionDes
 	end
-	if _UseType == 8 then -- TODO 显示收藏品
+	if _UseType == 8 then 
 		this:show(this.view.Panel_Detail_item)
 
 		this.view.Panel_Detail_item.Button_sale:SetActive(true)
 		this.view.Panel_Detail_item.Button_path:SetActive(false)
 		this.view.Panel_Detail_item.Button_use:SetActive(false)
+		this.view.Panel_Detail_item.Label_Container:SetActive(true)
 
 		this.view.Panel_Detail_item.Label_name:GetComponent(typeof(UILabel)).text = _Name
-		this.view.Panel_Detail_item.Item_count:GetComponent(typeof(UILabel)).text = ItemData.num
-		this.view.Panel_Detail_item.Item_icon:GetComponent(typeof(UISprite)).spriteName = nil -- TODO 
+		this.view.Panel_Detail_item.Item_count:GetComponent(typeof(UILabel)).text = sdata_UILiteral.mData.body[0xFF01][sdata_UILiteral.mFieldName2Index["Literal"]]..ItemData.num
+		this.view.Panel_Detail_item.Item_icon:GetComponent(typeof(UISprite)).spriteName = _Icon -- DONE: 收藏品界面：显示收藏品图标
+		this.view.Panel_Detail_item.Item_frame:GetComponent(typeof(UISprite)).spriteName = EquipUtil:getQualitySpriteStr(_Quality)
 		this.view.Panel_Detail_item.Label_tips:GetComponent(typeof(UILabel)).text = _Des
 		this.view.Panel_Detail_item.Label_description:GetComponent(typeof(UILabel)).text = _FunctionDes
+		this.view.Panel_Detail_item.Label_sellCoins:GetComponent(typeof(UILabel)).text = _SaleGold
 
 		UIEventListener.Get(this.view.Panel_Detail_item.Button_sale).onClick = function()
-				-- TODO 添加出售按钮的实现
+				-- FIXME: 收藏品界面：添加出售按钮的实现
+				local Items = {{id = ItemData.id,num = ItemData.num}}
+				Message_Manager:SendPB_10022(Items)
+				local on_10022_rec = function(body)
+					local gw2c = gw2c_pb.SellItem()
+				    gw2c:ParseFromString(body)
+				    local items = gw2c.item
+
+				    for k,v in ipairs(items) do
+				    	print("出售："..v.id..v.num)
+				    end
+
+					Event.RemoveListener("10022",on_10022_rec)
+				end
+				Event.AddListener("10022",on_10022_rec)
 			end
 	end
 	-- 数量工具条
@@ -369,168 +535,186 @@ function wnd_cangku_controller:showPanelByItemData(ItemData)
 		end
 	else
 		this.view.Panel_Detail_item.Sprite_Container:SetActive(false)
-	end
-		
+	end		
 end
 
-function wnd_cangku_controller:showEquipmentDetailsPanel(equip)
-
+function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 	this:show(this.view.Panel_Detail_equipment)
 
-	-- TODO 装备数据传递
-	local _EquipName = equip["EquipName"]
-	local _EquipIcon = equip["EquipIcon"]
+	local mDepth = GameObject.Find("ui_cangku"):GetComponent("UIPanel").depth
 
-	this.view.Panel_Detail_equipment.Label_name:GetComponent(typeof(UILabel)).text = _EquipName
-	-- this.view.Panel_Detail_equipment.Item_icon.spriteName = _EquipIcon
+	equipDetail:showEquip(equip,this.view.Panel_Detail_equipment.panel,mDepth + 1)
+	---------------------------------------------------------------
+	UIEventListener.Get(this.view.Panel_Detail_equipment.Button_decomposition).onClick = function()
+		-- DONE: 装备界面：装备分解按钮
+			before_panel = this._currentPanel_right
+			
+			this:show(this.view.Panel_Detail_decomposition)
+			
+			this:LoadDecompositionPanelState()
 
+		end
+	UIEventListener.Get(this.view.Panel_Detail_equipment.Button_share).onClick = function (go)
+			-- TODO: 装备界面：分享按钮
+		end
+	UIEventListener.Get(this.view.Panel_Detail_equipment.Button_commander).onClick = function (go)
+			-- TODO: 装备界面：指挥官按钮
+		end	
+	UIEventListener.Get(this.view.Panel_Detail_equipment.Button_lock).onClick = function (go)
+			-- DONE: 装备界面：锁定按钮
+			if equip.isLock == 0 then
+				Lock = 1
+				this.view.Panel_Detail_equipment.Button_lock:GetComponent(typeof(UISprite)).spriteName = cstr.EQUIPMENT_UNLOCKED
+			else 
+				Lock = 0
+				this.view.Panel_Detail_equipment.Button_lock:GetComponent(typeof(UISprite)).spriteName = cstr.EQUIPMENT_LOCKED
+			end
+			local on_10005_rec = function(body)
+				local gw2c = gw2c_pb.EquipLock()
+			    gw2c:ParseFromString(body)
+			    local serv_equip = gw2c.equip
+			    if serv_equip.isLock == 0 then
+			    	this:showToast("装备已解锁",2)
+			    	cangkuItem:setEquipmentLock(false)
+			    	this.view.Panel_Detail_equipment.Button_lock:GetComponent(typeof(UISprite)).spriteName = cstr.EQUIPMENT_UNLOCKED
+			    else
+			    	this:showToast("装备已锁定",2)
+			    	cangkuItem:setEquipmentLock(true)
+			    	this.view.Panel_Detail_equipment.Button_lock:GetComponent(typeof(UISprite)).spriteName = cstr.EQUIPMENT_LOCKED
+			    end
+			    -- 服务器返回数据后修改表内容
+			    equip.isLock = serv_equip.isLock
+			    -- 响应事件后移除Listener
+			    Event.RemoveListener("10005", on_10005_rec)
+			end
+			Message_Manager:SendPB_10005(equip.id,Lock,on_10005_rec)
+		end	
+	UIEventListener.Get(this.view.Panel_Detail_equipment.Button_unload).onClick = function (go)
+			if equip.equipped then
+				-- DONE: 装备界面：卸下按钮
+				for i = #this.model.serv_fitEquipmentList,1,-1 do
+					if this.model.serv_fitEquipmentList[i] == equip.id then
+						table.remove(this.model.serv_fitEquipmentList,i)
+					end
+				end
+			else
+				-- DONE: 装备界面：穿戴按钮
+				local _repeat,_repeatIndex = EquipUtil:whetherRepeatEquipped(equip)
+				-- 如果存在重复部件，则使用带装备物品替换已装备物品
+				if _repeat then
+					this:unloadEquipmentByID(this.model.serv_fitEquipmentList[_repeatIndex])
+					table.remove(this.model.serv_fitEquipmentList,_repeatIndex)
+					this:showToast("存在相同部位装备,将卸下之前装备",2)
+				end
+				table.insert(this.model.serv_fitEquipmentList,equip.id)
+			end
+			local on_10021_rec = function(body)
+				local gw2c = gw2c_pb.EquipFit()
+			    gw2c:ParseFromString(body)
+			    Event.RemoveListener("10021",on_10021_rec)
+			    -- FIXME: 未验证服务器返回数据
+			    -- print(gw2c.lst)
+			    -- for k,v in pairs(gw2c) do
+			    -- 	print(k..type(v))
+			    -- end
+			    print("接收已穿戴数据")
+			    local _str1 = sdata_UILiteral.mData.body[0xFE11][sdata_UILiteral.mFieldName2Index["Literal"]]
+				local _str2 = sdata_UILiteral.mData.body[0xFE12][sdata_UILiteral.mFieldName2Index["Literal"]]
+			    equip.equipped = not equip.equipped
+			    -- 完成操作后刷新界面显示
+			    cangkuItem:setEquipped(equip.equipped)
+			    this:showEquipmentDetailsPanel(equip,cangkuItem)
+				-- this.view.Panel_Detail_equipment.Button_unload:GetComponentInChildren(typeof(UILabel)).text = (equip.equipped and {_str2} or {_str1})[1]
+			end
+			Message_Manager:SendPB_10021(this.model.serv_fitEquipmentList,on_10021_rec)
+		end	
+	UIEventListener.Get(this.view.Panel_Detail_equipment.Button_plus).onClick = function (go)
+			-- TODO: 装备界面：当装备损坏时的处理
+			if equip.isBad == 1 then
+				local on_10006_rec = function(body)
+					local gw2c = gw2c_pb.EquipRepair()
+					gw2c:ParseFromString(body)
+					this:updateServData(gw2c.currency,gw2c.equip)
+					equipDetail:showEquip(equip,this.view.Panel_Detail_equipment.panel,mDepth + 1)
+				end
+				Message_Manager:SendPB_10006(equip.id,on_10006_rec)
+				return
+			end
+			-- DONE: 装备界面：强化按钮
+			if equip.lv + 1 <= this.model:getEquipmentPlusMAXLevel(equip.rarity) then
+
+				if this.model.serv_CurrencyInfo.power < equipDetail._EquipPlusCost then
+					this:showToast("能量点不足",1.5)
+					return
+				end
+				local on_10004_rec = function(body)
+					local gw2c = gw2c_pb.EquipLvlup()
+					gw2c:ParseFromString(body)
+					local serv_equip = gw2c.equip
+					local serv_currency = gw2c.currency
+
+					Event.RemoveListener("10004", on_10004_rec)
+					-- 强化后刷新界面
+					this:updateServData(gw2c.currency,gw2c.equip)
+					cangkuItem:setEquipmentLevel(gw2c.equip.lv)
+					this:showEquipmentDetailsPanel(equip,cangkuItem)
+				end
+				Message_Manager:SendPB_10004(equip.id,on_10004_rec)
+			else
+				if equip.rarity == 4 or equip.rarity == 5 or equip.rarity == 6 then 
+					-- TODO:装备重铸
+
+				else
+					this:showToast("该装备无法重铸",1)
+				end
+			end
+		end
 end
 
-function wnd_cangku_controller:showMessageBox()
-
+function wnd_cangku_controller:showTipsBox(messageToShow)
+	this.view.MessageBox.mBox.panel:SetActive(true)
+	this.view.MessageBox.mBox.Label:GetComponent(typeof(UILabel)).text = messageToShow
+	local sq = DG.Tweening.DOTween.Sequence()
+	local tweener = this.view.MessageBox.mBox.panel.transform:DOPunchScale(Vector3(0.5, 0.5, 0), 0.5, 1, 1)
+	sq:Append(this.view.MessageBox.mBox.panel.transform:DOScale(1,0))
+	sq:Append(tweener)
+	UIEventListener.Get(this.view.MessageBox.mBox.Button_back).onClick = function()
+		local sq = DG.Tweening.DOTween.Sequence()
+		local tweener = this.view.MessageBox.mBox.panel.transform:DOScale(0,0.5)
+		-- local tweener = this.view.MessageBox.mBox.panel.transform:DOFade(0,0.5)
+		tweener:OnComplete(function() this:hide(this.view.MessageBox.mBox) end)
+		sq:Append(tweener)
+	end
 end
 
-function wnd_cangku_controller:prepareDecompositionPanel() -- 准备装备分解界面
-	this.view.Panel_Detail_decomposition.Checkbox.Button_white.transform:
-	GetChild(0):GetComponent(typeof(UISprite)).spriteName = this.scrollViewController.cstr_SELECTED_CB
-	this.view.Panel_Detail_decomposition.Checkbox.Button_green.transform:
-	GetChild(0):GetComponent(typeof(UISprite)).spriteName = this.scrollViewController.cstr_SELECTED_CB
-	this.view.Panel_Detail_decomposition.Checkbox.Button_blue.transform:
-	GetChild(0):GetComponent(typeof(UISprite)).spriteName = this.scrollViewController.cstr_SELECTED_CB
-	this.view.Panel_Detail_decomposition.Checkbox.Button_purple.transform:
-	GetChild(0):GetComponent(typeof(UISprite)).spriteName = nil
-	this.view.Panel_Detail_decomposition.Checkbox.Button_golden.transform:
-	GetChild(0):GetComponent(typeof(UISprite)).spriteName = nil
-	this.view.Panel_Detail_decomposition.Checkbox.Button_red.transform:
-	GetChild(0):GetComponent(typeof(UISprite)).spriteName = nil
+function wnd_cangku_controller:showToast(messageToShow,duration)
+	
+	this.view.MessageBox.Toast.panel:SetActive(true)
+	this.view.MessageBox.Toast.Label:GetComponent(typeof(UILabel)).text = messageToShow
+	this.view.MessageBox.Toast.panel:GetComponent(typeof(UIWidget)).alpha = 1
+	this.view.MessageBox.Toast.Label:GetComponent(typeof(UIWidget)):AssumeNaturalSize()
+	this.view.MessageBox.Toast.Sprite:GetComponent(typeof(UIWidget)).width = this.view.MessageBox.Toast.Label:GetComponent(typeof(UIWidget)).width + 80
+
+	local sq = DG.Tweening.DOTween.Sequence()
+	local tweener = DG.Tweening.DOTween.ToAlpha(
+		function()
+			return this.view.MessageBox.Toast.panel:GetComponent(typeof(UIWidget)).color
+		end,
+		function(value) 
+			this.view.MessageBox.Toast.panel:GetComponent(typeof(UIWidget)).color = value
+		end,0,0.7)
+	tweener:OnComplete(function() this:hide(this.view.MessageBox.Toast) end)
+	sq:SetDelay((duration == nil and {3} or {duration})[1])
+	sq:Append(tweener)
 end
 
-
-----------------------------------------------------------------
---★Interact with the server
-function test()
-	print("向服务器req")
-	-- 登陆服务器
-	local c2gw = c2gw_pb.LoginGame()
-    c2gw.token = "token"
-    c2gw.hostId = 101
-    local msg1 = c2gw:SerializeToString()
-    this:reqData(10001, msg1)
-
-    Event.AddListener("10001",this.recData)
-
-end
-
-function wnd_cangku_controller:reqData(msgId,body)
-	local header = header_pb.Header()
-    header.ID = 1
-    header.msgId = msgId
-    header.userId = 8002--8001
-    header.version = '1.0.0'
-    header.errno = 0
-    header.ext = 0
-    if body then
-        header.body = body
-    end
-    local msg2 = header:SerializeToString()
-    local buffer = ByteBuffer()
-    buffer:WriteBuffer(msg2)
-    networkMgr:SendMessage(buffer)
-end
-
-function wnd_cangku_controller:recData() 
-    -- 监听数据
-	this:reqData(10002,nil)
-	Event.AddListener("10002", 
-		function(body)
-			local gw2c = gw2c_pb.SelectRole()
-		    gw2c:ParseFromString(body)
-		    local user = gw2c.user
-
-		    print('服务器返回装备数据>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-		    -- for k, v in ipairs(user.equip) do
-		        -- print('gw2c.user.equip.id==>' .. v.id);
-		    --     print('gw2c.user.equip.eid==>' .. v.eid);
-		        -- print('gw2c.user.equip.lv==>' .. v.lv);
-		        -- print('gw2c.user.equip.rarity==>' .. v.rarity);
-		        -- print('gw2c.user.equip.fst_attr==>' .. v.fst_attr);
-		        
-		        -- for k, v in ipairs(v.sndAttr) do
-		            -- print('gw2c.user.equip.sndAttr.id==>' .. v.id);
-		        --     print('gw2c.user.equip.sndAttr.val==>' .. v.val);
-		        --     print('gw2c.user.equip.sndAttr.isRemake==>' .. v.isRemake);
-		            
-		            -- for k, v in ipairs(v.remake) do
-		                -- print('gw2c.user.equip.sndAttr.remake.id==>' .. v.id);
-		        --         print('gw2c.user.equip.sndAttr.remake.val==>' .. v.val);
-		            -- end
-		            
-		        -- end
-		        -- print('gw2c.user.equip.isLock==>' .. v.isLock);
-		        -- print('gw2c.user.equip.isBad==>' .. v.isBad);
-
-		    -- end
-		    print('结束>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-		    -- print('装备count = '..count)
-
-		    -- print('服务器返回道具数据>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-		    
-
-		    -- print('结束>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-		    
-		    this:processServData(user.equip,user.item)
-		    	    
-		    this:sortServData()
-
-		    this:mergeServData()
-		    print('数据已储存')
-
-		    -- 默认选中第一个按钮
-			this:SelectYekaButton(this.view.Panel_Tab.TabButtons[1])
-
-		end)
-end
 ----------------------------------------------------------------
 --★Process Server Data
-
-function wnd_cangku_controller:processServData(user_equip,user_item) 
-
-	for k, v in ipairs(user_equip) do
-		
-		local equip = {}
-		equip = this.model:getLocalEquipmentDetailByEquipID(v.eid)
-		if equip ~= nil then
-			-- 添加选中属性
-			equip.selected = false
-			equip.id = v.id
-			equip.eid = v.eid
-			equip.lv = v.lv
-			equip.rarity = v.rarity
-			equip.fst_attr = v.fst_attr
-			equip.sndAttr = { remake = {} }
-			-- print("v.isLock = "..v.isLock)
-			equip.isLock = v.isLock
-			equip.isBad = v.isBad
-			for k, v in ipairs(v.sndAttr) do
-	           	table.insert(equip.sndAttr,
-	           	{
-	           		id = v.id,
-					val = v.val,
-					isRemake = v.isRemake,
-		        })
-	            for k, v in ipairs(v.remake) do
-	                table.insert(equip.sndAttr.remake,
-	                {
-						id = v.id,
-						val = v.val,
-	                })
-	            end
-	        end
-			table.insert(this.model.serv_Equipment,equip)
-		end
-    end
-    print("装备："..#this.model.serv_Equipment)
-
+--@params user_equip:服务器装备列表,user_item:服务器物品列表,user_fitEquip:服务器已穿戴装备列表
+function wnd_cangku_controller:processServData(user_item)
+	if not this.model then
+		this.model = require("uiscripts/cangku/wnd_cangku_model")
+	end
 	for k, v in ipairs(user_item) do
     	local item = {}
 		item = this.model:getLocalItemDetailByItemID(v.id)
@@ -548,12 +732,12 @@ function wnd_cangku_controller:processServData(user_equip,user_item)
 					for i = 1,math.ceil(v.num / _OverlapLimit) do
 						item.id = v.id
 						if i ~= math.ceil(v.num / _OverlapLimit) then
-							item = clone(item)
+							-- item = clone(item)
 							item.num = _OverlapLimit
 							table.insert(this.model.serv_Items,item)
 						else
-							item = clone(item)
-							-- TODO 未详细测试计算结果，数量可能与预期不同
+							-- item = clone(item)
+							-- TODO: 未详细测试计算结果，数量可能与预期不同
 							item.num = v.num - _OverlapLimit * (math.ceil(v.num / _OverlapLimit) - 1)
 							table.insert(this.model.serv_Items,item)
 						end
@@ -590,19 +774,17 @@ function wnd_cangku_controller:sortServData()
 	print("serv_Items排序完成..")
 	table.sort(this.model.serv_Equipment,
 		function(a,b)
-			if a.id ~= b.id then
-				-- print("cp id")
-				return a.id < b.id -- 装备专有ID小的在前
+			if a.rarity ~= b.rarity then
+				return a.rarity > b.rarity -- 装备品质高的在前
 			elseif a.lv ~= b.lv then
 				-- print("cp lv")
 				return a.lv > b.lv -- lv大的在前
-			elseif a.rarity	 ~= b.rarity then
+			elseif a.id	~= b.id then
 				-- print("cp rarity")
-				return a.rarity > b.rarity -- rarity大的在前
+				return a.id < b.id -- id小的在前
 			elseif a.isBad ~= 0 then
 				return false -- 损坏度
-			end
-			return false	
+			end	
 		end)
 	print("serv_Equipment排序完成..")
 
@@ -616,12 +798,183 @@ function wnd_cangku_controller:mergeServData()
 	for i = 1,#this.model.serv_Items do
 		table.insert(this.model.Processed_Items,this.model.serv_Items[i])
 	end
-	print("合并后："..#this.model.Processed_Items)
+end
+--@params user_currency:服务器货币信息,user_equip:服务器装备数据
+function wnd_cangku_controller:updateServData(user_currency,user_equip)
+	if user_currency then
+		this.model.serv_CurrencyInfo = user_currency
+	end
+	if user_equip then
+		-- 根据装备唯一id查找本地待更新数据
+		for i = 1,#this.model.serv_Equipment do
+			if this.model.serv_Equipment[i].id == user_equip.id then
+				local equip = this.model.serv_Equipment[i]
+				equip.eid = user_equip.eid
+				equip.lv = user_equip.lv
+				equip.rarity = user_equip.rarity
+				equip.fst_attr = user_equip.fst_attr
+				equip.sndAttr = { remake = {} }
+				equip.isLock = user_equip.isLock
+				equip.isBad = user_equip.isBad
+				for k, v in ipairs(user_equip.sndAttr) do
+		           	table.insert(equip.sndAttr,
+		           	{
+		           		id = v.id,
+						val = v.val,
+						isRemake = v.isRemake,
+			        })
+		            for kk, vv in ipairs(v.remake) do
+		                table.insert(equip.sndAttr.remake,
+		                {
+							id = vv.id,
+							val = vv.val,
+		                })
+		            end
+		        end
+			end
+		end
+	end
+end
+----------------------------------------------------------------
+--★Util
 
-	-- 克隆装备表到临时表，用于分解界面使用
-	this.model.decomposition_Equipment = clone(this.model.serv_Equipment)
-	print(this.model.decomposition_Equipment)
-	print(this.model.serv_Equipment)
+function wnd_cangku_controller:prepareDecompositionPanel() -- 准备装备分解界面
+	local mAtlas = this.view.Button_back:GetComponent("UISprite").atlas
+
+	this.view.Panel_Detail_decomposition.Checkbox.Button_white.transform:
+	GetChild(0):GetComponent(typeof(UISprite)).atlas = mAtlas
+	this.view.Panel_Detail_decomposition.Checkbox.Button_green.transform:
+	GetChild(0):GetComponent(typeof(UISprite)).atlas = mAtlas
+	this.view.Panel_Detail_decomposition.Checkbox.Button_blue.transform:
+	GetChild(0):GetComponent(typeof(UISprite)).atlas = mAtlas
+	this.view.Panel_Detail_decomposition.Checkbox.Button_purple.transform:
+	GetChild(0):GetComponent(typeof(UISprite)).atlas = mAtlas
+	this.view.Panel_Detail_decomposition.Checkbox.Button_golden.transform:
+	GetChild(0):GetComponent(typeof(UISprite)).atlas = mAtlas
+	this.view.Panel_Detail_decomposition.Checkbox.Button_red.transform:
+	GetChild(0):GetComponent(typeof(UISprite)).atlas = mAtlas
+
+	this.view.Panel_Detail_decomposition.Checkbox.Button_white.transform:
+	GetChild(0):GetComponent(typeof(UISprite)).spriteName = cstr.SELECTED_CB
+	this.view.Panel_Detail_decomposition.Checkbox.Button_green.transform:
+	GetChild(0):GetComponent(typeof(UISprite)).spriteName = cstr.SELECTED_CB
+	this.view.Panel_Detail_decomposition.Checkbox.Button_blue.transform:
+	GetChild(0):GetComponent(typeof(UISprite)).spriteName = cstr.SELECTED_CB
+	this.view.Panel_Detail_decomposition.Checkbox.Button_purple.transform:
+	GetChild(0):GetComponent(typeof(UISprite)).spriteName = nil
+	this.view.Panel_Detail_decomposition.Checkbox.Button_golden.transform:
+	GetChild(0):GetComponent(typeof(UISprite)).spriteName = nil
+	this.view.Panel_Detail_decomposition.Checkbox.Button_red.transform:
+	GetChild(0):GetComponent(typeof(UISprite)).spriteName = nil
+end
+
+function wnd_cangku_controller:updateDecompositionPanel()
+	local _Power = this.scrollViewController:calcTotalEquipmentDecomposeReturn()
+
+	local str = sdata_UILiteral.mData.body[0xFE20][sdata_UILiteral.mFieldName2Index["Literal"]]
+
+	this.view.Panel_Detail_decomposition.Label_decomposition_tips:GetComponent("UILabel").text = 
+		string.format(str,#this.scrollViewController._selectedItems) 
+	this.view.Panel_Detail_decomposition.Label_res:GetComponent("UILabel").text = _Power
+	this.view.Panel_Detail_decomposition.Label_decomposition_perfect_cost:GetComponent("UILabel").text = this:calcDecomposePrice(_Power)
+	this.view.Panel_Detail_decomposition.Label_decomposition_normal_cost:GetComponent("UILabel").text = this:calcDecomposePrice(_Power) * cint.ExchangeRate
+end
+-- 保存装备分解界面状态
+function wnd_cangku_controller:SaveDecompositionPanelState()
+	if this._DecompositionPanelState == nil then
+		this._DecompositionPanelState = {}
+		for i = 1,6 do
+			table.insert(this._DecompositionPanelState,false)
+		end
+	end
+	if this.view.Panel_Detail_decomposition.Checkbox.Button_white.
+		transform:GetChild(0):GetComponent(typeof(UISprite)).spriteName == cstr.SELECTED_CB then
+		this._DecompositionPanelState[1] = true
+	else this._DecompositionPanelState[1] = false end
+	if this.view.Panel_Detail_decomposition.Checkbox.Button_green.
+		transform:GetChild(0):GetComponent(typeof(UISprite)).spriteName == cstr.SELECTED_CB then
+		this._DecompositionPanelState[2] = true
+	else this._DecompositionPanelState[2] = false end
+	if this.view.Panel_Detail_decomposition.Checkbox.Button_blue.
+		transform:GetChild(0):GetComponent(typeof(UISprite)).spriteName == cstr.SELECTED_CB then
+		this._DecompositionPanelState[3] = true
+	else this._DecompositionPanelState[3] = false end
+	if this.view.Panel_Detail_decomposition.Checkbox.Button_purple.
+		transform:GetChild(0):GetComponent(typeof(UISprite)).spriteName == cstr.SELECTED_CB then
+		this._DecompositionPanelState[4] = true
+	else this._DecompositionPanelState[4] = false end
+	if this.view.Panel_Detail_decomposition.Checkbox.Button_golden.
+		transform:GetChild(0):GetComponent(typeof(UISprite)).spriteName == cstr.SELECTED_CB then
+		this._DecompositionPanelState[5] = true
+	else this._DecompositionPanelState[5] = false end
+	if this.view.Panel_Detail_decomposition.Checkbox.Button_red.
+		transform:GetChild(0):GetComponent(typeof(UISprite)).spriteName == cstr.SELECTED_CB then
+		this._DecompositionPanelState[6] = true
+	else this._DecompositionPanelState[6] = false end
+end
+-- 加载上次装备分解界面状态
+function wnd_cangku_controller:LoadDecompositionPanelState()
+	this.scrollViewController._State_InDECOMPOSITION = true -- 改变标记
+	if this._DecompositionPanelState == nil then
+		this:prepareDecompositionPanel()
+		this:updateDecompositionPanel()
+		this.scrollViewController:filterBy('Equip','Decomposition')
+		this.scrollViewController:addEquipmentShowByQuality(1)
+		this.scrollViewController:addEquipmentShowByQuality(2)
+		this.scrollViewController:addEquipmentShowByQuality(3)
+	else
+		this.scrollViewController:filterBy('Equip','Decomposition')
+		for i = 1,#this._DecompositionPanelState do
+			if this._DecompositionPanelState[i] then
+				this.scrollViewController:addEquipmentShowByQuality(i)
+			end
+		end
+	end
+end
+--@params power:能量点
+--@return (int,int)Interval
+function wnd_cangku_controller:calcInterval(power)
+	if power > cint.PowerInterval[#cint.PowerInterval] or power < cint.PowerInterval[1] then
+		Debugger.LogWarning("power out of bounds.")
+		return
+	end
+	for i = 1,#cint.PowerInterval do
+		if power >= cint.PowerInterval[i] and power <= cint.PowerInterval[i+1] then
+			return i,i+1
+		end
+	end
+end
+--@params power:能量点
+--@return (int)Diamond
+function wnd_cangku_controller:calcDecomposePrice(power)
+	local j,i = this:calcInterval(power)
+	local Diamond = (power - cint.PowerInterval[i-1])/
+		(cint.PowerInterval[i] - cint.PowerInterval[i-1])*
+		(cint.DiamondInterval[i] - cint.DiamondInterval[i-1]) + cint.DiamondInterval[i-1]
+	Diamond = math.ceil(Diamond * 0.2) * 5
+	return Diamond
+end
+--@Des 卸下指定id的装备
+--@params equip:本地装备数据
+function wnd_cangku_controller:unloadEquipmentByID(id)
+	for i = 1,#this.scrollViewController.currentItems do
+		if this.scrollViewController.currentItems[i].id == id then
+			print("卸下 "..this.scrollViewController.currentItems[i]["EquipName"])
+			this.scrollViewController.currentItems[i].equipped = false
+		end
+	end
+	-- 刷新列表显示
+	this.scrollViewController:refreshList()
+end
+--@Des 卸下指定id的装备
+--@params equipList:装备唯一id列表
+function wnd_cangku_controller:removeEquipmentByIDList(equipList)
+	for i = 1,#equipList do
+		table.remove(this.model.serv_Equipment,this.model:getIndexByID(equipList[i]))
+	end
+	this.model.Processed_Items = {}
+	this:mergeServData()
+	this.scrollViewController:refreshList()
 end
 
 return wnd_cangku_controller

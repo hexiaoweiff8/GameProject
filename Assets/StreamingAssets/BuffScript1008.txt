@@ -1,0 +1,16 @@
+BuffNum(1008)
+        Action
+        {
+            ResistDemage(1,3,1,true)
+            {
+                Point(1,test/ExplordScope,0,3,10,1,10),  
+            }
+        }
+        [
+            BuffTime(10)
+            TriggerLevel1(3)
+            TriggerLevel2(10)
+            DetachTriggerLevel1(3)
+            DetachTriggerLevel2(10)
+            DetachQualified(ResistDemage,<=,0.0f)
+        ]

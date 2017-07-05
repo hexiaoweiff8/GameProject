@@ -1,0 +1,21 @@
+SkillNum(1009)
+Action
+{
+	Point(1, test/Exprold, 0, %0, 1,1,1);
+}
+[
+	1, , , , , , , , , 
+	2, , , , , , , , , 
+	3, , , , , , , , , 
+	CDTime(1);
+	CDGroup(1);
+	BuffTime(10);
+	BuffType(1);
+	DetachTriggerLevel1(3);
+	DetachTriggerLevel2(10);
+	BuffLevel(10);
+	BuffGroup(1);
+	IsBeneficial(true);
+	IsDeadDisappear(false);
+	IsNotLethal(true);
+]

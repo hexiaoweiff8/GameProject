@@ -78,7 +78,7 @@ public class SkillFormulaItem : AbstractFormulaItem
         result = new Formula((callback) =>
         {
             // 数据依靠传递
-            SkillManager.Single.DoSkillNum(mySkillNum, paramsPacker);
+            SkillManager.Single.DoSkillNum(mySkillNum, paramsPacker, true);
             callback();
         }, myFormulaType);
 

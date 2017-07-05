@@ -23,20 +23,20 @@ public class MoveFormulaItem : AbstractFormulaItem
     /// <summary>
     /// 是否瞬间移动
     /// </summary>
-    public int IsBlink { get; private set; }
+    public bool IsBlink { get; private set; }
 
-    /// <summary>
-    /// 初始化
-    /// </summary>
-    /// <param name="formulaType">单元行为类型(0: 不等待完成, 1: 等待其执行完毕)</param>
-    /// <param name="speed">移动速度(如果isBlink为1则无效, isBlink为0才有效)</param>
-    /// <param name="isBlink">是否瞬间移动(0: 否, 1: 是)</param>
-    public MoveFormulaItem(int formulaType, float speed, int isBlink)
-    {
-        FormulaType = formulaType;
-        Speed = speed;
-        IsBlink = isBlink;
-    }
+    ///// <summary>
+    ///// 初始化
+    ///// </summary>
+    ///// <param name="formulaType">单元行为类型(0: 不等待完成, 1: 等待其执行完毕)</param>
+    ///// <param name="speed">移动速度(如果isBlink为1则无效, isBlink为0才有效)</param>
+    ///// <param name="isBlink">是否瞬间移动(0: 否, 1: 是)</param>
+    //public MoveFormulaItem(int formulaType, float speed, int isBlink)
+    //{
+    //    FormulaType = formulaType;
+    //    Speed = speed;
+    //    IsBlink = isBlink;
+    //}
 
     /// <summary>
     /// 初始化
@@ -61,7 +61,7 @@ public class MoveFormulaItem : AbstractFormulaItem
         // 如果该项值是以%开头的则作为替换数据
         var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
         var speed = GetDataOrReplace<float>("Speed", array, 1, ReplaceDic);
-        var isBlink = GetDataOrReplace<int>("IsBlink", array, 2, ReplaceDic);
+        var isBlink = GetDataOrReplace<bool>("IsBlink", array, 2, ReplaceDic);
 
         FormulaType = formulaType;
         Speed = speed;
@@ -97,7 +97,7 @@ public class MoveFormulaItem : AbstractFormulaItem
 
         IFormula result = new Formula((callback) =>
         {
-            if (myIsBlink == 1)
+            if (myIsBlink)
             {
                 // 瞬移
                 // 数据层面移动

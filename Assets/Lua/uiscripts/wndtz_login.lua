@@ -8,10 +8,11 @@ require("manager/Message_Manager")
 Message_Manager = Message_Manager()
 require("uiscripts/redDotControl")
 redDotControl = redDotControl()
-
-
-
+require("uiscripts/ui_tips")
+tips = nil
 function class_wnd_login:OnShowDone()
+    tips = ui_tips()
+
     local btn_go = self.transform:Find("mainpanel/btn_go").gameObject
     UIEventListener.Get(btn_go).onPress = function(btn_go, args)
         if args then
