@@ -25,7 +25,7 @@ public class SData_armyaoe_c : MonoEX.Singleton<SData_armyaoe_c>
 					case "AOERadius": dif.AOERadius = (float)(double)o22; break;
 					case "AOELength": dif.AOELength = (float)(double)o22; break;
 					case "AOEWidth": dif.AOEWidth = (float)(double)o22; break;
-                    case "BulletModel": dif.BulletModel = (string)o22; break;
+					case "BulletModel": dif.BulletModel = (string)o22; break;
 					case "BulletPath": dif.BulletPath = (short)(double)o22; break;
 					case "Ballistic": dif.Ballistic = (string)o22; break;
 					case "DamageEffect": dif.DamageEffect = (string)o22; break;

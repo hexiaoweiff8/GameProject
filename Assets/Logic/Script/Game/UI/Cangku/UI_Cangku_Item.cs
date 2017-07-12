@@ -22,6 +22,7 @@ public class UI_Cangku_Item : UIScrollViewItemBase
 
 
     public UISprite sIcon;//显示在列表中的Item的Icon
+    public UISprite sIconLayer;//Item品质底图
     public UISprite sIconFrame;//列表项边框，用于表现道具/装备的'品质'
     public UISprite sIconSelectFrame;//列表项选择框，用于表示Item是否被选中
 
@@ -44,8 +45,9 @@ public class UI_Cangku_Item : UIScrollViewItemBase
             _cItem = value;
 
             sIcon = _cItem.transform.parent.GetChild(0).GetComponent<UISprite>();
-            sIconFrame = _cItem.transform.parent.GetChild(1).GetComponent<UISprite>();
-            sIconSelectFrame = _cItem.transform.parent.GetChild(2).GetComponent<UISprite>();
+            sIconLayer = _cItem.transform.parent.GetChild(1).GetComponent<UISprite>();
+            sIconFrame = _cItem.transform.parent.GetChild(2).GetComponent<UISprite>();
+            sIconSelectFrame = _cItem.transform.parent.GetChild(3).GetComponent<UISprite>();
 
             sCompositeMark = _cItem.transform.GetChild(0).GetComponent<UISprite>();
             tItemCount = _cItem.transform.GetChild(1).GetComponent<UILabel>();
@@ -85,7 +87,16 @@ public class UI_Cangku_Item : UIScrollViewItemBase
             sIcon.atlas = atlas;
         sIcon.spriteName = spriteName;
     }
-
+    public void setIconLayer(string spriteName)
+    {
+        sIconLayer.spriteName = spriteName;
+    }
+    public void setIconLayer(UIAtlas atlas, string spriteName)
+    {
+        if (atlas != null)
+            sIconLayer.atlas = atlas;
+        sIconLayer.spriteName = spriteName;
+    }
     public void setIconFrame(string spriteName)
     {
         sIconFrame.spriteName = spriteName;
@@ -104,7 +115,7 @@ public class UI_Cangku_Item : UIScrollViewItemBase
         sIconSelectFrame.spriteName = spriteName;
     }
 
-    public void setCompositeMark(bool show,bool KePinHe = false)
+    public void setCompositeMark(bool show,bool KePinHe)
     {
         if (!show)
         {

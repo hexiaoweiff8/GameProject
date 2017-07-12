@@ -10,6 +10,6 @@ Const = class("Const")
     Const.MAX_ARMY_LV  = 8
     Const.MAX_SYNERGY_LV = 1
     Const.SLOT_NUM = 4
-
+    Const.EQUIP_TYPE_NUM = 8
 
 return Const

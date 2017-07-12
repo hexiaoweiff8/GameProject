@@ -11,7 +11,6 @@ local equipPage = require("uiscripts/myEquip/equipPage/equipPage_controller")
 local detailPage = require("uiscripts/myEquip/detailPage/detailPage_controller")
 local equipOnBody = require("uiscripts/myEquip/equipOnBody/equipOnBody_controller")
 local comPropty = require("uiscripts/myEquip/comPropty/comPropty_controller")
-require("uiscripts/commonGameObj/equipItem")
 
 
 ---
@@ -32,13 +31,7 @@ function equip_controller:OnShowDone()
     detailPage:init(self)
     equipOnBody:init(self)
     comPropty:init(self)
-    ---
-    ---设置一键装备和一键修理按钮的显示文字
-    ---
-    view.btn_equipOnce.transform:Find("lab1"):GetComponent(typeof(UILabel)).text = sdata_UILiteral:GetFieldV("Literal", 10013)
-    view.btn_equipOnce.transform:Find("lab2"):GetComponent(typeof(UILabel)).text = sdata_UILiteral:GetFieldV("Literal", 10014)
-    view.btn_fixOnce.transform:Find("lab1"):GetComponent(typeof(UILabel)).text = sdata_UILiteral:GetFieldV("Literal", 10013)
-    view.btn_fixOnce.transform:Find("lab2"):GetComponent(typeof(UILabel)).text = sdata_UILiteral:GetFieldV("Literal", 10015)
+
 
     ---
     ---初始化装备界面的显示
@@ -53,7 +46,9 @@ function equip_controller:initShow()
 
     view.rightDetail:SetActive(false)
     view.otherEquip:SetActive(false)
-
+    ---
+    ---显示穿戴装备
+    ---
     equipOnBody:showEquipsOnBody()
     ---
     ---初始化右侧界面
@@ -99,6 +94,8 @@ function equip_controller:showDetailByType(EquipType)
     detailPage:setListenerToBtnChange(self.showEquipsByType)
     view.otherEquip:SetActive(false)
     view.rightDetail:SetActive(true)
+    view.comProp_L:SetActive(false)
+    view.comProp_R:SetActive(false)
     view.btn_comPropR:SetActive(false)
     view.btn_comPropL:SetActive(true)
 end
@@ -109,17 +106,18 @@ end
 ---
 function equip_controller:showEquipsByType(EquipType)
 
-    equipPage:showEquipsByType(EquipType)
     view.rightDetail:SetActive(false)
     view.otherEquip:SetActive(true)
+    view.comProp_L:SetActive(false)
+    view.comProp_R:SetActive(false)
     view.btn_comPropR:SetActive(true)
     view.btn_comPropL:SetActive(false)
+    equipPage:showEquipsByType(EquipType)
 end
 
 
 ---
----装备卸下成功后调用
----装备主界面中只有卸下功能
+---装备或卸下成功后调用
 ---
 function equip_controller:equipLoadOrNotRefresh()
     ---
@@ -127,35 +125,84 @@ function equip_controller:equipLoadOrNotRefresh()
     ---
     data:getDatas()
     ---
-    ---刷新左侧装备信息
+    ---装备有变化，刷新左侧装备信息
     ---
-    equipOnBody:refresh()
+    equipOnBody:equipChangeRefresh()
     ---
     ---刷新右侧界面显示
     ---
     if view.rightDetail.activeSelf then
-        view.rightDetail:SetActive(false)
-        view.otherEquip:SetActive(true)
-        view.btn_comPropR:SetActive(true)
-        view.btn_comPropL:SetActive(false)
+        self:showEquipsByType(equipOnBody:getCurrentSelectEquipType())
+        return
     end
-    equipPage:refresh(equipOnBody:getCurrentSelectEquipType())
-
+    ---
+    ---
+    ---
+    if view.otherEquip.activeSelf then
+        equipPage:refresh(equipOnBody:getCurrentSelectEquipType())
+    end
 
 end
 
+---
+
+function equip_controller:equipLoadBestRefresh()
+    ---
+    ---更新数据
+    ---
+    data:getDatas()
+    ---
+    ---装备有变化，刷新左侧装备信息
+    ---
+    equipOnBody:equipChangeRefresh()
+    ---
+    ---刷新右侧界面显示
+    ---
+    if view.rightDetail.activeSelf then
+        detailPage:refresh()
+    end
+    ---
+    ---
+    ---
+    if view.otherEquip.activeSelf then
+        equipPage:onceEquipRefresh(equipOnBody:getCurrentSelectEquipType())
+    end
+end
 
 ---
----装备升级后调用
+---装备修理，升级，加锁后调用
 ---
-function equip_controller:equipPlusRefresh()
-
+function equip_controller:normalRefresh()
     ---
     ---更新数据
     ---
     data:getDatas()
 
-    equipOnBody:refresh()
+    ---
+    ---刷新左侧装备信息
+    ---
+    equipOnBody:refresh(equipOnBody:getCurrentSelectEquipType())
+
+    if view.rightDetail.activeSelf then
+        detailPage:refresh()
+        return
+    end
+    if view.otherEquip.activeSelf then
+        equipPage:refresh(equipOnBody:getCurrentSelectEquipType())
+    end
+end
+
+
+function equip_controller:equipFixRefreshAll()
+    ---
+    ---更新数据
+    ---
+    data:getDatas()
+
+    ---
+    ---刷新左侧装备信息
+    ---
+    equipOnBody:refreshAll()
 
     if view.rightDetail.activeSelf then
         detailPage:refresh()

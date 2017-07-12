@@ -1,9 +1,9 @@
+require('uiscripts/cangku/util/removeUtil')
 wnd_cangku_ScrollView_controller = {
 
 	_scrollView,
 	_scrollViewItem,
 
-	Items = {}, -- 所有道具及装备
 	currentItems = {}, -- 回调方法OnItemLoaded被调用时索引列表
 	Items_filterByUseType_1_2 = nil, -- 记录排好序的表，在当前界面仅初始化一次
 	Items_filterByUseType_3_4_5 = nil,
@@ -12,6 +12,7 @@ wnd_cangku_ScrollView_controller = {
 
 	_selectedIndex,
 	_selectedItem, -- 记录当前处于选择状态的Item
+	_selectedItems = {}, -- 记录装备分解状态时勾选的Item集合(data)
 
 	_State_InDECOMPOSITION = false,-- 标记当前是否处于装备分解界面
 
@@ -42,8 +43,6 @@ function wnd_cangku_ScrollView_controller:init(Ctrl)
 
 	_scrollView = view.Panel_depository.ListView:GetComponent(typeof(UIScrollViewAdapter))	
 	_scrollViewItem = this:initScrollViewItem()
-
-	this.Items = model.Processed_Items -- 所有物品，已排序
 
 	_scrollView.onItemLoaded = function(go)
 		this:HandleOnItemLoadedHandler(go)
@@ -85,8 +84,8 @@ function wnd_cangku_ScrollView_controller:initScrollViewItem()
 	view.cEquipment.transform:SetParent(Item.gameObject.transform)
 	view.cEquipment.transform.localPosition = Vector3.zero
 
-	Item.cItem = Item.transform:GetChild(3).gameObject
-	Item.cEquipment = Item.transform:GetChild(4).gameObject
+	Item.cItem = Item.transform:GetChild(4).gameObject
+	Item.cEquipment = Item.transform:GetChild(5).gameObject
 
 	return Item 
 end
@@ -102,15 +101,21 @@ end
 function wnd_cangku_ScrollView_controller:setQualityMark(cangkuItem,Quality)
 	if Quality == 1 then
 		cangkuItem:setIconFrame(cstr.QUALITY_WHITE)
+		cangkuItem:setIconLayer(cstr.QUALITY_WHITE_LAYER)
 	elseif Quality == 2 then
 		cangkuItem:setIconFrame(cstr.QUALITY_GREEN)
+		cangkuItem:setIconLayer(cstr.QUALITY_GREEN_LAYER)
 	elseif Quality == 3 then
 		cangkuItem:setIconFrame(cstr.QUALITY_BLUE)
+		cangkuItem:setIconLayer(cstr.QUALITY_BLUE_LAYER)
 	elseif Quality == 4 then
 		cangkuItem:setIconFrame(cstr.QUALITY_PURPLE)
+		cangkuItem:setIconLayer(cstr.QUALITY_PURPLE_LAYER)
 	elseif Quality == 5 then
 		cangkuItem:setIconFrame(cstr.QUALITY_ORANGE)
-	else cangkuItem:setIconFrame(cstr.QUALITY_RED) end
+		cangkuItem:setIconLayer(cstr.QUALITY_ORANGE_LAYER)
+	else cangkuItem:setIconFrame(cstr.QUALITY_RED)
+		 cangkuItem:setIconLayer(cstr.QUALITY_RED_LAYER) end
 end
 ----------------------------------------------------------------
 --★Callback
@@ -118,12 +123,20 @@ function wnd_cangku_ScrollView_controller:HandleOnItemLoadedHandler(item)
 
 	local cangkuItem = item.gameObject:GetComponent(typeof(UI_Cangku_Item))
 
+	cangkuItem.gameObject.name = "Index_"..cangkuItem.Index
+
 	if cangkuItem.cItem == nil then
-		cangkuItem.cItem = cangkuItem.transform:GetChild(3).gameObject
+		cangkuItem.cItem = cangkuItem.transform:GetChild(4).gameObject
 	end
 	if cangkuItem.cEquipment == nil then
-		cangkuItem.cEquipment = cangkuItem.transform:GetChild(4).gameObject
+		cangkuItem.cEquipment = cangkuItem.transform:GetChild(5).gameObject
 	end	
+	-- FIXED: 2017-7-05 修复由于列表项循环使用时会出现多个项目被选中
+	if cangkuItem.Index ~= this._selectedIndex then
+		cangkuItem:setIconSelectFrame(nil)
+	else
+		cangkuItem:setIconSelectFrame(cstr.SELECTED)
+	end
 
 	if cangkuItem.Index + 1 <= #this.currentItems then -- 索引不在范围内，则显示空物品
 		
@@ -143,7 +156,8 @@ function wnd_cangku_ScrollView_controller:HandleOnItemLoadedHandler(item)
 			else _isLock = true end
 			
 			this:setQualityMark(cangkuItem,_rarity)
-			cangkuItem:setIcon(this.currentItems[cangkuItem.Index+1]['EquipIcon'])
+			-- cangkuItem:setIcon(this.currentItems[cangkuItem.Index+1]['EquipIcon'])
+			cangkuItem:setIcon(equipment_Atlas,this.currentItems[cangkuItem.Index+1]['EquipIcon']..".PNG")
 			cangkuItem:setEquipmentLevel(_lv)
 			cangkuItem:setEquipmentLock(_isLock)
 			cangkuItem:setEquipped(_equipped)
@@ -165,7 +179,8 @@ function wnd_cangku_ScrollView_controller:HandleOnItemLoadedHandler(item)
 			local _UseType = this.currentItems[cangkuItem.Index+1]["UseType"]
 			local _ComposeNum = this.currentItems[cangkuItem.Index+1]["ComposeNum"]
 
-			cangkuItem:setIcon(this.currentItems[cangkuItem.Index+1]['Icon'])
+			-- cangkuItem:setIcon(this.currentItems[cangkuItem.Index+1]['Icon'])
+			cangkuItem:setIcon(items_Atlas,this.currentItems[cangkuItem.Index+1]['Icon']..".PNG")
 			this:setQualityMark(cangkuItem,_Quality)
 			
 			if _OverlapLimit == 1 then
@@ -177,8 +192,10 @@ function wnd_cangku_ScrollView_controller:HandleOnItemLoadedHandler(item)
 
 			if _UseType == 1 then 
 				if _ComposeNum ~= -1 then -- 可以合成的碎片显示此标记
-					cangkuItem:setCompositeMark(true,true)
-				else cangkuItem:setCompositeMark(true,false) end
+					if this.currentItems[cangkuItem.Index+1].num >= _ComposeNum then
+						cangkuItem:setCompositeMark(true,true)
+					else cangkuItem:setCompositeMark(true,false) end
+				end
 			else cangkuItem:setCompositeMark(false,false) end
 
 			cangkuItem:setItemSelect(false)
@@ -227,8 +244,8 @@ function wnd_cangku_ScrollView_controller:HandleOnItemClickedHandler(cangkuItem)
 			ctrl:showEquipmentDetailsPanel(this.currentItems[cangkuItem.Index+1],cangkuItem)
 		else
 			local useType = this.currentItems[cangkuItem.Index+1]["UseType"]
-			print(cangkuItem._ItemID)
-			print('显示'..this:getItemType(this.currentItems[cangkuItem.Index+1]["ItemID"])..'面板 by UseType = '..useType)
+			-- print(cangkuItem._ItemID)
+			-- print('显示'..this:getItemType(this.currentItems[cangkuItem.Index+1]["ItemID"])..'面板 by UseType = '..useType)
 
 			ctrl:showPanelByItemData(this.currentItems[cangkuItem.Index+1])
 		end
@@ -238,7 +255,6 @@ function wnd_cangku_ScrollView_controller:HandleOnItemClickedHandler(cangkuItem)
 			ctrl:hide(ctrl._currentPanel_right)
 		end
 	end
-
 end
 
 function wnd_cangku_ScrollView_controller:HandleOnItemClickedInDecompositionPanel(cangkuItem)
@@ -246,25 +262,29 @@ function wnd_cangku_ScrollView_controller:HandleOnItemClickedInDecompositionPane
 		if this.currentItems[cangkuItem.Index+1].selected then
 			this.currentItems[cangkuItem.Index+1].selected = false
 			cangkuItem:setItemSelect(false)
+
+			table.removeObject(this._selectedItems,this.currentItems[cangkuItem.Index+1])
 		else
 			local canSel = this:canSelect()
 			local canDecom = this:canDecompose(this.currentItems[cangkuItem.Index+1])
+			local equipped = this.currentItems[cangkuItem.Index+1].equipped
 
 			if not canSel then
-				ctrl:showToast("最多可以同时选择10件装备",1)
+				UIToast.Show("最多可以同时选择10件装备",nil,UIToast.ShowType.Upwards)
 				return
 			elseif not canDecom then
-				ctrl:showToast("装备已锁定，不可以分解",1)
+				UIToast.Show("装备已锁定，不可以分解",nil,UIToast.ShowType.Upwards)
+				return
+			elseif equipped then
+				UIToast.Show("卸下装备以分解",nil,UIToast.ShowType.Upwards)
 				return
 			end
 			this.currentItems[cangkuItem.Index+1].selected = true
 			cangkuItem:setItemSelect(true)
+
+			table.insert(this._selectedItems,this.currentItems[cangkuItem.Index+1])
 		end
-		
-		-- if #this.currentItems < 6 * 5 then
-		-- 	_scrollView:Reload(6 * 5)
-		-- else
-		-- 	_scrollView:Reload(#this.currentItems) end
+		ctrl:updateDecompositionPanel()
 	end
 end
 
@@ -278,9 +298,20 @@ function wnd_cangku_ScrollView_controller:HandleOnItemSelectedHandler(cangkuItem
 	cangkuItem:setIconSelectFrame(cstr.SELECTED) 
 
 	this._selectedItem = cangkuItem	
+	this._selectedIndex = cangkuItem.Index
 end
 ----------------------------------------------------------------
 --★ScrollView func
+function wnd_cangku_ScrollView_controller:refreshList()
+	-- ListView重新加载方法
+	local _itemsVisible_row = _scrollView._itemsVisible_row
+	local _itemsVisible_line = _scrollView._itemsVisible_line
+	if #this.currentItems <= _itemsVisible_row * _itemsVisible_line then
+		_scrollView:Reload(_itemsVisible_row * _itemsVisible_line)
+	else
+		_scrollView:Reload(#this.currentItems) end
+end
+
 function wnd_cangku_ScrollView_controller:filterBy(Goods,Maintype)
 	if Goods == nil or Maintype == nil then
 		error('筛选数据异常')
@@ -288,8 +319,8 @@ function wnd_cangku_ScrollView_controller:filterBy(Goods,Maintype)
 	end
 
 	if Goods == '-1' then -- 显示全部(装备在前，道具在后)
-		print("filterBy() 显示全部")
-		this.currentItems = this.Items
+		-- print("filterBy() 显示全部")
+		this.currentItems = model.Processed_Items
 	end
 
 	if Goods == 'Equip' then --  显示所有装备
@@ -368,11 +399,9 @@ function wnd_cangku_ScrollView_controller:filterBy(Goods,Maintype)
 		this._selectedItem:setIconSelectFrame(nil)
 	end
 	this._selectedItem = nil
-	-- ListView重新加载方法
-	if #this.currentItems <= 6 * 5 then
-		_scrollView:Reload(6 * 5)
-	else
-		_scrollView:Reload(#this.currentItems) end
+	this._selectedIndex = nil
+
+	this:refreshList()
 
 	-- 默认选择第一个
 	if #this.currentItems ~= 0 then
@@ -380,13 +409,13 @@ function wnd_cangku_ScrollView_controller:filterBy(Goods,Maintype)
 		-- this._selectedItem = nil
 
 		if this.currentItems[1]["EquipID"] ~= nil then
-			print("显示装备信息")
+			-- print("显示装备信息")
 			local cangkuItem = _scrollView.gameObject.transform:GetChild(0):GetChild(0).gameObject:GetComponent(typeof(UI_Cangku_Item))
 			ctrl:showEquipmentDetailsPanel(this.currentItems[1],cangkuItem)
 		else
 			local useType = this.currentItems[1]["UseType"]
 			-- print(this.currentItems[1])
-			print('显示'..this:getItemType(this.currentItems[1]["ItemID"])..'面板 by UseType = '..useType)
+			-- print('显示'..this:getItemType(this.currentItems[1]["ItemID"])..'面板 by UseType = '..useType)
 
 			ctrl:showPanelByItemData(this.currentItems[1])
 		end
@@ -396,7 +425,6 @@ function wnd_cangku_ScrollView_controller:filterBy(Goods,Maintype)
 			ctrl:hide(ctrl._currentPanel_right)
 		end
 	end
-
 end
 
 function wnd_cangku_ScrollView_controller:selectEquipmentByQuality(rarity)
@@ -405,14 +433,12 @@ function wnd_cangku_ScrollView_controller:selectEquipmentByQuality(rarity)
 			this.currentItems[i].selected = true
 		end
 	end
-	if #this.currentItems < 6 * 5 then
-		_scrollView:Reload(6 * 5)
-	else
-		_scrollView:Reload(#this.currentItems) end
+	this:refreshList()
 
 	-- 取消仓库默认选中
 	if this._selectedItem ~= nil then
 		this._selectedItem:setIconSelectFrame(nil)
+		this._selectedIndex = nil
 	end
 end
 
@@ -422,14 +448,12 @@ function wnd_cangku_ScrollView_controller:disselectEquipmentByQuality(rarity)
 			this.currentItems[i].selected = false
 		end
 	end
-	if #this.currentItems < 6 * 5 then
-		_scrollView:Reload(6 * 5)
-	else
-		_scrollView:Reload(#this.currentItems) end
+	this:refreshList()
 
 	-- 取消仓库默认选中
 	if this._selectedItem ~= nil then
 		this._selectedItem:setIconSelectFrame(nil)
+		this._selectedIndex = nil
 	end
 end
 
@@ -437,7 +461,6 @@ function wnd_cangku_ScrollView_controller:addEquipmentShowByQuality(rarity)
 	if this.currentItems ~= model.decomposition_Equipment or (this.currentItems == nil and #this.currentItems == 0) then
 		return
 	end
-
 	for i = 1,#model.serv_Equipment do
 		if model.serv_Equipment[i].rarity == rarity then
 			table.insert(this.currentItems,model.serv_Equipment[i])
@@ -448,14 +471,15 @@ function wnd_cangku_ScrollView_controller:addEquipmentShowByQuality(rarity)
 
 	this:sortEquipment(this.currentItems)
 
-	if #this.currentItems < 6 * 5 then
-		_scrollView:Reload(6 * 5)
-	else
-		_scrollView:Reload(#this.currentItems) end
+	this._selectedItems = {}
+	ctrl:updateDecompositionPanel()
+
+	this:refreshList()
 
 	-- 取消仓库默认选中
 	if this._selectedItem ~= nil then
 		this._selectedItem:setIconSelectFrame(nil)
+		this._selectedIndex = nil
 	end
 end
 
@@ -474,14 +498,15 @@ function wnd_cangku_ScrollView_controller:removeEquipmentShowByQuality(rarity)
 
 	this:sortEquipment(this.currentItems)
 
-	if #this.currentItems < 6 * 5 then
-		_scrollView:Reload(6 * 5)
-	else
-		_scrollView:Reload(#this.currentItems) end
+	this._selectedItems = {}
+	ctrl:updateDecompositionPanel()
+
+	this:refreshList()
 
 	-- 取消仓库默认选中
 	if this._selectedItem ~= nil then
 		this._selectedItem:setIconSelectFrame(nil)
+		this._selectedIndex = nil
 	end
 end
 ----------------------------------------------------------------
@@ -492,20 +517,19 @@ function wnd_cangku_ScrollView_controller:sortItems(Items)
 	end
 	table.sort(Items,
 		function(a,b)
-			if a["ItemID"] ~= nil and b["ItemID"] ~= nil then
-				if a["ItemID"] ~= b["ItemID"] then
-					-- print("cp ItemID")
-					return a["ItemID"] < b["ItemID"] -- ItemID小的在前
-				elseif a["Quality"] ~= b["Quality"] then
-					-- print("cp Quality")
-					return a["Quality"] > b["Quality"] -- Quality大的在前
-				elseif a["UseType"] ~= b["UseType"] then
-					-- print("cp UseType")
-					return a["UseType"] < b["UseType"] -- UseType小的在前
-				else 
-					-- print("cp ComposeNum")
-					return a["ComposeNum"] > b["ComposeNum"] end -- 可以合成的在前
-			end
+			if a.num >= a["ComposeNum"] and b.num < b["ComposeNum"] then -- 可以合成的在前
+				return true
+			elseif a.num < a["ComposeNum"] and b.num >= b["ComposeNum"] then
+				return false
+			elseif a["UseType"] ~= b["UseType"] then
+				return a["UseType"] < b["UseType"] -- UseType小的在前
+			elseif a["Quality"] ~= b["Quality"] then
+				return a["Quality"] > b["Quality"] -- Quality大的在前
+			elseif a["ItemID"] ~= b["ItemID"] then
+				return a["ItemID"] < b["ItemID"] -- ItemID小的在前
+			else
+				return a.num > b.num -- 另外一种情况，物品堆叠数量超出时，数量多的在前
+			end 
 		end)
 end
 
@@ -515,18 +539,15 @@ function wnd_cangku_ScrollView_controller:sortEquipment(Equipment)
 	end
 	table.sort(Equipment,
 		function(a,b)
-			if a.id ~= b.id then
-				-- print("cp id")
-				return a.id < b.id -- 装备专有ID小的在前
+			if a.isBad ~= b.isBad then
+				return (a.isBad == 1 and {true} or {false})[1] -- 损坏度,坏的在前
+			elseif a.rarity ~= b.rarity then
+				return a.rarity > b.rarity -- 装备品质高的在前
 			elseif a.lv ~= b.lv then
-				-- print("cp lv")
 				return a.lv > b.lv -- lv大的在前
-			elseif a.rarity	 ~= b.rarity then
-				-- print("cp rarity")
-				return a.rarity > b.rarity -- rarity大的在前
-			elseif a.isBad ~= 0 then
-				return false -- 损坏度
-			end	
+			else
+				return a.id < b.id -- id小的在前
+			end
 		end)
 end
 ----------------------------------------------------------------
@@ -553,6 +574,14 @@ function wnd_cangku_ScrollView_controller:clearSelectedFLAG()
 			model.decomposition_Equipment[i].selected = false
 		end
 	end
+end
+function wnd_cangku_ScrollView_controller:calcTotalEquipmentDecomposeReturn()
+	local _getPower = 0
+	for i = 1,#this._selectedItems do
+		local equip = this._selectedItems[i]
+		_getPower = _getPower + model:getEquipmentDecomposeReturn(equip.lv,equip.rarity)
+	end
+	return _getPower
 end
 
 return this

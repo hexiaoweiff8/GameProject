@@ -30,7 +30,7 @@ public class Soldier_Xingjin_State : SoldierFSMState
 
         // 切换动作
         var myself = fsm.Display.RanderControl;
-        myself.ModelRander.SetClip("run".GetHashCode());
+        //myself.ModelRander.SetClip("run".GetHashCode());
 
         // 重新寻路
         ReFindPath();

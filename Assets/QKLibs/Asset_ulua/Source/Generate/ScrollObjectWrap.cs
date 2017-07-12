@@ -20,7 +20,7 @@ public class ScrollObjectWrap
 		L.RegVar("bounds", get_bounds, null);
 		L.RegVar("ScrollViewPosition", get_ScrollViewPosition, null);
 		L.RegVar("ScrollLogicPosition", get_ScrollLogicPosition, null);
-        //L.RegVar("showHandles", get_showHandles, null);
+		L.RegVar("showHandles", get_showHandles, null);
 		L.EndClass();
 	}
 
@@ -243,24 +243,24 @@ public class ScrollObjectWrap
 		}
 	}
 
-    //[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-    //static int get_showHandles(IntPtr L)
-    //{
-    //    object o = null;
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_showHandles(IntPtr L)
+	{
+		object o = null;
 
-    //    try
-    //    {
-    //        o = ToLua.ToObject(L, 1);
-    //        ScrollObject obj = (ScrollObject)o;
-    //        bool ret = obj.showHandles;
-    //        LuaDLL.lua_pushboolean(L, ret);
-    //        return 1;
-    //    }
-    //    catch(Exception e)
-    //    {
-    //        return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index showHandles on a nil value" : e.Message);
-    //    }
-    //}
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			ScrollObject obj = (ScrollObject)o;
+			bool ret = obj.showHandles;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index showHandles on a nil value" : e.Message);
+		}
+	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_GizmosCubeColor(IntPtr L)

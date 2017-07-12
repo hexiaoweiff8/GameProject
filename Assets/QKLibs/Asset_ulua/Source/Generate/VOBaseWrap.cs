@@ -8,6 +8,7 @@ public class VOBaseWrap
 	{
 		L.BeginClass(typeof(VOBase), typeof(System.Object));
 		L.RegFunction("SetSoldierData", SetSoldierData);
+		L.RegFunction("ToString", ToString);
 		L.RegFunction("New", _CreateVOBase);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("UniqueID", get_UniqueID, set_UniqueID);
@@ -94,6 +95,23 @@ public class VOBaseWrap
 			armybase_cInfo arg0 = (armybase_cInfo)ToLua.CheckObject(L, 2, typeof(armybase_cInfo));
 			obj.SetSoldierData(arg0);
 			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int ToString(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			VOBase obj = (VOBase)ToLua.CheckObject(L, 1, typeof(VOBase));
+			string o = obj.ToString();
+			LuaDLL.lua_pushstring(L, o);
+			return 1;
 		}
 		catch(Exception e)
 		{

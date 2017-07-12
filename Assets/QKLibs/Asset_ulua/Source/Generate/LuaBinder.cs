@@ -67,6 +67,11 @@ public static class LuaBinder
 		PositionObjectWrap.Register(L);
 		VOBaseWrap.Register(L);
 		ClusterDataWrap.Register(L);
+		UIScrollViewAdapterWrap.Register(L);
+		UIScrollViewItemBaseWrap.Register(L);
+		UI_Cangku_ItemWrap.Register(L);
+		UIDragScrollViewWrap.Register(L);
+		UIToastWrap.Register(L);
 		UIRectWrap.Register(L);
 		UIBasicSpriteWrap.Register(L);
 		UIProgressBarWrap.Register(L);
@@ -225,11 +230,18 @@ public static class LuaBinder
 		L.BeginModule("UIRect");
 		UIRect_AnchorUpdateWrap.Register(L);
 		L.EndModule();
+		L.BeginModule("Util");
+		Util_TimerManagerWrap.Register(L);
+		Util_TimerWrap.Register(L);
+		L.EndModule();
 		L.BeginModule("UIBasicSprite");
 		UIBasicSprite_FlipWrap.Register(L);
 		L.EndModule();
 		L.BeginModule("FileSystem");
 		FileSystem_RES_LOCATIONWrap.Register(L);
+		L.EndModule();
+		L.BeginModule("UIToast");
+		UIToast_ShowTypeWrap.Register(L);
 		L.EndModule();
 		L.BeginModule("MonoEX");
 		MonoEX_Singleton_DP_CameraTrackObjectManageWrap.Register(L);
@@ -345,6 +357,14 @@ public static class LuaBinder
 		L.EndModule();
 		L.BeginModule("PositionTransform");
 		L.RegFunction("OnValueChangedDelegate", PositionTransform_OnValueChangedDelegate);
+		L.EndModule();
+		L.BeginModule("UIScrollViewAdapter");
+		L.RegFunction("OnItemLoadedHandler", UIScrollViewAdapter_OnItemLoadedHandler);
+		L.RegFunction("OnItemSelectedHandler", UIScrollViewAdapter_OnItemSelectedHandler);
+		L.RegFunction("OnListMovedHandler", UIScrollViewAdapter_OnListMovedHandler);
+		L.EndModule();
+		L.BeginModule("UIScrollViewItemBase");
+		L.RegFunction("OnSelectedHandler", UIScrollViewItemBase_OnSelectedHandler);
 		L.EndModule();
 		L.EndModule();
 		L.BeginPreLoad();
@@ -3621,6 +3641,114 @@ public static class LuaBinder
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
 				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(PositionTransform.OnValueChangedDelegate), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int UIScrollViewAdapter_OnItemLoadedHandler(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIScrollViewAdapter.OnItemLoadedHandler), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIScrollViewAdapter.OnItemLoadedHandler), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int UIScrollViewAdapter_OnItemSelectedHandler(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIScrollViewAdapter.OnItemSelectedHandler), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIScrollViewAdapter.OnItemSelectedHandler), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int UIScrollViewAdapter_OnListMovedHandler(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIScrollViewAdapter.OnListMovedHandler), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIScrollViewAdapter.OnListMovedHandler), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int UIScrollViewItemBase_OnSelectedHandler(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIScrollViewItemBase.OnSelectedHandler), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIScrollViewItemBase.OnSelectedHandler), func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;

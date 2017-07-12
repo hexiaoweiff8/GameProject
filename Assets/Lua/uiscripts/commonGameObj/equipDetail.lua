@@ -24,6 +24,7 @@ function equipDetail:initialize(model)
     self.btn_share = self.equipDetail.transform:Find("Widget_DetailContainer/Sprite_share").gameObject
     self.btn_loadOrNot = self.equipDetail.transform:Find("Widget_DetailContainer/Button_load-unload").gameObject
     self.lab_loadOrNot = self.btn_loadOrNot.transform:Find("Label_unload").gameObject
+    self.sprite_equipped = self.equipDetail.transform:Find("Widget_DetailContainer/Sprite_equipped").gameObject
 
     self.lab_mainAttribute = self.equipDetail.transform:Find("Widget_DetailContainer/Label_MainAttribute").gameObject
     self.lab_subAttribute = self.equipDetail.transform:Find("Widget_DetailContainer/Label_ViceAttribute").gameObject
@@ -41,6 +42,7 @@ function equipDetail:initialize(model)
         self.btn_share:SetActive(false)
         self.btn_loadOrNot:SetActive(false)
         self.btn_plus:SetActive(false)
+        self.btn_lock:SetActive(false)
         self.costSp:SetActive(false)
         self.bg:GetComponent("UIWidget").height = 417
         self.bg:AddComponent(typeof(UnityEngine.BoxCollider))
@@ -125,14 +127,7 @@ function equipDetail:refresh()
     ---
     ---刷新界面显示
     ---
-    local Lock -- 装备是否锁定
-    if equip.isLock == 0 then
-        Lock = 1
-        self.btn_lock:GetComponent(typeof(UISprite)).spriteName = cstr.EQUIPMENT_UNLOCKED
-    else
-        Lock = 0
-        self.btn_lock:GetComponent(typeof(UISprite)).spriteName = cstr.EQUIPMENT_LOCKED
-    end
+
     local _str_load = sdata_UILiteral.mData.body[0xFE11][sdata_UILiteral.mFieldName2Index["Literal"]]
     local _str_unload = sdata_UILiteral.mData.body[0xFE12][sdata_UILiteral.mFieldName2Index["Literal"]]
     local _str_repair = sdata_UILiteral.mData.body[0xFE16][sdata_UILiteral.mFieldName2Index["Literal"]]
@@ -151,7 +146,16 @@ function equipDetail:refresh()
     ---
     ---如果不是显示已穿戴装备的信息，则初始化按钮功能
     ---
-    if self.model ~= 0 then
+    if self.model == 0 then
+        self.sprite_equipped:SetActive(true)
+    else
+        ---
+        ---根据装备是否穿戴设置，已装备提示的可见性。
+        ---
+        self.sprite_equipped:SetActive(false)
+        if self.model and equip.equipped then
+            self.sprite_equipped:SetActive(true)
+        end
         ---
         ---初始化穿卸按钮
         ---
@@ -170,6 +174,20 @@ function equipDetail:refresh()
             self.costSp:SetActive(true)
             self.costLab:SetActive(true)
         end
+
+        ---
+        ---初始化装备锁定按钮
+        ---
+        local Lock -- 装备是否锁定
+        if equip.isLock == 0 then
+            Lock = 1
+            self.btn_lock:GetComponent(typeof(UISprite)).spriteName = cstr.EQUIPMENT_UNLOCKED
+        else
+            Lock = 0
+            self.btn_lock:GetComponent(typeof(UISprite)).spriteName = cstr.EQUIPMENT_LOCKED
+        end
+
+
     end
 
 end
@@ -185,6 +203,7 @@ end
 
 ---========================================================装备界面专用=====================================
 ---
+---外部调用
 ---如果当前在装备界面为按钮添加监听
 ---
 function equipDetail:setListener()
@@ -208,6 +227,10 @@ function equipDetail:setListener()
             ---向服务器发送指令
             Message_Manager:SendPB_loadOrNot(EquipModel.serv_fitEquipmentList)
         else
+            if equip.isBad == 1 then
+                UIToast.Show(stringUtil:getString(30103), nil, UIToast.ShowType.Upwards)
+                return
+            end
             for i = #EquipModel.serv_fitEquipmentList,1,-1 do
                 if EquipModel:getLocalEquipmentTypeByServID(EquipModel.serv_fitEquipmentList[i]) == equip.EquipType then
                     EquipModel.serv_fitEquipmentList[i] = equip.id
@@ -229,18 +252,23 @@ function equipDetail:setListener()
     UIEventListener.Get(self.btn_plus).onClick = function (go)
         if equip.isBad == 1 then
             print("修理")
-            --UIEventListener.Get(self.btn_plus).onClick = function (go)
-            --
-            --end
+            -- TODO: 装备界面：当装备损坏时的处理
+            --[[                装备修理消耗能量点规则待补充]]
+            --[[                local myPower = currencyModel:getCurrentTbl().power
+                            local needPower = self._EquipPlusCost
+                            print(myPower, needPower)
+                            if myPower < needPower then
+                                tips:show("能量点不足")
+                                return
+                            end]]
+            Message_Manager:SendPB_EquipFix(equip.id)
+
         else
             if equip.lv == EquipUtil:getEquipmentPlusMAXLevel(equip.rarity) then
                 print("重铸")
-                --UIEventListener.Get(self.btn_plus).onClick = function (go)
                 --    Message_Manager:SendPB_loadOrNot(EquipModel.serv_fitEquipmentList)
-                --end
             else
                 print("强化")
-
                 local myPower = currencyModel:getCurrentTbl().power
                 local needPower = self._EquipPlusCost
                 print(myPower, needPower)
@@ -253,8 +281,18 @@ function equipDetail:setListener()
         end
     end
 
-
-
+    if not self.btn_lock:GetComponent(typeof(UnityEngine.BoxCollider)) then
+        local collider = self.btn_lock:AddComponent(typeof(UnityEngine.BoxCollider))
+        collider.size = self.btn_lock:GetComponent(typeof(UIWidget)).localSize
+    end
+    UIEventListener.Get(self.btn_lock).onClick = function (go)
+        print("lock")
+        if equip.isLock == 1 then
+            Message_Manager:SendPB_lock(equip.id, 0)
+        else
+            Message_Manager:SendPB_lock(equip.id, 1)
+        end
+    end
 end
 
 

@@ -16,6 +16,18 @@ end
 
 function comPropty_view:getView(parent)
     self.comPropty = GameObjectExtension.InstantiateFromPacket("ui_equip", "comProp", parent).gameObject
+    self.basicProp_Grid = self.comPropty.transform:Find("basicProp/Scroll View/Grid").gameObject
+    self.suitProp_StartPoint = self.comPropty.transform:Find("suitProp/Scroll View/startPoint").gameObject
+end
+
+function comPropty_view:createBasicProp(parent)
+    return GameObjectExtension.InstantiateFromPacket("ui_equip", "propty", parent).gameObject
+end
+function comPropty_view:createSuitProp(parent)
+    return GameObjectExtension.InstantiateFromPacket("ui_equip", "suitPropty", parent).gameObject
+end
+function comPropty_view:createSuit(parent)
+    return GameObjectExtension.InstantiateFromPacket("ui_equip", "suit", parent).gameObject
 end
 
 return comPropty_view

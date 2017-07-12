@@ -21,27 +21,13 @@ public class RanderControl : MonoBehaviour
     /// </summary>
     [HideInInspector]
     public MFAModelRender ModelRander;
-
     private DisplayOwner data;
     private SoldierFSMControl _control;
+
     void Start()
     {
-        NowWorldCamera = GameObject.Find("/PTZCamera/SceneryCamera").GetComponent<Camera>();
-        Head = transform.Find("head");
-        bloodBar = GameObjectExtension.InstantiateFromPacket("ui_fightU", "blood.prefab", GameObject.Find("ui_fightU")).transform;
-        bloodBar.localScale = Vector3.zero;
-        bloodBarCom = bloodBar.gameObject.AddComponent<BloodBar>();
-        ModelRander = gameObject.GetComponent<MFAModelRender>();
-        data = DisplayerManager.Single.GetElementById(ModelRander.ObjId);
-
-
-        // 数据来源非正常方式, 抽出
-        //启动士兵的状态控制
-        var displayOwner = DisplayerManager.Single.GetElementById(ModelRander.ObjId);
-        _control = new SoldierFSMControl();
-        displayOwner.RanderControl = this;
-        _control.StartFSM(displayOwner);
-        //SetBloodBarValue();
+        LoadSource();
+        StartFSM();
     }
 
 
@@ -53,11 +39,41 @@ public class RanderControl : MonoBehaviour
             GetComponent<Renderer>().material.shader = PacketManage.Single.GetPacket("core").Load("Avatar_N.shader") as Shader;
         }
     }
+
+    /// <summary>
+    /// 加载
+    /// </summary>
+    private void LoadSource()
+    {
+        NowWorldCamera = GameObject.Find("/PTZCamera/SceneryCamera").GetComponent<Camera>();
+        Head = transform.Find("head");
+        bloodBar = GameObjectExtension.InstantiateFromPacket("ui_fightU", "blood.prefab", GameObject.Find("ui_fightU")).transform;
+        bloodBar.localScale = Vector3.zero;
+        bloodBarCom = bloodBar.gameObject.AddComponent<BloodBar>();
+        ModelRander = gameObject.GetComponent<MFAModelRender>();
+    }
+
+    /// <summary>
+    /// 启动状态机
+    /// </summary>
+    private void StartFSM()
+    {
+        // TODO 日了狗了 循环引用实在去不掉先这么写有空了改.
+        var clusterData = gameObject.GetComponent<ClusterData>();
+        data = DisplayerManager.Single.GetElementById(clusterData.AllData.MemberData.ObjID);
+        // 数据来源非正常方式, 抽出
+        // 启动士兵的状态控制
+        _control = new SoldierFSMControl();
+        data.RanderControl = this;
+        _control.StartFSM(data);
+    }
+
+
     void Update()
     {
-        Vector3 pt = NowWorldCamera.WorldToScreenPoint(Head.position);
-        Vector3 ff = UICamera.currentCamera.ScreenToWorldPoint(pt);
-        bloodBar.position = ff;
+        // 更新血条
+        SetBloodBarValue();
+        // 驱动状态机
         _control.UpdateFSM();
     }
     /// <summary>
@@ -69,8 +85,18 @@ public class RanderControl : MonoBehaviour
         _control = null;
     }
 
+    /// <summary>
+    /// 刷新血条
+    /// </summary>
     public void SetBloodBarValue()
     {
+        if (NowWorldCamera == null || UICamera.currentCamera == null || bloodBar == null || Head == null)
+        {
+            return;
+        }
+        Vector3 pt = NowWorldCamera.WorldToScreenPoint(Head.position);
+        Vector3 ff = UICamera.currentCamera.ScreenToWorldPoint(pt);
+        bloodBar.position = ff;
         var value = data.ClusterData.AllData.MemberData.CurrentHP / data.ClusterData.AllData.MemberData.TotalHp;
         bloodBarCom.SetBloodBarValue(value);
     }

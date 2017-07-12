@@ -65,6 +65,8 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
     [SerializeField]
     public int _spacing_row, _spacing_line;//行间距/列间距
     public int _itemsVisible_row, _itemsVisible_line;//每行每列可显示的总数
+    [Header("Properties")]
+    public bool WhetherAutomaticallyFill = false;//生成Items时是否自动补齐行/列
 
     private UIPanel _viewport;//视口范围控件
 
@@ -173,9 +175,11 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
         if (itemsToInstantiate > items || (items >= itemsToInstantiate && items <= 2 * itemsToInstantiate))
         {
             itemsToInstantiate = items;
-            //每行项目数不满的时候，补齐行
-            if (itemsToInstantiate % _itemsVisible_row != 0)
-                itemsToInstantiate += Mathf.CeilToInt((float)itemsToInstantiate / (float)_itemsVisible_row) * _itemsVisible_row - itemsToInstantiate;
+            
+            //CHANGED: 2017-7-06 添加自动补齐行/列开关
+            if (WhetherAutomaticallyFill)
+                if (itemsToInstantiate % _itemsVisible_row != 0)//每行项目数不满的时候，补齐行
+                    itemsToInstantiate += Mathf.CeilToInt((float)itemsToInstantiate / (float)_itemsVisible_row) * _itemsVisible_row - itemsToInstantiate;
             //print("total:"+ items);
             //print("gen:"+ itemsToInstantiate);
             //print("itemsToInstantiate / _itemsVisible_row = " + (float)(itemsToInstantiate / _itemsVisible_row));
@@ -325,7 +329,12 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
 
         float position_x = 0, position_y = 0;
 
-        position_x = (index % _itemsVisible_line) * (dimension.y + _spacing_line);
+        //position_x = (index % _itemsVisible_line) * (dimension.y + _spacing_line);
+        //position_y = Mathf.FloorToInt(index / (_itemsVisible_row)) * (dimension.x + _spacing_row);
+
+        //CHANGED: 2017-7-06 修复生成列表项行列数错误
+        //CHANGED: 2017-7-07 修复生成列表项行列坐标排布错误
+        position_x = (index % _itemsVisible_row) * (dimension.y + _spacing_line);
         position_y = Mathf.FloorToInt(index / (_itemsVisible_row)) * (dimension.x + _spacing_row);
 
         switch (_scrollOrientation)
@@ -428,10 +437,11 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
             //print("==========================================");
             if (_itemsToRecycleBefore >= (_itemsList.Count / _itemsVisible_row - _itemsVisible_line) / 2 && _lastItemIndex < _itemsTotal - 1)
             {
+                //CHANGED: 2017-7-05 修改为,先回收,再修改头尾索引
+                RecycleItem(ScrollDirection.NEXT);
+
                 _firstItemIndex += _itemsVisible_row;
                 _lastItemIndex += _itemsVisible_row;
-
-                RecycleItem(ScrollDirection.NEXT);
             }
             else
             {
@@ -481,10 +491,11 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
             //print("==========================================");
             if (_itemsToRecycleAfter >= (_itemsList.Count / _itemsVisible_row - _itemsVisible_line) / 2 && _lastItemIndex > _itemsList.Count - 1)
             {
-                RecycleItem(ScrollDirection.PREVIOUS);
-
+                //CHANGED: 2017-7-05 修改为,先头尾索引,再进行回收
                 _firstItemIndex -= _itemsVisible_row;
                 _lastItemIndex -= _itemsVisible_row;
+
+                RecycleItem(ScrollDirection.PREVIOUS);
             }
             else
             {
@@ -590,7 +601,8 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
                     
                     for(int i = 0;i < firstRowItems.Length; ++i)
                     {
-                        firstRowItems[i].Index = _lastItemIndex + i;
+                        //CHANGED: 2017-7-05 首行回收添加索引偏移 +1
+                        firstRowItems[i].Index = _lastItemIndex + i + 1;
                         firstRowItems[i].transform.SetAsLastSibling();
 
                         _itemsList.RemoveAt(0);
@@ -617,9 +629,10 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
                             }
                             break;
                     }
-                    for (int i = 0; i < lastItems.Length; ++i)
+                    for (int i = 0; i < lastItems.Length; i++)
                     {
-                        lastItems[i].Index = _lastItemIndex - _itemsList.Count + i;
+                        //CHANGED: 2017-7-05 尾行回收bug修复
+                        lastItems[i].Index = _firstItemIndex + _itemsVisible_row - i - 1;
                         lastItems[i].transform.SetAsFirstSibling();
 
                         _itemsList.RemoveAt(_itemsList.Count - 1);

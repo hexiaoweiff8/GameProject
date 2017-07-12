@@ -28,10 +28,14 @@ public class ClusterManager : ILoopItem
     // -------------------------公有属性-------------------------------
     public Vector3 MovementPlanePosition;
 
-
+    /// <summary>
+    /// 地图宽度
+    /// </summary>
     public float MapWidth;
 
-
+    /// <summary>
+    /// 地图高度
+    /// </summary>
     public float MapHeight;
     
     /// <summary>
@@ -48,7 +52,7 @@ public class ClusterManager : ILoopItem
     ///// <summary>
     ///// 碰撞挤开系数
     ///// </summary>
-    public float CollisionThrough = 10f;
+    //public float CollisionThrough = 3f;
 
     /// <summary>
     /// 摩擦力系数
@@ -345,7 +349,7 @@ public class ClusterManager : ILoopItem
         { return; }
 
         // 前方角度/2
-        var cosForwardAngle = (float)Math.Cos(ForwardAngle / 2f);
+        //var cosForwardAngle = (float)Math.Cos(ForwardAngle / 2f);
         // 遍历所有成员
         for (var i = 0; i < memberList.Count; i++)
         {
@@ -353,7 +357,7 @@ public class ClusterManager : ILoopItem
             var member = memberList[i];
             if (member is ClusterData)
             {
-                OneMemberMove(member as ClusterData, cosForwardAngle);
+                OneMemberMove(member as ClusterData);
             }
             //else if (member is FixtureData)
             //{
@@ -370,26 +374,34 @@ public class ClusterManager : ILoopItem
     /// 可移动单位移动
     /// </summary>
     /// <param name="member">单个单位</param>
-    /// <param name="cosForwardAngle">前方角度</param>
-    private void OneMemberMove(ClusterData member, float cosForwardAngle)
+    private void OneMemberMove(ClusterData member)
     {
         if (member == null || !member.IsMoving)
         {
             return;
         }
+
+        // 高度控制
+        var heightDiff = member.transform.position.y - member.Height;
+        if (heightDiff > Utils.ApproachZero || heightDiff < Utils.ApproachZero)
+        {
+            member.transform.position = new Vector3(member.transform.position.x, member.Height,
+                member.transform.position.z);
+        }
+
         // 单位状态切换
         ChangeMemberState(member);
         // 当前单位到目标的方向
-        Vector3 targetDir = member.TargetPos - member.Position;
+        Vector3 targetDir = Utils.WithOutY(member.TargetPos - member.Position);
         // 转向角度
         float rotate = 0f;
         // 标准化目标方向
         Vector3 normalizedTargetDir = targetDir.normalized;
         // 计算后最终方向
-        var finalDir = GetGroupGtivity(member, cosForwardAngle);
+        var finalDir = GetGtivity(member);
         Debug.DrawLine(member.Position, member.Position + finalDir, Color.cyan);
         // 当前方向与目标方向夹角
-        var angleForTarget = Vector3.Dot(normalizedTargetDir, member.Direction);
+        var angleForTarget = Vector3.Dot(normalizedTargetDir, Utils.WithOutY(member.Direction));
 
         // 当前单位位置减去周围单位的位置的和, 与最终方向相加, 这个向量做处理, 只能指向目标方向的左右90°之内, 防止调头
         // 获取周围成员(不论敌友, 包括障碍物)的斥力引力
@@ -404,46 +416,35 @@ public class ClusterManager : ILoopItem
             }
         }
 
-
+        // 计算周围单位碰撞
+        GetCloseMemberGrivity2(member);
         // 转向
         member.Rotate = Vector3.up * rotate * member.RotateSpeed * Time.deltaTime;
-        
+        member.Position += member.SpeedDirection * Time.deltaTime;
         // 前进
         Debug.DrawLine(member.Position, member.Position + member.SpeedDirection, Color.white);
-        member.Position += member.SpeedDirection * Time.deltaTime;
-        GetCloseMemberGrivity2(member);
-        // 速度由于摩擦力的原因衰减
-        member.SpeedDirection -= member.SpeedDirection.normalized * Friction * Time.deltaTime;
-        // TODO 最大速度限制, 方式有待确认
-        var speed = member.SpeedDirection.magnitude;
-        if (speed > member.MaxSpeed)
-        {
-            member.SpeedDirection *= member.MaxSpeed / speed;
-        }
     }
 
     /// <summary>
-    /// 计算队伍引力
+    /// 计算引力
     /// </summary>
     /// <param name="member">队员对象</param>
-    /// <param name="cosForwardAngle">前方角度</param>
-    /// <param name="speed"></param>
     /// <returns></returns>
-    private Vector3 GetGroupGtivity(ClusterData member, float cosForwardAngle)
+    private Vector3 GetGtivity(ClusterData member)
     {
         var result = Vector3.zero;
         
         // 同队伍聚合
         if (member != null) // && member.Group != null
         {
-            var grivity = member.TargetPos - member.Position;
+            var grivity = Utils.WithOutY(member.TargetPos - member.Position);
             // 如果当前方向与引力方向
             // 速度不稳定问题
             member.SpeedDirection = grivity.normalized * member.MaxSpeed;
 
             // 加入最大速度限制, 防止溢出
             //member.PhysicsInfo.SpeedDirection *= GetUpTopSpeed(member.PhysicsInfo.SpeedDirection.magnitude);
-            result = grivity;
+            result = grivity.normalized * member.MaxSpeed;
         }
 
         return result;
@@ -454,149 +455,149 @@ public class ClusterManager : ILoopItem
     /// </summary>
     /// <param name="member"></param>
     /// <returns></returns>
-    private void GetCloseMemberGrivity(ClusterData member)
-    {
-        if (member == null)
-        {
-            return;
-        }
-        // 遍历附近单位(不论敌友), 检测碰撞并排除碰撞, (挤开效果), 列表中包含障碍物
-        var graphics = member.MyCollisionGraphics;
-        var closeMemberList = targetList.QuadTree.GetScope(graphics);
-        // 目标方向
-        var targetDir = member.TargetPos - member.Position;
-        // 释放压力方向
-        var pressureReleaseDir = Vector3.zero;
-        // 是否需要躲避
-        var collisionCount = 0;
-        // 碰撞前进方向
-        var collisionThoughDir = Vector3.zero;
-        // 碰撞不能前进方向(不能移动的物体)
-        var collisionCouldNotThoughDir = Vector3.zero;
-        var collisionCouldNotThoughCount = 0;
-        for (var k = 0; closeMemberList !=null && k < closeMemberList.Count; k++)
-        {
-            var closeMember = closeMemberList[k];
-            if (closeMember.Equals(member))
-            {
-                continue;
-            }
+    //private void GetCloseMemberGrivity(ClusterData member)
+    //{
+    //    if (member == null)
+    //    {
+    //        return;
+    //    }
+    //    // 遍历附近单位(不论敌友), 检测碰撞并排除碰撞, (挤开效果), 列表中包含障碍物
+    //    var graphics = member.MyCollisionGraphics;
+    //    var closeMemberList = targetList.QuadTree.GetScope(graphics);
+    //    // 目标方向
+    //    var targetDir = member.TargetPos - member.Position;
+    //    // 释放压力方向
+    //    var pressureReleaseDir = Vector3.zero;
+    //    // 是否需要躲避
+    //    var collisionCount = 0;
+    //    // 碰撞前进方向
+    //    var collisionThoughDir = Vector3.zero;
+    //    // 碰撞不能前进方向(不能移动的物体)
+    //    var collisionCouldNotThoughDir = Vector3.zero;
+    //    var collisionCouldNotThoughCount = 0;
+    //    for (var k = 0; closeMemberList !=null && k < closeMemberList.Count; k++)
+    //    {
+    //        var closeMember = closeMemberList[k];
+    //        if (closeMember.Equals(member))
+    //        {
+    //            continue;
+    //        }
 
-            // 计算周围人员的位置, 相对位置的倒数相加, 并且不往来时方向移动
-            var diffPosition = member.Position - closeMember.Position;
-            pressureReleaseDir -= diffPosition;
-            // 判断两对象是否已计算过, 如果计算过不再计算
-            var compereId1 = member.Id + closeMember.Id << 32;
-            var compereId2 = closeMember.Id + member.Id << 32;
-            if (!areadyCollisionList.ContainsKey(compereId1) &&
-                !areadyCollisionList.ContainsKey(compereId2))
-            {
-                // 获取附近单位的图形
-                var closeGraphics = closeMember.MyCollisionGraphics;
-                // 检测当前单位是否与其有碰撞
-                if (graphics.CheckCollision(closeGraphics))
-                {
-                    // 如果碰撞来自前方, 则增加
-                    if (Vector3.Angle(targetDir, -diffPosition) < 90)
-                    {
-                        collisionCount++;
-                    }
+    //        // 计算周围人员的位置, 相对位置的倒数相加, 并且不往来时方向移动
+    //        var diffPosition = member.Position - closeMember.Position;
+    //        pressureReleaseDir -= diffPosition;
+    //        // 判断两对象是否已计算过, 如果计算过不再计算
+    //        var compereId1 = member.Id + closeMember.Id << 32;
+    //        var compereId2 = closeMember.Id + member.Id << 32;
+    //        if (!areadyCollisionList.ContainsKey(compereId1) &&
+    //            !areadyCollisionList.ContainsKey(compereId2))
+    //        {
+    //            // 获取附近单位的图形
+    //            var closeGraphics = closeMember.MyCollisionGraphics;
+    //            // 检测当前单位是否与其有碰撞
+    //            if (graphics.CheckCollision(closeGraphics))
+    //            {
+    //                // 如果碰撞来自前方, 则增加
+    //                if (Vector3.Angle(targetDir, -diffPosition) < 90)
+    //                {
+    //                    collisionCount++;
+    //                }
 
-                    var minDistance = member.Diameter + closeMember.Diameter;
+    //                var minDistance = member.Diameter + closeMember.Diameter;
 
-                    var departSpeed = closeMember.SpeedDirection - member.SpeedDirection;
+    //                var departSpeed = closeMember.SpeedDirection - member.SpeedDirection;
                     
-                    // TODO 定最终拥挤方向
-                    // TODO 排斥力未做
-                    // 基础排斥力
-                    if (diffPosition.magnitude < minDistance)
-                    {
-                        // TODO 排除力有时无效
-                        // 计算不可移动方向
-                        var diffPosNor = diffPosition.normalized;
-                        collisionThoughDir += diffPosNor * (minDistance - diffPosition.magnitude) * CollisionThrough * Time.deltaTime;
-                        if (!closeMember.CouldMove)
-                        {
-                            // 如果目标不能移动则
-                            collisionCouldNotThoughDir += diffPosNor;
-                            collisionCouldNotThoughCount++;
-                        }
-                        else
-                        {
-                            // 可移动附近单位也移动
-                            closeMember.Position -= diffPosNor * Time.deltaTime;
-                        }
-                    }
+    //                // TODO 定最终拥挤方向
+    //                // TODO 排斥力未做
+    //                // 基础排斥力
+    //                if (diffPosition.magnitude < minDistance)
+    //                {
+    //                    // TODO 排除力有时无效
+    //                    // 计算不可移动方向
+    //                    var diffPosNor = diffPosition.normalized;
+    //                    collisionThoughDir += diffPosNor * (minDistance - diffPosition.magnitude) * CollisionThrough * Time.deltaTime;
+    //                    if (!closeMember.CouldMove)
+    //                    {
+    //                        // 如果目标不能移动则
+    //                        collisionCouldNotThoughDir += diffPosNor;
+    //                        collisionCouldNotThoughCount++;
+    //                    }
+    //                    else
+    //                    {
+    //                        // 可移动附近单位也移动
+    //                        closeMember.Position -= diffPosNor * Time.deltaTime;
+    //                    }
+    //                }
 
-                    // 求出射角度, 出射角度*出射量
-                    // 使用向量法线计算求出出射标准向量
-                    // TODO 角度有问题
-                    var outDir =
-                        ((member.SpeedDirection +
-                          Vector3.Dot(member.SpeedDirection, diffPosition) *diffPosition)*2 -
-                         member.SpeedDirection).normalized;
+    //                // 求出射角度, 出射角度*出射量
+    //                // 使用向量法线计算求出出射标准向量
+    //                // TODO 角度有问题
+    //                var outDir =
+    //                    ((member.SpeedDirection +
+    //                      Vector3.Dot(member.SpeedDirection, diffPosition) *diffPosition)*2 -
+    //                     member.SpeedDirection).normalized;
                     
 
-                    // 质量比例
-                    var qualityRate = member.Quality * member.Quality / (closeMember.Quality * closeMember.Quality);
-                    departSpeed *= 0.5f;
+    //                // 质量比例
+    //                var qualityRate = member.Quality * member.Quality / (closeMember.Quality * closeMember.Quality);
+    //                departSpeed *= 0.5f;
 
-                    // 当前对象的弹出角度为镜面弹射角度
-                    var partForMember = -outDir * departSpeed.magnitude / qualityRate;
-                    var partForCloseMember = departSpeed * qualityRate;
-                    if (partForMember.magnitude > departSpeed.magnitude)
-                    {
-                        partForMember *= departSpeed.magnitude / partForMember.magnitude;
-                    }
-                    if (partForCloseMember.magnitude > departSpeed.magnitude)
-                    {
-                        partForCloseMember *= departSpeed.magnitude / partForCloseMember.magnitude;
-                    }
-                    // TODO 这个力和某个力冲突导致移动缓慢
-                    //member.PhysicsInfo.SpeedDirection += partForMember;
-                    closeMember.SpeedDirection -= partForCloseMember;
-                    // 加入最大速度限制, 防止溢出
-                    member.SpeedDirection *= GetUpTopSpeed(member.SpeedDirection.magnitude);
-                    closeMember.SpeedDirection *= GetUpTopSpeed(closeMember.SpeedDirection.magnitude);
-                    // 加入已对比列表
-                    areadyCollisionList.Add(compereId1, true);
-                    Debug.DrawLine(member.Position, partForMember + member.Position, Color.green);
-                }
-            }
-        }
+    //                // 当前对象的弹出角度为镜面弹射角度
+    //                var partForMember = -outDir * departSpeed.magnitude / qualityRate;
+    //                var partForCloseMember = departSpeed * qualityRate;
+    //                if (partForMember.magnitude > departSpeed.magnitude)
+    //                {
+    //                    partForMember *= departSpeed.magnitude / partForMember.magnitude;
+    //                }
+    //                if (partForCloseMember.magnitude > departSpeed.magnitude)
+    //                {
+    //                    partForCloseMember *= departSpeed.magnitude / partForCloseMember.magnitude;
+    //                }
+    //                // TODO 这个力和某个力冲突导致移动缓慢
+    //                //member.PhysicsInfo.SpeedDirection += partForMember;
+    //                closeMember.SpeedDirection -= partForCloseMember;
+    //                // 加入最大速度限制, 防止溢出
+    //                member.SpeedDirection *= GetUpTopSpeed(member.SpeedDirection.magnitude);
+    //                closeMember.SpeedDirection *= GetUpTopSpeed(closeMember.SpeedDirection.magnitude);
+    //                // 加入已对比列表
+    //                areadyCollisionList.Add(compereId1, true);
+    //                Debug.DrawLine(member.Position, partForMember + member.Position, Color.green);
+    //            }
+    //        }
+    //    }
 
-        // 物体移动, 并且不能超不可移动方向移动
-        if (collisionThoughDir != Vector3.zero)
-        {
-            // 排除掉移动向量中不可移动方向的移动量
-            // 计算当前移动方向与不可移动的反方向是否角度小于90
-            // 如果小于90则无问题, 如果大于90则将与超过的角度部分抹掉
-            //var angleCollisionThoughDir = Vector3.Angle(collisionThoughDir, collisionCouldNotThoughDir);
-            //if (angleCollisionThoughDir > 90)
-            //{
-            //    angleCollisionThoughDir -= 90;
-            //    var subDirLength = (float)Math.Cos(angleCollisionThoughDir)*collisionThoughDir.magnitude;
-            //    // 求不能前进的反方向的垂直向量
-            //    collisionThoughDir = Vector3.Cross(collisionCouldNotThoughDir, Vector3.up).normalized * subDirLength;
-            //}
-            member.Position += collisionThoughDir;
-        }
+    //    // 物体移动, 并且不能超不可移动方向移动
+    //    if (collisionThoughDir != Vector3.zero)
+    //    {
+    //        // 排除掉移动向量中不可移动方向的移动量
+    //        // 计算当前移动方向与不可移动的反方向是否角度小于90
+    //        // 如果小于90则无问题, 如果大于90则将与超过的角度部分抹掉
+    //        //var angleCollisionThoughDir = Vector3.Angle(collisionThoughDir, collisionCouldNotThoughDir);
+    //        //if (angleCollisionThoughDir > 90)
+    //        //{
+    //        //    angleCollisionThoughDir -= 90;
+    //        //    var subDirLength = (float)Math.Cos(angleCollisionThoughDir)*collisionThoughDir.magnitude;
+    //        //    // 求不能前进的反方向的垂直向量
+    //        //    collisionThoughDir = Vector3.Cross(collisionCouldNotThoughDir, Vector3.up).normalized * subDirLength;
+    //        //}
+    //        member.Position += collisionThoughDir;
+    //    }
 
-        // 判断是否需要躲避
-        if (collisionCount > 1)
-        {
-            // TODO 引力方向是附近的空格子
-            // TODO 躲避力始终朝向同一方向, 导致群聚旋转
-            // TODO 重写绕障功能
-            // 获取周围的格子
-            //var aroundNodes = targetList.MapInfo.GetAroundPos(member, 2);
-            // 给予横向拉扯力
-            // 求聚合位置向量的垂直向量
-            var transverseDir = Vector3.Cross(pressureReleaseDir, Vector3.up);
-            // 随机左右
-            member.SpeedDirection += transverseDir * member.MaxSpeed;// * (new Random((int)DateTime.Now.Ticks).Next(10) > 5 ? -1 : 1);
-        }
-    }
+    //    // 判断是否需要躲避
+    //    if (collisionCount > 1)
+    //    {
+    //        // TODO 引力方向是附近的空格子
+    //        // TODO 躲避力始终朝向同一方向, 导致群聚旋转
+    //        // TODO 重写绕障功能
+    //        // 获取周围的格子
+    //        //var aroundNodes = targetList.MapInfo.GetAroundPos(member, 2);
+    //        // 给予横向拉扯力
+    //        // 求聚合位置向量的垂直向量
+    //        var transverseDir = Vector3.Cross(pressureReleaseDir, Vector3.up);
+    //        // 随机左右
+    //        member.SpeedDirection += transverseDir * member.MaxSpeed;// * (new Random((int)DateTime.Now.Ticks).Next(10) > 5 ? -1 : 1);
+    //    }
+    //}
 
     /// <summary>
     /// 获取同区域内成员引力斥力
@@ -613,101 +614,101 @@ public class ClusterManager : ILoopItem
         var graphics = member.MyCollisionGraphics;
         var closeMemberList = targetList.QuadTree.GetScope(graphics);
         // 目标方向
-        var targetDir = member.TargetPos - member.Position;
+        //var targetDir = member.TargetPos - member.Position;
         // 释放压力方向
-        var pressureReleaseDir = Vector3.zero;
+        //var pressureReleaseDir = Vector3.zero;
         // 是否需要躲避
-        var collisionCount = 0;
+        //var collisionCount = 0;
         // 碰撞前进方向
         var collisionThoughDir = Vector3.zero;
         // 碰撞不能前进方向(不能移动的物体)
         //var collisionCouldNotThoughDir = Vector3.zero;
         //var collisionCouldNotThoughCount = 0;
         // 当前单位的体积*速度
-        var memberEnergy = member.Quality * member.MaxSpeed;
-        for (var k = 0; closeMemberList != null && k < closeMemberList.Count; k++)
+        //var memberEnergy = member.Quality * member.MaxSpeed;
+        if (closeMemberList != null)
         {
-            var closeMember = closeMemberList[k];
-            if (closeMember.Equals(member))
+            for (var k = 0; k < closeMemberList.Count; k++)
             {
-                continue;
-            }
-
-            // 计算周围人员的位置, 相对位置的倒数相加, 并且不往来时方向移动
-            var diffPosition = member.Position - closeMember.Position;
-            pressureReleaseDir -= diffPosition;
-            // 判断两对象是否已计算过, 如果计算过不再计算
-            var compereId1 = member.Id + closeMember.Id << 32;
-            var compereId2 = closeMember.Id + member.Id << 32;
-            if (!areadyCollisionList.ContainsKey(compereId1) &&
-                !areadyCollisionList.ContainsKey(compereId2))
-            {
-                // 获取附近单位的图形
-                var closeGraphics = closeMember.MyCollisionGraphics;
-                // 检测当前单位是否与其有碰撞
-                if (graphics.CheckCollision(closeGraphics))
+                var closeMember = closeMemberList[k];
+                // 如果是自己或者非同组跳过
+                if (closeMember.Equals(member) || member.CollisionGroup != closeMember.CollisionGroup)
                 {
-                    // 如果碰撞来自前方, 则增加
-                    if (Vector3.Angle(targetDir, -diffPosition) < 90)
+                    continue;
+                }
+
+                // 计算周围人员的位置, 相对位置的倒数相加, 并且不往来时方向移动
+                var diffPosition = member.Position - closeMember.Position;
+                // 判断两对象是否已计算过, 如果计算过不再计算
+                var compereId1 = Utils.GetKey(member.Id, closeMember.Id);
+                var compereId2 = Utils.GetKey(closeMember.Id, member.Id);
+                if (!areadyCollisionList.ContainsKey(compereId1) &&
+                    !areadyCollisionList.ContainsKey(compereId2))
+                {
+                    // 获取附近单位的图形
+                    var closeGraphics = closeMember.MyCollisionGraphics;
+                    // 检测当前单位是否与其有碰撞
+                    if (graphics.CheckCollision(closeGraphics))
                     {
-                        collisionCount++;
-                    }
-
-                    var minDistance = member.Diameter + closeMember.Diameter;
-
-                    var departSpeed = closeMember.SpeedDirection - member.SpeedDirection;
-
-                    // 基础排斥力
-                    if (diffPosition.magnitude < minDistance)
-                    {
-                        // TODO 排除力有时无效
-                        // 计算不可移动方向
-                        var diffPosNor = diffPosition.normalized;
-                        // 对比速度与体积
-                        var closeMemberEnergy = closeMember.MaxSpeed * closeMember.Quality;
-
-                        collisionThoughDir += diffPosNor
-                            * (minDistance / diffPosition.magnitude)
-                            * CollisionThrough 
-                            * Utils.GetRange(0.1f, 5f, closeMemberEnergy / memberEnergy) 
-                            * Time.deltaTime;
-                        if (closeMember.CouldMove)
+                        // 最小距离
+                        var minDistance = member.Diameter * 0.5f + closeMember.Diameter * 0.5f;
+                        // 质量比例
+                        var qualityRate =  member.Quality / closeMember.Quality;
+                        // 插入深度
+                        var insertDis = minDistance - diffPosition.magnitude;
+                        // 基础排斥力
+                        if (insertDis > 0)
                         {
-                            // 可移动附近单位也移动
-                            closeMember.Position -= diffPosNor * Utils.GetRange(0.1f, 5f, memberEnergy / closeMemberEnergy * Time.deltaTime);
+                            // 插入深度
+                            var diffCollisionThoughDir = diffPosition.normalized * (insertDis);
+                            
+                            collisionThoughDir += diffCollisionThoughDir / qualityRate;
+                                                  //*CollisionThrough
+                                                  //*Utils.GetRange(0.1f, 5f, closeMemberEnergy/memberEnergy)
+                                                  //*Time.deltaTime;
+                            // 碰撞单位是否可移动
+                            if (closeMember.CouldMove)
+                            {
+                                // 直接设置未碰撞位置
+                                closeMember.Position -= diffCollisionThoughDir;
+                                // 影响速度
+                                closeMember.SpeedDirection -= diffCollisionThoughDir * qualityRate;
+                            }
+                            member.Position += diffCollisionThoughDir;
                         }
+
+                        // 求出射角度, 出射角度*出射量
+                        // 使用向量法线计算求出出射标准向量
+                        //var outDir =
+                        //    ((member.SpeedDirection +
+                        //      Vector3.Dot(member.SpeedDirection, diffPosition)*diffPosition)*2 -
+                        //     member.SpeedDirection).normalized;
+
+
+                        //departSpeed *= 0.5f;
+
+                        // 当前对象的弹出角度为镜面弹射角度
+                        //var partForMember = -outDir * departSpeed.magnitude / qualityRate;
+                        //var partForMember = -departSpeed / qualityRate;
+                        //Debug.Log(partForMember);
+                        // 影响速度
+                        member.SpeedDirection += collisionThoughDir;
+
+                        // 加入最大速度限制, 防止溢出
+                        member.SpeedDirection *= GetUpTopSpeed(member.SpeedDirection.magnitude);
+                        closeMember.SpeedDirection *= GetUpTopSpeed(closeMember.SpeedDirection.magnitude);
+                        // 加入已对比列表
+                        areadyCollisionList.Add(compereId1, true);
+                        Debug.DrawLine(member.Position, collisionThoughDir + member.Position, Color.green);
                     }
-
-                    // 求出射角度, 出射角度*出射量
-                    // 使用向量法线计算求出出射标准向量
-                    var outDir =
-                        ((member.SpeedDirection +
-                          Vector3.Dot(member.SpeedDirection, diffPosition) * diffPosition) * 2 -
-                         member.SpeedDirection).normalized;
-
-
-                    // 质量比例
-                    var qualityRate = member.Quality * member.Quality / (closeMember.Quality * closeMember.Quality);
-                    departSpeed *= 0.5f;
-
-                    // 当前对象的弹出角度为镜面弹射角度
-                    var partForMember = -outDir * departSpeed.magnitude / qualityRate;
-
-                    // 加入最大速度限制, 防止溢出
-                    member.SpeedDirection *= GetUpTopSpeed(member.SpeedDirection.magnitude);
-                    closeMember.SpeedDirection *= GetUpTopSpeed(closeMember.SpeedDirection.magnitude);
-                    // 加入已对比列表
-                    areadyCollisionList.Add(compereId1, true);
-                    Debug.DrawLine(member.Position, partForMember + member.Position, Color.green);
                 }
             }
         }
-
-        // 碰撞移动
-        if (collisionThoughDir != Vector3.zero)
-        {
-            member.Position += collisionThoughDir;
-        }
+        //// 碰撞移动
+        //if (collisionThoughDir != Vector3.zero)
+        //{
+        //    member.Position += collisionThoughDir * Time.deltaTime;
+        //}
     }
 
     /// <summary>

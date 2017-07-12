@@ -14,6 +14,7 @@ function equipPage_view:init_view(args)
     self.otherEquip_EquipsP = self.otherEquip.transform:Find("equips").gameObject
     self.otherEquip_Scroll = self.otherEquip_EquipsP.transform:Find("Scroll View").gameObject
     self.otherEquip_Grid = self.otherEquip_Scroll.transform:Find("eqGrid").gameObject
+    self.equipItem = GameObjectExtension.InstantiateFromPacket("ui_equip", "equipItem",self.gameObject).gameObject
 end
 
 

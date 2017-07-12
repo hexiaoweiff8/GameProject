@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
+using Util;
 
 public class AstarFight : MonoBehaviour
 {
@@ -201,13 +202,17 @@ public class AstarFight : MonoBehaviour
         var loadMapPos = LoadMap.GetLeftBottom();
         ClusterManager.Single.Init(loadMapPos.x + MapWidth * UnitWidth * 0.5f, loadMapPos.z + MapHeight * UnitWidth * 0.5f, MapWidth, MapHeight, UnitWidth, mapInfoData);
 
-
         // 解析地图
         MapManager.Instance().AnalysisBuidingMap(mapInfoData);
         MapManager.Instance().AnalysisBuidingMap(mapInfoBuildingData);
         // 加载TriggerTicker
         TriggerTicker.Single.StopAndClear();
         TriggerTicker.Single.Start();
+
+        // TODO 测试连接服务器
+        SocketManager.Single.Connect("127.0.0.1", 6000);
+
+        // 启动数据缓存传输器
     }
 
 
@@ -632,9 +637,8 @@ public class AstarFight : MonoBehaviour
     /// </summary>
     /// <param name="data"></param>
     /// <param name="isEnemy">是否为地方阵营</param>
-    /// <param name="groupIndex">队伍index</param>
     /// <param name="displayOwner"></param>
-    internal void toXunLu(ClusterData data, bool isEnemy, int groupIndex, DisplayOwner displayOwner)
+    internal void toXunLu(ClusterData data, bool isEnemy, DisplayOwner displayOwner)
     {
         var go = displayOwner.GameObj;
         if (go == null)

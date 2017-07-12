@@ -13151,6 +13151,101 @@ function IsPause() end
 ----Void TimeTicker:Stop()
 function Stop() end 
 
+TimerManager = {} 
+--*
+--[Comment]
+--consturctor for TimerManager overrides:
+--*
+--TimerManager.New()
+--*
+
+function TimerManager.New() end
+--*
+--[Comment]
+-- property: TimerManager TimerManager.Single	get	
+Single = nil 
+--*
+--[Comment]
+-- property: Double TimerManager.StartTimerTick	get	
+StartTimerTick = nil 
+--*
+----Void TimerManager:AddTimer(Timer timer)
+function AddTimer() end 
+
+----Void TimerManager:RemoveTimer(Timer timer)
+function RemoveTimer() end 
+
+----Void TimerManager:Do()
+function Do() end 
+
+----Boolean TimerManager:DoOnce(Double time)
+function DoOnce() end 
+
+----Boolean TimerManager:IsEnd()
+function IsEnd() end 
+
+----Void TimerManager:OnDestroy()
+function OnDestroy() end 
+
+Timer = {} 
+--*
+--[Comment]
+--consturctor for Timer overrides:
+--*
+--Timer.New(Single liveTime,Boolean isLoop)
+--*
+
+function Timer.New() end
+--*
+--[Comment]
+-- property: Boolean Timer.IsPause	get	set	
+IsPause = nil 
+--*
+--[Comment]
+-- property: Boolean Timer.IsLoop	get	set	
+IsLoop = nil 
+--*
+--[Comment]
+-- property: Single Timer.LoopTime	get	set	
+LoopTime = nil 
+--*
+--[Comment]
+-- property: Action Timer.TimesUpDo	get	set	
+TimesUpDo = nil 
+--*
+--[Comment]
+-- property: Action Timer.KillDo	get	set	
+KillDo = nil 
+--*
+--[Comment]
+-- property: Boolean Timer.IsStop	get	set	
+IsStop = nil 
+--*
+--[Comment]
+-- property: Double Timer.StopTime	get	
+StopTime = nil 
+--*
+----Timer Timer:Start()
+function Start() end 
+
+----Timer Timer:OnCompleteCallback(Action completeCallback)
+function OnCompleteCallback() end 
+
+----Timer Timer:OnKill(Action onKill)
+function OnKill() end 
+
+----Void Timer:Kill()
+function Kill() end 
+
+----Void Timer:NextTick()
+function NextTick() end 
+
+----Void Timer:Pause()
+function Pause() end 
+
+----Void Timer:GoOn()
+function GoOn() end 
+
 UIEventListener = {} 
 --*
 --[Comment]
@@ -14639,6 +14734,10 @@ function ClearAll() end
 ----IList`1 ClusterManager:GetPositionObjectListByGraphics(ICollisionGraphics graphics)
 function GetPositionObjectListByGraphics() end 
 
+----IList`1 ClusterManager:CheckRange(Vector2 pos,Single range,Int32 myCamp,Boolean isExceptMyCamp)
+--IList`1 ClusterManager:CheckRange(ICollisionGraphics graphics,Int32 myCamp,Boolean isExceptMyCamp)
+function CheckRange() end 
+
 PositionTransform = {} 
 --*
 --[Comment]
@@ -14745,6 +14844,12 @@ CreateActorParam = {}
 --*
 
 --CreateActorParam.New(Int32 cmType,Boolean colorMat,Int32 flagColorIdx,String meshPackName,String texturePackName,Boolean isHero,Int32 soldierID,Int32 cardID)
+--*
+
+--CreateActorParam.New(Single x,Single y,Int32 level)
+--*
+
+--CreateActorParam.New(Single x,Single y)
 --*
 
 function CreateActorParam.New() end
@@ -14913,7 +15018,13 @@ DisplayOwner = {}
 --[Comment]
 --consturctor for DisplayOwner overrides:
 --*
---DisplayOwner.New(GameObject gameObj,ClusterData clusterData,MFAModelRender modelRender,RanderControl randerControl)
+--DisplayOwner.New(GameObject gameObj,PositionObject clusterData)
+--*
+
+--DisplayOwner.New(GameObject gameObj,PositionObject clusterData,MFAModelRender mfa)
+--*
+
+--DisplayOwner.New(GameObject gameObj,PositionObject clusterData,MFAModelRender modelRender,RanderControl randerControl)
 --*
 
 function DisplayOwner.New() end
@@ -14923,7 +15034,7 @@ function DisplayOwner.New() end
 GameObj = nil 
 --*
 --[Comment]
--- property: ClusterData DisplayOwner.ClusterData	get	set	
+-- property: PositionObject DisplayOwner.ClusterData	get	set	
 ClusterData = nil 
 --*
 --[Comment]
@@ -14943,8 +15054,8 @@ function CleanData() end
 PositionObject = {} 
 --*
 --[Comment]
--- property: VOBase PositionObject.MemberData	get	set	
-MemberData = nil 
+-- property: AllData PositionObject.AllData	get	set	
+AllData = nil 
 --*
 --[Comment]
 -- property: ICollisionGraphics PositionObject.MyCollisionGraphics	get	set	
@@ -14955,8 +15066,8 @@ MyCollisionGraphics = nil
 Id = nil 
 --*
 --[Comment]
--- property: PhysicsInfo PositionObject.PhysicsInfo	get	
-PhysicsInfo = nil 
+-- property: Int32 PositionObject.CollisionGroup	get	set	
+CollisionGroup = nil 
 --*
 --[Comment]
 -- property: Single PositionObject.Diameter	get	set	
@@ -14973,6 +15084,10 @@ X = nil
 --[Comment]
 -- property: Single PositionObject.Y	get	set	
 Y = nil 
+--*
+--[Comment]
+-- property: Single PositionObject.Height	get	set	
+Height = nil 
 --*
 --[Comment]
 -- property: Vector3 PositionObject.Rotate	set	
@@ -14997,6 +15112,18 @@ CouldMove = nil
 --[Comment]
 -- property: Boolean PositionObject.IsMoving	get	
 IsMoving = nil 
+--*
+--[Comment]
+-- property: Single PositionObject.Quality	get	set	
+Quality = nil 
+--*
+--[Comment]
+-- property: Vector3 PositionObject.SpeedDirection	get	set	
+SpeedDirection = nil 
+--*
+--[Comment]
+-- property: Single PositionObject.MaxSpeed	get	set	
+MaxSpeed = nil 
 --*
 --[Comment]
 -- property: Boolean PositionObject.useGUILayout	get	set	
@@ -15035,6 +15162,9 @@ function Stop() end
 
 ----Void PositionObject:ContinueMove()
 function ContinueMove() end 
+
+----Void PositionObject:Clear()
+function Clear() end 
 
 VOBase = {} 
 --*
@@ -15125,6 +15255,9 @@ Camp = nil
 ----Void VOBase:SetSoldierData(armybase_cInfo data)
 function SetSoldierData() end 
 
+----String VOBase:ToString()
+function ToString() end 
+
 ClusterData = {} 
 --*
 --[Comment]
@@ -15160,8 +15293,8 @@ Wait = nil
 Complete = nil 
 --*
 --[Comment]
--- property: VOBase ClusterData.MemberData	get	set	
-MemberData = nil 
+-- property: AllData ClusterData.AllData	get	set	
+AllData = nil 
 --*
 --[Comment]
 -- property: ICollisionGraphics ClusterData.MyCollisionGraphics	get	set	
@@ -15172,8 +15305,8 @@ MyCollisionGraphics = nil
 Id = nil 
 --*
 --[Comment]
--- property: PhysicsInfo ClusterData.PhysicsInfo	get	
-PhysicsInfo = nil 
+-- property: Int32 ClusterData.CollisionGroup	get	set	
+CollisionGroup = nil 
 --*
 --[Comment]
 -- property: Single ClusterData.Diameter	get	set	
@@ -15190,6 +15323,10 @@ X = nil
 --[Comment]
 -- property: Single ClusterData.Y	get	set	
 Y = nil 
+--*
+--[Comment]
+-- property: Single ClusterData.Height	get	set	
+Height = nil 
 --*
 --[Comment]
 -- property: Vector3 ClusterData.Rotate	set	
@@ -15214,6 +15351,18 @@ CouldMove = nil
 --[Comment]
 -- property: Boolean ClusterData.IsMoving	get	
 IsMoving = nil 
+--*
+--[Comment]
+-- property: Single ClusterData.Quality	get	set	
+Quality = nil 
+--*
+--[Comment]
+-- property: Vector3 ClusterData.SpeedDirection	get	set	
+SpeedDirection = nil 
+--*
+--[Comment]
+-- property: Single ClusterData.MaxSpeed	get	set	
+MaxSpeed = nil 
 --*
 --[Comment]
 -- property: Boolean ClusterData.useGUILayout	get	set	
@@ -15249,6 +15398,9 @@ hideFlags = nil
 --*
 ----Void ClusterData:SetDataValue(VOBase data)
 function SetDataValue() end 
+
+----Void ClusterData:RotateToWithoutYAxis(Vector3 target)
+function RotateToWithoutYAxis() end 
 
 ----Void ClusterData:PushTarget(Vector3 target)
 function PushTarget() end 
@@ -15451,9 +15603,16 @@ hideFlags = nil
 --Void UI_Cangku_Item:setIcon(UIAtlas atlas,String spriteName)
 function setIcon() end 
 
+----Void UI_Cangku_Item:setIconLayer(String spriteName)
+--Void UI_Cangku_Item:setIconLayer(UIAtlas atlas,String spriteName)
+function setIconLayer() end 
+
 ----Void UI_Cangku_Item:setIconFrame(String spriteName)
 --Void UI_Cangku_Item:setIconFrame(UIAtlas atlas,String spriteName)
 function setIconFrame() end 
+
+----Void UI_Cangku_Item:setIconSelectFrame(String spriteName)
+function setIconSelectFrame() end 
 
 ----Void UI_Cangku_Item:setCompositeMark(Boolean show,Boolean KePinHe)
 function setCompositeMark() end 
@@ -15520,4 +15679,23 @@ hideFlags = nil
 --*
 ----Void UIDragScrollView:OnPan(Vector2 delta)
 function OnPan() end 
+
+UIToast = {} 
+--*
+--[Comment]
+--consturctor for UIToast overrides:
+--*
+--UIToast.New()
+--*
+
+function UIToast.New() end
+--*
+----Void UIToast.Show(String messageToShow,TweenCallback callback,ShowType showType)
+function UIToast.Show() end 
+
+ShowType = {} 
+
+Queue = nil;
+
+Upwards = nil;
 

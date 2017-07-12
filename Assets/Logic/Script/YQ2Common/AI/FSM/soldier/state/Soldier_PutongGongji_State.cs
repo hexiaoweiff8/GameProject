@@ -2,7 +2,6 @@
 using System.Collections;
 using Util;
 using System;
-using System.Collections.Generic;
 
 public class Soldier_PutongGongji_State : SoldierFSMState
 {
@@ -51,6 +50,11 @@ public class Soldier_PutongGongji_State : SoldierFSMState
         }
     }
 
+
+    /// <summary>
+    /// 攻击方法
+    /// </summary>
+    /// <param name="fsm"></param>
     private void fire(SoldierFSMSystem fsm)
     {
         if (null == fsm.EnemyTarget || null == fsm.EnemyTarget.ClusterData)
@@ -171,7 +175,7 @@ public class Soldier_PutongGongji_State : SoldierFSMState
         }
 
         // 攻击动作
-        var myself = fsm.Display.RanderControl;
+        //var myself = fsm.Display.RanderControl;
         // TODO 部分单位没有attack动画会报错
         //myself.ModelRander.SetClip("attack".GetHashCode());
 

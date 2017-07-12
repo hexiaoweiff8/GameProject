@@ -21,6 +21,10 @@ public class UIScrollViewAdapterWrap
 		L.RegVar("_scrollOrientation", get__scrollOrientation, set__scrollOrientation);
 		L.RegVar("_spacing_row", get__spacing_row, set__spacing_row);
 		L.RegVar("_spacing_line", get__spacing_line, set__spacing_line);
+		L.RegVar("_itemsVisible_row", get__itemsVisible_row, set__itemsVisible_row);
+		L.RegVar("_itemsVisible_line", get__itemsVisible_line, set__itemsVisible_line);
+		L.RegVar("WhetherAutomaticallyFill", get_WhetherAutomaticallyFill, set_WhetherAutomaticallyFill);
+		L.RegVar("_itemsList", get__itemsList, set__itemsList);
 		L.RegFunction("OnListMovedHandler", UIScrollViewAdapter_OnListMovedHandler);
 		L.RegFunction("OnItemSelectedHandler", UIScrollViewAdapter_OnItemSelectedHandler);
 		L.RegFunction("OnItemLoadedHandler", UIScrollViewAdapter_OnItemLoadedHandler);
@@ -263,6 +267,82 @@ public class UIScrollViewAdapterWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get__itemsVisible_row(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIScrollViewAdapter obj = (UIScrollViewAdapter)o;
+			int ret = obj._itemsVisible_row;
+			LuaDLL.lua_pushinteger(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index _itemsVisible_row on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get__itemsVisible_line(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIScrollViewAdapter obj = (UIScrollViewAdapter)o;
+			int ret = obj._itemsVisible_line;
+			LuaDLL.lua_pushinteger(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index _itemsVisible_line on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_WhetherAutomaticallyFill(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIScrollViewAdapter obj = (UIScrollViewAdapter)o;
+			bool ret = obj.WhetherAutomaticallyFill;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index WhetherAutomaticallyFill on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get__itemsList(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIScrollViewAdapter obj = (UIScrollViewAdapter)o;
+			System.Collections.Generic.List<UIScrollViewItemBase> ret = obj._itemsList;
+			ToLua.PushObject(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index _itemsList on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_onItemLoaded(IntPtr L)
 	{
 		object o = null;
@@ -409,6 +489,82 @@ public class UIScrollViewAdapterWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index _spacing_line on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set__itemsVisible_row(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIScrollViewAdapter obj = (UIScrollViewAdapter)o;
+			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+			obj._itemsVisible_row = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index _itemsVisible_row on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set__itemsVisible_line(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIScrollViewAdapter obj = (UIScrollViewAdapter)o;
+			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+			obj._itemsVisible_line = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index _itemsVisible_line on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_WhetherAutomaticallyFill(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIScrollViewAdapter obj = (UIScrollViewAdapter)o;
+			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
+			obj.WhetherAutomaticallyFill = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index WhetherAutomaticallyFill on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set__itemsList(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIScrollViewAdapter obj = (UIScrollViewAdapter)o;
+			System.Collections.Generic.List<UIScrollViewItemBase> arg0 = (System.Collections.Generic.List<UIScrollViewItemBase>)ToLua.CheckObject(L, 2, typeof(System.Collections.Generic.List<UIScrollViewItemBase>));
+			obj._itemsList = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index _itemsList on a nil value" : e.Message);
 		}
 	}
 

@@ -23,11 +23,16 @@ public class UtilsWrap
 		L.RegFunction("GetDistancePointToPoint", GetDistancePointToPoint);
 		L.RegFunction("CreateOrOpenFile", CreateOrOpenFile);
 		L.RegFunction("LoadFileInfo", LoadFileInfo);
+		L.RegFunction("LoadFileRotate", LoadFileRotate);
+		L.RegFunction("CombineFile", CombineFile);
+		L.RegFunction("DepartFileData", DepartFileData);
+		L.RegFunction("GetMapDataByFileName", GetMapDataByFileName);
 		L.RegFunction("GetTheta", GetTheta);
 		L.RegFunction("WithOutY", WithOutY);
 		L.RegFunction("GetRange", GetRange);
 		L.RegFunction("GetTwoPointDistance2D", GetTwoPointDistance2D);
 		L.RegFunction("CopyArray", CopyArray);
+		L.RegFunction("GetMapFileNameById", GetMapFileNameById);
 		L.RegFunction("MoveAndRotateObj", MoveAndRotateObj);
 		L.RegFunction("StopMove", StopMove);
 		L.RegFunction("New", _CreateUtils);
@@ -35,18 +40,34 @@ public class UtilsWrap
 		L.RegConstant("Member", 2);
 		L.RegConstant("Obstacle", 1);
 		L.RegConstant("Accessibility", 0);
+		L.RegConstant("MyBaseId", 10);
+		L.RegConstant("MyTurretId", 11);
+		L.RegConstant("EnemyBaseId", 110);
+		L.RegConstant("EnemyTurretId", 111);
 		L.RegConstant("Closed", -1);
 		L.RegConstant("Opened", -1);
-		L.RegConstant("MemberItemTypeSoldier", 1);
-		L.RegConstant("MemberItemTypeTank", 2);
-		L.RegConstant("MemberItemTypeLV", 3);
-		L.RegConstant("MemberItemTypeCannon", 4);
-		L.RegConstant("MemberItemTypeAircraft", 5);
+		L.RegConstant("MemberItemTypeHuman", 1);
+		L.RegConstant("MemberItemTypeOrc", 2);
+		L.RegConstant("MemberItemTypeOmnic", 3);
+		L.RegConstant("EnemyCamp", 2);
+		L.RegConstant("MyCamp", 1);
+		L.RegConstant("BulletTypeNormal", 1);
+		L.RegConstant("BulletTypeScope", 2);
+		L.RegConstant("AOEObjScope", 1);
+		L.RegConstant("AOEPointScope", 2);
+		L.RegConstant("AOEScope", 3);
+		L.RegConstant("AOEForwardScope", 4);
 		L.RegConstant("GeneralTypeSurface", 1);
 		L.RegConstant("GeneralTypeAir", 2);
 		L.RegConstant("GeneralTypeBuilding", 3);
+		L.RegConstant("SurfaceCollisionGroup", 0);
+		L.RegConstant("AirCollisionGroup", 2);
+		L.RegConstant("SurfaceTypeConstantId", 5);
+		L.RegConstant("AirTypeConstantId", 6);
+		L.RegConstant("BaseBaseId", 220001000);
 		L.RegConstant("AngleToPi", 0.0174532923847437);
 		L.RegConstant("PiToAngle", 57.2957801818848);
+		L.RegConstant("EffectLayer", 12);
 		L.RegVar("RadianToAngle", get_RadianToAngle, null);
 		L.RegVar("AngleToRadian", get_AngleToRadian, null);
 		L.RegVar("HalfPI", get_HalfPI, null);
@@ -404,6 +425,74 @@ public class UtilsWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int LoadFileRotate(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			string arg0 = ToLua.CheckString(L, 1);
+			string o = Utils.LoadFileRotate(arg0);
+			LuaDLL.lua_pushstring(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int CombineFile(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			System.Collections.Generic.List<string> arg0 = (System.Collections.Generic.List<string>)ToLua.CheckObject(L, 1, typeof(System.Collections.Generic.List<string>));
+			string o = Utils.CombineFile(arg0);
+			LuaDLL.lua_pushstring(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int DepartFileData(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			string arg0 = ToLua.CheckString(L, 1);
+			System.Collections.Generic.Dictionary<string,string> o = Utils.DepartFileData(arg0);
+			ToLua.PushObject(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetMapDataByFileName(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			string arg0 = ToLua.CheckString(L, 1);
+			string o = Utils.GetMapDataByFileName(arg0);
+			LuaDLL.lua_pushstring(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int GetTheta(IntPtr L)
 	{
 		try
@@ -492,6 +581,40 @@ public class UtilsWrap
 			Utils.CopyArray(arg0, out arg1, arg2, arg3);
 			ToLua.Push(L, arg1);
 			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetMapFileNameById(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(string), typeof(int)))
+			{
+				string arg0 = ToLua.ToString(L, 1);
+				int arg1 = (int)LuaDLL.lua_tonumber(L, 2);
+				string o = Utils.GetMapFileNameById(arg0, arg1);
+				LuaDLL.lua_pushstring(L, o);
+				return 1;
+			}
+			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(int), typeof(int)))
+			{
+				int arg0 = (int)LuaDLL.lua_tonumber(L, 1);
+				int arg1 = (int)LuaDLL.lua_tonumber(L, 2);
+				string o = Utils.GetMapFileNameById(arg0, arg1);
+				LuaDLL.lua_pushstring(L, o);
+				return 1;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: Utils.GetMapFileNameById");
+			}
 		}
 		catch(Exception e)
 		{

@@ -7,7 +7,14 @@ using System.Linq;
 using System.Reflection;
 using Random = System.Random;
 
-public class AstarTest : MonoBehaviour {
+public class AstarTest : MonoBehaviour
+{
+
+    /// <summary>
+    /// 主相机
+    /// </summary>
+    public Camera MainCamera;
+
     /// <summary>
     /// 寻路X轴宽度
     /// </summary>
@@ -37,6 +44,11 @@ public class AstarTest : MonoBehaviour {
     /// 单位宽度
     /// </summary>
     public int UnitWidth = 1;
+
+    /// <summary>
+    /// 是否启动状态机
+    /// </summary>
+    public bool IsFSM = false;
 
     ///// <summary>
     ///// 其实x
@@ -94,11 +106,6 @@ public class AstarTest : MonoBehaviour {
     /// 路径点列表
     /// </summary>
     private IList<GameObject> pathPoint = new List<GameObject>();
-
-    /// <summary>
-    /// 主相机
-    /// </summary>
-    private Camera mainCamera;
 
     /// <summary>
     /// 上次目标点X
@@ -194,8 +201,8 @@ public class AstarTest : MonoBehaviour {
             {
                 If(1, 0, Health, 0_100)
                 {
-                    Buff(1,1007)
-                    Buff(1,1008)
+                    Buff(1,1007, 1)
+                    Buff(1,1008, 1)
                     //PointToObj(1,test/TrailPrj,10,0,10,1,10),
                     //Point(1,test/ExplordScope,1,%1,10,1,10),   
                 }
@@ -274,57 +281,28 @@ public class AstarTest : MonoBehaviour {
         //Debug.Log(buffInfo1.GetReplacedDescription(1));
         // 设定帧数
         Application.targetFrameRate = 60;
-        mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
         var loadMapPos = LoadMap.GetLeftBottom();
         ClusterManager.Single.Init(loadMapPos.x + LoadMap.MapWidth * LoadMap.UnitWidth, loadMapPos.z + LoadMap.MapHeight * LoadMap.UnitWidth, MapWidth, MapHeight, UnitWidth, null);
         InitMapInfo();
-        DisplayerManager.AutoInstance();
 
-        // 测试
-        //var data = new VOBase();
-        //data.CurrentHP = 100;
-        //var changeData = new VOBase();
-        //changeData.CurrentHP = 100;
-        //var property = data.GetType().GetProperty("CurrentHP");
-        //// TODO 测试
-        //property.SetValue(data, Convert.ChangeType(10, property.PropertyType), null);
-        //Debug.Log(data.CurrentHP);
-        // 测试获取有特性的属性
-        //var propertyList = typeof(VOBase).GetProperties().Where((property) =>
-        //{
-        //    Debug.Log(property.Name);
-        //    if (property.GetCustomAttributes(typeof(SkillAddition), false).Any())
-        //    {
-        //        return true;
-        //    }
-        //    return false;
-        //});
-        //Debug.Log(propertyList.Count());
-        //foreach (var property in propertyList)
-        //{
-        //    ChangeDataType changeDataType = ChangeDataType.Absolute;
-        //    // 读取赋值类型, 如果没有则默认使用绝对值
-        //    // 修改float类型属性
-        //    if (property.PropertyType == typeof(float))
-        //    {
-        //        var sourceValue = Convert.ToSingle(property.GetValue(data, null));
-        //        var plusValue = Convert.ToSingle(property.GetValue(changeData, null)) * (changeDataType == ChangeDataType.Absolute ? 1 : sourceValue);
-        //        property.SetValue(data, sourceValue + plusValue, null);
-        //    }
-        //    // 修改bool类型属性
-        //    else if (property.PropertyType == typeof(bool))
-        //    {
-        //        property.SetValue(data, Convert.ToBoolean(property.GetValue(changeData, null)), null);
-        //    }
-        //    // 修改int,short,long类型属性
-        //    else if (property.PropertyType == typeof(long) || property.PropertyType == typeof(short) || property.PropertyType == typeof(int))
-        //    {
-        //        var sourceValue = Convert.ToInt64(property.GetValue(data, null));
-        //        var plusValue = Convert.ToInt64(property.GetValue(changeData, null)) * (changeDataType == ChangeDataType.Absolute ? 1 : sourceValue);
-        //        property.SetValue(data, Convert.ChangeType((sourceValue + plusValue), property.PropertyType), null);
-        //    }
-        //}
-        //Debug.Log(data.CurrentHP);
+        // 启动显示管理器
+        DisplayerManager.AutoInstance();
+        // 启动携程器
+        CoroutineManage.AutoInstance();
+        // 启动数据管理器
+        DataManager.AutoInstance();
+        // 加载资源包
+        var packLoader = new PacketLoader();
+        packLoader.Start(PackType.Res, new List<string>()
+            {
+                "ui_fightU"
+            }, (isDone) =>
+            {
+                if (isDone)
+                {
+                    Debug.Log("加载完毕");
+                }
+            });
     }
     
     void Update()
@@ -333,8 +311,8 @@ public class AstarTest : MonoBehaviour {
         Control();
         Scan();
         // 显示数据
-        Log();
-        CheckTrigger();
+        //Log();
+        //CheckTrigger();
     }
 
 
@@ -360,7 +338,7 @@ public class AstarTest : MonoBehaviour {
         if (Input.GetMouseButtonDown(1))
         {
             // 释放技能
-            var ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+            var ray = MainCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             Physics.Raycast(ray, out hit);
             if (hit.collider != null && hit.collider.name.Equals(LoadMap.MapPlane.name))
@@ -370,14 +348,14 @@ public class AstarTest : MonoBehaviour {
                 {
                     StartPos = new Vector3(hit.point.x, 0, hit.point.z),
                     TargetPos = new Vector3(hit.point.x - 40, 0, hit.point.z + 40),
-                    ReleaseMember = new DisplayOwner(scaner.gameObject, scaner, null, null),
+                    ReleaseMember = new DisplayOwner(scaner.gameObject, scaner),
                 });
             }
         }
         if (Input.GetMouseButtonDown(0))
         {
             // 获取地图上的点击点
-            var ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+            var ray = MainCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             Physics.Raycast(ray, out hit);
             // 点击到底板
@@ -390,7 +368,7 @@ public class AstarTest : MonoBehaviour {
 
                 var path = AStarPathFinding.SearchRoad(mapInfoData, lastTimeTargetX, lastTimeTargetY, posOnMap[0], posOnMap[1], DiameterX, DiameterY, IsJumpPoint);
                 // 根据path放地标, 使用组队寻路跟随过去
-                StartCoroutine(Step(path));
+                //StartCoroutine(Step(path));
                 
                 var loadMapPos = LoadMap.GetLeftBottom();
                 ClusterManager.Single.Init(loadMapPos.x + LoadMap.MapWidth * LoadMap.UnitWidth * 0.5f, loadMapPos.z + LoadMap.MapHeight * LoadMap.UnitWidth * 0.5f, MapWidth, MapHeight, UnitWidth, mapInfoData);
@@ -407,7 +385,7 @@ public class AstarTest : MonoBehaviour {
         if (Input.GetMouseButtonDown(2))
         {
             // 获取地图上的点击点
-            var ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+            var ray = MainCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             Physics.Raycast(ray, out hit);
             // 点击到底板
@@ -436,28 +414,28 @@ public class AstarTest : MonoBehaviour {
         // 上下左右移动
         if (Input.GetKey(KeyCode.UpArrow))
         {
-            mainCamera.transform.localPosition = new Vector3(mainCamera.transform.localPosition.x, mainCamera.transform.localPosition.y, mainCamera.transform.localPosition.z + 1);
+            MainCamera.transform.localPosition = new Vector3(MainCamera.transform.localPosition.x, MainCamera.transform.localPosition.y, MainCamera.transform.localPosition.z + 1);
         }
         if (Input.GetKey(KeyCode.DownArrow))
         {
-            mainCamera.transform.localPosition = new Vector3(mainCamera.transform.localPosition.x, mainCamera.transform.localPosition.y, mainCamera.transform.localPosition.z - 1);
+            MainCamera.transform.localPosition = new Vector3(MainCamera.transform.localPosition.x, MainCamera.transform.localPosition.y, MainCamera.transform.localPosition.z - 1);
         }
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            mainCamera.transform.localPosition = new Vector3(mainCamera.transform.localPosition.x - 1, mainCamera.transform.localPosition.y, mainCamera.transform.localPosition.z);
+            MainCamera.transform.localPosition = new Vector3(MainCamera.transform.localPosition.x - 1, MainCamera.transform.localPosition.y, MainCamera.transform.localPosition.z);
         }
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            mainCamera.transform.localPosition = new Vector3(mainCamera.transform.localPosition.x + 1, mainCamera.transform.localPosition.y, mainCamera.transform.localPosition.z);
+            MainCamera.transform.localPosition = new Vector3(MainCamera.transform.localPosition.x + 1, MainCamera.transform.localPosition.y, MainCamera.transform.localPosition.z);
         }
         // 升高下降
         if (Input.GetKey(KeyCode.PageUp))
         {
-            mainCamera.transform.localPosition = new Vector3(mainCamera.transform.localPosition.x, mainCamera.transform.localPosition.y + 1, mainCamera.transform.localPosition.z);
+            MainCamera.transform.localPosition = new Vector3(MainCamera.transform.localPosition.x, MainCamera.transform.localPosition.y + 1, MainCamera.transform.localPosition.z);
         }
         if (Input.GetKey(KeyCode.PageDown))
         {
-            mainCamera.transform.localPosition = new Vector3(mainCamera.transform.localPosition.x, mainCamera.transform.localPosition.y - 1, mainCamera.transform.localPosition.z);
+            MainCamera.transform.localPosition = new Vector3(MainCamera.transform.localPosition.x, MainCamera.transform.localPosition.y - 1, MainCamera.transform.localPosition.z);
         }
         if (Input.GetKey(KeyCode.P))
         {
@@ -486,110 +464,109 @@ public class AstarTest : MonoBehaviour {
     }
 
 
-    /// <summary>
-    /// 检测当前单位的触发事件
-    /// </summary>
-    private void CheckTrigger()
-    {
-        if (scaner == null)
-        {
-            return;
-        }
-        var alldata = scaner.AllData;
-        if (alldata.MemberData != null && alldata.SkillInfoList != null)
-        {
-            // 触发当前单位的所有事件
-            SkillManager.Single.SetEachAction(alldata.MemberData.ObjID, (type1, type2, trigger) =>
-            {
-                // 触发skill类
-                SkillManager.Single.CheckAndDoSkillInfo(alldata.SkillInfoList, trigger);
-                // 触发buff类
-                BuffManager.Single.CheckAndDoBuffInfo(alldata.BuffInfoList, trigger);
-            },
-            true);
+    ///// <summary>
+    ///// 检测当前单位的触发事件
+    ///// </summary>
+    //private void CheckTrigger()
+    //{
+    //    if (scaner == null)
+    //    {
+    //        return;
+    //    }
+    //    var alldata = scaner.AllData;
+    //    if (alldata.MemberData != null && alldata.SkillInfoList != null)
+    //    {
+    //        // 结算技能伤害/治疗
+    //        SettlementDamageOrCure();
+    //        // 触发当前单位的所有事件
+    //        SkillManager.Single.SetEachAction(alldata.MemberData.ObjID, (type1, type2, trigger) =>
+    //        {
+    //            // 触发skill类
+    //            SkillManager.Single.CheckAndDoSkillInfo(alldata.SkillInfoList, trigger);
+    //            // 触发buff类
+    //            BuffManager.Single.CheckAndDoBuffInfo(alldata.BuffInfoList, trigger);
+    //        },
+    //        true);
+    //    }
+    //}
 
-            // 结算技能伤害/治疗
-            SettlementDamageOrCure();
-        }
-    }
+    ///// <summary>
+    ///// 结算当前单位的血量
+    ///// </summary>
+    //private void SettlementDamageOrCure()
+    //{
+    //    var alldata = scaner.AllData;
+    //    var isOneHealth = false;
+    //    if (alldata.MemberData != null && alldata.SkillInfoList != null)
+    //    {
+    //        var demage = 0f;
+    //        var cure = 0f;
 
-    /// <summary>
-    /// 结算当前单位的血量
-    /// </summary>
-    private void SettlementDamageOrCure()
-    {
-        var alldata = scaner.AllData;
-        var isOneHealth = false;
-        if (alldata.MemberData != null && alldata.SkillInfoList != null)
-        {
-            var demage = 0f;
-            var cure = 0f;
+    //        // 先计算治疗量
+    //        var cureList = SkillManager.Single.GetSkillTriggerDataList(alldata.MemberData.ObjID, TriggerLevel1.Fight, TriggerLevel2.BeCure);
+    //        if (cureList != null && cureList.Count > 0)
+    //        {
+    //            // 计算治疗量总和
+    //            cure += cureList.Sum(attackMember => attackMember.HealthChangeValue);
+    //        }
 
-            // 先计算治疗量
-            var cureList = SkillManager.Single.GetSkillTriggerDataList(alldata.MemberData.ObjID, TriggerLevel1.Fight, TriggerLevel2.BeCure);
-            if (cureList != null && cureList.Count > 0)
-            {
-                // 计算治疗量总和
-                cure += cureList.Sum(attackMember => attackMember.HealthChangeValue);
-            }
+    //        // 再计算伤害量
+    //        // 获取被击列表
+    //        var attackList = SkillManager.Single.GetSkillTriggerDataList(alldata.MemberData.ObjID, TriggerLevel1.Fight, TriggerLevel2.BeAttack);
+    //        // 检测是否被击
+    //        if (attackList != null && attackList.Count > 0)
+    //        {
+    //            // 计算血量变动总和
+    //            // 这里返回的都是负值所以使用+=
+    //            demage += attackList.Sum(attackMember => attackMember.HealthChangeValue);
 
-            // 再计算伤害量
-            // 获取被击列表
-            var attackList = SkillManager.Single.GetSkillTriggerDataList(alldata.MemberData.ObjID, TriggerLevel1.Fight, TriggerLevel2.BeAttack);
-            // 检测是否被击
-            if (attackList != null && attackList.Count > 0)
-            {
-                // 计算血量变动总和
-                // 这里返回的都是负值所以使用+=
-                demage += attackList.Sum(attackMember => attackMember.HealthChangeValue);
-
-                // 如果单位死亡在抛出一个死亡事件
-                // 检测致死攻击
-                if (alldata.MemberData.CurrentHP - demage < Utils.ApproachZero)
-                {
-                    // 检测最后一个
-                    var lastHitMember = attackList[attackList.Count - 1];
-                    // 并判断该伤害是否致死, 如果不致死则生命值设置为1
-                    if (lastHitMember.IsNotLethal)
-                    {
-                        isOneHealth = true;
-                    }
-                    else
-                    {
-                        // 抛出致死攻击事件
-                        SkillManager.Single.SetTriggerData(new TriggerData()
-                        {
-                            HealthChangeValue = lastHitMember.HealthChangeValue,
-                            ReceiveMember = lastHitMember.ReceiveMember,
-                            ReleaseMember = lastHitMember.ReleaseMember,
-                            TypeLevel1 = TriggerLevel1.Fight,
-                            TypeLevel2 = TriggerLevel2.LethalHit
-                        });
-                    }
-                }
+    //            // 如果单位死亡在抛出一个死亡事件
+    //            // 检测致死攻击
+    //            if (alldata.MemberData.CurrentHP - demage < Utils.ApproachZero)
+    //            {
+    //                // 检测最后一个
+    //                var lastHitMember = attackList[attackList.Count - 1];
+    //                // 并判断该伤害是否致死, 如果不致死则生命值设置为1
+    //                if (lastHitMember.IsNotLethal)
+    //                {
+    //                    isOneHealth = true;
+    //                }
+    //                else
+    //                {
+    //                    // 抛出致死攻击事件
+    //                    SkillManager.Single.SetTriggerData(new TriggerData()
+    //                    {
+    //                        HealthChangeValue = lastHitMember.HealthChangeValue,
+    //                        ReceiveMember = lastHitMember.ReceiveMember,
+    //                        ReleaseMember = lastHitMember.ReleaseMember,
+    //                        TypeLevel1 = TriggerLevel1.Fight,
+    //                        TypeLevel2 = TriggerLevel2.LethalHit
+    //                    });
+    //                }
+    //            }
 
 
-                // 如果有伤害吸收则将伤害计算到技能的伤害吸收中
-                if (demage < Utils.ApproachZero)
-                {
-                    // 检测是否有伤害吸收的buff/skill
-                    // 触发吸收伤害事件
-                }
+    //            // 如果有伤害吸收则将伤害计算到技能的伤害吸收中
+    //            if (demage < Utils.ApproachZero)
+    //            {
+    //                // 检测是否有伤害吸收的buff/skill
+    //                // 触发吸收伤害事件
+    //            }
 
-                // 结算血量变动
-                if (isOneHealth)
-                {
-                    // 收到非致死超过血量的伤害, 生命值设置为1
-                    scaner.AllData.MemberData.CurrentHP = 1;
-                }
-                else
-                {
-                    // 正常扣血
-                    scaner.AllData.MemberData.CurrentHP += cure + demage;
-                }
-            }
-        }
-    }
+    //            // 结算血量变动
+    //            if (isOneHealth)
+    //            {
+    //                // 收到非致死超过血量的伤害, 生命值设置为1
+    //                scaner.AllData.MemberData.CurrentHP = 1;
+    //            }
+    //            else
+    //            {
+    //                // 正常扣血
+    //                scaner.AllData.MemberData.CurrentHP += cure - demage;
+    //            }
+    //        }
+    //    }
+    //}
 
     /// <summary>
     /// 初始化
@@ -729,7 +706,7 @@ public class AstarTest : MonoBehaviour {
             school.transform.localPosition = new Vector3((i % 3) * 2 + start.x, start.y, i / 3 * 2 + start.z);
             school.name = "item" + i;
             school.TargetPos = target;
-            school.Diameter = 5;
+            school.Diameter = i == 0 ? 10 : 3;
             school.PushTargetList(Utils.NumToPostionByList(LoadMap.transform.position, cloneList, UnitWidth, MapWidth, MapHeight));
             //school.Moveing = (a) => { Debug.Log(a.name + "Moving"); };
 
@@ -769,10 +746,26 @@ public class AstarTest : MonoBehaviour {
                 
             };
 
+
             itemList.Add(school);
             ClusterManager.Single.Add(school);
-            DisplayerManager.Single.AddElement(objId, new DisplayOwner(schoolItem, school, null, null));
+            var displayOwner = new DisplayOwner(schoolItem, school);
+            DisplayerManager.Single.AddElement(objId, displayOwner);
 
+            if (IsFSM)
+            {
+                // 加载RanderControl
+                var randerControl = schoolItem.AddComponent<RanderControl>();
+                displayOwner.RanderControl = randerControl;
+                // 挂载事件处理器
+                var triggerRunner = schoolItem.AddComponent<TriggerRunner>();
+                triggerRunner.Display = displayOwner;
+
+                // TODO 为了适应状态机中的效果
+                var head = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                head.name = "head";
+                schoolItem.AddChild(head);
+            }
 
             //Action<ClusterGroup> lam = (thisGroup) =>
             //{

@@ -12,10 +12,10 @@
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
+    <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
     <CompilerResponseFile></CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
-    <UnityBuildTarget>Android:13</UnityBuildTarget>
+    <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>5.4.1f1</UnityVersion>
     <RootNamespace></RootNamespace>
   </PropertyGroup>
@@ -26,7 +26,7 @@
     <IntermediateOutputPath>Temp\UnityVS_obj\Debug\</IntermediateOutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DefineConstants>DEBUG;TRACE;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_4_1;UNITY_5_4;UNITY_5;ENABLE_NEW_BUGREPORTER;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_EDITOR_RETINA;ENABLE_RETINA_GUISTYLES;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SPRITERENDERER_FLIPPING;ENABLE_SPRITES;ENABLE_SPRITE_POLYGON;ENABLE_TERRAIN;ENABLE_RAKNET;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_COLLAB;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_METRICS;ENABLE_EDITOR_METRICS_CACHING;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;INCLUDE_PUBNUB;ENABLE_LOCALIZATION;ENABLE_ANDROID_ATLAS_ETC1_COMPRESSION;ENABLE_EDITOR_TESTS_RUNNER;UNITY_ANDROID;UNITY_ANDROID_API;ENABLE_SUBSTANCE;UNITY_ANDROID_API;ENABLE_TEXTUREID_MAP;ENABLE_EGL;ENABLE_NETWORK;ENABLE_RUNTIME_GI;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_UNITYWEBREQUEST;PLATFORM_SUPPORTS_ADS_ID;UNITY_CAN_SHOW_SPLASH_SCREEN;ENABLE_UNITYADS_RUNTIME;UNITY_UNITYADS_API;ENABLE_MONO;DEVELOPMENT_BUILD;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;UNITY_TEAM_LICENSE;ENABLE_VSTU;UNITY_PRO_LICENSE</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_4_1;UNITY_5_4;UNITY_5;UNITY_64;ENABLE_NEW_BUGREPORTER;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_DUCK_TYPING;ENABLE_EDITOR_RETINA;ENABLE_RETINA_GUISTYLES;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SPRITERENDERER_FLIPPING;ENABLE_SPRITES;ENABLE_SPRITE_POLYGON;ENABLE_TERRAIN;ENABLE_RAKNET;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_COLLAB;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_METRICS;ENABLE_EDITOR_METRICS_CACHING;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;INCLUDE_PUBNUB;ENABLE_LOCALIZATION;ENABLE_ANDROID_ATLAS_ETC1_COMPRESSION;ENABLE_EDITOR_TESTS_RUNNER;UNITY_STANDALONE_WIN;UNITY_STANDALONE;ENABLE_SUBSTANCE;ENABLE_TEXTUREID_MAP;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_UNITYWEBREQUEST;ENABLE_EVENT_QUEUE;ENABLE_CLUSTERINPUT;ENABLE_WEBSOCKET_HOST;ENABLE_MONO;DEVELOPMENT_BUILD;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;UNITY_TEAM_LICENSE;ENABLE_VSTU;UNITY_PRO_LICENSE;FEAT_SAFE</DefineConstants>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -36,7 +36,7 @@
     <IntermediateOutputPath>Temp\UnityVS_obj\Release\</IntermediateOutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DefineConstants>TRACE;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_4_1;UNITY_5_4;UNITY_5;ENABLE_NEW_BUGREPORTER;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_EDITOR_RETINA;ENABLE_RETINA_GUISTYLES;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SPRITERENDERER_FLIPPING;ENABLE_SPRITES;ENABLE_SPRITE_POLYGON;ENABLE_TERRAIN;ENABLE_RAKNET;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_COLLAB;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_METRICS;ENABLE_EDITOR_METRICS_CACHING;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;INCLUDE_PUBNUB;ENABLE_LOCALIZATION;ENABLE_ANDROID_ATLAS_ETC1_COMPRESSION;ENABLE_EDITOR_TESTS_RUNNER;UNITY_ANDROID;UNITY_ANDROID_API;ENABLE_SUBSTANCE;UNITY_ANDROID_API;ENABLE_TEXTUREID_MAP;ENABLE_EGL;ENABLE_NETWORK;ENABLE_RUNTIME_GI;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_UNITYWEBREQUEST;PLATFORM_SUPPORTS_ADS_ID;UNITY_CAN_SHOW_SPLASH_SCREEN;ENABLE_UNITYADS_RUNTIME;UNITY_UNITYADS_API;ENABLE_MONO;DEVELOPMENT_BUILD;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;UNITY_TEAM_LICENSE;ENABLE_VSTU;UNITY_PRO_LICENSE</DefineConstants>
+    <DefineConstants>TRACE;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_4_1;UNITY_5_4;UNITY_5;UNITY_64;ENABLE_NEW_BUGREPORTER;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_DUCK_TYPING;ENABLE_EDITOR_RETINA;ENABLE_RETINA_GUISTYLES;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SPRITERENDERER_FLIPPING;ENABLE_SPRITES;ENABLE_SPRITE_POLYGON;ENABLE_TERRAIN;ENABLE_RAKNET;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_COLLAB;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_METRICS;ENABLE_EDITOR_METRICS_CACHING;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;INCLUDE_PUBNUB;ENABLE_LOCALIZATION;ENABLE_ANDROID_ATLAS_ETC1_COMPRESSION;ENABLE_EDITOR_TESTS_RUNNER;UNITY_STANDALONE_WIN;UNITY_STANDALONE;ENABLE_SUBSTANCE;ENABLE_TEXTUREID_MAP;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_UNITYWEBREQUEST;ENABLE_EVENT_QUEUE;ENABLE_CLUSTERINPUT;ENABLE_WEBSOCKET_HOST;ENABLE_MONO;DEVELOPMENT_BUILD;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;UNITY_TEAM_LICENSE;ENABLE_VSTU;UNITY_PRO_LICENSE;FEAT_SAFE</DefineConstants>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
@@ -98,13 +98,17 @@
     <Compile Include="Assets\AStarSchoolBehaviour\AstarTest.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\MapEditor.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\Move.cs" />
+    <Compile Include="Assets\AStarSchoolBehaviour\Script\ShutUp.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestBallistic.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestCollision.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestEffectFactory.cs" />
+    <Compile Include="Assets\AStarSchoolBehaviour\Script\TestFSM.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestFormulaConstruct.cs" />
+    <Compile Include="Assets\AStarSchoolBehaviour\Script\TestProtoBuffer.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestQuadTree.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestSkill.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestSkillEditor.cs" />
+    <Compile Include="Assets\AStarSchoolBehaviour\Script\TestSocket.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestTargetSelecter.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestTimer.cs" />
     <Compile Include="Assets\Logic\Script\AstarFight.cs" />
@@ -159,7 +163,10 @@
     <Compile Include="Assets\Logic\Script\Game\UI\Cangku\UIScrollViewAdapter.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\Cangku\UIScrollViewItemBase.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\Cangku\UI_Cangku_Item.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\Common\Tuple.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\Common\UIToast.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\DragableCard.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\Equip\UI_Equip_Item.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\LoopHorizontalScrollRect.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\LoopScrollRect.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\LoopVerticalScrollRect.cs" />
@@ -287,6 +294,8 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\ItemSelecter.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Looper.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Map\MapManager.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Net\FightDataSyncer.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Net\SocketManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\PoolLoader.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\QuadTree.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\ResourceLoader.cs" />
@@ -318,6 +327,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillTriggerData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SlideCollisionDetectionFormulaItem.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\TriggerRunner.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\TriggerTicker.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\TargetSelecter\ISelectWeightData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\TargetSelecter\ISelectWeightDataHolder.cs" />
@@ -336,7 +346,6 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\map\__RBTree.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\patrol\PatrolManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\patrol\SinglePatrol.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\Constant.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_Army.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_ArmyBase_C.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_Audio.cs" />
@@ -346,6 +355,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_BuffMath.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_CJItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_ChouJiang.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_Constant.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_DamoxingYindao.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_DiaoluoType.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_FightKeyValue.cs" />
@@ -404,7 +414,10 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equipdata.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equippower_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equipsuit_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_item_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_kezhi_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_pack_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_selectchest_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_skill_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_soldierRender_data.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_soldier_data.cs" />
@@ -814,6 +827,8 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UISliderWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UISpriteWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UITextureWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIToastWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIToast_ShowTypeWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UITweenerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIWidgetContainerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIWidgetWrap.cs" />
@@ -903,6 +918,8 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_UI_VerticalLayoutGroupWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_WWWWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_WrapModeWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\Util_TimerManagerWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\Util_TimerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UtilsWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\VOBaseWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\WndManageWrap.cs" />
@@ -960,6 +977,94 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\ToLua\Reflection\LuaMethod.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\ToLua\Reflection\LuaProperty.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\ToLua\Reflection\LuaReflection.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\BclHelpers.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\BufferExtension.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\BufferPool.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\CallbackAttributes.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Compiler\CompilerContext.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Compiler\CompilerDelegates.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Compiler\Local.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\DataFormat.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Extensible.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\ExtensibleUtil.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\GlobalSuppressions.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Helpers.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\IExtensible.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\IExtension.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\ImplicitFields.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\KeyValuePairProxy.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Meta\AttributeMap.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Meta\BasicList.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Meta\CallbackSet.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Meta\MetaType.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Meta\RuntimeTypeModel.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Meta\SubType.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Meta\TypeFormatEventArgs.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Meta\TypeModel.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Meta\ValueMember.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\NetObjectCache.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\PrefixStyle.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Properties\AssemblyInfo.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\ProtoContractAttribute.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\ProtoConverterAttribute.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\ProtoEnumAttribute.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\ProtoException.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\ProtoIgnoreAttribute.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\ProtoIncludeAttribute.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\ProtoMemberAttribute.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\ProtoReader.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\ProtoWriter.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\SerializationContext.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\ArrayDecorator.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\BlobSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\BooleanSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\ByteSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\CharSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\CompiledSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\DateTimeSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\DecimalSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\DefaultValueDecorator.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\DoubleSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\EnumSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\FieldDecorator.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\GuidSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\IProtoSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\IProtoTypeSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\ISerializerProxy.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\ImmutableCollectionDecorator.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\Int16Serializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\Int32Serializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\Int64Serializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\KeyValuePairDecorator.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\ListDecorator.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\MemberSpecifiedDecorator.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\NetObjectSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\NullDecorator.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\ParseableSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\PropertyDecorator.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\ProtoDecoratorBase.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\SByteSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\SingleSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\StringSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\SubItemSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\SurrogateSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\SystemTypeSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\TagDecorator.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\TimeSpanSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\TupleSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\TypeSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\UInt16Serializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\UInt32Serializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\UInt64Serializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\Serializers\UriDecorator.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\ServiceModel\ProtoBehaviorAttribute.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\ServiceModel\ProtoBehaviorExtensionElement.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\ServiceModel\ProtoEndpointBehavior.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\ServiceModel\ProtoOperationBehavior.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\ServiceModel\XmlProtoSerializer.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\SubItemToken.cs" />
+    <Compile Include="Assets\QKLibs\Protobuf\WireType.cs" />
     <Compile Include="Assets\QKLibs\YQ2\UIEagleEyeMap.cs" />
     <Compile Include="Assets\QKLibs\YQ2\UIFollow.cs" />
     <Compile Include="Assets\QKLibs\YQ2\UIZhenFaView.cs" />
@@ -1070,6 +1175,7 @@
     <None Include="Assets\QKLibs\Asset_T4M\Shaders\ShaderModel3\Specular\T4M 4 TexturesSpec.shader" />
     <None Include="Assets\QKLibs\Asset_ulua\Editor\3rd Tools\GenBabeluaApi\readme.txt" />
     <None Include="Assets\QKLibs\Asset_ulua\ToLua\readme.txt" />
+    <None Include="Assets\QKLibs\Protobuf\Web\TODO.txt" />
     <None Include="Assets\Resources\Shader\QK - Cloud - 1.shader" />
     <None Include="Assets\Resources\Shader\QK - Cloud - 2.shader" />
     <None Include="Assets\Resources\Shader\QK - Cloud - 3.shader" />

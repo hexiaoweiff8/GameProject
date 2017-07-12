@@ -8,7 +8,9 @@ public class UI_Cangku_ItemWrap
 	{
 		L.BeginClass(typeof(UI_Cangku_Item), typeof(UIScrollViewItemBase));
 		L.RegFunction("setIcon", setIcon);
+		L.RegFunction("setIconLayer", setIconLayer);
 		L.RegFunction("setIconFrame", setIconFrame);
+		L.RegFunction("setIconSelectFrame", setIconSelectFrame);
 		L.RegFunction("setCompositeMark", setCompositeMark);
 		L.RegFunction("setItemSelect", setItemSelect);
 		L.RegFunction("setItemCount", setItemCount);
@@ -21,7 +23,9 @@ public class UI_Cangku_ItemWrap
 		L.RegVar("_ItemID", get__ItemID, set__ItemID);
 		L.RegVar("_EquipID", get__EquipID, set__EquipID);
 		L.RegVar("sIcon", get_sIcon, set_sIcon);
+		L.RegVar("sIconLayer", get_sIconLayer, set_sIconLayer);
 		L.RegVar("sIconFrame", get_sIconFrame, set_sIconFrame);
+		L.RegVar("sIconSelectFrame", get_sIconSelectFrame, set_sIconSelectFrame);
 		L.RegVar("sCompositeMark", get_sCompositeMark, set_sCompositeMark);
 		L.RegVar("sSelected", get_sSelected, set_sSelected);
 		L.RegVar("tItemCount", get_tItemCount, set_tItemCount);
@@ -67,6 +71,39 @@ public class UI_Cangku_ItemWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int setIconLayer(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(UI_Cangku_Item), typeof(string)))
+			{
+				UI_Cangku_Item obj = (UI_Cangku_Item)ToLua.ToObject(L, 1);
+				string arg0 = ToLua.ToString(L, 2);
+				obj.setIconLayer(arg0);
+				return 0;
+			}
+			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(UI_Cangku_Item), typeof(UIAtlas), typeof(string)))
+			{
+				UI_Cangku_Item obj = (UI_Cangku_Item)ToLua.ToObject(L, 1);
+				UIAtlas arg0 = (UIAtlas)ToLua.ToObject(L, 2);
+				string arg1 = ToLua.ToString(L, 3);
+				obj.setIconLayer(arg0, arg1);
+				return 0;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: UI_Cangku_Item.setIconLayer");
+			}
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int setIconFrame(IntPtr L)
 	{
 		try
@@ -92,6 +129,23 @@ public class UI_Cangku_ItemWrap
 			{
 				return LuaDLL.luaL_throw(L, "invalid arguments to method: UI_Cangku_Item.setIconFrame");
 			}
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int setIconSelectFrame(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			UI_Cangku_Item obj = (UI_Cangku_Item)ToLua.CheckObject(L, 1, typeof(UI_Cangku_Item));
+			string arg0 = ToLua.CheckString(L, 2);
+			obj.setIconSelectFrame(arg0);
+			return 0;
 		}
 		catch(Exception e)
 		{
@@ -295,6 +349,25 @@ public class UI_Cangku_ItemWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_sIconLayer(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UI_Cangku_Item obj = (UI_Cangku_Item)o;
+			UISprite ret = obj.sIconLayer;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index sIconLayer on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_sIconFrame(IntPtr L)
 	{
 		object o = null;
@@ -310,6 +383,25 @@ public class UI_Cangku_ItemWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index sIconFrame on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_sIconSelectFrame(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UI_Cangku_Item obj = (UI_Cangku_Item)o;
+			UISprite ret = obj.sIconSelectFrame;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index sIconSelectFrame on a nil value" : e.Message);
 		}
 	}
 
@@ -523,6 +615,25 @@ public class UI_Cangku_ItemWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_sIconLayer(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UI_Cangku_Item obj = (UI_Cangku_Item)o;
+			UISprite arg0 = (UISprite)ToLua.CheckUnityObject(L, 2, typeof(UISprite));
+			obj.sIconLayer = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index sIconLayer on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_sIconFrame(IntPtr L)
 	{
 		object o = null;
@@ -538,6 +649,25 @@ public class UI_Cangku_ItemWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index sIconFrame on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_sIconSelectFrame(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UI_Cangku_Item obj = (UI_Cangku_Item)o;
+			UISprite arg0 = (UISprite)ToLua.CheckUnityObject(L, 2, typeof(UISprite));
+			obj.sIconSelectFrame = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index sIconSelectFrame on a nil value" : e.Message);
 		}
 	}
 

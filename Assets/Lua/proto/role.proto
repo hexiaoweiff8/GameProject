@@ -86,7 +86,21 @@ message Mail{
     repeated Rewardfrm rewards = 6;
     required int32 time         =7;
     required string way         =8;
+    required int32 new          =9;
+    required int32 autoDel      =10;
 };
+
+
+message GoodItem{
+    required int32 id           =1;
+    required int32 isSold       =2;
+};
+
+
+message ShopItem{
+    repeated GoodItem good      =1;
+    required int32 cnt          =2;
+}
 
 
 message Role{
@@ -105,4 +119,9 @@ message Role{
     optional OpFields opFields  =13;
     repeated Sci sci            =14;
     repeated int32 fitEquip     =15;
-}
+    required int32 sex          =16;
+    repeated ShopItem shop      =17;
+};
+
+
+

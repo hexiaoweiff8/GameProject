@@ -264,6 +264,10 @@ public class SkillManager
                 // 技能可释放次数-暂时不做
                 DoFormula(skillInfo.GetFormula(packer));
             }
+            else
+            {
+                Debug.Log("技能:" + skillInfo.Num + "在cd中");
+            }
             // 否则技能在CD中不能释放
         }
     }

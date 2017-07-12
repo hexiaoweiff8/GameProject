@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Linq;
+using JetBrains.Annotations;
 
 public class SoldierFSMControl{
 
@@ -28,7 +29,7 @@ public class SoldierFSMControl{
         _iSAwake = false;
     }
 
-    public void StartFSM(DisplayOwner obj)
+    public void StartFSM([NotNull]DisplayOwner obj)
     {
         //初始化状态机
         fsm = new SoldierFSMSystem();
@@ -86,112 +87,19 @@ public class SoldierFSMControl{
         fsm.CurrentState.CheckTrigger(fsm);
         fsm.CurrentState.Action(fsm);
         // 检测被触发的Skill事件是否有对应技能
-        CheckTrigger();
+        //TriggerAction();
+        //// 设置血条
+        //fsm.Display.RanderControl.SetBloodBarValue(fsm.Display.ClusterData.AllData.MemberData);
+        Debug.Log("当前状态:" + fsm.CurrentStateID);
     }
 
     /// <summary>
-    /// 检测当前单位的触发事件
+    /// 修改该单位的当前状态
     /// </summary>
-    private void CheckTrigger()
+    public void SetState(SoldierFSMSystem targetFsm)
     {
-        var alldata = fsm.Display.ClusterData.AllData;
-        if (alldata.MemberData != null && alldata.SkillInfoList != null)
-        {
-            // 结算技能伤害/治疗
-            SettlementDamageOrCure();
-            // 触发当前单位的所有事件
-            SkillManager.Single.SetEachAction(alldata.MemberData.ObjID, (type1, type2, trigger) =>
-            {
-                // 触发skill类
-                SkillManager.Single.CheckAndDoSkillInfo(alldata.SkillInfoList, trigger);
-                // 触发buff类
-                BuffManager.Single.CheckAndDoBuffInfo(alldata.BuffInfoList, trigger);
-
-                // 结算伤害
-            },
-            true);
-        }
+        // 设置状态数据
+        fsm = targetFsm;
     }
-
-    /// <summary>
-    /// 结算当前单位的血量
-    /// </summary>
-    private void SettlementDamageOrCure()
-    {
-        var alldata = fsm.Display.ClusterData.AllData;
-        var isOneHealth = false;
-        if (alldata.MemberData != null && alldata.SkillInfoList != null)
-        {
-            var demage = 0f;
-            var cure = 0f;
-
-            // 先计算治疗量
-            var cureList = SkillManager.Single.GetSkillTriggerDataList(alldata.MemberData.ObjID, TriggerLevel1.Fight, TriggerLevel2.BeCure);
-            if (cureList != null && cureList.Count > 0)
-            {
-                // 计算治疗量总和
-                cure += cureList.Sum(attackMember => attackMember.HealthChangeValue);
-            }
-
-            // 再计算伤害量
-            // 获取被击列表
-            var attackList = SkillManager.Single.GetSkillTriggerDataList(alldata.MemberData.ObjID, TriggerLevel1.Fight, TriggerLevel2.BeAttack);
-            // 检测是否被击
-            if (attackList != null && attackList.Count > 0)
-            {
-                // 计算血量变动总和
-                // 这里返回的都是负值所以使用+=
-                demage += attackList.Sum(attackMember => attackMember.HealthChangeValue);
-
-                // 如果单位死亡在抛出一个死亡事件
-                // 检测致死攻击
-                if (alldata.MemberData.CurrentHP - demage < Utils.ApproachZero)
-                {
-                    // 检测最后一个
-                    var lastHitMember = attackList[attackList.Count - 1];
-                    // 并判断该伤害是否致死, 如果不致死则生命值设置为1
-                    if (lastHitMember.IsNotLethal)
-                    {
-                        isOneHealth = true;
-                    }
-                    else
-                    {
-                        // 抛出致死攻击事件
-                        SkillManager.Single.SetTriggerData(new TriggerData()
-                        {
-                            HealthChangeValue = lastHitMember.HealthChangeValue,
-                            ReceiveMember = lastHitMember.ReceiveMember,
-                            ReleaseMember = lastHitMember.ReleaseMember,
-                            TypeLevel1 = TriggerLevel1.Fight,
-                            TypeLevel2 = TriggerLevel2.LethalHit
-                        });
-                    }
-                }
-
-
-                // 如果有伤害吸收则将伤害计算到技能的伤害吸收中
-                if (demage < Utils.ApproachZero)
-                {
-                    // 检测是否有伤害吸收的buff/skill
-                    // 触发吸收伤害事件
-                }
-
-                // 结算血量变动
-                if (isOneHealth)
-                {
-                    // 收到非致死超过血量的伤害, 生命值设置为1
-                    fsm.Display.ClusterData.AllData.MemberData.CurrentHP = 1;
-                }
-                else
-                {
-                    // 正常扣血
-                    fsm.Display.ClusterData.AllData.MemberData.CurrentHP += cure - demage;
-                }
-                // 刷新血条
-                fsm.Display.RanderControl.SetBloodBarValue();
-            }
-        }
-    }
-
 
 }

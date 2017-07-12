@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using JetBrains.Annotations;
+using UnityEngine;
 
 
 /// <summary>
@@ -32,8 +33,20 @@ public class DisplayOwner
     //public VOBase MemberData { get; set; }
 
 
+    public DisplayOwner([NotNull] GameObject gameObj, [NotNull] PositionObject clusterData)
+    {
+        GameObj = gameObj;
+        ClusterData = clusterData;
+    }
 
-    public DisplayOwner(GameObject gameObj, PositionObject clusterData, MFAModelRender modelRender, RanderControl randerControl)
+    public DisplayOwner([NotNull] GameObject gameObj, [NotNull] PositionObject clusterData, MFAModelRender mfa)
+    {
+        GameObj = gameObj;
+        ClusterData = clusterData;
+        MFAModelRender = mfa;
+    }
+
+    public DisplayOwner([NotNull]GameObject gameObj, [NotNull]PositionObject clusterData, MFAModelRender modelRender, [NotNull]RanderControl randerControl)
     {
         GameObj = gameObj;
         ClusterData = clusterData;

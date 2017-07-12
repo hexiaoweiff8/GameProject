@@ -8,6 +8,8 @@ public class FightUnitFactory {
 
     public static DisplayOwner CreateUnit(int unitType, CreateActorParam otherParam)
     {
+        // TODO 封装这里
+        // 将操作封装
         VOBase vo = new VOBase();
         switch (unitType)
         {

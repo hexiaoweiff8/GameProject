@@ -8,11 +8,6 @@ using System.Collections.Generic;
 /// </summary>
 public abstract class SoldierFSMState
 {
-    protected SoldierStateID _stateId;
-    /// <summary>
-    /// 本状态是否过期
-    /// </summary>
-    protected bool _stateIsLose = false;
 
     public SoldierStateID StateID
     {
@@ -20,14 +15,45 @@ public abstract class SoldierFSMState
         set { _stateId = value; }
     }
 
+    ///// <summary>
+    ///// 来源状态
+    ///// </summary>
+    //public SoldierStateID SourceStateID { get; set; }
+
+
+    /// <summary>
+    /// 状态ID
+    /// </summary>
+    protected SoldierStateID _stateId;
+
+    /// <summary>
+    /// 本状态是否过期
+    /// </summary>
+    protected bool _stateIsLose = false;
+
+    /// <summary>
+    /// state-trigger对应关系表
+    /// </summary>
     private Dictionary<SoldierTriggerID, SoldierStateID> dict = new Dictionary<SoldierTriggerID, SoldierStateID>();
+
+    /// <summary>
+    /// 当前状态可切换状态的trigger检测列表
+    /// </summary>
     private List<SoldierFSMTrigger> _fsmTrriggerList = new List<SoldierFSMTrigger>();
+
+    /// <summary>
+    /// 初始化
+    /// </summary>
     public SoldierFSMState()
     {
         Init();
     }
 
+    /// <summary>
+    /// 初始化方法
+    /// </summary>
     public abstract void Init();
+
     /// <summary>
     /// 添加状态 转换和状态id必须成对存在 且唯一
     /// </summary>
@@ -63,6 +89,7 @@ public abstract class SoldierFSMState
         }
         Debug.LogError("FSMState ERROR: " + trigger + " 不存在");
     }
+
     /// <summary>
     ///  根据当前转换获取对应的状态
     /// </summary>
@@ -123,12 +150,19 @@ public abstract class SoldierFSMState
         }
     }
 
+    /// <summary>
+    /// 销毁
+    /// </summary>
     public void Destory()
     {
         _fsmTrriggerList.Clear();
         dict.Clear();
     }
 
+    /// <summary>
+    /// 该事件行为
+    /// </summary>
+    /// <param name="fsm"></param>
     public abstract void Action(SoldierFSMSystem fsm);
 }
 

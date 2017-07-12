@@ -73,6 +73,11 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
         }
     }
 
+    /// <summary>
+    /// 碰撞组, 不同组不会碰到
+    /// </summary>
+    public int CollisionGroup { get; set; }
+
     ///// <summary>
     ///// 物理信息
     ///// </summary>
@@ -155,6 +160,15 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
             //    CollisionGraphics.Postion = new Vector2(x, y);
             //}
         }
+    }
+
+    /// <summary>
+    /// 当前高度
+    /// </summary>
+    public float Height
+    {
+        get { return height; }
+        set { height = value; }
     }
 
 
@@ -269,6 +283,11 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
     /// 当前位置y
     /// </summary>
     private float y = 0f;
+
+    /// <summary>
+    /// 当前高度
+    /// </summary>
+    private float height = 0;
 
     /// <summary>
     /// 物体质量

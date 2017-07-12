@@ -52,7 +52,6 @@ function wnd_cangku_controller:OnShowDone()
 	this.view.Panel_Detail_decomposition.panel:SetActive(false)
 	this:hide(this.view.Panel_Detail_item)
 	this:hide(this.view.Panel_Detail_equipment)
-	this.view.MessageBox.Toast.panel:SetActive(false)
 	this.view.MessageBox.mBox.panel:SetActive(false)
 	this.view.MessageBox.mBox_decomposition_tips.panel:SetActive(false)
 	this.view.MessageBox.mBox_decomposition_detail_tips.panel:SetActive(false)
@@ -69,8 +68,7 @@ function wnd_cangku_controller:initListener()
 
 	UIEventListener.Get(this.view.Button_back).onClick = function()
 			-- TODO: 仓库界面：返回按钮的实现
-			print('返回上一界面')
-			ui_toast:show('返回上一界面',1,nil)
+			UIToast.Show("返回上一界面",nil,UIToast.ShowType.Upwards)
 		end
 	-- 页卡
 	for i = 1,this.model.DepositoryTab_Count do
@@ -129,7 +127,7 @@ function wnd_cangku_controller:initListener()
 		if (_sellType == 1 and {diamondNum} or {this.model.serv_CurrencyInfo.gold})[1] < _Cost then
 			print("当前钻石："..diamondNum)
 			print("当前金币："..this.model.serv_CurrencyInfo.gold)
-			this:showToast("货币不足，无法分解",1.5)
+			UIToast.Show("货币不足，无法分解",nil,UIToast.ShowType.Upwards)
 			return
 		end
 
@@ -140,7 +138,7 @@ function wnd_cangku_controller:initListener()
 		end
 		local on_10023_rec = function(body)
 			Event.RemoveListener("10023", on_10023_rec)
-			this:showToast("所选装备已分解.",2)
+			UIToast.Show("所选装备已分解.",nil,UIToast.ShowType.Queue)
 			local gw2c = gw2c_pb.SellEquip()
 		    gw2c:ParseFromString(body)
 		    this:updateServData(gw2c.currency,nil)
@@ -164,7 +162,7 @@ function wnd_cangku_controller:initListener()
 	local OnPerfectClick = function()
 
 		if #this.scrollViewController._selectedItems == 0 then
-			this:showToast("还没有选中任何要分解的装备",1.5)
+			UIToast.Show("还没有选中任何要分解的装备",nil,UIToast.ShowType.Upwards)
 			return
 		end
 		
@@ -205,7 +203,7 @@ function wnd_cangku_controller:initListener()
 	UIEventListener.Get(this.view.Panel_Detail_decomposition.Button_decomposition_normal).onClick = function()
 
 		if #this.scrollViewController._selectedItems == 0 then
-			this:showToast("还没有选中任何要分解的装备",1.5)
+			UIToast.Show("还没有选中任何要分解的装备",nil,UIToast.ShowType.Upwards)
 			return
 		end
 		
@@ -301,18 +299,13 @@ function wnd_cangku_controller:SelectYekaButton(selectedButton)
 
 	selectedButton:GetComponent(typeof(UISprite)).atlas = mAtlas
 	selectedButton:GetComponent(typeof(UISprite)).spriteName = cstr.SELECTED_YEKA
+	this.view.Panel_Tab.sTabTop.transform.localPosition = Vector3(selectedButton.transform.localPosition.x,
+		selectedButton.transform.localPosition.y + selectedButton:GetComponent(typeof(UIWidget)).height / 2 + this.view.Panel_Tab.sTabTop:GetComponent(typeof(UIWidget)).height / 2,
+		selectedButton.transform.localPosition.z)
 
 	local start, e = string.find(selectedButton.name, '_')
 	local Goods = string.sub(selectedButton.name,1,start-1)
 	local Maintype = string.sub(selectedButton.name,e+1,string.len(selectedButton.name))
-
-	-- print("Goods = "..Goods.." Maintype = "..Maintype)
-
-	-- if Goods == 'Equip' then -- 显示装备分解按钮
-	-- 	this.view.Button_decomposition:SetActive(true)
-	-- else
-	-- 	this.view.Button_decomposition:SetActive(false)
-	-- end
 	-- 如果在装备分解界面点击页卡，则退出装备分解状态
 	if this.scrollViewController._State_InDECOMPOSITION then
 		this:hide(this.view.Panel_Detail_decomposition)
@@ -363,10 +356,15 @@ function wnd_cangku_controller:showPanelByItemData(ItemData)
 		this.view.Panel_Detail_item.Button_use:SetActive(false)
 		this.view.Panel_Detail_item.Button_sale:SetActive(false)
 		this.view.Panel_Detail_item.Label_Container:SetActive(false)
+		-- 如果是时装碎片，则根据性别显示
+		if _UseType == 2 then
+			local Male,Female = this:analysisFashionFragmentStr(_Name)
+			_Name = (userModel:getUserRoleTbl().sex == 0 and {Male} or {Female})[1]
+		end
 
 		this.view.Panel_Detail_item.Label_name:GetComponent(typeof(UILabel)).text = _Name
 		this.view.Panel_Detail_item.Item_count:GetComponent(typeof(UILabel)).text = sdata_UILiteral.mData.body[0xFF01][sdata_UILiteral.mFieldName2Index["Literal"]]..ItemData.num
-		this.view.Panel_Detail_item.Item_icon:GetComponent(typeof(UISprite)).spriteName = _Icon -- DONE: 碎片详细面板:显示碎片的图标
+		this.view.Panel_Detail_item.Item_icon:GetComponent(typeof(UISprite)).spriteName = _Icon
 		this.view.Panel_Detail_item.Item_frame:GetComponent(typeof(UISprite)).spriteName = EquipUtil:getQualitySpriteStr(_Quality)
 		this.view.Panel_Detail_item.Label_tips:GetComponent(typeof(UILabel)).text = _Des
 		this.view.Panel_Detail_item.Label_description:GetComponent(typeof(UILabel)).text = _FunctionDes
@@ -381,7 +379,21 @@ function wnd_cangku_controller:showPanelByItemData(ItemData)
 	
 		UIEventListener.Get(this.view.Panel_Detail_item.Button_path).onClick = function()
 				-- TODO: 碎片详细面板:添加途径/合成按钮的实现
-				print("途径/合成按钮")
+				if ItemData.num >= ItemData["ComposeNum"] then
+					local on_10024_rec = function(body)
+						local gw2c = gw2c_pb.ComposeEquip()
+					    gw2c:ParseFromString(body)
+					    local equip = gw2c.equip
+					    local items = gw2c.item
+					    for k,v in ipairs(items) do
+					    	this:updateServData(nil,nil,v)
+					    	UIToast.Show("碎片剩余："..v.num,nil,UIToast.ShowType.Upwards)
+					    end
+					    this:insertServData(equip)
+					    Event.RemoveListener("10024",on_10024_rec)	
+					end
+					Message_Manager:SendPB_10024(ItemData["ItemID"],on_10024_rec)
+				end
 			end
 	end
 	if _UseType == 3 then -- 显示消耗品详细面板
@@ -574,11 +586,11 @@ function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 			    gw2c:ParseFromString(body)
 			    local serv_equip = gw2c.equip
 			    if serv_equip.isLock == 0 then
-			    	this:showToast("装备已解锁",2)
+			    	UIToast.Show("装备已解锁",nil,UIToast.ShowType.Upwards)
 			    	cangkuItem:setEquipmentLock(false)
 			    	this.view.Panel_Detail_equipment.Button_lock:GetComponent(typeof(UISprite)).spriteName = cstr.EQUIPMENT_UNLOCKED
 			    else
-			    	this:showToast("装备已锁定",2)
+			    	UIToast.Show("装备已锁定",nil,UIToast.ShowType.Upwards)
 			    	cangkuItem:setEquipmentLock(true)
 			    	this.view.Panel_Detail_equipment.Button_lock:GetComponent(typeof(UISprite)).spriteName = cstr.EQUIPMENT_LOCKED
 			    end
@@ -604,7 +616,7 @@ function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 				if _repeat then
 					this:unloadEquipmentByID(this.model.serv_fitEquipmentList[_repeatIndex])
 					table.remove(this.model.serv_fitEquipmentList,_repeatIndex)
-					this:showToast("存在相同部位装备,将卸下之前装备",2)
+					UIToast.Show("存在相同部位装备,将卸下之前装备",nil,UIToast.ShowType.Upwards)
 				end
 				table.insert(this.model.serv_fitEquipmentList,equip.id)
 			end
@@ -641,10 +653,10 @@ function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 				return
 			end
 			-- DONE: 装备界面：强化按钮
-			if equip.lv + 1 <= this.model:getEquipmentPlusMAXLevel(equip.rarity) then
+			if equip.lv + 1 <= EquipUtil:getEquipmentPlusMAXLevel(equip.rarity) then
 
 				if this.model.serv_CurrencyInfo.power < equipDetail._EquipPlusCost then
-					this:showToast("能量点不足",1.5)
+					UIToast.Show("能量点不足",nil,UIToast.ShowType.Upwards)
 					return
 				end
 				local on_10004_rec = function(body)
@@ -658,6 +670,7 @@ function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 					this:updateServData(gw2c.currency,gw2c.equip)
 					cangkuItem:setEquipmentLevel(gw2c.equip.lv)
 					this:showEquipmentDetailsPanel(equip,cangkuItem)
+					UIToast.Show("已强化到+"..serv_equip.lv,nil,UIToast.ShowType.Upwards)
 				end
 				Message_Manager:SendPB_10004(equip.id,on_10004_rec)
 			else
@@ -665,7 +678,7 @@ function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 					-- TODO:装备重铸
 
 				else
-					this:showToast("该装备无法重铸",1)
+					UIToast.Show("该装备无法重铸",nil,UIToast.ShowType.Upwards)
 				end
 			end
 		end
@@ -685,27 +698,6 @@ function wnd_cangku_controller:showTipsBox(messageToShow)
 		tweener:OnComplete(function() this:hide(this.view.MessageBox.mBox) end)
 		sq:Append(tweener)
 	end
-end
-
-function wnd_cangku_controller:showToast(messageToShow,duration)
-	
-	this.view.MessageBox.Toast.panel:SetActive(true)
-	this.view.MessageBox.Toast.Label:GetComponent(typeof(UILabel)).text = messageToShow
-	this.view.MessageBox.Toast.panel:GetComponent(typeof(UIWidget)).alpha = 1
-	this.view.MessageBox.Toast.Label:GetComponent(typeof(UIWidget)):AssumeNaturalSize()
-	this.view.MessageBox.Toast.Sprite:GetComponent(typeof(UIWidget)).width = this.view.MessageBox.Toast.Label:GetComponent(typeof(UIWidget)).width + 80
-
-	local sq = DG.Tweening.DOTween.Sequence()
-	local tweener = DG.Tweening.DOTween.ToAlpha(
-		function()
-			return this.view.MessageBox.Toast.panel:GetComponent(typeof(UIWidget)).color
-		end,
-		function(value) 
-			this.view.MessageBox.Toast.panel:GetComponent(typeof(UIWidget)).color = value
-		end,0,0.7)
-	tweener:OnComplete(function() this:hide(this.view.MessageBox.Toast) end)
-	sq:SetDelay((duration == nil and {3} or {duration})[1])
-	sq:Append(tweener)
 end
 
 ----------------------------------------------------------------
@@ -732,11 +724,11 @@ function wnd_cangku_controller:processServData(user_item)
 					for i = 1,math.ceil(v.num / _OverlapLimit) do
 						item.id = v.id
 						if i ~= math.ceil(v.num / _OverlapLimit) then
-							-- item = clone(item)
+							item = table.deepcopy(item)
 							item.num = _OverlapLimit
 							table.insert(this.model.serv_Items,item)
 						else
-							-- item = clone(item)
+							item = table.deepcopy(item)
 							-- TODO: 未详细测试计算结果，数量可能与预期不同
 							item.num = v.num - _OverlapLimit * (math.ceil(v.num / _OverlapLimit) - 1)
 							table.insert(this.model.serv_Items,item)
@@ -748,7 +740,6 @@ function wnd_cangku_controller:processServData(user_item)
 		item = {}
     end
     print("Items："..#this.model.serv_Items)
-
 end
 
 function wnd_cangku_controller:sortServData()
@@ -756,38 +747,36 @@ function wnd_cangku_controller:sortServData()
 	table.sort(this.model.serv_Items,
 		function(a,b)
 			if a["ItemID"] ~= nil and b["ItemID"] ~= nil then
-				if a["ItemID"] ~= b["ItemID"] then
-					-- print("cp ItemID")
-					return a["ItemID"] < b["ItemID"] -- ItemID小的在前
-				elseif a["Quality"] ~= b["Quality"] then
-					-- print("cp Quality")
-					return a["Quality"] > b["Quality"] -- Quality大的在前
+				if a.num >= a["ComposeNum"] and b.num < b["ComposeNum"] then -- 可以合成的在前
+					return true
+				elseif a.num < a["ComposeNum"] and b.num >= b["ComposeNum"] then
+					return false
 				elseif a["UseType"] ~= b["UseType"] then
-					-- print("cp UseType")
 					return a["UseType"] < b["UseType"] -- UseType小的在前
-				else 
-					-- print("cp ComposeNum")
-					return a["ComposeNum"] > b["ComposeNum"] end -- 可以合成的在前
+				elseif a["Quality"] ~= b["Quality"] then
+					return a["Quality"] > b["Quality"] -- Quality大的在前
+				elseif a["ItemID"] ~= b["ItemID"] then
+					return a["ItemID"] < b["ItemID"] -- ItemID小的在前
+				else
+					return a.num > b.num -- 另外一种情况，物品堆叠数量超出时，数量多的在前
+				end 
 			end
 			return false
 		end)
 	print("serv_Items排序完成..")
 	table.sort(this.model.serv_Equipment,
 		function(a,b)
-			if a.rarity ~= b.rarity then
+			if a.isBad ~= b.isBad then
+				return (a.isBad == 1 and {true} or {false})[1] -- 损坏度,坏的在前
+			elseif a.rarity ~= b.rarity then
 				return a.rarity > b.rarity -- 装备品质高的在前
 			elseif a.lv ~= b.lv then
-				-- print("cp lv")
 				return a.lv > b.lv -- lv大的在前
-			elseif a.id	~= b.id then
-				-- print("cp rarity")
+			else
 				return a.id < b.id -- id小的在前
-			elseif a.isBad ~= 0 then
-				return false -- 损坏度
-			end	
+			end
 		end)
 	print("serv_Equipment排序完成..")
-
 end
 
 function wnd_cangku_controller:mergeServData()
@@ -800,7 +789,7 @@ function wnd_cangku_controller:mergeServData()
 	end
 end
 --@params user_currency:服务器货币信息,user_equip:服务器装备数据
-function wnd_cangku_controller:updateServData(user_currency,user_equip)
+function wnd_cangku_controller:updateServData(user_currency,user_equip,user_items)
 	if user_currency then
 		this.model.serv_CurrencyInfo = user_currency
 	end
@@ -831,9 +820,51 @@ function wnd_cangku_controller:updateServData(user_currency,user_equip)
 		                })
 		            end
 		        end
+		        return
 			end
 		end
 	end
+	if user_items then
+		if user_items.num == 0 then
+			this:removeItemByItemID(user_items.id)
+		else
+			this:updateItemData(user_items.id,user_items.num)
+		end
+	end
+end
+
+function wnd_cangku_controller:insertServData(user_equip)
+	if user_equip then
+		local equip = this.model:getLocalEquipmentDetailByEquipID(user_equip.eid)
+		equip.id = user_equip.id
+		equip.eid = user_equip.eid
+		equip.lv = user_equip.lv
+		equip.rarity = user_equip.rarity
+		equip.fst_attr = user_equip.fst_attr
+		equip.sndAttr = { remake = {} }
+		equip.isLock = user_equip.isLock
+		equip.isBad = user_equip.isBad
+		for k, v in ipairs(user_equip.sndAttr) do
+           	table.insert(equip.sndAttr,
+           	{
+           		id = v.id,
+				val = v.val,
+				isRemake = v.isRemake,
+	        })
+            for kk, vv in ipairs(v.remake) do
+                table.insert(equip.sndAttr.remake,
+                {
+					id = vv.id,
+					val = vv.val,
+                })
+            end
+        end
+        table.insert(this.model.serv_Equipment,equip) 
+        this.scrollViewController:sortEquipment(this.model.serv_Equipment)
+	end
+	
+	this.model.Processed_Items = {}
+	this:mergeServData()
 end
 ----------------------------------------------------------------
 --★Util
@@ -931,6 +962,45 @@ function wnd_cangku_controller:LoadDecompositionPanelState()
 		end
 	end
 end
+--@Des 更新Model中指定itemID的物品数据
+function wnd_cangku_controller:updateItemData(itemID,num)
+	for k,v in ipairs(this.model.serv_Items) do
+		if v.id == itemID then
+			v.num = num
+			break
+		end
+	end
+	this.scrollViewController:refreshList()
+end
+--@Des 从Model删除指定itemID的物品
+function wnd_cangku_controller:removeItemByItemID(itemID)
+	for k,v in ipairs(this.model.serv_Items) do
+		if v.id == itemID then
+			table.remove(this.model.serv_Items,k)
+			break
+		end
+	end
+	for k,v in ipairs(this.model.Processed_Items) do
+		if v.id == itemID then
+			table.remove(this.model.Processed_Items,k)
+			break
+		end 
+	end
+	local _UseType = this.model:getUseTypeByItemID(itemID)
+	if _UseType == 1 or _UseType == 2 then
+		this.scrollViewController.Items_filterByUseType_1_2 = nil
+		this.scrollViewController:filterBy('Item','1')
+	elseif _UseType == 3 or _UseType == 4 or _UseType == 5 then
+		this.scrollViewController.Items_filterByUseType_3_4_5 = nil
+		this.scrollViewController:filterBy('Item','3')
+	elseif _UseType == 6 or _UseType == 7 then
+		this.scrollViewController.Items_filterByUseType_6_7 = nil
+		this.scrollViewController:filterBy('Item','2')
+	else
+		this.scrollViewController.Items_filterByUseType_8 = nil
+		this.scrollViewController:filterBy('Item','4')
+	end
+end
 --@params power:能量点
 --@return (int,int)Interval
 function wnd_cangku_controller:calcInterval(power)
@@ -976,5 +1046,15 @@ function wnd_cangku_controller:removeEquipmentByIDList(equipList)
 	this:mergeServData()
 	this.scrollViewController:refreshList()
 end
+--@Des 解析时装碎片字符串
+--@params str:时装碎片字符串
+function wnd_cangku_controller:analysisFashionFragmentStr(str)
+	local Male = string.sub(str,0,string.find(str,';')-1)
+	local Female = string.sub(str,string.find(str,';')+1,-1)
 
+	Male = string.gsub(Male,"Male%$",'')
+	Female = string.gsub(Female,"Female%$",'')
+
+	return Male,Female
+end
 return wnd_cangku_controller

@@ -26,6 +26,20 @@ function EquipModel:getLocalEquipmentDetailByEquipID(equipmentID)
 	return nil
 end
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+--@Des 通过EquipID获取本地装备数据(引用)
+--@params (number)equipmentID:装备eid
+--@return (table)本地装备表数据副本
+--■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+function EquipModel:getLocalEquipmentDataRefByEquipID(equipmentID)
+	for i = 1,#EquipModel.local_Equipment do
+		if EquipModel.local_Equipment[i]["EquipID"] == equipmentID then
+			return EquipModel.local_Equipment[i]
+		end
+	end
+	Debugger.LogWarning(equipmentID.." not found in EquipModel:getLocalEquipmentDataRefByEquipID(equipmentID)")
+	return nil
+end
+--■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --@Des 通过装备唯一id获取装备类型,用于查询装备是否重复装备
 --@params id:装备唯一id
 --@return (Int32)EquipType

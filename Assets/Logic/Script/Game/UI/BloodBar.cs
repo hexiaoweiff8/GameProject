@@ -12,6 +12,12 @@ public class BloodBar : MonoBehaviour
         BloodBarSprite2 = transform.Find("bg2").GetComponent<UISprite>();
     }
 
+
+    void Awake()
+    {
+        Start();
+    }
+
     // Update is called once per frame
     void Update()
     {

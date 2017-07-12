@@ -6,7 +6,7 @@ local equipPage_controller = {}
 local view = require("uiscripts/myEquip/equipPage/equipPage_view")
 local data = require("uiscripts/myEquip/equipPage/equipPage_model")
 local EquipDetail = require("uiscripts/commonGameObj/equipDetail")
-
+local equipItemControl = require("uiscripts/myEquip/equipPage/equipItemControl")
 ---
 ---装备信息显示界面
 ---
@@ -15,17 +15,18 @@ local otherEquipDetail
 ---
 ---正选中的装备栏装备
 ---
-local equipItems = {}
 local currentEquip
-local beforeEquip
 
 ---
 ---装备栏正显示的装备类型
 ---
-local showEquipType
 function equipPage_controller:init(equipController)
     view:init_view(equipController)
-    --data:getDatas()
+
+    view.otherEquip_DetailP:SetActive(false)
+    equipItemControl:init(self, view)
+    equipItemControl:setItemClickEvent(onEquipClicked)
+    ----data:getDatas()
     UIEventListener.Get(view.otherEquip_DetailMask).onClick = function()
         view.otherEquip_DetailL:SetActive(false)
         view.otherEquip_DetailR:SetActive(false)
@@ -45,41 +46,7 @@ end
 ---equipType    装备的类型
 ---
 function equipPage_controller:showEquipsByType(equipType)
-    showEquipType = equipType
-    local equipList = data:getEquipListByType(equipType)
-    equipItems = {}
-    for i = 1, #equipList do
-        equipItems[i] = EquipItem(view.otherEquip_Grid, equipList[i])
-        equipItems[i]:refresh()
-        equipItems[i]:SetListener(onEquipClicked)
-        ---
-        ---如果该装备已装备，则设为当前选择的装备
-        ---
-        if equipList[i].equipped then
-            currentEquip = equipItems[i]
-            beforeEquip = currentEquip
-        end
-    end
-    view.otherEquip_Grid.transform:GetComponent("UIGrid"):Reposition()
-
-end
----
----刷新右侧装备栏界面
----equipType    装备的类型
----
-function equipPage_controller:refreshEquipsByType(equipType)
-    if showEquipType and showEquipType == equipType then
-        if currentEquip then
-            currentEquip:refresh()
-        end
-        if beforeEquip then
-            beforeEquip:refresh()
-        end
-        beforeEquip = currentEquip
-    else
-        equipPage_controller:showEquipsByType(equipType)
-    end
-
+    equipItemControl:show(data:getEquipListByType(equipType))
 end
 
 ---
@@ -87,13 +54,16 @@ end
 ---equip    要显示的装备对象
 ---
 function equipPage_controller:showDetails(equip)
+
     ---显示选择的装备信息界面
     if not otherEquipDetail then
         otherEquipDetail = EquipDetail(1)
     end
+
     otherEquipDetail:showEquip(equip, view.otherEquip_DetailR, 14)
     otherEquipDetail:setListener()
     view.otherEquip_DetailR:SetActive(true)
+
 
 
     ---获取穿戴中同类型的装备ID
@@ -103,6 +73,7 @@ function equipPage_controller:showDetails(equip)
         if not onBodyDetail then
             onBodyDetail = EquipDetail(0)
         end
+
         onBodyDetail:showEquip(data:getEquipByOnlyID(onBodyEquipID), view.otherEquip_DetailL, 14)
         view.otherEquip_DetailL:SetActive(true)
     else
@@ -136,18 +107,45 @@ function equipPage_controller:refreshDetails(equip)
     ---显示信息界面
     view.otherEquip_DetailP:SetActive(true)
 end
+
 ---
 ---刷新装备的显示和装备信息界面
 ---
 function equipPage_controller:refresh(equipType)
-    if view.otherEquip.activeSelf then
-        equipPage_controller:refreshEquipsByType(equipType)
+    if view.otherEquip_DetailP.activeSelf then
+        print("equipPage_controller:refresh")
+        equipPage_controller:refreshDetails(currentEquip)
     end
+
+
+    if view.otherEquip.activeSelf then
+        ---
+        ---如果装备列表顺序，数量有改变，则重新加载列表显示
+        ---
+        if data:isListChanged(equipType) then
+            equipItemControl:show(data:getEquipListByType(equipType))
+            return
+        end
+        equipItemControl:refresh()
+    end
+
+end
+
+---
+---一键装备后刷新
+---
+function equipPage_controller:onceEquipRefresh(equipType)
+    if view.otherEquip.activeSelf then
+        if equipType then
+            equipItemControl:set_selectItem(data.equipOnBodyList[equipType])
+        end
+        equipItemControl:refresh()
+    end
+
 
     if view.otherEquip_DetailP.activeSelf then
-        equipPage_controller:refreshDetails(currentEquip:getEquipToShow())
+        equipPage_controller:refreshDetails(currentEquip)
     end
-
 end
 
 ---
@@ -155,16 +153,18 @@ end
 ---equip    装备对象
 ---self     装备Item对象
 ---
-function onEquipClicked(equip, self)
+
+function onEquipClicked(equip)
     ---
     ---屏蔽重复点击事件
     ---
-    if currentEquip == self and view.otherEquip_DetailP.activeSelf then
+    if currentEquip and currentEquip.id == equip.id and view.otherEquip_DetailP.activeSelf then
         return
     end
-    currentEquip = self
+    currentEquip = equip
     equipPage_controller:showDetails(equip)
 end
+
 
 
 return equipPage_controller

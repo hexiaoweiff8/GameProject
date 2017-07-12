@@ -170,11 +170,11 @@ public class DataManager : MonoEX.Singleton<DataManager>
         ClusterManager.Single.Add(cluster);
 
         // 创建RanderControl
-        //var randerControl = myBase.AddComponent<RanderControl>();
+        //var randerControl = baseObj.AddComponent<RanderControl>();
 
 
         // 创建外层持有类
-        var displayOwner = new DisplayOwner(baseObj, cluster, null, null);
+        var displayOwner = new DisplayOwner(baseObj, cluster);
         DisplayerManager.Single.AddElement(jidiVo.ObjID, displayOwner);
 
         //// 创建MFAModelRander
@@ -222,6 +222,12 @@ public class DataManager : MonoEX.Singleton<DataManager>
         }
     }
 
+    /// <summary>
+    /// 创建单位
+    /// </summary>
+    /// <param name="soldier">单位数据</param>
+    /// <param name="param">数据参数</param>
+    /// <returns></returns>
     private DisplayOwner CreateSoldier(FightVO soldier, CreateActorParam param)
     {
         if (soldier.ObjID.ObjType == ObjectID.ObjectType.MySoldier)
@@ -243,7 +249,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
         // 设置父级
         ParentManager.Instance().SetParent(display, ParentManager.ClusterParent);
 
-        // 创建渲染
+        // 创建渲染器
         var mfa = display.GetComponent<MFAModelRender>();
         mfa.ObjId = soldier.ObjID;
 
@@ -251,12 +257,37 @@ public class DataManager : MonoEX.Singleton<DataManager>
         mfa.Cluster = display.AddComponent<ClusterData>();
         mfa.Cluster.SetDataValue(soldier);
 
+
+        // 设置空地高度
+        switch (soldier.GeneralType)
+        {
+            // 空中单位高度
+            case Utils.GeneralTypeAir:
+                mfa.Cluster.Height = SData_Constant.Single.GetDataOfID(Utils.AirTypeConstantId).Value;
+                mfa.Cluster.CollisionGroup = Utils.AirCollisionGroup;
+                break;
+            // 地面单位高度
+            case Utils.GeneralTypeBuilding:
+            case Utils.GeneralTypeSurface:
+                mfa.Cluster.Height = SData_Constant.Single.GetDataOfID(Utils.SurfaceTypeConstantId).Value;
+                mfa.Cluster.CollisionGroup = Utils.SurfaceCollisionGroup;
+                break;
+        }
+        Debug.Log("类型: " + soldier.AimGeneralType + "高度: " + mfa.Cluster.Height);
+
+
         // 创建外层持有类
-        var displayOwner = new DisplayOwner(display, mfa.Cluster, mfa, null);
+        var displayOwner = new DisplayOwner(display, mfa.Cluster, mfa);
         DisplayerManager.Single.AddElement(soldier.ObjID, displayOwner);
 
-        // 启动单位状态机
-        //randerControl.StartFSM(displayOwner);
+        // 创建RanderControl
+        //var randerControl = RanderControl.GetIns(display, soldier.ObjID);
+        //displayOwner.RanderControl = randerControl;
+
+        // 挂载事件处理器
+        var triggerRunner = display.AddComponent<TriggerRunner>();
+        // 设置数据
+        triggerRunner.Display = displayOwner;
 
         // 设置目标选择权重数据
         var aimData = SData_armyaim_c.Single.GetDataOfID(soldier.ArmyID);
@@ -433,7 +464,8 @@ public class DataManager : MonoEX.Singleton<DataManager>
         fix.X = otherParam.X * unitWidth - mapWidth * unitWidth * 0.5f + offsetPos.x;
         fix.Y = otherParam.Y * unitWidth - mapHeight * unitWidth * 0.5f + offsetPos.z;
         fix.Diameter = 1 * unitWidth;
-        var result = new DisplayOwner(fixItem, fix, null, null);
+
+        var result = new DisplayOwner(fixItem, fix);
 
         ClusterManager.Single.Add(fix);
 

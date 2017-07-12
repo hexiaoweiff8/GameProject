@@ -184,6 +184,26 @@ public class Utils
     /// </summary>
     public const short GeneralTypeBuilding = 3;
 
+    /// <summary>
+    /// 地面碰撞组
+    /// </summary>
+    public const int SurfaceCollisionGroup = 0;
+
+    /// <summary>
+    /// 空中碰撞组
+    /// </summary>
+    public const int AirCollisionGroup = 2;
+
+    /// <summary>
+    /// 地面单位Constant数据ID
+    /// </summary>
+    public const int SurfaceTypeConstantId = 5;
+
+    /// <summary>
+    /// 空中单位Constant数据ID
+    /// </summary>
+    public const int AirTypeConstantId = 6;
+
     // ----------------------------单位大类型-----------------------------
 
 

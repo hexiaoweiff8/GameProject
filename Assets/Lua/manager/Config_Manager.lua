@@ -7,6 +7,8 @@ Config_Manager = class("Config_Manager")
 --@return 
 --==============================--
 function Config_Manager:LoadConfig()
+    --常量表
+    sdata_constant_data = luacsv.new(require("pk_tabs/Constant")) 
     --读取士兵阵型表
     sdata_array_data = luacsv.new(require("pk_tabs/array_c"))
     --读取士兵模型表
@@ -73,6 +75,7 @@ function Config_Manager:LoadConfig()
     sdata_equippower_data = luacsv.new(require("pk_tabs/equippower_c")) 
     
     -----------------------------------C#需要调用的配置表在以下位置添加---------------------------------------
+    SDataUtils.setData("constant", sdata_constant_data.mData.head, sdata_constant_data.mData.body)
     SDataUtils.setData("armyaim_c", sdata_armyaim_data.mData.head, sdata_armyaim_data.mData.body)
     SDataUtils.setData("armyaoe_c", sdata_armyaoe_data.mData.head, sdata_armyaoe_data.mData.body)
     SDataUtils.setData("armybase_c", sdata_armybase_data.mData.head, sdata_armybase_data.mData.body)

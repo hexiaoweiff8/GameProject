@@ -15,6 +15,13 @@ cstr = {
 	QUALITY_BLUE = "tongyong_zhuangbeibiankuang_lanse",
 	QUALITY_GREEN = "tongyong_zhuangbeibiankuang_lvse",
 	QUALITY_PURPLE = "tongyong_zhuangbeibiankuang_zise",
+
+	QUALITY_WHITE_LAYER = "tongyong_zhuangbeikuangdi_baise",
+	QUALITY_ORANGE_LAYER = "tongyong_zhuangbeikuangdi_chengse",
+	QUALITY_RED_LAYER = "tongyong_zhuangbeikuangdi_hongse",
+	QUALITY_BLUE_LAYER = "tongyong_zhuangbeikuangdi_lanse",
+	QUALITY_GREEN_LAYER = "tongyong_zhuangbeikuangdi_lvse",
+	QUALITY_PURPLE_LAYER = "tongyong_zhuangbeikuangdi_zise",
 }
 
 cint = {

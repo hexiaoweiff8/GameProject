@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using Object = UnityEngine.Object;
 
 public class Soldier_Siwang_State : SoldierFSMState
 {
@@ -29,6 +30,7 @@ public class Soldier_Siwang_State : SoldierFSMState
                 TypeLevel2 = TriggerLevel2.Death
             });
         }
+        Object.Destroy(fsm.Display.ClusterData);
     }
 
     public override void Action(SoldierFSMSystem fsm)

@@ -9,6 +9,7 @@ public class TestTimer : MonoBehaviour
     public string log = "";
 
     private Timer timer;
+
 	void Update () {
         if (Input.GetMouseButtonDown(1))
         {
@@ -18,8 +19,13 @@ public class TestTimer : MonoBehaviour
             timer.Start().OnCompleteCallback(() =>
             {
                 stopwatch.Stop();
-                Debug.Log(stopwatch.Elapsed);
+                Debug.Log(stopwatch.Elapsed + ", " + timer.ToString());
+                timer.Kill();
+            }).OnKill(() =>
+            {
+                Debug.Log("Kill");
             });
+
 
             // LooperImpl.Single.Remove(10000);
             //for(var i = 0; i < 1000; i++)

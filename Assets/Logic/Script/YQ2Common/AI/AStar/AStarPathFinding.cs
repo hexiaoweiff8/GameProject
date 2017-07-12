@@ -164,7 +164,7 @@ public class AStarPathFinding
                     //(float)Math.Sqrt(xOff * xOff / y2Line + yOff * yOff / x2Line)
                     // 曼哈顿启发
                     //(Math.Abs(xOff) + Math.Abs(yOff)) 
-                    surroundPoint.H = (float)Math.Sqrt(xOff * xOff + yOff * yOff) * 4 + (NearObstacleCount(surroundPoint, map, colCount, rowCount) * 8);
+                    surroundPoint.H = (float)Math.Sqrt(xOff * xOff + yOff * yOff) * 4 + (NearObstacleCount(surroundPoint, map, colCount, rowCount) << 3);
                     surroundPoint.G = g;
                     surroundPoint.F = surroundPoint.H + surroundPoint.G;
                     surroundPoint.Parent = currentPoint;

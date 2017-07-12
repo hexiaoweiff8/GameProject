@@ -25,10 +25,27 @@ public class DisplayOwnerWrap
 		{
 			int count = LuaDLL.lua_gettop(L);
 
-			if (count == 4)
+			if (count == 2)
 			{
 				UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 1, typeof(UnityEngine.GameObject));
-				ClusterData arg1 = (ClusterData)ToLua.CheckUnityObject(L, 2, typeof(ClusterData));
+				PositionObject arg1 = (PositionObject)ToLua.CheckUnityObject(L, 2, typeof(PositionObject));
+				DisplayOwner obj = new DisplayOwner(arg0, arg1);
+				ToLua.PushObject(L, obj);
+				return 1;
+			}
+			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.GameObject), typeof(PositionObject), typeof(MFAModelRender)))
+			{
+				UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 1, typeof(UnityEngine.GameObject));
+				PositionObject arg1 = (PositionObject)ToLua.CheckUnityObject(L, 2, typeof(PositionObject));
+				MFAModelRender arg2 = (MFAModelRender)ToLua.CheckUnityObject(L, 3, typeof(MFAModelRender));
+				DisplayOwner obj = new DisplayOwner(arg0, arg1, arg2);
+				ToLua.PushObject(L, obj);
+				return 1;
+			}
+			else if (count == 4 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.GameObject), typeof(PositionObject), typeof(MFAModelRender), typeof(RanderControl)))
+			{
+				UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 1, typeof(UnityEngine.GameObject));
+				PositionObject arg1 = (PositionObject)ToLua.CheckUnityObject(L, 2, typeof(PositionObject));
 				MFAModelRender arg2 = (MFAModelRender)ToLua.CheckUnityObject(L, 3, typeof(MFAModelRender));
 				RanderControl arg3 = (RanderControl)ToLua.CheckUnityObject(L, 4, typeof(RanderControl));
 				DisplayOwner obj = new DisplayOwner(arg0, arg1, arg2, arg3);
@@ -106,7 +123,7 @@ public class DisplayOwnerWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			DisplayOwner obj = (DisplayOwner)o;
-			ClusterData ret = obj.ClusterData as ClusterData;
+			PositionObject ret = obj.ClusterData;
 			ToLua.Push(L, ret);
 			return 1;
 		}
@@ -182,7 +199,7 @@ public class DisplayOwnerWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			DisplayOwner obj = (DisplayOwner)o;
-			ClusterData arg0 = (ClusterData)ToLua.CheckUnityObject(L, 2, typeof(ClusterData));
+			PositionObject arg0 = (PositionObject)ToLua.CheckUnityObject(L, 2, typeof(PositionObject));
 			obj.ClusterData = arg0;
 			return 0;
 		}

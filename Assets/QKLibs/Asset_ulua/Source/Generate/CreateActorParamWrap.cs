@@ -17,6 +17,9 @@ public class CreateActorParamWrap
 		L.RegVar("IsHero", get_IsHero, set_IsHero);
 		L.RegVar("SoldierID", get_SoldierID, set_SoldierID);
 		L.RegVar("CardID", get_CardID, set_CardID);
+		L.RegVar("Level", get_Level, set_Level);
+		L.RegVar("X", get_X, set_X);
+		L.RegVar("Y", get_Y, set_Y);
 		L.EndClass();
 	}
 
@@ -27,9 +30,26 @@ public class CreateActorParamWrap
 		{
 			int count = LuaDLL.lua_gettop(L);
 
-			if (count == 8 && TypeChecker.CheckTypes(L, 1, typeof(int), typeof(bool), typeof(int), typeof(string), typeof(string), typeof(bool), typeof(int), typeof(int)))
+			if (count == 2)
 			{
-				int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
+				float arg0 = (float)LuaDLL.luaL_checknumber(L, 1);
+				float arg1 = (float)LuaDLL.luaL_checknumber(L, 2);
+				CreateActorParam obj = new CreateActorParam(arg0, arg1);
+				ToLua.PushObject(L, obj);
+				return 1;
+			}
+			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(float), typeof(float), typeof(int)))
+			{
+				float arg0 = (float)LuaDLL.luaL_checknumber(L, 1);
+				float arg1 = (float)LuaDLL.luaL_checknumber(L, 2);
+				int arg2 = (int)LuaDLL.luaL_checknumber(L, 3);
+				CreateActorParam obj = new CreateActorParam(arg0, arg1, arg2);
+				ToLua.PushObject(L, obj);
+				return 1;
+			}
+			else if (count == 8 && TypeChecker.CheckTypes(L, 1, typeof(AvatarCM), typeof(bool), typeof(int), typeof(string), typeof(string), typeof(bool), typeof(int), typeof(int)))
+			{
+				AvatarCM arg0 = (AvatarCM)ToLua.CheckObject(L, 1, typeof(AvatarCM));
 				bool arg1 = LuaDLL.luaL_checkboolean(L, 2);
 				int arg2 = (int)LuaDLL.luaL_checknumber(L, 3);
 				string arg3 = ToLua.CheckString(L, 4);
@@ -41,9 +61,9 @@ public class CreateActorParamWrap
 				ToLua.PushObject(L, obj);
 				return 1;
 			}
-			else if (count == 8 && TypeChecker.CheckTypes(L, 1, typeof(AvatarCM), typeof(bool), typeof(int), typeof(string), typeof(string), typeof(bool), typeof(int), typeof(int)))
+			else if (count == 8 && TypeChecker.CheckTypes(L, 1, typeof(int), typeof(bool), typeof(int), typeof(string), typeof(string), typeof(bool), typeof(int), typeof(int)))
 			{
-				AvatarCM arg0 = (AvatarCM)ToLua.CheckObject(L, 1, typeof(AvatarCM));
+				int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
 				bool arg1 = LuaDLL.luaL_checkboolean(L, 2);
 				int arg2 = (int)LuaDLL.luaL_checknumber(L, 3);
 				string arg3 = ToLua.CheckString(L, 4);
@@ -219,6 +239,63 @@ public class CreateActorParamWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_Level(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			CreateActorParam obj = (CreateActorParam)o;
+			int ret = obj.Level;
+			LuaDLL.lua_pushinteger(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index Level on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_X(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			CreateActorParam obj = (CreateActorParam)o;
+			float ret = obj.X;
+			LuaDLL.lua_pushnumber(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index X on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_Y(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			CreateActorParam obj = (CreateActorParam)o;
+			float ret = obj.Y;
+			LuaDLL.lua_pushnumber(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index Y on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_CmType(IntPtr L)
 	{
 		object o = null;
@@ -367,6 +444,63 @@ public class CreateActorParamWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index CardID on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_Level(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			CreateActorParam obj = (CreateActorParam)o;
+			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+			obj.Level = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index Level on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_X(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			CreateActorParam obj = (CreateActorParam)o;
+			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
+			obj.X = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index X on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_Y(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			CreateActorParam obj = (CreateActorParam)o;
+			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
+			obj.Y = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index Y on a nil value" : e.Message);
 		}
 	}
 }

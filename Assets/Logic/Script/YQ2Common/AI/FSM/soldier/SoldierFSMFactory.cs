@@ -6,6 +6,11 @@ public class SoldierFSMFactory
 {
     public static void GetTrigger(SoldierTriggerID stateName, List<SoldierFSMTrigger> _fsmTrriggerList)
     {
+        // 除死亡状态以外的任何状态都可以切死亡
+        // 优先检测死亡
+        var siwang = new SiwangTrigger();
+        _fsmTrriggerList.Add(siwang);
+
         switch(stateName){
             case SoldierTriggerID.RuChang:
                 {
@@ -35,28 +40,29 @@ public class SoldierFSMFactory
                 }
             case SoldierTriggerID.PutongGongji:
                 {
+                    var zhunbeizhandou = new ZhunbeizhandouTrigger();
+                    _fsmTrriggerList.Add(zhunbeizhandou);
                     var putongToXingjin = new XingjinTrigger();
                     _fsmTrriggerList.Add(putongToXingjin);
                 }
                 break;
             case SoldierTriggerID.JinengGongji:
                 {
+                    var zhunbeizhandou = new ZhunbeizhandouTrigger();
+                    _fsmTrriggerList.Add(zhunbeizhandou);
                     var jinengToXingjin = new XingjinTrigger();
                     _fsmTrriggerList.Add(jinengToXingjin);
                     break;
                 }
             case SoldierTriggerID.ZhuiJi:
                 {
-                    var zhuijiToXingjin = new XingjinTrigger();
-                    _fsmTrriggerList.Add(zhuijiToXingjin);
                     var zhunbeizhandou = new ZhunbeizhandouTrigger();
                     _fsmTrriggerList.Add(zhunbeizhandou);
+                    var zhuijiToXingjin = new XingjinTrigger();
+                    _fsmTrriggerList.Add(zhuijiToXingjin);
                     break;
                 }
         }
-        //除死亡状态以外的任何状态都可以切死亡
-        var siwang = new SiwangTrigger();
-        _fsmTrriggerList.Add(siwang);
     }
 
     public static SoldierStateID GetStateIDByTrigger(SoldierTriggerID id)

@@ -123,3 +123,35 @@ message SellEquip {
 }
 
 
+message ComposeEquip {
+    required int32  itemId      =1;
+}
+
+
+message ReadMail {
+    required string id          =1;
+}
+
+
+message DelMail {
+    required string id          =1;
+}
+
+
+message GetShopDetail {
+    required int32 shopId       =1;
+}
+
+
+message RefreshShop {
+    required int32 shopId       =1;
+}
+
+
+message BuyShopGood {
+    required int32 shopId       =1;
+    required int32 goodId       =2;
+    required int32 commId       =3;
+}
+
+

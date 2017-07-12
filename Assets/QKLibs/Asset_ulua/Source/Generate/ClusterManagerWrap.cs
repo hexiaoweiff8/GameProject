@@ -17,14 +17,14 @@ public class ClusterManagerWrap
 		L.RegFunction("GoOn", GoOn);
 		L.RegFunction("ClearAll", ClearAll);
 		L.RegFunction("GetPositionObjectListByGraphics", GetPositionObjectListByGraphics);
+		L.RegFunction("CheckRange", CheckRange);
 		L.RegFunction("New", _CreateClusterManager);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("MovementPlanePosition", get_MovementPlanePosition, set_MovementPlanePosition);
-		L.RegVar("MovementWidth", get_MovementWidth, set_MovementWidth);
-		L.RegVar("MovementHeight", get_MovementHeight, set_MovementHeight);
+		L.RegVar("MapWidth", get_MapWidth, set_MapWidth);
+		L.RegVar("MapHeight", get_MapHeight, set_MapHeight);
 		L.RegVar("ForwardAngle", get_ForwardAngle, set_ForwardAngle);
 		L.RegVar("CollisionWeight", get_CollisionWeight, set_CollisionWeight);
-		L.RegVar("CollisionThrough", get_CollisionThrough, set_CollisionThrough);
 		L.RegVar("Friction", get_Friction, set_Friction);
 		L.RegVar("UnitWidth", get_UnitWidth, set_UnitWidth);
 		L.RegVar("Single", get_Single, null);
@@ -227,6 +227,45 @@ public class ClusterManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int CheckRange(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 4 && TypeChecker.CheckTypes(L, 1, typeof(ClusterManager), typeof(ICollisionGraphics), typeof(int), typeof(bool)))
+			{
+				ClusterManager obj = (ClusterManager)ToLua.ToObject(L, 1);
+				ICollisionGraphics arg0 = (ICollisionGraphics)ToLua.ToObject(L, 2);
+				int arg1 = (int)LuaDLL.lua_tonumber(L, 3);
+				bool arg2 = LuaDLL.lua_toboolean(L, 4);
+				System.Collections.Generic.IList<PositionObject> o = obj.CheckRange(arg0, arg1, arg2);
+				ToLua.PushObject(L, o);
+				return 1;
+			}
+			else if (count == 5 && TypeChecker.CheckTypes(L, 1, typeof(ClusterManager), typeof(UnityEngine.Vector2), typeof(float), typeof(int), typeof(bool)))
+			{
+				ClusterManager obj = (ClusterManager)ToLua.ToObject(L, 1);
+				UnityEngine.Vector2 arg0 = ToLua.ToVector2(L, 2);
+				float arg1 = (float)LuaDLL.lua_tonumber(L, 3);
+				int arg2 = (int)LuaDLL.lua_tonumber(L, 4);
+				bool arg3 = LuaDLL.lua_toboolean(L, 5);
+				System.Collections.Generic.IList<PositionObject> o = obj.CheckRange(arg0, arg1, arg2, arg3);
+				ToLua.PushObject(L, o);
+				return 1;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: ClusterManager.CheckRange");
+			}
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_MovementPlanePosition(IntPtr L)
 	{
 		object o = null;
@@ -246,7 +285,7 @@ public class ClusterManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_MovementWidth(IntPtr L)
+	static int get_MapWidth(IntPtr L)
 	{
 		object o = null;
 
@@ -260,12 +299,12 @@ public class ClusterManagerWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MovementWidth on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MapWidth on a nil value" : e.Message);
 		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_MovementHeight(IntPtr L)
+	static int get_MapHeight(IntPtr L)
 	{
 		object o = null;
 
@@ -279,7 +318,7 @@ public class ClusterManagerWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MovementHeight on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MapHeight on a nil value" : e.Message);
 		}
 	}
 
@@ -318,25 +357,6 @@ public class ClusterManagerWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index CollisionWeight on a nil value" : e.Message);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_CollisionThrough(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			ClusterManager obj = (ClusterManager)o;
-			float ret = obj.CollisionThrough;
-			LuaDLL.lua_pushnumber(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index CollisionThrough on a nil value" : e.Message);
 		}
 	}
 
@@ -412,7 +432,7 @@ public class ClusterManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_MovementWidth(IntPtr L)
+	static int set_MapWidth(IntPtr L)
 	{
 		object o = null;
 
@@ -426,12 +446,12 @@ public class ClusterManagerWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MovementWidth on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MapWidth on a nil value" : e.Message);
 		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_MovementHeight(IntPtr L)
+	static int set_MapHeight(IntPtr L)
 	{
 		object o = null;
 
@@ -445,7 +465,7 @@ public class ClusterManagerWrap
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MovementHeight on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MapHeight on a nil value" : e.Message);
 		}
 	}
 
@@ -484,25 +504,6 @@ public class ClusterManagerWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index CollisionWeight on a nil value" : e.Message);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_CollisionThrough(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			ClusterManager obj = (ClusterManager)o;
-			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
-			obj.CollisionThrough = arg0;
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index CollisionThrough on a nil value" : e.Message);
 		}
 	}
 

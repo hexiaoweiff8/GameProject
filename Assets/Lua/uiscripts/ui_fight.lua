@@ -32,7 +32,7 @@ function ui_fight:OnShowDone()
     local localpaiStr = "101001,101002,101003,101004,101005,101006,101007,101008,101009,101001,101002,101003,101004,101005,101006,101007,101008,101009"
     -- -- localpaiStr = "1,2,3,4,5,6"
     --剩余牌库
-    self.paiKutb = string.splitToInt(localpaiStr, ",")
+    self.paiKutb = string.splitToInt(localpaiStr, ",")  
     --打乱牌库
     table.upset(self.paiKutb)
     --当前手牌库
@@ -159,7 +159,7 @@ function ui_fight:OnShowDone()
     --兵阵型右边最宽距离
     self.maxSpan = {}
     --组ID
-    self.groupIndex = 0
+    --self.groupIndex = 0
     --费Bounds
     --费barUISprite
     self.feiBg = self.transform:Find("currentCards_bg/feiBg/feiBg")
@@ -417,11 +417,11 @@ end
 function ui_fight:OnAddHandler()
     ui_fight = self
     --注册玩家下兵事件
-    Event.AddListener(GameEventType.WANJIAXIABING, WANJIAXIABING)
+    --Event.AddListener(GameEventType.WANJIAXIABING, WANJIAXIABING)
     Event.AddListener(GameEventType.HUIFUZANTING, HUIFUZANTING)
 end
 function ui_fight:OnRemoveHandler()
-    Event.RemoveListener(GameEventType.WANJIAXIABING, WANJIAXIABING)
+    --Event.RemoveListener(GameEventType.WANJIAXIABING, WANJIAXIABING)
     Event.RemoveListener(GameEventType.HUIFUZANTING, HUIFUZANTING)
 end
 --判断是否点击到卡牌本身（因为有两个碰撞框）
@@ -454,6 +454,7 @@ function WANJIAXIABING(self)
     end
     --如果敌人费够
     if self.enemyNowFei >= sdata_armycardbase_data:GetFieldV("TrainCost", tempID) then
+        print("WANJIAXIABING")
         local ct = self:getModel(tempID, 5)
         --增加敌人出牌UI
         local euc = GameObject.Instantiate(self.enemyUsedCard)
@@ -499,7 +500,7 @@ end
 --==============================--
 function ui_fight:getModel(id, index)
     if index == 5 then
-        self.groupIndex = self.groupIndex + 1
+        --self.groupIndex = self.groupIndex + 1
     else
         index = self.arrayIndex
     end
@@ -525,7 +526,8 @@ function ui_fight:getModel(id, index)
             tempMod.eulerAngles = Vector3(0, -90, 0)
             local mt = tempMod.gameObject:AddComponent(typeof(RanderControl))
             mt.isEnemy = true
-            mt.groupIndex = self.groupIndex
+            --mt:StartRanderControl()
+            --mt.groupIndex = self.groupIndex
         else
             tempMod.eulerAngles = Vector3(0, 90, 0)
             tempMod.position = Vector3(renderZhenxing[i], 0, renderZhenxing[i + 1]) * self.UnitWidth
@@ -634,13 +636,13 @@ end
 --事件处理
 function ui_fight:doEvent(tf, var, isXiaBing)
     if isXiaBing > 0 then -- 下兵或回收事件
-        lgyPrint("下兵或回收事件")
+        lgyPrint("下兵或回收事件" .. isXiaBing)
         if isXiaBing > 2 then --拖动下兵
             self:backCallback(tf)
             --消耗费
             self.nowFei = self.nowFei - sdata_armycardbase_data:GetFieldV("TrainCost", self.nowHandpaiKutb[var])
             self.nowFeiLabel.text = self.nowFei .. ""
-            Event.Brocast(GameEventType.WANJIAXIABING, self)
+            --Event.Brocast(GameEventType.WANJIAXIABING, self)
         else -- 回收卡
             lgyPrint("回收卡")
             self.feiBar2Spr.gameObject:SetActive(false)
@@ -726,10 +728,10 @@ function ui_fight:backCallback(tf, b)
         -- 删除父级
         Object.Destroy(tmpObj)
     else
-        self.groupIndex = self.groupIndex + 1
+        --self.groupIndex = self.groupIndex + 1
         --从父物体中移除（加入父物体是为了移动的时候只移动父物体）
         for i = 1, self.onPressArmytb[index].childCount do
-            self.onPressArmytb[index]:GetChild(0).gameObject:AddComponent(typeof(RanderControl)).groupIndex = self.groupIndex
+            self.onPressArmytb[index]:GetChild(0).gameObject:AddComponent(typeof(RanderControl))--:StartRanderControl()
             self.onPressArmytb[index]:GetChild(0).parent = nil
         end
         --玩家下兵寻路网格位置(敌人下兵平行位置)
@@ -883,11 +885,14 @@ function ui_fight:Update()
         end
     end
     --敌人费每秒增长
-    self.enemyNowFei = self.enemyNowFei + 1
+    self.enemyNowFei = self.enemyNowFei + 5
+    -- 判断是否满费
     if self.enemyNowFei > self.enemyAllFei then
+        -- 满费出牌
         self.enemyNowFei = self.enemyAllFei
         self.ctPosition = Vector3(25 + math.random(40), 0, 10 + math.random(40))
         WANJIAXIABING(self)
+        -- 为满费但是能够出上次费用不够的牌则出牌
     elseif self.nextEnemyCardFei and self.enemyNowFei > self.nextEnemyCardFei then
         self.nextEnemyCardFei = nil
         WANJIAXIABING(self)

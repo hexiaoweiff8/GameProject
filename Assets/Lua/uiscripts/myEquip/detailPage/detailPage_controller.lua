@@ -15,6 +15,7 @@ local rightPanelDetail
 
 function detailPage_controller:init(equipController)
     view:init_view(equipController)
+    view.rightDetail:SetActive(false)
 end
 ---
 --- 显示装备主界面右侧的装备信息界面

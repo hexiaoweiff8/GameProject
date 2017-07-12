@@ -138,6 +138,24 @@ function EquipUtil:getEquipmentMainAttributeStr(EquipID,AttributeID,lv)
 
 	return str
 end
+
+--■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+--@Des 获取装备主属性数值
+--@params equip:装备对象
+--@return 装备主属性数值
+--■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+function EquipUtil:getMainAttributeValue(equip)
+	local _PlanID = equip.MainAttribute
+	local _AttributeID = equip.fst_attr
+	local _UniqueID = tostring(_PlanID)..tostring(_AttributeID)
+
+	local _AttributeMin = sdata_attributeplan_data.mData.body[tonumber(_UniqueID)][sdata_attributeplan_data.mFieldName2Index['Min']]
+	local _GrowthValue = sdata_attributeplan_data.mData.body[tonumber(_UniqueID)][sdata_attributeplan_data.mFieldName2Index['up']]
+	-- 主属性值 = 最小值 + 装备等级 * 成长系数
+	local _AttributeValue = _AttributeMin + equip.lv * _GrowthValue
+
+	return _AttributeValue
+end
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --@Des 获取装备副属性字符串
 --@params equip:装备Data(混合数据)

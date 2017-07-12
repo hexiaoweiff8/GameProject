@@ -7,8 +7,13 @@ public class JinengGongjiTrigger : SoldierFSMTrigger
     public override bool CheckTrigger(SoldierFSMSystem fsm)
     {
         // 当前单位技能释放判断
-
-        return fsm.IsCanInJinenggongji;
+        switch (fsm.CurrentStateID)
+        {
+            case SoldierStateID.Zhunbeizhandou:
+                return fsm.IsCanInJinenggongji;
+            default :
+                return false;
+        }
     }
 
     public override void Init()

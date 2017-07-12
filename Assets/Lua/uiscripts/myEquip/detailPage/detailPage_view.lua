@@ -6,6 +6,7 @@ local detailPage_view = {}
 local view
 function detailPage_view:init_view(args)
     view = args
+    self.rightDetail = view.transform:Find("rightDetailParent").gameObject
 end
 
 

@@ -21,6 +21,33 @@ local currentTab = 0
 local tabBtn
 local tabPanel
 local tabControl
+
+
+function wnd_cardyc_controller:show3DModel()
+    --添加RenderTexture 实现UI上添加3d模型
+    local playerModelTexture = self.transform:Find("playerModelTexture")
+    local Camera3D = self.transform:Find("Camera3D")
+    self.myTexture = UnityEngine.RenderTexture(1024, 1024, 24)
+    self.myTexture:Create()
+    Camera3D:GetComponent(typeof(UnityEngine.Camera)).targetTexture = self.myTexture
+    playerModelTexture:GetComponent(typeof(UITexture)).mainTexture = self.myTexture
+    --添加玩家3d模型
+    tempMod = DP_FightPrefabManage.InstantiateAvatar(CreateActorParam(AvatarCM.Infantry_R, false, 0, "xuebaotujidui", "xuebaotujidui", true, 0, 0)).transform
+    --tempMod = DP_FightPrefabManage.InstantiateAvatar(CreateActorParam(AvatarCM.Infantry_R, false, 0, "gongjianbing", "gongjianbing", true, 0, 0)).transform
+    tempMod.parent = Camera3D
+    tempMod.localScale = Vector3(0.8, 0.8, 0.8);
+    tempMod.localRotation = Quaternion(0, 180, 0, 1);
+    tempMod.localPosition = Vector3(0, -7, 500);
+    tempMod.gameObject:SetActive(true)
+    tempMod.gameObject.layer = UnityEngine.LayerMask.NameToLayer("3DUI")
+
+    playerModelTexture:GetComponent(typeof(SpinWithMouse)).target = tempMod
+    UIEventListener.Get(playerModelTexture.gameObject).onPress = function(go, args)
+        if args then
+            --self:dianjikongbai()
+        end
+    end
+end
 function wnd_cardyc_controller:OnShowDone()
     --初始化view
     view:init_view(self)
@@ -36,6 +63,7 @@ function wnd_cardyc_controller:OnShowDone()
 
     self:init_tabPanel()
     self:refresh()
+    self:show3DModel()
     
 end
 

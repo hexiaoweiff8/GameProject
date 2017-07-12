@@ -39,6 +39,11 @@ namespace Util
         }
 
         /// <summary>
+        /// kill事件
+        /// </summary>
+        public Action KillDo { get; set; }
+
+        /// <summary>
         /// 是否
         /// </summary>
         public bool IsStop { get; private set; }
@@ -94,10 +99,25 @@ namespace Util
         }
 
         /// <summary>
+        /// kill时执行时间
+        /// </summary>
+        /// <param name="onKill"></param>
+        /// <returns></returns>
+        public Timer OnKill(Action onKill)
+        {
+            KillDo = onKill;
+            return this;
+        }
+
+        /// <summary>
         /// 干掉计时器
         /// </summary>
         public void Kill()
         {
+            if (KillDo != null)
+            {
+                KillDo();
+            }
             IsStop = true;
         }
 
@@ -273,6 +293,14 @@ namespace Util
                     {
                         timer.NextTick();
                         AddTimer(timer);
+                    }
+                    else
+                    {
+                        // 执行OnKill
+                        if (timer.KillDo != null)
+                        {
+                            timer.KillDo();
+                        }
                     }
                 }
             }

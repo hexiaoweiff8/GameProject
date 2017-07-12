@@ -8,9 +8,6 @@ function equip_view:init(args)
     view = args
 end
 function equip_view:getView()
-    --onbody
-    self.btn_equipOnce = view.transform:Find("onBody/btn_equipOnce").gameObject
-    self.btn_fixOnce = view.transform:Find("onBody/btn_fixOnce").gameObject
 
     self.btn_comPropL = view.transform:Find("comProp/btn_propDetail_L").gameObject
     self.btn_comPropR = view.transform:Find("comProp/btn_propDetail_R").gameObject

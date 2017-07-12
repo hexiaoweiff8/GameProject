@@ -421,8 +421,11 @@ public class TrajectoryAlgorithm
                         if (ballistic != null && ballisticArriveTarget != null)
                         {
                             var tmpTargetPos = GetTargetPos(ballistic, ballisticArriveTarget);
-                            // TODO 移动目标可能会有问题
                             var targetDir = tmpTargetPos - ballistic.StartPos;
+                            if (targetDir == Vector3.zero)
+                            {
+                                targetDir = Vector3.one;
+                            }
                             // 判断是否有重力效果
                             if (!ballistic.HasGravity)
                             {

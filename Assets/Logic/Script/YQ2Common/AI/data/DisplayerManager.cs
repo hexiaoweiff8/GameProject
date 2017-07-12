@@ -64,7 +64,9 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
     {
         if (displayPool.ContainsKey(soldiername) && displayPool[soldiername].Count > 0)
         {
-            return displayPool[soldiername].Pop();
+            var go = displayPool[soldiername].Pop();
+            Debug.Log("Go:" + go);
+            return go;
         }
         return DP_FightPrefabManage.InstantiateAvatar(param);
     }
@@ -276,7 +278,7 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
     private void _destoryDisplay(Dictionary<int, DisplayOwner> dict, ObjectID objID)
     {
         ClusterManager.Single.Remove(dict[objID.ID].ClusterData);
-        dict[objID.ID].RanderControl.DestoryFSM();
+        //dict[objID.ID].RanderControl.DestoryFSM();
         dict[objID.ID].RanderControl.bloodBarCom.DestorySelf();
         GameObject.Destroy(dict[objID.ID].RanderControl.gameObject);
     }

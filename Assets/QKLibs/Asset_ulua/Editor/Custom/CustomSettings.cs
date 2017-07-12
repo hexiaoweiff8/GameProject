@@ -8,6 +8,7 @@ using BindType = ToLuaMenu.BindType;
 using System.Reflection;
 
 using UnityEngine.EventSystems;
+using Util;
 
 public static class CustomSettings
 {
@@ -215,6 +216,8 @@ public static class CustomSettings
         _GT(typeof (Types)),
 
         _GT(typeof (TimeTicker)),
+        _GT(typeof (TimerManager)),
+        _GT(typeof (Timer)),
         _GT(typeof (UIEventListener)),
         _GT(typeof (UIDragObjectEX)),
         _GT(typeof (DP_FightPrefabManage)),
@@ -259,7 +262,8 @@ public static class CustomSettings
         _GT(typeof(UIScrollViewItemBase)),
         _GT(typeof(UI_Cangku_Item)),
         _GT(typeof(UIDragScrollView)),
-
+        _GT(typeof(UIToast)),
+        _GT(typeof(UIToast.ShowType)),
     };
 
 

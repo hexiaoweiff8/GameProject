@@ -105,13 +105,14 @@ function MSGID_EquipPlus(body)
     gw2c:ParseFromString(body)
     currencyModel:setPower(gw2c.currency)
     EquipModel:updateEquipData(gw2c.equip)
-    equip_controller:equipPlusRefresh()
+    equip_controller:normalRefresh()
     Event.RemoveListener("10004", MSGID_EquipPlus)
 end
  
 --================================================================
 --@Des 发送锁定/解锁装备请求
---@params eid(number):isLock(number):是否上锁(0不上锁,1上锁),CallBack:服务器返回数据时调用
+--@params eid(number):装备Id
+--        isLock(number):是否上锁(0不上锁,1上锁)
 --================================================================
 function Message_Manager:SendPB_10005(eid, isLock, CallBack)
     lgyPrint('isLock==>' .. isLock);
@@ -148,29 +149,50 @@ function MSGID_10005(body)
     end
 end
 
--- 测试发送PBLUA--
+function Message_Manager:SendPB_lock(equipId, isLock)
+    Event.AddListener("10005",MSGID_lock)
+    local c2gw = c2gw_pb:EquipLock()
+    c2gw.equipId = equipId
+    c2gw.isLock = isLock
+    local msg1 = c2gw:SerializeToString()
+    Message_Manager:createSendPBHeader(10005, msg1)
+end
+function MSGID_lock(body)
+    local gw2c = gw2c_pb.EquipLock()
+    gw2c:ParseFromString(body)
+    EquipModel:updateEquipData(gw2c.equip)
+    equip_controller:normalRefresh()
+    Event.RemoveListener("10005", MSGID_lock)
+end
+
+
+---
+---装备修理
+---
 function Message_Manager:SendPB_10006(id)
+
     local c2gw = c2gw_pb:EquipRepair()
     c2gw.equipId = id
     local msg1 = c2gw:SerializeToString()
     Message_Manager:createSendPBHeader(10006, msg1)
 end
 function MSGID_10006(body)
+
     local gw2c = gw2c_pb.EquipRepair()
     gw2c:ParseFromString(body);
     --装备数据
     local v = gw2c.equip
     local tempTB1 = {}
     for k, v in ipairs(v.sndAttr) do
-        
+
         local tempTB2 = {}
         for k, v in ipairs(v.remake) do
-           
+
             tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
         end
         tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
     end
-    
+
     local value = equipM(v.id, v.eid, v.lv, v.rarity + 1, v.isBad, v.isLock, v.fst_attr, tempTB1)
     local index, index2 = equipP.getIndexByID(v.id)
     if index2 then
@@ -180,6 +202,63 @@ function MSGID_10006(body)
     end
 end
 
+
+
+---
+---修理穿戴的所有装备
+---
+local equipsTofix = nil
+function Message_Manager:SendPB_EquipFixAll(equipList)
+    if equipList and #equipList >= 1 then
+        equipsTofix = equipList
+        Event.AddListener("10006", MSGID_EquipFixAll)
+        local c2gw = c2gw_pb:EquipRepair()
+        c2gw.equipId = equipsTofix[1].id
+        local msg1 = c2gw:SerializeToString()
+        Message_Manager:createSendPBHeader(10006, msg1)
+    end
+end
+
+function MSGID_EquipFixAll(body)
+    local gw2c = gw2c_pb.EquipRepair()
+    gw2c:ParseFromString(body)
+    EquipModel:updateEquipData(gw2c.equip)
+    currencyModel:setPower(gw2c.currency)
+    Event.RemoveListener("10006",MSGID_EquipFixAll)
+
+    if equipsTofix and #equipsTofix > 1 then
+        table.remove(equipsTofix, 1)
+        Message_Manager:SendPB_EquipFixAll(equipsTofix)
+        return
+    end
+    equip_controller:equipFixRefreshAll()
+    equipsTofix = nil
+
+end
+
+---
+---修理一件装备
+---
+function Message_Manager:SendPB_EquipFix(id)
+    Event.AddListener("10006", MSGID_EquipFix)
+    local c2gw = c2gw_pb:EquipRepair()
+    c2gw.equipId = id
+    local msg1 = c2gw:SerializeToString()
+    Message_Manager:createSendPBHeader(10006, msg1)
+end
+function MSGID_EquipFix(body)
+    local gw2c = gw2c_pb.EquipRepair()
+    gw2c:ParseFromString(body)
+    EquipModel:updateEquipData(gw2c.equip)
+    currencyModel:setPower(gw2c.currency)
+    equip_controller:normalRefresh()
+    Event.RemoveListener("10006",MSGID_EquipFix)
+end
+
+
+---
+---不知道干嘛的
+---
 -- 测试发送PBLUA--
 function Message_Manager:SendPB_10007(id, viceId)
     local c2gw = c2gw_pb:EquipRemake()
@@ -194,18 +273,18 @@ function MSGID_10007(body)
     gw2c:ParseFromString(body);
     --装备数据
     local v = gw2c.equip
-   
+
     local tempTB1 = {}
     for k, v in ipairs(v.sndAttr) do
-        
+
         local tempTB2 = {}
         for k, v in ipairs(v.remake) do
-            
+
             tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
         end
         tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
     end
-    
+
     local value = equipM(v.id, v.eid, v.lv, v.rarity + 1, v.isBad, v.isLock, v.fst_attr, tempTB1)
     local index, index2 = equipP.getIndexByID(v.id)
     if index2 then
@@ -238,7 +317,7 @@ function MSGID_10008(body)
         end
         tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
     end
-    
+
     local value = equipM(v.id, v.eid, v.lv, v.rarity + 1, v.isBad, v.isLock, v.fst_attr, tempTB1)
     local index, index2 = equipP.getIndexByID(v.id)
     if index2 then
@@ -253,8 +332,8 @@ end
 ---
 function Message_Manager:SendPB_CardUpLevel(id,lv)
     Event.AddListener("10009", MSGID_CardUpLevel)
-	print("SendPB_10009")
-	local c2gw = c2gw_pb:CardFeed()
+    print("SendPB_10009")
+    local c2gw = c2gw_pb:CardFeed()
     c2gw.cardId	 = id
     c2gw.lvs	 = lv
     local msg = c2gw:SerializeToString()
@@ -263,8 +342,8 @@ function Message_Manager:SendPB_CardUpLevel(id,lv)
 end
 
 function MSGID_CardUpLevel(body)
-	print("MSGID_10009..")
-	local gw2c = gw2c_pb.CardFeed()
+    print("MSGID_10009..")
+    local gw2c = gw2c_pb.CardFeed()
     gw2c:ParseFromString(body)
 
     cardModel:setCardInfo(gw2c.card)
@@ -279,7 +358,7 @@ end
 function Message_Manager:SendPB_10010(id)
     Event.AddListener("10010", MSGID_10010)
     print("SendPB_10010..")
-	local c2gw = c2gw_pb:CardStarup()
+    local c2gw = c2gw_pb:CardStarup()
     c2gw.cardId	 = id
     local msg = c2gw:SerializeToString()
     Message_Manager:createSendPBHeader(10010, msg)
@@ -288,8 +367,8 @@ function Message_Manager:SendPB_10010(id)
 end
 
 function MSGID_10010(body)
-	print("MSGID_10010..")
-	local gw2c = gw2c_pb.CardStarup()
+    print("MSGID_10010..")
+    local gw2c = gw2c_pb.CardStarup()
     gw2c:ParseFromString(body)
     cardModel:setCardInfo(gw2c.card)
     currencyModel:setCoin(gw2c.currency)
@@ -309,8 +388,8 @@ function Message_Manager:SendPB_10011(id)
 end
 
 function MSGID_10011(body)
-	print("MSGID_10011..")
-	local gw2c = gw2c_pb.CardCarryup()
+    print("MSGID_10011..")
+    local gw2c = gw2c_pb.CardCarryup()
     gw2c:ParseFromString(body)
     cardModel:setCardInfo(gw2c.card)
     currencyModel:setCoin(gw2c.currency)
@@ -332,8 +411,8 @@ function Message_Manager:SendPB_10012(id)
 end
 
 function MSGID_10012(body)
-	print("MSGID_10012..")
-	local gw2c = gw2c_pb.CardRankup()
+    print("MSGID_10012..")
+    local gw2c = gw2c_pb.CardRankup()
     gw2c:ParseFromString(body)
     cardModel:setCardInfo(gw2c.card)
     currencyModel:setGold(gw2c.currency)
@@ -349,16 +428,16 @@ function Message_Manager:SendPB_10013(id,slotId)
     Event.AddListener("10013", MSGID_10013)
 
     print("SendPB_10013..")
-	local c2gw = c2gw_pb:CardTakeMedal()
+    local c2gw = c2gw_pb:CardTakeMedal()
     c2gw.cardId	 = id
-    c2gw.slotId = slotId	
+    c2gw.slotId = slotId
     local msg = c2gw:SerializeToString()
     Message_Manager:createSendPBHeader(10013, msg)
 end
 
 function MSGID_10013(body)
-	print("MSGID_10013..")
-	local gw2c = gw2c_pb.CardTakeMedal()
+    print("MSGID_10013..")
+    local gw2c = gw2c_pb.CardTakeMedal()
     gw2c:ParseFromString(body)
     cardModel:setCardInfo(gw2c.card)
     userModel:setItem(gw2c.item)
@@ -374,7 +453,7 @@ function Message_Manager:SendPB_10014(id,skillIndex)
     Event.AddListener("10014", MSGID_10014)
 
     print("SendPB_10014..upSkill")
-	local c2gw = c2gw_pb:SkillLevelup()
+    local c2gw = c2gw_pb:SkillLevelup()
     c2gw.cardId	 = id
     c2gw.skillId = skillIndex
     local msg = c2gw:SerializeToString()
@@ -382,15 +461,13 @@ function Message_Manager:SendPB_10014(id,skillIndex)
 end
 
 function MSGID_10014(body)
-	print("MSGID_10014..upSkill")
-	local gw2c = gw2c_pb.SkillLevelup()
+    print("MSGID_10014..upSkill")
+    local gw2c = gw2c_pb.SkillLevelup()
     gw2c:ParseFromString(body)
     cardModel:setCardInfo(gw2c.card)
     currencyModel:setSkillPt(gw2c.currency)
     upSkill_controller:upSkill_refresh()
-
     Event.RemoveListener("100014", MSGID_10014)
-
 end
 
 ---
@@ -407,8 +484,8 @@ function Message_Manager:SendPB_10015(id,cost)
 end
 
 function MSGID_10015(body)
-	print("MSGID_10015..")
-	local gw2c = gw2c_pb.SkillReset()
+    print("MSGID_10015..")
+    local gw2c = gw2c_pb.SkillReset()
     gw2c:ParseFromString(body)
     cardModel:setCardInfo(gw2c.card)
     currencyModel:setSkillPt(gw2c.currency)
@@ -433,8 +510,8 @@ function Message_Manager:SendPB_10018(cardId,synergyId)
 end
 
 function MSGID_10018(body)
-	print("MSGID_10018..")
-	local gw2c = gw2c_pb.CardUnionLvlup()
+    print("MSGID_10018..")
+    local gw2c = gw2c_pb.CardUnionLvlup()
     gw2c:ParseFromString(body)
     cardModel:setCardInfo(gw2c.card)
     currencyModel:setCoin(gw2c.currency)
@@ -487,6 +564,26 @@ function MSGID_loadOrNot(body)
     Event.RemoveListener("10021", MSGID_loadOrNot)
 end
 
+function Message_Manager:SendPB_loadBest(idList)
+    Event.AddListener("10021", MSGID_loadBest)
+    local c2gw = c2gw_pb:EquipFit()
+    for k,v in ipairs(idList) do
+        table.insert(c2gw.lst,v)
+    end
+    local msg = c2gw:SerializeToString()
+    Message_Manager:createSendPBHeader(10021, msg)
+
+end
+function MSGID_loadBest(body)
+    local gw2c = gw2c_pb.EquipFit()
+    gw2c:ParseFromString(body)
+    EquipModel.serv_fitEquipmentList = gw2c.lst
+    for k, v in ipairs(EquipModel.serv_Equipment) do
+        v.equipped = EquipUtil:whetherHasBeenEquipped(v.id)
+    end
+    equip_controller:equipLoadBestRefresh()
+    Event.RemoveListener("10021", MSGID_loadBest)
+end
 
 --================================================================
 --@Des 出售物品
@@ -495,12 +592,12 @@ end
 function Message_Manager:SendPB_10022(itemList,CallBack)
     local c2gw = c2gw_pb:SellItem()
 
-     for k,v in pairs(itemList) do
+    for k,v in pairs(itemList) do
         -- table.insert(c2gw.item,{id = v.id,num = v.num})
-         table.insert(c2gw.item,v)
-         print(k.." "..type(v))
+        table.insert(c2gw.item,v)
+        print(k.." "..type(v))
 
-     end
+    end
 
     local msg = c2gw:SerializeToString()
     Message_Manager:createSendPBHeader(10022, msg)
@@ -510,18 +607,19 @@ function Message_Manager:SendPB_10022(itemList,CallBack)
 end
 --================================================================
 --@Des 装备分解
---@params sellType:分解方式(0：金币 1：钻石),equipList:装备唯一id列表{id,...}
+--@params sellType:分解方式(0：金币 1：钻石)
+--        equipList:装备唯一id列表{id,...}
 --================================================================
 function Message_Manager:SendPB_10023(sellType,equipList,CallBack)
     local c2gw = c2gw_pb:SellEquip()
 
     c2gw.sellType = sellType
 
-     for k,v in pairs(equipList) do
+    for k,v in pairs(equipList) do
         -- table.insert(c2gw.item,{id = v.id,num = v.num})
-         table.insert(c2gw.equip,v)
-         print(k.." "..type(v))
-     end
+        table.insert(c2gw.equip,v)
+        print(k.." "..type(v))
+    end
 
     local msg = c2gw:SerializeToString()
     Message_Manager:createSendPBHeader(10023, msg)
@@ -530,7 +628,75 @@ function Message_Manager:SendPB_10023(sellType,equipList,CallBack)
         Event.AddListener("10023",CallBack)
     end
 end
+--================================================================
+--@Des 碎片合成
+--@params itemId:碎片ID
+--================================================================
+function Message_Manager:SendPB_10024(itemId,CallBack)
+    local c2gw = c2gw_pb:ComposeEquip()
 
+    c2gw.itemId = itemId
+
+    local msg = c2gw:SerializeToString()
+    Message_Manager:createSendPBHeader(10024, msg)
+
+    if CallBack then
+        Event.AddListener("10024",CallBack)
+    end
+end
+--================================================================
+--@Des 拉取商店商品列表
+--@params shopId:商店ID
+--================================================================
+function Message_Manager:SendPB_10027(shopId,CallBack)
+    local c2gw = c2gw_pb:GetShopDetail()
+
+    c2gw.shopId = shopId
+
+    local msg = c2gw:SerializeToString()
+    Message_Manager:createSendPBHeader(10027, msg)
+
+    if CallBack then
+        Event.AddListener("10027",CallBack)
+    end
+end
+--================================================================
+--@Des 刷新商店商品列表
+--@params shopId:商店ID
+--================================================================
+function Message_Manager:SendPB_10028(shopId,CallBack)
+    local c2gw = c2gw_pb:RefreshShop()
+
+    c2gw.shopId = shopId
+
+    local msg = c2gw:SerializeToString()
+    Message_Manager:createSendPBHeader(10028, msg)
+
+    if CallBack then
+        Event.AddListener("10028",CallBack)
+    end
+end
+--================================================================
+--@Des 购买商店商品
+--@params shopId  int32   商店ID
+--        goodId  int32   商品槽位ID
+--        commId  int32   商品ID（GoodItem中的id）
+--================================================================
+function Message_Manager:SendPB_10029(shopId,goodId,commId,CallBack)
+    local c2gw = c2gw_pb:BuyShopGood()
+
+    c2gw.shopId = shopId
+    c2gw.goodId = goodId
+    c2gw.goodId = goodId
+    c2gw.commId = commId
+
+    local msg = c2gw:SerializeToString()
+    Message_Manager:createSendPBHeader(10029, msg)
+
+    if CallBack then
+        Event.AddListener("10029",CallBack)
+    end
+end
 
 function Message_Manager:createSendPBHeader(msgId, body)
     local header = header_pb.Header()
@@ -548,7 +714,6 @@ function Message_Manager:createSendPBHeader(msgId, body)
     buffer:WriteBuffer(msg2)
     networkMgr:SendMessage(buffer)
 end
-
 
 function Message_Manager:getAllData(gw2c)
     --保存角色信息
@@ -570,9 +735,11 @@ function Message_Manager:getAllData(gw2c)
     wnd_cangku_controller:processServData(gw2c.user.item)
     wnd_cangku_controller:sortServData()
     wnd_cangku_controller:mergeServData()
+    --初始化商店model
+    wnd_shop_model = require("uiscripts/shop/wnd_shop_model")
+    wnd_shop_model:initModel()
+    wnd_shop_model.serv_CurrencyInfo = gw2c.user.currency
 end
-
-
 
 --==============================--
 --desc:在事件管理类里注册消息监听
@@ -585,7 +752,7 @@ function Message_Manager:OnAddHandler()
     Event.AddListener("10003", MSGID_10003)
     --Event.AddListener("10004", MSGID_10004)
     Event.AddListener("10005", MSGID_10005)
-    Event.AddListener("10006", MSGID_10006)
+    --Event.AddListener("10006", MSGID_10006)
     Event.AddListener("10007", MSGID_10007)
     Event.AddListener("10008", MSGID_10008)
     --Event.AddListener("10009", MSGID_10009)
@@ -606,7 +773,7 @@ end
 --@return 
 --==============================--
 function Message_Manager:OnRemoveHandler()
-	--[[
+    --[[
     Event.RemoveListener("10001", MSGID_10001)
     Event.RemoveListener("10002", MSGID_10002)
     Event.RemoveListener("10003", MSGID_10003)

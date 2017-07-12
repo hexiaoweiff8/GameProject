@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
+
 /// <summary>
 /// 状态机主类 管理各状态切换
 /// </summary>
@@ -64,6 +64,11 @@ public class SoldierFSMSystem {
     /// 当前状态
     /// </summary>
     public SoldierFSMState CurrentState { get { return _currentState; } }
+
+    /// <summary>
+    /// 来源状态
+    /// </summary>
+    public SoldierStateID SourceStateID { get; set; }
 
     // ----------------------------私有属性----------------------------
 
@@ -131,13 +136,12 @@ public class SoldierFSMSystem {
     public void ChangeState(SoldierStateID stateId)
     {
         if (stateId == SoldierStateID.NullState)
-
         {
             Debug.LogError("SoldierFSM ERROR: 不允许切换空状态");
-
         }
 
-        foreach (SoldierFSMState state in _states)//遍历此状态容器 
+        //遍历此状态容器 
+        foreach (SoldierFSMState state in _states)
         {
             if (state.StateID == stateId)
             {
@@ -145,6 +149,8 @@ public class SoldierFSMSystem {
                 {
                     _currentState.DoBeforeLeaving(this);
                 }
+                // 设置前置状态
+                SourceStateID = _currentStateId;
                 //只允许在这里切换状态
                 _currentState = state;
                 _currentStateId = state.StateID;
@@ -153,11 +159,16 @@ public class SoldierFSMSystem {
                 {
                     _currentState.DoBeforeEntering(this);
                 }
+                // TODO 同步状态切换操作
+                // 同步数据包括 状态, FSM数据, 单位属性, 单位位置, 单位方向, 目标点列表(路径), 目标(技能/攻击目标)
                 break;
             }
         }
     }
 
+    /// <summary>
+    /// 销毁
+    /// </summary>
     public void Destory()
     {
         foreach (var state in _states)
@@ -165,5 +176,14 @@ public class SoldierFSMSystem {
             state.Destory();
         }
         _states.Clear();
+    }
+
+    /// <summary>
+    /// 设置数据
+    /// </summary>
+    /// <param name="fsm"></param>
+    public void SetData(SoldierFSMControl fsm)
+    {
+
     }
 }

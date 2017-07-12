@@ -2,19 +2,60 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+
 /// <summary>
 /// 准备战斗触发器
 /// </summary>
 public class ZhunbeizhandouTrigger : SoldierFSMTrigger
 {
-
+    /// <summary>
+    /// 初始化
+    /// </summary>
     public override void Init()
     {
         triggerId = SoldierTriggerID.Zhunbeizhandou;
     }
 
-
+    /// <summary>
+    /// 检测条件
+    /// </summary>
+    /// <param name="fsm"></param>
+    /// <returns></returns>
     public override bool CheckTrigger(SoldierFSMSystem fsm)
+    {
+        // 状态检查路由
+        switch (fsm.CurrentStateID)
+        {
+            // 行进追击切准备战斗
+            case SoldierStateID.Xingjin:
+            case SoldierStateID.ZhuiJi:
+            {
+                return CheckChangeState(fsm);
+            }
+            // 技能攻击/普通攻击切准备战斗
+            case SoldierStateID.PutongGongji:
+            case SoldierStateID.JinengGongji:
+            {
+                //// 如果有正在攻击目标则 不切换状态
+                //// 判断是否有正在攻击的目标
+                //if ((!fsm.IsCanInJinenggongji && !fsm.IsCanInPutonggongji) || fsm.TargetIsLoseEfficacy)
+                //{
+                //    // 可以切换
+                //    return CheckChangeState(fsm);
+                //}
+
+                return false;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 检查是否可以切换状态
+    /// </summary>
+    /// <param name="fsm"></param>
+    /// <returns></returns>
+    private bool CheckChangeState(SoldierFSMSystem fsm)
     {
         var searchData = fsm.Display.ClusterData;
         //var objId = searchData.MemberData.ObjID;
@@ -47,10 +88,7 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger
                 fsm.IsCanInPutonggongji = true;
                 return true;
             }
-            return false;
         }
-
-
         return false;
     }
 
@@ -101,7 +139,7 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger
                 // TODO 按照技能释放Enum来获取能够释放的技能
                 // 触发一个目标是敌人的技能
                 // 技能没有在CD中
-                if (CDTimer.Instance().IsInCD(skill.Num, fsm.Display.ClusterData.AllData.MemberData.ObjID.ID, skill.CDGroup))
+                if (!CDTimer.Instance().IsInCD(skill.Num, fsm.Display.ClusterData.AllData.MemberData.ObjID.ID, skill.CDGroup))
                 {
                     continue;
                 }

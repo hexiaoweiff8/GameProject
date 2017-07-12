@@ -9,6 +9,7 @@ wnd_cangku_view = {
 	-- Panel (inc Panel.panel.gameObject)
 	Panel_Tab = {
 		TabButtons = {},
+		sTabTop,
 	},
 	Panel_depository = {
 		ListView,
@@ -65,10 +66,6 @@ wnd_cangku_view = {
 	},
 	-- MessageBox
 	MessageBox = {
-		Toast = {
-			Label,
-			Sprite,
-		},
 		mBox = {
 			Label,
 			Button_back,
@@ -144,6 +141,7 @@ function wnd_cangku_view:initView(root)
 
 	--★ui_cangku Panel_Tab
 	this.pButton_yeka = self.transform:Find("Panel_Tab/Widget_Tab/pButton").gameObject
+	this.Panel_Tab.sTabTop = self.transform:Find("Panel_Tab/Widget_Tab/sTabTop").gameObject
 
 	--★ui_cangku Panel_depository	
 	this.Panel_depository = {
@@ -216,12 +214,6 @@ function wnd_cangku_view:initView(root)
 
 	--★ui_cangku MessageBox
 	this.MessageBox.panel = self.transform:Find("MessageBox").gameObject
-
-	this.MessageBox.Toast = {
-			Label = self.transform:Find("MessageBox/Toast/Label").gameObject,
-			Sprite = self.transform:Find("MessageBox/Toast/Sprite").gameObject,
-		}
-	this.MessageBox.Toast.panel = self.transform:Find("MessageBox/Toast").gameObject
 
 	this.MessageBox.mBox = {
 			Label = self.transform:Find("MessageBox/mBox/Label").gameObject,
