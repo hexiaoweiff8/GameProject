@@ -70,7 +70,7 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger
             ClusterManager.Single.CheckRange(pos, searchData.AllData.MemberData.AttackRange, searchData.AllData.MemberData.Camp, true));
 
         Utils.DrawGraphics(new CircleGraphics(pos, searchData.AllData.MemberData.AttackRange), Color.yellow);
-        if (list.Count > 0)
+        if (list != null && list.Count > 0)
         {
             // 攻击目标
             fsm.TargetIsLoseEfficacy = false;
@@ -175,9 +175,13 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger
     private bool SetTarget(SoldierFSMSystem fsm, IList<PositionObject> res)
     {
         //var ran = new System.Random();
+        if (res == null || res.Count == 0)
+        {
+            return false;
+        }
         // TODO 取最近的
         var target = res[0];
         fsm.EnemyTarget = DisplayerManager.Single.GetElementByPositionObject(target);
-        return res.Count > 0;
+        return fsm.EnemyTarget != null;
     }
 }

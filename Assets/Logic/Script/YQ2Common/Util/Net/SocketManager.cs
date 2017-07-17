@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -186,42 +187,104 @@ public class SocketManager : ILoopItem
     }
 
 
+    ///// <summary>
+    ///// 链接Socket udp
+    ///// </summary>
+    ///// <param name="ip">目标IP</param>
+    ///// <param name="port">目标端口</param>
+    ///// <returns>是否链接成功</returns>
+    //public bool ConnectUDP(string ip, int port)
+    //{
+    //    // 关闭已有链接.
+    //    Close();
+    //    Debug.Log("开始链接:" + ip + ":" + port);
+
+    //    // 建立链接类
+    //    socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp); 
+
+    //    // 建立IP地址对象
+    //    var ipAddress = IPAddress.Parse(ip);
+    //    // 建立端口对象
+    //    var portObj = new IPEndPoint(ipAddress, port);
+
+    //    // 异步请求建立链接
+    //    var result = socket.BeginConnect(portObj, (ayResult) =>
+    //    {
+    //        ConnectSuccess = true;
+    //        Debug.Log("链接成功");
+    //    }, socket);
+
+    //    // 强制同步等待连接完成
+    //    var isSuccess = result.AsyncWaitHandle.WaitOne(WaitTime, true);
+    //    if (!isSuccess)
+    //    {
+    //        Close();
+    //        Debug.Log("连接超时");
+    //        return false;
+    //    }
+    //    else
+    //    {
+    //        // 保存IP与Port
+    //        connectingAddress = ip;
+    //        connectingPort = port;
+    //        // 接收消息Callback
+    //        AsyncCallback receiveCallback = null;
+    //        receiveCallback = (ayResult) =>
+    //        {
+    //            try
+    //            {
+    //                // 收到消息
+    //                SocketError se;
+    //                // 收到的字节数量
+    //                var receivedByteCount = socket.EndReceive(ayResult, out se);
+    //                Debug.Log("收到数据, 长度:" + receivedByteCount + ",error:" + se.ToString());
+    //                if (receivedByteCount > 0)
+    //                {
+    //                    // 保证线程数据安全
+    //                    lock (receivedBuffer)
+    //                    {
+    //                        receivedBuffer = ByteUtils.ConnectByte(receivedBuffer, buffer, 0, receivedByteCount);
+    //                    }
+    //                    // 继续接收数据
+    //                    socket.BeginReceive(buffer, 0, BuffSize, SocketFlags.None, receiveCallback, socket);
+    //                }
+    //                else if (receivedByteCount == 0)
+    //                {
+    //                    Debug.Log("收到0长度数据");
+    //                }
+    //            }
+    //            catch (Exception e)
+    //            {
+    //                Debug.Log("数据解析错误:" + e.ToString());
+    //            }
+    //        };
+    //        // 开始接收消息
+    //        socket.BeginReceive(buffer, 0, BuffSize, SocketFlags.None, receiveCallback, socket);
+    //    }
+
+    //    return true;
+    //}
+
+
     /// <summary>
-    /// 链接Socket
+    /// 链接Socket TCP
     /// </summary>
     /// <param name="ip">目标IP</param>
     /// <param name="port">目标端口</param>
     /// <returns>是否链接成功</returns>
     public bool Connect(string ip, int port)
-    {
-        // 关闭已有链接.
+    {// 关闭已有链接.
         Close();
         Debug.Log("开始链接:" + ip + ":" + port);
 
         // 建立链接类
-        socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
         // 建立IP地址对象
         var ipAddress = IPAddress.Parse(ip);
-        // 建立端口对象
-        var portObj = new IPEndPoint(ipAddress, port);
-
+        var ipEndPoint = new IPEndPoint(ipAddress, port);
         // 异步请求建立链接
-        var result = socket.BeginConnect(portObj, (ayResult) =>
-        {
-            ConnectSuccess = true;
-            Debug.Log("链接成功");
-        }, socket);
-
-        // 强制同步等待连接完成
-        var isSuccess = result.AsyncWaitHandle.WaitOne(WaitTime, true);
-        if (!isSuccess)
-        {
-            Close();
-            Debug.Log("连接超时");
-            return false;
-        }
-        else
+        var async = socket.BeginConnect(ipEndPoint, (ia) =>
         {
             // 保存IP与Port
             connectingAddress = ip;
@@ -259,7 +322,11 @@ public class SocketManager : ILoopItem
             };
             // 开始接收消息
             socket.BeginReceive(buffer, 0, BuffSize, SocketFlags.None, receiveCallback, socket);
-        }
+        }, socket);
+
+        async.AsyncWaitHandle.WaitOne(5000, true);
+
+        socket.EndConnect(async);
 
         return true;
     }
@@ -273,16 +340,8 @@ public class SocketManager : ILoopItem
     {
         if (socket == null || !socket.Connected)
         {
-            if (string.IsNullOrEmpty(connectingAddress) || connectingPort == 0)
-            {
-                Debug.LogError("请先链接再发送消息");
-                return false;
-            }
-            if (!Connect(connectingAddress, connectingPort))
-            {
-                Debug.LogError("链接失败");
-                return false;
-            }
+            Debug.LogError("请先链接再发送消息");
+            return false;
         }
         if (msg == null || msg.Length == 0)
         {
@@ -323,7 +382,7 @@ public class SocketManager : ILoopItem
     /// </summary>
     /// <param name="msgList">数据list</param>
     /// <returns></returns>
-    public bool Send(List<byte[]> msgList)
+    public bool SendList(List<byte[]> msgList)
     {
         if (socket == null || !socket.Connected)
         {
@@ -375,6 +434,62 @@ public class SocketManager : ILoopItem
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// 将消息序列化为二进制的方法
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    public static byte[] Serialize<T>(T model)
+    {
+        try
+        {
+            //涉及格式转换，需要用到流，将二进制序列化到流中
+            using (var ms = new MemoryStream())
+            {
+                //使用ProtoBuf工具的序列化方法
+                ProtoBuf.Serializer.Serialize(ms, model);
+                //定义二级制数组，保存序列化后的结果
+                var result = new byte[ms.Length];
+                //将流的位置设为0，起始点
+                ms.Position = 0;
+                //将流中的内容读取到二进制数组中
+                ms.Read(result, 0, result.Length);
+                return result;
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("序列化失败: " + ex.ToString());
+            return null;
+        }
+    }
+
+    // 将收到的消息反序列化成对象
+    // < returns>The serialize.< /returns>
+    // < param name="msg">收到的消息.</param>
+    public static T DeSerialize<T>(byte[] msg)
+    {
+        try
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                //将消息写入流中
+                ms.Write(msg, 0, msg.Length);
+                //将流的位置归0
+                ms.Position = 0;
+                //使用工具反序列化对象
+                T result = ProtoBuf.Serializer.Deserialize<T>(ms);
+                return result;
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("反序列化失败: " + ex.ToString());
+            return default(T);
+        }
     }
 
 
@@ -528,7 +643,7 @@ public static class ByteUtils
     /// <returns></returns>
     public static byte[] AddDataHead(byte[] msg)
     {
-        if (msg == null || msg.Length == 0)
+        if (msg == null)
         {
             return null;
         }
@@ -544,7 +659,7 @@ public static class ByteUtils
     /// <returns></returns>
     public static byte[] GetDataWithHead(byte[] msg)
     {
-        if (msg == null || msg.Length == 0)
+        if (msg == null)
         {
             return null;
         }
@@ -579,7 +694,7 @@ public static class ByteUtils
     /// <returns></returns>
     public static byte[] GetSubBytes(byte[] bytes, int start, int length)
     {
-        if (bytes == null || bytes.Length == 0)
+        if (bytes == null)
         {
             return null;
         }

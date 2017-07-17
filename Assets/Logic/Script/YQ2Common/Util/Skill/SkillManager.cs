@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 
 /// <summary>
@@ -374,8 +375,12 @@ public class SkillManager
     /// </summary>
     /// <param name="skillsList">被检查列表</param>
     /// <param name="triggerData">事件数据</param>
-    public void CheckAndDoSkillInfo(IList<SkillInfo> skillsList, TriggerData triggerData)
+    public void CheckAndDoSkillInfo([NotNull]IList<SkillInfo> skillsList, TriggerData triggerData)
     {
+        if (skillsList.Count == 0)
+        {
+            return;
+        }
         // 如果攻击时触发
         foreach (var skill in skillsList.Where(
                 skill => skill != null && skill.TriggerLevel1 == triggerData.TypeLevel1 &&  skill.TriggerLevel2 == triggerData.TypeLevel2).ToArray())

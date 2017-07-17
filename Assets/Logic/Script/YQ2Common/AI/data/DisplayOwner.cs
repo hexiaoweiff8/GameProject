@@ -1,10 +1,12 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 using UnityEngine;
 
 
 /// <summary>
 /// 显示单位包装对象
 /// </summary>
+[Serializable]
 public class DisplayOwner
 {
     /// <summary>

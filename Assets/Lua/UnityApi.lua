@@ -14157,6 +14157,9 @@ name = nil
 -- property: HideFlags RanderControl.hideFlags	get	set	
 hideFlags = nil 
 --*
+----Void RanderControl:Begin()
+function Begin() end 
+
 ----Void RanderControl:DestoryFSM()
 function DestoryFSM() end 
 
@@ -14567,6 +14570,9 @@ name = nil
 -- property: HideFlags AstarFight.hideFlags	get	set	
 hideFlags = nil 
 --*
+----Void AstarFight:InitMap()
+function InitMap() end 
+
 ----Void AstarFight:isZhangAi(Vector3 mp,Int32 index)
 function isZhangAi() end 
 

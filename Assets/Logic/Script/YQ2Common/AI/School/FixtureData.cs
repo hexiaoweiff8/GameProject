@@ -7,6 +7,7 @@ using UnityEngine;
 /// <summary>
 /// 固定障碍物
 /// </summary>
+[Serializable]
 public class FixtureData : PositionObject
 {
     public FixtureData()

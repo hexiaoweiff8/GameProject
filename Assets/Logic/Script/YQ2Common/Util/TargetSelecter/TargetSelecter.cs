@@ -73,10 +73,8 @@ public class TargetSelecter
     public IList<T> TargetFilter<T>(T searchObj, IList<T> dataList) where T : IAllDataHolder, IBaseMember, IGraphicsHolder
     {
         IList<T> result = null;
-        if (searchObj != null && searchObj.AllData.MemberData != null && dataList != null)
+        if (searchObj != null && searchObj.AllData.MemberData != null && searchObj.AllData.MemberData.MultiAimMax > 0 && dataList != null)
         {
-
-
             // 单位数量
             var targetCount = searchObj.AllData.MemberData.MultiAimMax;
             // 目标列表Array

@@ -204,6 +204,7 @@ function ui_fight:OnShowDone()
                 self.allrenderZhenxingList = self.AstarFight:setAllZhenxingList(self.paiKutb, self.paiKuLeveltb)
             end
         end
+        self.AstarFight:InitMap()
     end)
     local cardBoxCollider = self.transform:Find("currentCards_bg/currentCard" .. 1):GetComponent(typeof(UnityEngine.BoxCollider)).size
     -----------------------------------卡牌UI获取
@@ -306,7 +307,7 @@ function ui_fight:OnShowDone()
                 --是否在下兵区域中（上下UI区域）
                 local isenterRect = (tempY > self.downCardY) and (tempY < self.upCardY)
                 
-                
+                -- TODO 操作
                 if isFeiEnough and isenterRect then --拖到屏幕中
                     --print("333")
                     self:doEvent(tf, var, 3)
@@ -524,8 +525,9 @@ function ui_fight:getModel(id, index)
         if index == 5 then --如果是敌方则阵型水平翻转
             tempMod.position = Vector3(-renderZhenxing[i], 0, renderZhenxing[i + 1]) * self.UnitWidth
             tempMod.eulerAngles = Vector3(0, -90, 0)
-            local mt = tempMod.gameObject:AddComponent(typeof(RanderControl))
+            local mt = tempMod.gameObject:GetComponent(typeof(RanderControl))
             mt.isEnemy = true
+            mt:Begin()
             --mt:StartRanderControl()
             --mt.groupIndex = self.groupIndex
         else
@@ -638,6 +640,8 @@ function ui_fight:doEvent(tf, var, isXiaBing)
     if isXiaBing > 0 then -- 下兵或回收事件
         lgyPrint("下兵或回收事件" .. isXiaBing)
         if isXiaBing > 2 then --拖动下兵
+            -- 下兵事件
+            -- 将下兵消息发送
             self:backCallback(tf)
             --消耗费
             self.nowFei = self.nowFei - sdata_armycardbase_data:GetFieldV("TrainCost", self.nowHandpaiKutb[var])
@@ -731,8 +735,9 @@ function ui_fight:backCallback(tf, b)
         --self.groupIndex = self.groupIndex + 1
         --从父物体中移除（加入父物体是为了移动的时候只移动父物体）
         for i = 1, self.onPressArmytb[index].childCount do
-            self.onPressArmytb[index]:GetChild(0).gameObject:AddComponent(typeof(RanderControl))--:StartRanderControl()
+            local rander = self.onPressArmytb[index]:GetChild(0).gameObject:GetComponent(typeof(RanderControl))--:Begin()--:StartRanderControl()
             self.onPressArmytb[index]:GetChild(0).parent = nil
+            rander:Begin()
         end
         --玩家下兵寻路网格位置(敌人下兵平行位置)
         self.ctPosition = self.AstarFight:getNum(self.onPressArmytb[index].position)
@@ -884,19 +889,19 @@ function ui_fight:Update()
             self.nowFeiLabel.text = math.round(self.nowFei) .. ""
         end
     end
-    --敌人费每秒增长
-    self.enemyNowFei = self.enemyNowFei + 5
-    -- 判断是否满费
-    if self.enemyNowFei > self.enemyAllFei then
-        -- 满费出牌
-        self.enemyNowFei = self.enemyAllFei
-        self.ctPosition = Vector3(25 + math.random(40), 0, 10 + math.random(40))
-        WANJIAXIABING(self)
-        -- 为满费但是能够出上次费用不够的牌则出牌
-    elseif self.nextEnemyCardFei and self.enemyNowFei > self.nextEnemyCardFei then
-        self.nextEnemyCardFei = nil
-        WANJIAXIABING(self)
-    end
+    -- --敌人费每秒增长
+    -- self.enemyNowFei = self.enemyNowFei + 5
+    -- -- 判断是否满费
+    -- if self.enemyNowFei > self.enemyAllFei then
+    --     -- 满费出牌
+    --     self.enemyNowFei = self.enemyAllFei
+    --     self.ctPosition = Vector3(25 + math.random(40), 0, 10 + math.random(40))
+    --     WANJIAXIABING(self)
+    --     -- 为满费但是能够出上次费用不够的牌则出牌
+    -- elseif self.nextEnemyCardFei and self.enemyNowFei > self.nextEnemyCardFei then
+    --     self.nextEnemyCardFei = nil
+    --     WANJIAXIABING(self)
+    -- end
 end
 function ui_fight:OnDestroyDone()
     self.PTZCameraTf.position = Vector3(0, self.PTZCameraTf.position.y, self.PTZCameraTf.position.z)

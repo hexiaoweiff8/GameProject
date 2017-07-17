@@ -178,10 +178,27 @@ public class AstarFight : MonoBehaviour
     /// </summary>
     private void Init()
     {
+        // 初始化集群管理
+        var loadMapPos = LoadMap.GetLeftBottom();
+        ClusterManager.Single.Init(loadMapPos.x, loadMapPos.z, MapWidth, MapHeight, UnitWidth, mapInfoData);
+        // 加载TriggerTicker
+        TriggerTicker.Single.StopAndClear();
+        TriggerTicker.Single.Start();
+
+        // TODO 测试连接服务器
+        SocketManager.Single.Connect("127.0.0.1", 6000);
+
+        // 启动数据缓存传输器
+    }
+
+    /// <summary>
+    /// 初始化地图
+    /// </summary>
+    public void InitMap()
+    {
         //var mapInfoPath = Application.dataPath + Path.AltDirectorySeparatorChar + "mapinfo";
         //var mapInfoStr = Utils.LoadFileInfo(mapInfoPath);
         //mapInfoData = DeCodeInfo(mapInfoStr);
-
         // TODO 加载0001地图第1层 后期该值由外部传入
         // TODO 同时加载两层 
         mapInfoData = MapManager.Instance().GetMapInfoById(1, 1);
@@ -198,21 +215,9 @@ public class AstarFight : MonoBehaviour
             TargetY = MapHeight - 1;
         }
         LoadMap.Init(mapInfoData, UnitWidth);
-        // 初始化集群管理
-        var loadMapPos = LoadMap.GetLeftBottom();
-        ClusterManager.Single.Init(loadMapPos.x + MapWidth * UnitWidth * 0.5f, loadMapPos.z + MapHeight * UnitWidth * 0.5f, MapWidth, MapHeight, UnitWidth, mapInfoData);
-
         // 解析地图
         MapManager.Instance().AnalysisBuidingMap(mapInfoData);
         MapManager.Instance().AnalysisBuidingMap(mapInfoBuildingData);
-        // 加载TriggerTicker
-        TriggerTicker.Single.StopAndClear();
-        TriggerTicker.Single.Start();
-
-        // TODO 测试连接服务器
-        SocketManager.Single.Connect("127.0.0.1", 6000);
-
-        // 启动数据缓存传输器
     }
 
 
@@ -653,9 +658,12 @@ public class AstarFight : MonoBehaviour
         ClusterData clusterData = data;
         clusterData.RotateSpeed = 10;
         clusterData.RotateWeight = 1;
-        clusterData.MaxSpeed = clusterData.AllData.MemberData.MoveSpeed;
+        //clusterData.MaxSpeed = clusterData.AllData.MemberData.MoveSpeed;
         clusterData.Diameter *= ClusterManager.Single.UnitWidth;
-        clusterData.PushTargetList(Utils.NumToPostionByList(LoadMap.MapPlane.transform.position, path, UnitWidth, MapWidth, MapHeight));
+        if (path != null && path.Count > 0)
+        {
+            clusterData.PushTargetList(Utils.NumToPostionByList(LoadMap.MapPlane.transform.position, path, UnitWidth, MapWidth, MapHeight));
+        }
         // 默认出事状态不行进
         clusterData.Stop();
         ClusterManager.Single.Add(clusterData);

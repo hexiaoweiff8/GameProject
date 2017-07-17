@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.IO;
+using ProtoBuf;
+using UnityEngine;
 
 public class RanderControl : MonoBehaviour
 {
@@ -21,13 +23,67 @@ public class RanderControl : MonoBehaviour
     /// </summary>
     [HideInInspector]
     public MFAModelRender ModelRander;
+    
+    /// <summary>
+    /// 显示持有类
+    /// </summary>
     private DisplayOwner data;
-    private SoldierFSMControl _control;
 
-    void Start()
+    /// <summary>
+    /// FSM状态机控制器
+    /// </summary>
+    private SoldierFSMControl _control;
+    /// <summary>
+    /// 是否已启动
+    /// </summary>
+    private bool isStart = false;
+
+
+    public void Begin()
     {
+        isStart = true;
         LoadSource();
         StartFSM();
+
+        // TODO 测试确认下兵
+        // 添加同步数据
+        var msgOp = MsgFactory.GetMsgOptional(1, gameObject.transform.position.x, gameObject.transform.position.y,
+            gameObject.transform.position.z, 
+                "ObjectId:" + data.ClusterData.AllData.MemberData.ObjID +
+                ",UniqueId:" + data.ClusterData.AllData.MemberData.UniqueID);
+
+        // 序列化
+        var msgOpSer = SocketManager.Serialize(msgOp);
+        // 包装数据
+        var msgHead = MsgFactory.GetMsgHead(1, 1, ByteUtils.AddDataHead(msgOpSer));
+        var headData = SocketManager.Serialize(msgHead);
+        // 发送消息
+        SocketManager.Single.Send(headData);
+    }
+
+    /// <summary>
+    /// 打包数据
+    /// </summary>
+    /// <param name="packageData">被包装数据</param>
+    /// <param name="uId">用户Id</param>
+    /// <param name="msgId">数据Id</param>
+    /// <returns></returns>
+    private byte[] PackageData(byte[] packageData, int uId, int msgId)
+    {
+        byte[] result = null;
+
+        // 将数据打包放入MsgHead的body中
+        var dataHead = new MsgHead()
+        {
+            msgId = msgId,
+            userId = uId,
+            body = ByteUtils.AddDataHead(packageData),
+        };
+        var stream = new MemoryStream();
+        Serializer.Serialize(stream, dataHead);
+        result = stream.ToArray();
+
+        return result;
     }
 
 
@@ -71,6 +127,10 @@ public class RanderControl : MonoBehaviour
 
     void Update()
     {
+        if (!isStart)
+        {
+            return;
+        }
         // 更新血条
         SetBloodBarValue();
         // 驱动状态机

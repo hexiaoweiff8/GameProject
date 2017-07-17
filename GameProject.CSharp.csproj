@@ -111,6 +111,8 @@
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestSocket.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestTargetSelecter.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestTimer.cs" />
+    <Compile Include="Assets\AStarSchoolBehaviour\Script\msg\MsgHead.cs" />
+    <Compile Include="Assets\AStarSchoolBehaviour\Script\msg\MsgOptional.cs" />
     <Compile Include="Assets\Logic\Script\AstarFight.cs" />
     <Compile Include="Assets\Logic\Script\Boot.cs" />
     <Compile Include="Assets\Logic\Script\DebugConfig.cs" />
@@ -295,6 +297,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Looper.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Map\MapManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Net\FightDataSyncer.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Net\MsgFactory.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Net\SocketManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\PoolLoader.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\QuadTree.cs" />

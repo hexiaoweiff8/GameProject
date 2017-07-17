@@ -86,20 +86,17 @@ public class SoldierFSMControl{
         if (_iSAwake) return;
         fsm.CurrentState.CheckTrigger(fsm);
         fsm.CurrentState.Action(fsm);
-        // 检测被触发的Skill事件是否有对应技能
-        //TriggerAction();
-        //// 设置血条
-        //fsm.Display.RanderControl.SetBloodBarValue(fsm.Display.ClusterData.AllData.MemberData);
-        Debug.Log("当前状态:" + fsm.CurrentStateID);
     }
 
-    /// <summary>
-    /// 修改该单位的当前状态
-    /// </summary>
-    public void SetState(SoldierFSMSystem targetFsm)
-    {
-        // 设置状态数据
-        fsm = targetFsm;
-    }
+    ///// <summary>
+    ///// 修改该单位的当前状态
+    ///// </summary>
+    //public void SetState(SoldierFSMSystem targetFsm)
+    //{
+    //    // 设置状态数据
+    //    fsm = targetFsm;
+    //    // 切到目标状态
+
+    //}
 
 }

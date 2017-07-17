@@ -90,15 +90,25 @@ public class TriggerRunner : MonoBehaviour
     /// </summary>
     private void CheckTrigger(AllData alldata)
     {
-        if (alldata.MemberData != null && alldata.SkillInfoList != null)
+        if (gameObject.name.StartsWith("zhujidi"))
+        {
+            int i = 0;
+        }
+        if (alldata.MemberData != null)
         {
             // 触发当前单位的所有事件
             SkillManager.Single.SetEachAction(alldata.MemberData.ObjID, (type1, type2, trigger) =>
             {
-                // 触发skill类
-                SkillManager.Single.CheckAndDoSkillInfo(alldata.SkillInfoList, trigger);
-                // 技能触发完毕开始触发buff类
-                BuffManager.Single.CheckAndDoBuffInfo(alldata.BuffInfoList, trigger);
+                if (alldata.SkillInfoList != null)
+                {
+                    // 触发skill类
+                    SkillManager.Single.CheckAndDoSkillInfo(alldata.SkillInfoList, trigger);
+                }
+                if (alldata.BuffInfoList != null)
+                {
+                    // 技能触发完毕开始触发buff类
+                    BuffManager.Single.CheckAndDoBuffInfo(alldata.BuffInfoList, trigger);
+                }
                 // 计算伤害
                 settlementDamageOrCure(type1, type2, trigger, alldata);
             },

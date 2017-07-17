@@ -7,6 +7,7 @@ using UnityEngine;
 /// <summary>
 /// 位置对象
 /// </summary>
+[Serializable]
 public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHolder//, IGraphical<Rectangle>
 {
 
@@ -345,15 +346,21 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
     /// </summary>
     public void Clear()
     {
-        // 清除运行中的技能
-        foreach (var skillInfo in AllData.SkillInfoList)
+        if (AllData.SkillInfoList != null)
         {
-            TriggerTicker.Single.Remove(skillInfo.AddtionId);
+            // 清除运行中的技能
+            foreach (var skillInfo in AllData.SkillInfoList)
+            {
+                TriggerTicker.Single.Remove(skillInfo.AddtionId);
+            }
         }
-        // 清除运行中的Buff
-        foreach (var buffInfo in AllData.BuffInfoList)
+        if (AllData.BuffInfoList != null)
         {
-            TriggerTicker.Single.Remove(buffInfo.AddtionId);
+            // 清除运行中的Buff
+            foreach (var buffInfo in AllData.BuffInfoList)
+            {
+                TriggerTicker.Single.Remove(buffInfo.AddtionId);
+            }
         }
         
     }

@@ -48,7 +48,7 @@ public class ZhuiJiTrigger : SoldierFSMTrigger
                 var filtedlist = TargetSelecter.Single.TargetFilter(clusterData, scopeMemberList);
                 Utils.DrawGraphics(new CircleGraphics(pos, clusterData.AllData.MemberData.SightRange), Color.yellow);
                 //fsm.Display.ClusterData.MemberData.SightRange
-                if (filtedlist.Count > 0)
+                if (filtedlist != null && filtedlist.Count > 0)
                 {
                     // 追击目标
                     // 设置状态 切追击状态

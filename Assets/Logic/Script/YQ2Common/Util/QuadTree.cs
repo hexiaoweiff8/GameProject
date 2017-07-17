@@ -279,7 +279,7 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
     {
         List<T> result = null;
         // 判断与当前四叉树的相交
-        if (scopeRect != null && rect.CheckCollision(scopeRect))
+        if (scopeRect != null)
         {
             result = new List<T>();
             T tmpItem;
@@ -292,25 +292,28 @@ public class QuadTree<T> where T : IGraphicsHolder//IGraphical<Rectangle>
                     result.Add(tmpItem);
                 }
             }
-            if (nodes[0] != null)
+            if (rect.CheckCollision(scopeRect))
             {
-                for (int i = 0; i < nodes.Length; i++)
+                if (nodes[0] != null)
                 {
-                    if (nodes[i].rect.CheckCollision(scopeRect))
+                    for (int i = 0; i < nodes.Length; i++)
                     {
-                        result.AddRange(nodes[i].GetScope(scopeRect));
+                        if (nodes[i].rect.CheckCollision(scopeRect))
+                        {
+                            result.AddRange(nodes[i].GetScope(scopeRect));
+                        }
                     }
                 }
+                // 划定范围, 获取范围内子对象中符合范围的对象
+                // 判断是否与该区域相交 相交则取该区域内对象判断, 并获取其子节点判断是否相交
+                // 获取子列表中的对象
+                //var log = "";
+                //foreach (var item in result)
+                //{
+                //    log += (item as PositionObject).name + ",";
+                //}
+                //UnityEngine.Debug.LogError(log);
             }
-            // 划定范围, 获取范围内子对象中符合范围的对象
-            // 判断是否与该区域相交 相交则取该区域内对象判断, 并获取其子节点判断是否相交
-            // 获取子列表中的对象
-            //var log = "";
-            //foreach (var item in result)
-            //{
-            //    log += (item as PositionObject).name + ",";
-            //}
-            //UnityEngine.Debug.LogError(log);
         }
         return result;
     }

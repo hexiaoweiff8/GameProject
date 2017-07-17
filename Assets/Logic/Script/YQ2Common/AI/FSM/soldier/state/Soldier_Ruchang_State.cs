@@ -8,22 +8,21 @@ public class Soldier_Ruchang_State : SoldierFSMState
     public override void Init()
     {
         this.StateID = SoldierStateID.RuChang;
-
     }
 
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
-        //var soldier = fsm.Display.RanderControl;
+        var soldier = fsm.Display.RanderControl;
 
-        //soldier.bloodBar.localScale = Vector3.one;
-        ////soldier.ModelRander.speedScale = 1;
+        soldier.bloodBar.localScale = Vector3.one;
+        //soldier.ModelRander.speedScale = 1;
         //soldier.GetComponent<Renderer>().material.shader = PacketManage.Single.GetPacket("core").Load("Avatar_N.shader") as Shader;
-        ////soldier.ModelRander.SetClip("run".GetHashCode());
-        ////Vector3 pt = soldier.NowWorldCamera.WorldToScreenPoint(soldier.Head.position);
-        ////Vector3 ff = UICamera.currentCamera.ScreenToWorldPoint(pt);
-        ////soldier.bloodBar.position = ff;
-        //AstarFight at = GameObject.Find("/AstarFight").GetComponent<AstarFight>();
-        //at.toXunLu(fsm.Display.ClusterData as ClusterData, soldier.isEnemy, fsm.Display);
+        //soldier.ModelRander.SetClip("run".GetHashCode());
+        //Vector3 pt = soldier.NowWorldCamera.WorldToScreenPoint(soldier.Head.position);
+        //Vector3 ff = UICamera.currentCamera.ScreenToWorldPoint(pt);
+        //soldier.bloodBar.position = ff;
+        AstarFight at = GameObject.Find("/AstarFight").GetComponent<AstarFight>();
+        at.toXunLu(fsm.Display.ClusterData as ClusterData, soldier.isEnemy, fsm.Display);
         Debug.Log("士兵入场, armyID:" + fsm.Display.ClusterData.AllData.MemberData.ArmyID);
         float deployTime = 0f;
 

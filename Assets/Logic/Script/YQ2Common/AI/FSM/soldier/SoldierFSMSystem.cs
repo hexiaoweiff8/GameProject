@@ -180,6 +180,8 @@ public class SoldierFSMSystem {
 
     /// <summary>
     /// 设置数据
+    /// TODO 这步操作之前应该还有一步将数据转化为本地数据
+    /// 如果收到的是入场则创建单位并入场
     /// </summary>
     /// <param name="fsm"></param>
     public void SetData(SoldierFSMControl fsm)

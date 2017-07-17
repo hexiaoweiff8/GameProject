@@ -25,6 +25,11 @@ public class FightDataSyncer : ILoopItem
     /// </summary>
     private static FightDataSyncer single = null;
 
+    /// <summary>
+    /// 数据列表
+    /// </summary>
+    private List<FightSyncData> dataStack = new List<FightSyncData>();
+
 
     /// <summary>
     /// 添加数据
@@ -36,9 +41,11 @@ public class FightDataSyncer : ILoopItem
     /// 状态切换
     /// 状态机FSM数据
     /// </summary>
-    public void AddData()
+    public void AddData(MsgOptional msgOp)
     {
-        
+        // DisplayOwner转化为ObjectID
+        // 封装, 放入列表
+
     }
 
 
@@ -76,5 +83,10 @@ public class FightSyncData
 
 
     public ClusterData ClusterData { get; set; }
+
+    // DisplayOwner转化为Id
+
+    // 两边ID一致问题
+
 
 }

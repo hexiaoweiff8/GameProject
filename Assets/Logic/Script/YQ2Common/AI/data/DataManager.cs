@@ -140,6 +140,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
         // 创建基地模型
         // 从AB包中加载
         var baseObj = GameObjectExtension.InstantiateFromPacket("jidi", "zhujidi_model", null);
+
         // 设置父级
         ParentManager.Instance().SetParent(baseObj, ParentManager.BuildingParent);
         var mesh = baseObj.GetComponentInChildren<SkinnedMeshRenderer>();
@@ -160,28 +161,35 @@ public class DataManager : MonoEX.Singleton<DataManager>
 
 
         var cluster = baseObj.AddComponent<ClusterData>();
+        // 设置在地面上
+        cluster.Height = SData_Constant.Single.GetDataOfID(Utils.SurfaceTypeConstantId).Value;
+        cluster.CollisionGroup = Utils.SurfaceCollisionGroup;
         cluster.AllData.MemberData = jidiVo;
         //cluster.GroupId = 999;
-        cluster.AllData.MemberData.MoveSpeed = -1;
-        cluster.Diameter = 40;
+        //cluster.AllData.MemberData.MoveSpeed = 0;
+        //cluster.Diameter = 40;
         cluster.X = otherParam.X;
         cluster.Y = otherParam.Y;
         cluster.Stop();
         ClusterManager.Single.Add(cluster);
 
-        // 创建RanderControl
-        //var randerControl = baseObj.AddComponent<RanderControl>();
-
-
         // 创建外层持有类
         var displayOwner = new DisplayOwner(baseObj, cluster);
         DisplayerManager.Single.AddElement(jidiVo.ObjID, displayOwner);
 
+        // 创建RanderControl
+        var randerControl = baseObj.AddComponent<RanderControl>();
+        displayOwner.RanderControl = randerControl;
+        randerControl.Begin();
         //// 创建MFAModelRander
         //var mfaModelRander = myBase.GetComponent<MFAModelRender>();
         //mfaModelRander.ObjId = cluster.MemberData.ObjID;
 
         //displayOwner.MFAModelRender = mfaModelRander;
+
+        // 创建事件检查器
+        var triggerRunner = baseObj.AddComponent<TriggerRunner>();
+        triggerRunner.Display = displayOwner;
 
         return result;
     }
@@ -273,7 +281,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
                 mfa.Cluster.CollisionGroup = Utils.SurfaceCollisionGroup;
                 break;
         }
-        Debug.Log("类型: " + soldier.AimGeneralType + "高度: " + mfa.Cluster.Height);
+        Debug.Log("类型: " + soldier.GeneralType + "高度: " + mfa.Cluster.Height);
 
 
         // 创建外层持有类
@@ -281,8 +289,8 @@ public class DataManager : MonoEX.Singleton<DataManager>
         DisplayerManager.Single.AddElement(soldier.ObjID, displayOwner);
 
         // 创建RanderControl
-        //var randerControl = RanderControl.GetIns(display, soldier.ObjID);
-        //displayOwner.RanderControl = randerControl;
+        var randerControl = display.AddComponent<RanderControl>();
+        displayOwner.RanderControl = randerControl;
 
         // 挂载事件处理器
         var triggerRunner = display.AddComponent<TriggerRunner>();

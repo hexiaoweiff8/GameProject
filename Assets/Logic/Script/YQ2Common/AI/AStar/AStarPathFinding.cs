@@ -72,6 +72,10 @@ public class AStarPathFinding
         }
         // 获取可行进目标点
         var targetNode = GetFormatTarget(map, endX, endY, diameterX, diameterY);
+        if (targetNode == null)
+        {
+            return null;
+        }
         endX = targetNode.X;
         endY = targetNode.Y;
 

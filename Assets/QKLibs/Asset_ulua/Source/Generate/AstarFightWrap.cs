@@ -7,6 +7,7 @@ public class AstarFightWrap
 	public static void Register(LuaState L)
 	{
 		L.BeginClass(typeof(AstarFight), typeof(UnityEngine.MonoBehaviour));
+		L.RegFunction("InitMap", InitMap);
 		L.RegFunction("isZhangAi", isZhangAi);
 		L.RegFunction("setAllZhenxingList", setAllZhenxingList);
 		L.RegFunction("setZhenxingInfo", setZhenxingInfo);
@@ -29,6 +30,22 @@ public class AstarFightWrap
 		L.RegVar("PathPointFather", get_PathPointFather, set_PathPointFather);
 		L.RegVar("ItemCount", get_ItemCount, set_ItemCount);
 		L.EndClass();
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int InitMap(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			AstarFight obj = (AstarFight)ToLua.CheckObject(L, 1, typeof(AstarFight));
+			obj.InitMap();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
