@@ -6,7 +6,7 @@
 local detailPage_controller = {}
 local view = require("uiscripts/myEquip/detailPage/detailPage_view")
 local data = require("uiscripts/myEquip/detailPage/detailPage_model")
-local EquipDetail = require("uiscripts/commonGameObj/equipDetail")
+local EquipDetail = require("uiscripts/commonGameObj/equipDetail/equipDetail_controller")
 
 ---
 ---装备信息显示界面
@@ -26,7 +26,8 @@ function detailPage_controller:show(equip, parent)
         if not rightPanelDetail then
             rightPanelDetail = EquipDetail()
         end
-        rightPanelDetail:showEquip(equip, parent, 14)
+        rightPanelDetail:showEquip(equip, parent, 16)
+        rightPanelDetail:setShowRemakePanelFunc(equip_controller.showRemakePanel)
         rightPanelDetail:setListener()
     end
 end
@@ -34,11 +35,19 @@ end
 ---
 ---刷新右侧信息界面
 ---
-function detailPage_controller:refresh()
+function detailPage_controller:refresh(equip)
+    if equip then
+        if rightPanelDetail then
+            rightPanelDetail:refresh(equip)
+            rightPanelDetail:setListener()
+        end
+        return
+    end
     if rightPanelDetail then
         rightPanelDetail:refresh()
     end
 end
+
 
 ---
 ---为右侧信息界面的更换装备按钮添加监听

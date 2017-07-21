@@ -7,6 +7,8 @@ Config_Manager = class("Config_Manager")
 --@return 
 --==============================--
 function Config_Manager:LoadConfig()
+    --地图数据
+    sdata_mapData_data = luacsv.new(require("pk_tabs/MapData"))
     --常量表
     sdata_constant_data = luacsv.new(require("pk_tabs/Constant")) 
     --读取士兵阵型表
@@ -72,9 +74,24 @@ function Config_Manager:LoadConfig()
     --仓库页卡标签表
     sdata_pack_data = luacsv.new(require("pk_tabs/pack_c"))
     --装备强化所需能量表
-    sdata_equippower_data = luacsv.new(require("pk_tabs/equippower_c")) 
+    sdata_equippower_data = luacsv.new(require("pk_tabs/equippower_c"))
+    --装备重铸所需物品表
+    sdata_equiprecast_data = luacsv.new(require("pk_tabs/equiprecast_c"))
+    --商店页卡表
+    sdata_shop_data = luacsv.new(require("pk_tabs/shop_c"))
+    --商店刷新时间表
+    sdata_shoprefresh_data = luacsv.new(require("pk_tabs/refresh_c"))
+    --商店物品表
+    sdata_shopcommodity_data = luacsv.new(require("pk_tabs/commodity_c"))
+    --商店货币表
+    sdata_shopcurrency_data = luacsv.new(require("pk_tabs/currency_c"))
+    --每日签到奖励表
+    sdata_checkin_data = luacsv.new(require("pk_tabs/checkin_c"))
+    --系统常量表
+    sdata_systemconstant_data = luacsv.new(require("pk_tabs/systemconstant_c"))
     
     -----------------------------------C#需要调用的配置表在以下位置添加---------------------------------------
+    SDataUtils.setData("mapData", sdata_mapData_data.mData.head, sdata_mapData_data.mData.body)
     SDataUtils.setData("constant", sdata_constant_data.mData.head, sdata_constant_data.mData.body)
     SDataUtils.setData("armyaim_c", sdata_armyaim_data.mData.head, sdata_armyaim_data.mData.body)
     SDataUtils.setData("armyaoe_c", sdata_armyaoe_data.mData.head, sdata_armyaoe_data.mData.body)

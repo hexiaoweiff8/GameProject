@@ -1,0 +1,36 @@
+syntax = "proto2";
+
+message ChatRecord{
+    required int32 rId			=1;
+    repeated int32 userName		=2;
+    required int32 content      =3;
+    required int32 time         =4;
+};
+
+
+message EnterChat{
+    required int32 type			=1;
+};
+
+
+message GetChatRecord{
+    required int32 type			=1;
+    required int32 time			=2;
+};
+
+
+message GetChatRecordResp{
+    repeated ChatRecord rec		=1;
+};
+
+
+message ChatToWorld{
+    required string content		=1;
+};
+
+
+message ChatToWorldNotify{
+    required ChatRecord rec		=1;
+};
+
+

@@ -275,13 +275,14 @@ public class TargetSelecter
             // 先随机命中, 如果命中则返回一个对象
             // 如果没命中则返回空对象
             // 随机一个值从对象中
-            var random = new System.Random(DateTime.Now.Millisecond);
-            var randomNum = random.Next(100);
+            // TODO 包装随机
+            //var random = new System.Random(DateTime.Now.Millisecond);
+            var randomNum = RandomPacker.Single.GetRangeI(0, 100);
             
             if (randomNum <= hitRate)
             {
                 // 命中
-                result.Add(scatteringList[random.Next(scatteringList.Count)]);
+                result.Add(scatteringList[RandomPacker.Single.GetRangeI(0, scatteringList.Count)]);
             }
         }
         return result;

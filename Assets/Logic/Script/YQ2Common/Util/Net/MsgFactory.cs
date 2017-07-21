@@ -8,6 +8,15 @@ using System.Text;
 /// </summary>
 public static class MsgFactory
 {
+    /// <summary>
+    /// 操作唯一编号
+    /// </summary>
+    private static int addtionOpUniqueNum = 1024;
+
+    /// <summary>
+    /// 操作唯一编号
+    /// </summary>
+    private static int AddtionOpUniqueNum { get { return addtionOpUniqueNum++; } }
 
     /// <summary>
     /// 创建数据头消息
@@ -49,8 +58,31 @@ public static class MsgFactory
             OpPosX = opPosX,
             OpPosY = opPosY,
             OpPosZ = opPosZ,
-            OpParams = opParams
+            OpParams = opParams,
+            OpUniqueNum = AddtionOpUniqueNum
         };
+
+        return result;
+    }
+
+
+    /// <summary>
+    /// 创建操作确认消息
+    /// </summary>
+    /// <param name="opUniqueNum">操作唯一编号</param>
+    /// <param name="opSourceUserId">操作来源用户Id</param>
+    /// <param name="opParams">操作参数</param>
+    /// <returns></returns>
+    public static MsgComfirmOperation GetMsgComfirmOperation(int opUniqueNum, int opSourceUserId, string opParams)
+    {
+        MsgComfirmOperation result = null;
+
+        result = new MsgComfirmOperation()
+        {
+            OpUniqueNum = opUniqueNum,
+            OpSourceUserId = opSourceUserId,
+            OpParams = opParams
+        }; 
 
         return result;
     }

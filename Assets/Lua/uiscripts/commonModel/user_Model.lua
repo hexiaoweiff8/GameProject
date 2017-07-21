@@ -6,7 +6,7 @@ local class = require("common/middleclass")
 
 local UserRole = class("UserRole")
 --用户id, 服务器id, 角色数字id, 角色名, 经验值, vip经验值, 角色等级，VIP等级，可堆叠道具(背包)
-function UserRole:initialize(uid,hostId,rId,userName,exp,vipexp,lv,vipLv,item,sex)
+function UserRole:initialize(uid,hostId,rId,userName,exp,vipexp,lv,vipLv,sex,sign)
     self.uid = uid
     self.hostId = hostId
     self.rId = rId
@@ -15,16 +15,19 @@ function UserRole:initialize(uid,hostId,rId,userName,exp,vipexp,lv,vipLv,item,se
     self.vipexp = vipexp
     self.lv = lv
     self.vipLv = vipLv
-    self.item = item
     self.sex = sex
+    self.sign = {
+        isSigned = sign.isSigned,
+        days = sign.days
+    }
 end
 
 userModel = {}
 local userRoleTbl ={}
 
-function userModel:setUserRoleTbl(user)
-    --print( string.format("User==> uid:%d, hostid:%d, rid:%d, username:%s, exp:%d, vipexp:%d, itemTblNum:%d",user.uId, user.hostId, user.rId, user.userName, user.exp, user.vipexp, #user.item) )
-    userRoleTbl = UserRole(user.uId, user.hostId, user.rId, user.userName, user.exp, user.vipexp, user.lv, user.vip, user.item, user.sex)
+function userModel:initUserRoleTbl(user)
+    print( string.format("User==> uid:%d, hostid:%d, rid:%d, username:%s, exp:%d, vipexp:%d, sex:%d isSign:%d",user.uId, user.hostId, user.rId, user.userName, user.exp, user.vipexp, user.sex, user.sign.isSigned))
+    userRoleTbl = UserRole(user.uId, user.hostId, user.rId, user.userName, user.exp, user.vipexp, user.lv, user.vip, user.sex, user.sign)
 end
 
 function userModel:setUserID(user)
@@ -35,6 +38,9 @@ function userModel:setHostID(user)
 end
 function userModel:setRID(user)
     userRoleTbl.rId = user.rId
+end
+function userModel:getRID()
+    return userRoleTbl.rId
 end
 function userModel:setUserName(user)
     userRoleTbl.userName = user.userName
@@ -54,15 +60,9 @@ end
 function userModel:setSex(user)
     userRoleTbl.sex= user.sex
 end
-function userModel:setItem(item)
-    for i = 1,#item do
-        for k,v in ipairs(userRoleTbl.item) do
-            if v.id == item[i].id then
-                v.num = item[i].num
-            end
-        end
-    end
-
+function userModel:setSign(sign)
+    userRoleTbl.sign.isSigned = sign.isSigned
+    userRoleTbl.sign.days = sign.days
 end
 
 function userModel:getUserRoleTbl()

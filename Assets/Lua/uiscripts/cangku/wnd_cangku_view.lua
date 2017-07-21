@@ -172,23 +172,23 @@ function wnd_cangku_view:initView(root)
 	this.Panel_Detail_item.panel = self.transform:Find("Panel_Detail_item").gameObject
 
 	--★ui_cangku Panel_Detail_equipment	
-	equipDetail = require('uiscripts/commonGameObj/equipDetail')
+	equipDetail = require('uiscripts/commonGameObj/equipDetail/equipDetail_controller')
 	equipDetail:initialize()
-
+	local equipDetail_view = equipDetail:get_View()
 	this.Panel_Detail_equipment = {
-		Button_decomposition = equipDetail.btn_decomposition,
-		Button_share = equipDetail.btn_share,
-		Button_commander = equipDetail.btn_commander,
-		Item_icon = equipDetail.equipIcon,
-		Label_name = equipDetail.equipNameLab,
-		Label_nextLevel = equipDetail.lab_nextLevel,
-		Label_MainAttribute = equipDetail.lab_mainAttribute,
-		Label_ViceAttribute = equipDetail.lab_subAttribute,
-		Label_SuitEffect = equipDetail.lab_suitEffect,
-		Label_plus_cost = equipDetail.costLab,
-		Button_lock = equipDetail.btn_lock,
-		Button_unload = equipDetail.btn_loadOrNot,
-		Button_plus = equipDetail.btn_plus,
+		Button_decomposition = equipDetail_view.btn_decomposition,
+		Button_share = equipDetail_view.btn_share,
+		Button_commander = equipDetail_view.btn_commander,
+		Item_icon = equipDetail_view.equipIcon,
+		Label_name = equipDetail_view.equipNameLab,
+		Label_nextLevel = equipDetail_view.lab_nextLevel,
+		Label_MainAttribute = equipDetail_view.lab_mainAttribute,
+		Label_ViceAttribute = equipDetail_view.lab_subAttribute,
+		Label_SuitEffect = equipDetail_view.lab_suitEffect,
+		Label_plus_cost = equipDetail_view.costLab,
+		Button_lock = equipDetail_view.btn_lock,
+		Button_unload = equipDetail_view.btn_loadOrNot,
+		Button_plus = equipDetail_view.btn_plus,
 	}
 	this.Panel_Detail_equipment.panel = self.transform:Find("Panel_Detail_equipment").gameObject
 

@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Util;
 
 public class AstarFight : MonoBehaviour
@@ -135,7 +136,19 @@ public class AstarFight : MonoBehaviour
     {
         // 初始化
         Init();
-        //初始化点阵数组
+    }
+
+    //private void setAllZhenxingList()
+    //{
+    //}
+
+
+    /// <summary>
+    /// 初始化战斗场景
+    /// </summary>
+    private void Init()
+    {
+        // 初始化点阵数组
         // 以触摸点为中心循环扩大搜索半径来搜索可下兵的点，tempList记录搜索正方形范围边上的所有点
         serchPathArray[0] = new[] { 0, 0 };
         var spani = 1;
@@ -166,29 +179,20 @@ public class AstarFight : MonoBehaviour
             serchPathArray[spani][templ - 1] = b2;
             spani++;
         }
-    }
-
-    //private void setAllZhenxingList()
-    //{
-    //}
 
 
-    /// <summary>
-    /// 初始化战斗场景
-    /// </summary>
-    private void Init()
-    {
         // 初始化集群管理
         var loadMapPos = LoadMap.GetLeftBottom();
         ClusterManager.Single.Init(loadMapPos.x, loadMapPos.z, MapWidth, MapHeight, UnitWidth, mapInfoData);
         // 加载TriggerTicker
         TriggerTicker.Single.StopAndClear();
         TriggerTicker.Single.Start();
+        // 初始化TimerManager
+        TimerManager.Single.Do();
 
-        // TODO 测试连接服务器
-        SocketManager.Single.Connect("127.0.0.1", 6000);
-
-        // 启动数据缓存传输器
+        // TODO 如果是联网战斗
+        // 启动战斗数据同步
+        FightDataSyncer.Single.Start();
     }
 
     /// <summary>

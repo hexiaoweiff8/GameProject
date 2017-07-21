@@ -188,6 +188,26 @@ public class LoadMap : MonoBehaviour
         return mapData;
     }
 
+    /// <summary>
+    /// 将位置映射到敌方位置
+    /// </summary>
+    /// <param name="pos">被映射位置</param>
+    /// <returns>映射到对方阵营位置</returns>
+    public Vector3 MapItemToEnemy(Vector3 pos)
+    {
+        Vector3 result = Vector3.zero;
+        
+        // 当前位置 + 地图偏移
+        var mapAbsoluteWidth = MapWidth*UnitWidth;
+        // loadMap的位置*2 - 地图宽度 = 地图偏移
+        var mapOffsetX = transform.position.x*2 - mapAbsoluteWidth;
+
+        // 单位位置 = 地图位置 - 当前位置 + 地图偏移
+        result = new Vector3(mapAbsoluteWidth - pos.x + mapOffsetX, pos.y, pos.z);
+
+        return result;
+    }
+
     ///// <summary>
     ///// 刷新地图
     ///// </summary>

@@ -8,7 +8,6 @@ using UnityEngine;
 /// <summary>
 /// 集群行为
 /// </summary>
-[Serializable]
 public class ClusterData: PositionObject
 {
 

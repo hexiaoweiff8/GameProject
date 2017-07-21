@@ -107,8 +107,9 @@ public class HurtResult
 
         var mingzhongchazhi = Mathf.Max(0.3f,
             gongjiMingzhong*(1 + gongjiMingzhongAdd) - fangshouShanbi*(1 + fangshouShanbiAdd));
-        var ran = new QKRandom((int)DateTime.Now.Ticks);
-        var value = ran.RangeI(0, 1000);
+        // TODO 包装随机
+        //var ran = new QKRandom((int)DateTime.Now.Ticks);
+        var value = RandomPacker.Single.GetRangeI(0, 1000);
         bool isMiss = value >= mingzhongchazhi*1000;
         return isMiss;
     }
@@ -132,8 +133,9 @@ public class HurtResult
         //暴击伤害系数=战前百分比加成和+战斗中百分比加成和
         var beforeFight = 0.0f;
         var inFight = 0.0f;
-        var ran = new QKRandom((int)DateTime.Now.Ticks);
-        return ran.RangeI(0, 1000) <= chazhi*1000 ? (beforeFight + inFight) : 1;
+        // TODO 包装随机
+        //var ran = new QKRandom((int)DateTime.Now.Ticks);
+        return RandomPacker.Single.GetRangeI(0, 1000) <= chazhi * 1000 ? (beforeFight + inFight) : 1;
     }
 
     /// <summary>
@@ -176,9 +178,10 @@ public class HurtResult
         var wushifangyu = 0.0f;
         var wushizhuangjia = 0.0f;
 
-        var ran = new QKRandom((int)DateTime.Now.Ticks);
-        var a = ran.RangeI(0, 1000);
-        var a1 = ran.RangeI(0, 1000);
+        // TODO 包装随机
+        //var ran = new QKRandom((int)DateTime.Now.Ticks);
+        var a = RandomPacker.Single.GetRangeI(0, 1000);
+        var a1 = RandomPacker.Single.GetRangeI(0, 1000);
 
         fangyu = a <= wushifangyu*1000 ? 0 : fangyu;
         zhuangjia = a1 <= wushizhuangjia*1000 ? 0 : zhuangjia;

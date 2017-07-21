@@ -11,6 +11,12 @@ local equipPage = require("uiscripts/myEquip/equipPage/equipPage_controller")
 local detailPage = require("uiscripts/myEquip/detailPage/detailPage_controller")
 local equipOnBody = require("uiscripts/myEquip/equipOnBody/equipOnBody_controller")
 local comPropty = require("uiscripts/myEquip/comPropty/comPropty_controller")
+local UIModel = require("uiscripts/commonGameObj/UIModel")
+local Model
+
+local Remake = require("uiscripts/commonGameObj/remake/remake_controller")
+local remakePanel = nil   ---
+
 
 
 ---
@@ -32,16 +38,24 @@ function equip_controller:OnShowDone()
     equipOnBody:init(self)
     comPropty:init(self)
 
+    ---初始化重铸界面
+    remakePanel = Remake()
 
+
+    Model = UIModel(view.UIModelPosition)
     ---
     ---初始化装备界面的显示
     ---
     self:initShow()
 
+
+
 end
 
 
-
+---
+---初始化界面显示
+---
 function equip_controller:initShow()
 
     view.rightDetail:SetActive(false)
@@ -58,8 +72,18 @@ function equip_controller:initShow()
 
 end
 
+---
+---获取重铸界面
+---
+function equip_controller:getRemakePanel()
+    return remakePanel
+end
+function equip_controller:showRemakePanel(equip)
 
-
+    remakePanel:show(equip, view.remakeP, 18)
+    remakePanel:setExchangeRefreshFunc(equip_controller.remakeExchangeRefresh)
+end
+---
 ---
 ---控制右侧界面的显示状态
 ---index    已穿戴装备的代码，也是该穿戴装备的类型
@@ -145,7 +169,8 @@ function equip_controller:equipLoadOrNotRefresh()
 end
 
 ---
-
+---一键装备后调用
+---
 function equip_controller:equipLoadBestRefresh()
     ---
     ---更新数据
@@ -159,7 +184,9 @@ function equip_controller:equipLoadBestRefresh()
     ---刷新右侧界面显示
     ---
     if view.rightDetail.activeSelf then
-        detailPage:refresh()
+        local equipType = equipOnBody:getCurrentSelectEquipType()
+        local equip = data:getEquipByOnlyID(data.equipOnBodyList[equipType])
+        detailPage:refresh(equip)
     end
     ---
     ---
@@ -192,7 +219,9 @@ function equip_controller:normalRefresh()
     end
 end
 
-
+---
+---一键修理后调用
+---
 function equip_controller:equipFixRefreshAll()
     ---
     ---更新数据
@@ -213,6 +242,14 @@ function equip_controller:equipFixRefreshAll()
     end
 end
 
+---
+---属性重铸替换后调用
+---
+function equip_controller:remakeExchangeRefresh()
+    if view.rightDetail.activeSelf then
+        detailPage:refresh()
+    end
+end
 
 return equip_controller
 

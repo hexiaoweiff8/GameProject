@@ -8,6 +8,7 @@ message Currency{
     required int32 coin         =5;
     required int32 tili         =6;
     required int32 power        =7;
+    required int32 PkPt         =8;
 };
 
 
@@ -100,8 +101,13 @@ message GoodItem{
 message ShopItem{
     repeated GoodItem good      =1;
     required int32 cnt          =2;
-}
+};
 
+
+message Sign{
+    required int32 isSigned     =1;
+    required int32 days         =2;
+};
 
 message Role{
     required int32 uId			=1;
@@ -121,6 +127,7 @@ message Role{
     repeated int32 fitEquip     =15;
     required int32 sex          =16;
     repeated ShopItem shop      =17;
+    required Sign sign          =18;
 };
 
 

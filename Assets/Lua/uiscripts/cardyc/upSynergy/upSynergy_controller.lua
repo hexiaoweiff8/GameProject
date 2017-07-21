@@ -11,17 +11,14 @@ local isInitxtLayer = false     --是否初始化协同详细信息界面
 
 local synergyItems = {}
 local cardHead
-local CardIndex
 function upSynergy_controller:init( args )
     view:init_view(args)
 end
 
-function upSynergy_controller:refresh(cardIndex)
+function upSynergy_controller:Refresh()
     print("upSynergy_controller refresh!!!!")
-    CardIndex = cardIndex
-    if not data:getDatas(CardIndex) then 
-        return 
-    end 
+    data:init_synergyIDTbl()
+    data:init_synergyStateTbl()
     self:synergy_Body()
 end
 
@@ -158,19 +155,18 @@ end
 --点击协同升级按钮
 function upSynergy_controller:upSynergyP_btnOk_onClicked(index)
     --判断当前是否可以协同升级
-    if data:isCan_UpSynergy(index) ~= 0 then
-        tips:show( tipsText )
-        return 
+    local isCan_UpSynergy = data:isCan_UpSynergy(index)
+    if isCan_UpSynergy ~= 0 then
+        UIToast.Show(isCan_UpSynergy, nil, UIToast.ShowType.Upwards)
+        return
     end
     UpSynergyIndex = index
     --向服务器发送升级协同数据
-    Message_Manager:SendPB_10018(data.cardId,index-1)
+    Message_Manager:SendPB_UpSynergy(data.cardId,index-1)
     
 end
 --协同升级成功后刷新界面
 function upSynergy_controller:upSynergy_refresh()
-
-    wnd_cardyc_controller:refresh()
     --刷新协同升级界面
     self:show_synergyItemInfo(UpSynergyIndex)
 end

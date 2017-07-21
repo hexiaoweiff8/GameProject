@@ -198,27 +198,27 @@ public class LogicInit
 
         //设置场景滚动限制参数
         {
-            GameObject ScrollAreaLimiterObj = GameObject.Find("/ScrollAreaLimiter");
-            ScrollAreaLimiter scrollAreaLimiter = ScrollAreaLimiterObj.GetComponent<ScrollAreaLimiter>();
+            var scrollAreaLimiterObj = GameObject.Find("/ScrollAreaLimiter");
+            var scrollAreaLimiter = scrollAreaLimiterObj.GetComponent<ScrollAreaLimiter>();
 
-            var xmin = SData_MapData.Single.FreeCameraXmin;
-            var xmax = SData_MapData.Single.FreeCameraXmax;
-            //TODODO 设置相机最右距离
-            xmax = 1196;
-            var zmin = SData_MapData.Single.FreeCameraZmin;
-            var zmax = SData_MapData.Single.FreeCameraZmax;
+            var mapData = SData_MapData.Single.GetDataOfID(1);
+            var xmin = mapData.FreeCameraXmin;
+            var xmax = mapData.FreeCameraXmax;
 
-            float halfBoxw = (xmax - xmin) / 2;
-            float halfBoxh = (zmax - zmin) / 2;
+            var zmin = mapData.FreeCameraZmin;
+            var zmax = mapData.FreeCameraZmax;
 
-            float centerX = xmin + halfBoxw;
-            float centerZ = zmin + halfBoxh;
+            var halfBoxw = (xmax - xmin) / 2;
+            var halfBoxh = (zmax - zmin) / 2;
+
+            var centerX = xmin + halfBoxw;
+            var centerZ = zmin + halfBoxh;
 
             scrollAreaLimiter.Area.center = new Vector3(centerX, 300, centerZ);
             scrollAreaLimiter.Area.extents = new Vector3(halfBoxw, 1000, halfBoxh);
             scrollAreaLimiter.SoftArea.center = new Vector3(centerX, 300, centerZ);
             scrollAreaLimiter.SoftArea.extents = new Vector3(
-                halfBoxw + 5 * DiamondGridMap.wxs * SData_MapData.Single.TerrainCellBianchang,
+                halfBoxw + 5 * DiamondGridMap.wxs * mapData.terrain_cell_bianchang,
                 4000,
                 halfBoxh + 5 * DiamondGridMap.VerticalSpacingFactor
                 );

@@ -23,7 +23,7 @@ message EquipRepair {
 
 message EquipRemake {
     required  Equip  equip          =1;
-    required  Currency currency     =2;
+    repeated  Item item             =2;
 }
 
 message EquipConfirmRemake {
@@ -127,10 +127,20 @@ message GetShopDetail {
 
 message RefreshShop {
     required ShopItem shop          =1;
+    repeated Item item              =2;
+    required Currency currency      =3;
 }
 
-message BuyShopItem {
+message BuyShopGood {
     required ShopItem shop          =1;
+    repeated Card card              =2;
+    repeated Equip equip            =3;
+    required Currency currency      =4;
+    repeated Item item              =5;
+}
+
+message SignIn {
+    required Sign sign              =1;
     repeated Card card              =2;
     repeated Equip equip            =3;
     required Currency currency      =4;

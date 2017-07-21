@@ -216,7 +216,7 @@ public class AstarTest : MonoBehaviour
             ReleaseTime(10)
             TriggerLevel1(1)
             TriggerLevel2(1)
-            Description(哟哦哦{%0},哦哟哦哟{%1})
+            Description(Test{%0},测试{%1})
             100, 5
         ]
 "; 
@@ -303,6 +303,14 @@ public class AstarTest : MonoBehaviour
                     Debug.Log("加载完毕");
                 }
             });
+
+        Debug.LogError(RandomPacker.Single.GetRangeI(0, 100));
+        RandomPacker.Single.SetSeed(100);
+        Debug.LogError(RandomPacker.Single.GetRangeI(0, 100));
+        Debug.LogError(RandomPacker.Single.GetRangeI(0, 100));
+        RandomPacker.Single.SetSeed(100);
+        Debug.LogError(RandomPacker.Single.GetRangeI(0, 100));
+        Debug.LogError(RandomPacker.Single.GetRangeI(0, 100));
     }
     
     void Update()

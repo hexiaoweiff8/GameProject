@@ -12,9 +12,9 @@ public class Soldier_Siwang_State : SoldierFSMState
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
         base.DoBeforeEntering(fsm);
-        fsm.Display.ClusterData.Stop();
-        ClusterManager.Single.Remove(fsm.Display.ClusterData);
-        FightUnitFactory.DeleteUnit(fsm.Display.ClusterData.AllData.MemberData);
+        //fsm.Display.ClusterData.Stop();
+        //ClusterManager.Single.Remove(fsm.Display.ClusterData);
+        //FightUnitFactory.DeleteUnit(fsm.Display.ClusterData.AllData.MemberData);
         // 释放死亡时技能
         var allData = fsm.Display.ClusterData.AllData;
 
@@ -30,7 +30,9 @@ public class Soldier_Siwang_State : SoldierFSMState
                 TypeLevel2 = TriggerLevel2.Death
             });
         }
-        Object.Destroy(fsm.Display.ClusterData);
+        // 删除单位
+        DisplayerManager.Single.DelDisplay(fsm.Display);
+        //Object.Destroy(fsm.Display.ClusterData);
     }
 
     public override void Action(SoldierFSMSystem fsm)

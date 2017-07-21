@@ -115,12 +115,12 @@ class wnd_fight : wnd_base
         Vector2 WorldOrigin = new Vector2();
         Vector2 WorldSize = new Vector2();
 
-        int mapHeight = SData_MapData.Single.MapMaxRow + 5;//+ DiamondGridMap.SideSize * 2
+        int mapHeight = SData_MapData.Single.GetDataOfID(1).MapMaxRow + 5;//+ DiamondGridMap.SideSize * 2
         DiamondGridMap.Grid2World(mapHeight, DiamondGridMap.SideSize, -DiamondGridMap.SideSize*2 , out WorldOrigin.x, out WorldOrigin.y);
 
         DiamondGridMap.Grid2World(
             mapHeight,
-            SData_MapData.Single.MapMaxColumn+DiamondGridMap.SideSize , SData_MapData.Single.MapMaxRow,
+            SData_MapData.Single.GetDataOfID(1).MapMaxColumn + DiamondGridMap.SideSize, SData_MapData.Single.GetDataOfID(1).MapMaxRow,
             out WorldSize.x, out WorldSize.y
             );
 

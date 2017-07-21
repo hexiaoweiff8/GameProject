@@ -27,6 +27,13 @@ function luacsv:Name2I(name)
 	return self.mFieldName2Index[name]
 end
 
+--判断表中是否包含该字段
+function luacsv:IsHaveCloumName(name)
+	if self.mFieldName2Index[name] then
+		return true
+	end
+	return false
+end
 --[[
 function luacsv:GKey(key)
 	if(self.keytype==keytype.int) then

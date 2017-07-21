@@ -7,6 +7,7 @@ public class RanderControlWrap
 	public static void Register(LuaState L)
 	{
 		L.BeginClass(typeof(RanderControl), typeof(UnityEngine.MonoBehaviour));
+		L.RegFunction("SyncData", SyncData);
 		L.RegFunction("Begin", Begin);
 		L.RegFunction("DestoryFSM", DestoryFSM);
 		L.RegFunction("SetBloodBarValue", SetBloodBarValue);
@@ -21,6 +22,22 @@ public class RanderControlWrap
 		L.RegVar("groupIndex", get_groupIndex, set_groupIndex);
 		L.RegVar("ModelRander", get_ModelRander, set_ModelRander);
 		L.EndClass();
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int SyncData(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			RanderControl obj = (RanderControl)ToLua.CheckObject(L, 1, typeof(RanderControl));
+			obj.SyncData();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]

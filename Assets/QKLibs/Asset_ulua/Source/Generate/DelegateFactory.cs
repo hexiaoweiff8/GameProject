@@ -138,6 +138,10 @@ public static class DelegateFactory
 		dict.Add(typeof(PositionTransform.OnValueChangedDelegate), PositionTransform_OnValueChangedDelegate);
 		dict.Add(typeof(System.Action<object,object>), System_Action_object_object);
 		dict.Add(typeof(System.Action<UnityEngine.GameObject>), System_Action_UnityEngine_GameObject);
+		dict.Add(typeof(UIScrollViewAdapter.OnItemLoadedHandler), UIScrollViewAdapter_OnItemLoadedHandler);
+		dict.Add(typeof(UIScrollViewAdapter.OnItemSelectedHandler), UIScrollViewAdapter_OnItemSelectedHandler);
+		dict.Add(typeof(UIScrollViewAdapter.OnListMovedHandler), UIScrollViewAdapter_OnListMovedHandler);
+		dict.Add(typeof(UIScrollViewItemBase.OnSelectedHandler), UIScrollViewItemBase_OnSelectedHandler);
 	}
 
     [NoToLuaAttribute]
@@ -5997,6 +6001,190 @@ public static class DelegateFactory
 		{
 			System_Action_UnityEngine_GameObject_Event target = new System_Action_UnityEngine_GameObject_Event(func, self);
 			System.Action<UnityEngine.GameObject> d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UIScrollViewAdapter_OnItemLoadedHandler_Event : LuaDelegate
+	{
+		public UIScrollViewAdapter_OnItemLoadedHandler_Event(LuaFunction func) : base(func) { }
+		public UIScrollViewAdapter_OnItemLoadedHandler_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(UIScrollViewItemBase param0)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(UIScrollViewItemBase param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UIScrollViewAdapter_OnItemLoadedHandler(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UIScrollViewAdapter.OnItemLoadedHandler fn = delegate(UIScrollViewItemBase param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UIScrollViewAdapter_OnItemLoadedHandler_Event target = new UIScrollViewAdapter_OnItemLoadedHandler_Event(func);
+			UIScrollViewAdapter.OnItemLoadedHandler d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UIScrollViewAdapter_OnItemLoadedHandler_Event target = new UIScrollViewAdapter_OnItemLoadedHandler_Event(func, self);
+			UIScrollViewAdapter.OnItemLoadedHandler d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UIScrollViewAdapter_OnItemSelectedHandler_Event : LuaDelegate
+	{
+		public UIScrollViewAdapter_OnItemSelectedHandler_Event(LuaFunction func) : base(func) { }
+		public UIScrollViewAdapter_OnItemSelectedHandler_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(UIScrollViewItemBase param0)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(UIScrollViewItemBase param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UIScrollViewAdapter_OnItemSelectedHandler(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UIScrollViewAdapter.OnItemSelectedHandler fn = delegate(UIScrollViewItemBase param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UIScrollViewAdapter_OnItemSelectedHandler_Event target = new UIScrollViewAdapter_OnItemSelectedHandler_Event(func);
+			UIScrollViewAdapter.OnItemSelectedHandler d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UIScrollViewAdapter_OnItemSelectedHandler_Event target = new UIScrollViewAdapter_OnItemSelectedHandler_Event(func, self);
+			UIScrollViewAdapter.OnItemSelectedHandler d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UIScrollViewAdapter_OnListMovedHandler_Event : LuaDelegate
+	{
+		public UIScrollViewAdapter_OnListMovedHandler_Event(LuaFunction func) : base(func) { }
+		public UIScrollViewAdapter_OnListMovedHandler_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call()
+		{
+			func.Call();
+		}
+
+		public void CallWithSelf()
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UIScrollViewAdapter_OnListMovedHandler(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UIScrollViewAdapter.OnListMovedHandler fn = delegate() { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UIScrollViewAdapter_OnListMovedHandler_Event target = new UIScrollViewAdapter_OnListMovedHandler_Event(func);
+			UIScrollViewAdapter.OnListMovedHandler d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UIScrollViewAdapter_OnListMovedHandler_Event target = new UIScrollViewAdapter_OnListMovedHandler_Event(func, self);
+			UIScrollViewAdapter.OnListMovedHandler d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UIScrollViewItemBase_OnSelectedHandler_Event : LuaDelegate
+	{
+		public UIScrollViewItemBase_OnSelectedHandler_Event(LuaFunction func) : base(func) { }
+		public UIScrollViewItemBase_OnSelectedHandler_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(UIScrollViewItemBase param0)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(UIScrollViewItemBase param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UIScrollViewItemBase_OnSelectedHandler(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UIScrollViewItemBase.OnSelectedHandler fn = delegate(UIScrollViewItemBase param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UIScrollViewItemBase_OnSelectedHandler_Event target = new UIScrollViewItemBase_OnSelectedHandler_Event(func);
+			UIScrollViewItemBase.OnSelectedHandler d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UIScrollViewItemBase_OnSelectedHandler_Event target = new UIScrollViewItemBase_OnSelectedHandler_Event(func, self);
+			UIScrollViewItemBase.OnSelectedHandler d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}

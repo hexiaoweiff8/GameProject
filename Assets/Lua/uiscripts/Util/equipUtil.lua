@@ -1,45 +1,8 @@
-require('uiscripts/commonModel/publicEquip_Model')
 EquipUtil = {}
-
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
---@Des 读取本地装备表
---@return (table)本地装备表副本
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-function EquipUtil:getLocalEquipData()
-	if sdata_equip_data == nil then
-		print("没获取到以下数据表：sdata_equip_data")
-		return
-	end	
-	local local_Equipment = {}
-	local Equipment = {}
-
-	for k,v in pairs(sdata_equip_data.mData.body) do
-
-		Equipment["EquipID"] = v[sdata_equip_data.mFieldName2Index['EquipID']]
-		Equipment["EquipName"] = v[sdata_equip_data.mFieldName2Index['EquipName']]
-		Equipment["EquipIcon"] = v[sdata_equip_data.mFieldName2Index['EquipIcon']]
-		Equipment["EquipType"] = v[sdata_equip_data.mFieldName2Index['EquipType']]
-		Equipment["SuitID"] = v[sdata_equip_data.mFieldName2Index['SuitID']]
-		Equipment["MainAttribute"] = v[sdata_equip_data.mFieldName2Index['MainAttribute']]
-	
-		table.insert(local_Equipment,Equipment)
-
-		Equipment = {}
-	end
-	-- 按照EquipID从小到大排序
-	table.sort(local_Equipment,function(a,b)
-		return a["EquipID"] < b["EquipID"]
-	end)
-
-	print("read "..#local_Equipment.." Equipments(Local).")
-
-	return local_Equipment
-end
-
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --@Des 混合本地/服务器数据
 --	   调用顺序:
---		1.使用getLocalEquipData()方法存储本地表数据到公用Model的local_Equipment表
+--		1.initModel()方法初始化公用Model的local_Equipment表
 --		2.getEquipData()存储服务器装备表数据到公用Model的serv_Equipment表
 --@params user_equip:服务器装备表数据
 --@return (table)混合了本地装备表信息的服务器装备表副本
@@ -62,7 +25,7 @@ function EquipUtil:getEquipData(user_equip)
 			equip.lv = v.lv
 			equip.rarity = v.rarity
 			equip.fst_attr = v.fst_attr
-			equip.sndAttr = { remake = {} }
+			equip.sndAttr = {}
 			equip.isLock = v.isLock
 			equip.isBad = v.isBad
 			for k, v in ipairs(v.sndAttr) do
@@ -71,12 +34,13 @@ function EquipUtil:getEquipData(user_equip)
 	           		id = v.id,
 					val = v.val,
 					isRemake = v.isRemake,
+					remake = {}
 		        })
-	            for k, v in ipairs(v.remake) do
-	                table.insert(equip.sndAttr.remake,
+	            for _, vv in ipairs(v.remake) do
+	                table.insert(equip.sndAttr[k].remake,
 	                {
-						id = v.id,
-						val = v.val,
+						id = vv.id,
+						val = vv.val,
 	                })
 	            end
 	        end
@@ -90,7 +54,7 @@ end
 
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --@Des 对传入的装备表根据给定规则排序
---@params Equipment(table):装备列表引用
+--@params Equipment(table*):装备列表引用
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:sortEquipment(Equipment)
 	if Equipment == nil or #Equipment == 0 then
@@ -98,21 +62,23 @@ function EquipUtil:sortEquipment(Equipment)
 	end
 	table.sort(Equipment,
 		function(a,b)
-			if a.id ~= b.id then
-				return a.id < b.id -- 装备专有ID小的在前
+			if a.isBad ~= b.isBad then
+				return (a.isBad == 1 and {true} or {false})[1] -- 损坏度,坏的在前
 			elseif a.lv ~= b.lv then
 				return a.lv > b.lv -- lv大的在前
-			elseif a.rarity	 ~= b.rarity then
-				return a.rarity > b.rarity -- rarity大的在前
-			elseif a.isBad ~= 0 then
-				return false -- 损坏度
-			end	
+			elseif a.rarity ~= b.rarity then
+				return a.rarity > b.rarity -- 装备品质高的在前
+			else
+				return a.id < b.id -- id小的在前
+			end
 		end)
 end
 
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --@Des 获取装备主属性字符串
---@params EquipID(number):装备ID，AttributeID(number):属性ID(从服务器获取),lv(number):装备等级
+--@params EquipID(number):装备ID
+--		  AttributeID(number):属性ID(从服务器获取)
+--		  lv(number):装备等级
 --@return (string)装备主属性字符串
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:getEquipmentMainAttributeStr(EquipID,AttributeID,lv)
@@ -141,7 +107,7 @@ end
 
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --@Des 获取装备主属性数值
---@params equip:装备对象
+--@params equip:装备Data(混合数据)
 --@return 装备主属性数值
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:getMainAttributeValue(equip)
@@ -158,7 +124,7 @@ function EquipUtil:getMainAttributeValue(equip)
 end
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --@Des 获取装备副属性字符串
---@params equip:装备Data(混合数据)
+--@params equip*:装备Data(混合数据)
 --@return (string)装备副属性字符串
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:getEquipmentSubAttributeStr(equip)
@@ -207,73 +173,90 @@ function EquipUtil:getEquipmentSubAttributeStr(equip)
 	return str
 end
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+--@Des 获取装备副属性字符串表
+--@params equip*:装备Data(混合数据)
+--@return （table）副属性字符串表
+--■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+function EquipUtil:getEquipmentSubAttributeStrList(equip)
+	local _AttributeID
+	local _lv = equip.lv
+	local _UniqueID
+	local strList = {}
+	for i = 1,math.floor(EquipUtil:getEquipmentPlusMAXLevel(equip.rarity) / cint.SUBATTR_NEED) do
+
+		if equip.sndAttr[i] ~= nil then
+			_AttributeID = equip.sndAttr[i].id
+
+			local AttributeName = sdata_attribute_data.mData.body[_AttributeID][sdata_attribute_data.mFieldName2Index['AttributeName']]
+			local Symbol = sdata_attribute_data.mData.body[_AttributeID][sdata_attribute_data.mFieldName2Index['Symbol']]
+
+			if AttributeName == nil then
+				Debugger.LogWarning("没找到副属性,AttributeID = ".._AttributeID)
+				return
+			end
+			table.insert(strList, AttributeName.."+"..equip.sndAttr[i].val..Symbol)
+		end
+	end
+	return strList
+end
+--■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --@Des 获取套装效果字符串,该方法使用储存在公用Model的serv_fitEquipmentList表查询已穿戴的装备
+--@params SuitID:套装id
+--@return	list = { suitAttr }
+--	suitAttr = {
+--		str,        --套装属性字符串
+--		actNum      --属性激活次数
+--	}
+--■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+function EquipUtil:getSuitAttrbuteList(SuitID)
+	local list = {}
+	local suitNumList = equipSuitUtil:getSuitNumList(SuitID)
+	local suitAttrStrList = equipSuitUtil:getEquipSuitAttrbuteStringList(SuitID)
+	local suitCount = EquipModel:getSuitEquipNum(SuitID)
+
+	for i = 1, #suitNumList do
+		local suitAttr = {
+			str = "",       --套装属性字符串
+			actNum = 0     	--属性激活次数
+		}
+		if suitCount >= suitNumList[i] then
+			suitAttr.str = suitAttrStrList[i]
+			local actNum= math.modf(suitCount / suitNumList[#suitNumList])
+			local L = suitCount % suitNumList[#suitNumList]
+			if L >= suitNumList[i] then
+				actNum = actNum + 1
+			end
+			suitAttr.actNum = actNum
+		else
+			suitAttr.str = "[707070]"..suitAttrStrList[i].."[-]"
+		end
+		table.insert(list, suitAttr)
+	end
+	return list
+end
+
+
+--■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+--@Des 获取套装效果字符串,不受已穿戴的装备数量的影响
 --@params SuitID:套装id
 --@return (string)套装效果字符串
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-function EquipUtil:getEquipmentSuitEffectStr(SuitID)
-	local nilValue = -1
-	local SuitEffect_2_AttributeID = sdata_equipsuit_data.mData.body[SuitID][sdata_equipsuit_data.mFieldName2Index['SuitEffect2']]
-	local SuitEffect_3_AttributeID = sdata_equipsuit_data.mData.body[SuitID][sdata_equipsuit_data.mFieldName2Index['SuitEffect3']]
-	local SuitEffect_5_AttributeID = sdata_equipsuit_data.mData.body[SuitID][sdata_equipsuit_data.mFieldName2Index['SuitEffect5']]
-	local SuitCount = 0
-	local str = ""
+function EquipUtil:getEquipmentSuitEffectNormalStr(SuitID)
 
-	for i = 1,#EquipModel.serv_fitEquipmentList do
-		if self:getEquipmentSuitIDByID(EquipModel.serv_fitEquipmentList[i]) == SuitID then
-			SuitCount = SuitCount + 1
-		end
-	end
-	-- gray #707070
-	if SuitEffect_2_AttributeID ~= nilValue then
-		local SuitEffect_2_AttributeName = sdata_attribute_data.mData.body[SuitEffect_2_AttributeID][sdata_attribute_data.mFieldName2Index['AttributeName']]
-		local SuitEffect_2_AttributePoint = sdata_equipsuit_data.mData.body[SuitID][sdata_equipsuit_data.mFieldName2Index['Effect2Point']]
-		local Symbol = sdata_attribute_data.mData.body[SuitEffect_2_AttributeID][sdata_attribute_data.mFieldName2Index['Symbol']]
-		if SuitCount >= 2 then 
-			str = str..
-				sdata_UILiteral.mData.body[0xFE13][sdata_UILiteral.mFieldName2Index["Literal"]]..
-				SuitEffect_2_AttributeName.."+"..
-				SuitEffect_2_AttributePoint..Symbol.."\n"
-		else
-			str = str.."[707070]"..
-				sdata_UILiteral.mData.body[0xFE13][sdata_UILiteral.mFieldName2Index["Literal"]]..
-				SuitEffect_2_AttributeName.."+"..
-				SuitEffect_2_AttributePoint..Symbol.."[-]".."\n"
-		end
-	end
-	if SuitEffect_3_AttributeID ~= nilValue then
-		local SuitEffect_3_AttributeName = sdata_attribute_data.mData.body[SuitEffect_3_AttributeID][sdata_attribute_data.mFieldName2Index['AttributeName']]
-		local SuitEffect_3_AttributePoint = sdata_equipsuit_data.mData.body[SuitID][sdata_equipsuit_data.mFieldName2Index['Effect3Point']]
-		local Symbol = sdata_attribute_data.mData.body[SuitEffect_3_AttributeID][sdata_attribute_data.mFieldName2Index['Symbol']]
-		if SuitCount >= 3 then 
-			str = str..
-				sdata_UILiteral.mData.body[0xFE14][sdata_UILiteral.mFieldName2Index["Literal"]]..
-				SuitEffect_3_AttributeName.."+"..
-				SuitEffect_3_AttributePoint..Symbol.."\n"
-		else
-			str = str.."[707070]"..
-				sdata_UILiteral.mData.body[0xFE14][sdata_UILiteral.mFieldName2Index["Literal"]]..
-				SuitEffect_3_AttributeName.."+"..
-				SuitEffect_3_AttributePoint..Symbol.."[-]".."\n"
-		end
-	end
-	if SuitEffect_5_AttributeID ~= nilValue then
-		local SuitEffect_5_AttributeName = sdata_attribute_data.mData.body[SuitEffect_5_AttributeID][sdata_attribute_data.mFieldName2Index['AttributeName']]
-		local SuitEffect_5_AttributePoint = sdata_equipsuit_data.mData.body[SuitID][sdata_equipsuit_data.mFieldName2Index['Effect5Point']]
-		local Symbol = sdata_attribute_data.mData.body[SuitEffect_5_AttributeID][sdata_attribute_data.mFieldName2Index['Symbol']]
-		if SuitCount >= 5 then 
-			str = str..
-				sdata_UILiteral.mData.body[0xFE15][sdata_UILiteral.mFieldName2Index["Literal"]]..
-				SuitEffect_5_AttributeName.."+"..
-				SuitEffect_5_AttributePoint..Symbol.."\n"
-		else
-			str = str.."[707070]"..
-				sdata_UILiteral.mData.body[0xFE15][sdata_UILiteral.mFieldName2Index["Literal"]]..
-				SuitEffect_5_AttributeName.."+"..
-				SuitEffect_5_AttributePoint..Symbol.."[-]".."\n"
-		end
-	end
+	local str = ''
+	local suitNumList = equipSuitUtil:getSuitNumList(SuitID)
 
+	for i = 1, #suitNumList do
+
+		local suitAttrID = equipSuitUtil:getSuitAttributeID(SuitID, suitNumList[i])
+		local suitAttrPoint = equipSuitUtil:getSuitAttributeValue(SuitID, suitNumList[i])
+		local suitName = attributeUtil:getAttributeName(suitAttrID)
+		local suitSymbol = attributeUtil:getAttributeSymbol(suitAttrID)
+
+		local suitStr = string.format(stringUtil:getString(0xFE19), suitNumList[i])
+		.."[30D6FF]"..suitName.."[-]+"..suitAttrPoint..suitSymbol
+		str = str .. suitStr .. "\n"
+	end
 	return str
 end
 --@Des 根据品质获取品质框精灵图字符串
@@ -309,13 +292,14 @@ function EquipUtil:getEquipmentPlusMAXLevel(Quality)
 	elseif Quality == 4 then
 		return cint.QUALITY_4_MAXLEVEL
 	elseif Quality == 5 then
-		return cint.QUALITY_5_MAXLEVEL	
+		return cint.QUALITY_5_MAXLEVEL
 	else
 		return cint.QUALITY_6_MAXLEVEL end
 end
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --@Des 获取强化到下一等级所需要的能量点
---@params currentLV:装备当前等级,Quality:装备品质
+--@params currentLV:装备当前等级
+--		  Quality:装备品质
 --@return (int or Str)强化到下一等级所需要的能量点
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:getEquipmentPlusCost(currentLV,Quality)
@@ -324,11 +308,18 @@ function EquipUtil:getEquipmentPlusCost(currentLV,Quality)
 		return
 	end
 	if currentLV + 1 <= self:getEquipmentPlusMAXLevel(Quality) then
-		return sdata_equippower_data.mData.body[currentLV + 1][sdata_equippower_data.mFieldName2Index['Quality'..Quality]] - 
-			sdata_equippower_data.mData.body[currentLV][sdata_equippower_data.mFieldName2Index['Quality'..Quality]]
+		return sdata_equippower_data.mData.body[currentLV + 1][sdata_equippower_data.mFieldName2Index['Quality'..Quality]] -
+		sdata_equippower_data.mData.body[currentLV][sdata_equippower_data.mFieldName2Index['Quality'..Quality]]
 	else
 		return "no pls"
 	end
+end
+function EquipUtil:getEquipmentFixCost(currentLV, Quality)
+	if sdata_equippower_data == nil then
+		print("sdata_equippower_data")
+		return
+	end
+	return math.ceil(sdata_equippower_data:GetFieldV('Quality'..Quality,currentLV) / 10)
 end
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --@Des 获取强化到下一等级提升数值
@@ -356,7 +347,6 @@ end
 --@return (int)装备SuitID
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:getEquipmentSuitIDByID(id)
-	
 	for i = 1,#EquipModel.serv_Equipment do
 		if EquipModel.serv_Equipment[i].id == id then
 			return EquipModel.serv_Equipment[i]["SuitID"]
@@ -393,5 +383,22 @@ function EquipUtil:whetherRepeatEquipped(equip)
 	return false,nil
 end
 
+--[[
+     获取属性重铸所需材料的id
+     equipRarity	装备品质
+     index  		第几条重铸属性
+]]
+function EquipUtil:getEquipRemakeItemID(equipRarity, index)
+	return sdata_equiprecast_data:GetFieldV("Item"..index, equipRarity)
+end
+
+--[[
+     获取重铸所需材料的数量
+     equipRarity	装备品质
+     index  		第几条重铸属性
+]]
+function EquipUtil:getEquipRemakeItemNum(equipRarity, index)
+	return sdata_equiprecast_data:GetFieldV("Num"..index, equipRarity)
+end
 
 return EquipUtil

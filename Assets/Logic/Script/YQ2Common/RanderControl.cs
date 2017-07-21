@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using ProtoBuf;
 using UnityEngine;
 
@@ -38,55 +39,40 @@ public class RanderControl : MonoBehaviour
     /// </summary>
     private bool isStart = false;
 
-
-    public void Begin()
+    /// <summary>
+    /// 同步数据(网络对战时使用, 本机AI不用调用)
+    /// </summary>
+    public void SyncData()
     {
-        isStart = true;
-        LoadSource();
-        StartFSM();
-
-        // TODO 测试确认下兵
-        // 添加同步数据
-        var msgOp = MsgFactory.GetMsgOptional(1, gameObject.transform.position.x, gameObject.transform.position.y,
-            gameObject.transform.position.z, 
-                "ObjectId:" + data.ClusterData.AllData.MemberData.ObjID +
-                ",UniqueId:" + data.ClusterData.AllData.MemberData.UniqueID);
-
-        // 序列化
-        var msgOpSer = SocketManager.Serialize(msgOp);
-        // 包装数据
-        var msgHead = MsgFactory.GetMsgHead(1, 1, ByteUtils.AddDataHead(msgOpSer));
-        var headData = SocketManager.Serialize(msgHead);
-        // 发送消息
-        SocketManager.Single.Send(headData);
+        if (FightDataSyncer.Single.IsStart)
+        {
+            // 如果是联网战斗则同步数据
+            GetDisplayOwner();
+            FightDataSyncer.Single.AddData(data);
+            Debug.Log("网络单位创建:" + transform.position.x + "," + transform.position.z);
+        }
+        else
+        {
+            // 否则直接调用begin
+            Begin();
+        }
     }
 
     /// <summary>
-    /// 打包数据
+    /// 开始行动
     /// </summary>
-    /// <param name="packageData">被包装数据</param>
-    /// <param name="uId">用户Id</param>
-    /// <param name="msgId">数据Id</param>
-    /// <returns></returns>
-    private byte[] PackageData(byte[] packageData, int uId, int msgId)
+    public void Begin()
     {
-        byte[] result = null;
-
-        // 将数据打包放入MsgHead的body中
-        var dataHead = new MsgHead()
-        {
-            msgId = msgId,
-            userId = uId,
-            body = ByteUtils.AddDataHead(packageData),
-        };
-        var stream = new MemoryStream();
-        Serializer.Serialize(stream, dataHead);
-        result = stream.ToArray();
-
-        return result;
+        GetDisplayOwner();
+        isStart = true;
+        LoadSource();
+        StartFSM();
     }
 
-
+    /// <summary>
+    /// 当绘制单位时设置shader
+    /// TODO 解决加载单位没有shader问题
+    /// </summary>
     private void OnWillRenderObject()
     {
         if (!isSetShader)
@@ -114,14 +100,24 @@ public class RanderControl : MonoBehaviour
     /// </summary>
     private void StartFSM()
     {
-        // TODO 日了狗了 循环引用实在去不掉先这么写有空了改.
-        var clusterData = gameObject.GetComponent<ClusterData>();
-        data = DisplayerManager.Single.GetElementById(clusterData.AllData.MemberData.ObjID);
-        // 数据来源非正常方式, 抽出
         // 启动士兵的状态控制
         _control = new SoldierFSMControl();
         data.RanderControl = this;
         _control.StartFSM(data);
+    }
+
+    /// <summary>
+    /// 获取显示数据包装
+    /// </summary>
+    private void GetDisplayOwner()
+    {
+        if (data == null)
+        {
+            // 数据来源非正常方式, 抽出
+            // TODO 日了狗了 循环引用实在去不掉先这么写有空了改.
+            var clusterData = gameObject.GetComponent<ClusterData>();
+            data = DisplayerManager.Single.GetElementById(clusterData.AllData.MemberData.ObjID);
+        }
     }
 
 
@@ -141,8 +137,11 @@ public class RanderControl : MonoBehaviour
     /// </summary>
     public void DestoryFSM()
     {
-        _control.Destory();
-        _control = null;
+        if (_control != null)
+        {
+            _control.Destory();
+            _control = null;
+        }
     }
 
     /// <summary>

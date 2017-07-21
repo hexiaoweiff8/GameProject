@@ -7,7 +7,6 @@ using UnityEngine;
 /// <summary>
 /// 位置对象
 /// </summary>
-[Serializable]
 public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHolder//, IGraphical<Rectangle>
 {
 

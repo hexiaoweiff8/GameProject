@@ -72,9 +72,9 @@ public class ZhuiJiTrigger : SoldierFSMTrigger
     /// <returns></returns>
     private bool SetTarget(SoldierFSMSystem fsm, IList<PositionObject> res)
     {
-        var ran = new System.Random();
+        // TODO 包装随机
         // TODO 取最近的
-        var target = res[ran.Next(0, res.Count)];
+        var target = res[RandomPacker.Single.GetRangeI(0, res.Count)];
         fsm.EnemyTarget = DisplayerManager.Single.GetElementByPositionObject(target);
         return res.Count > 0;
     }

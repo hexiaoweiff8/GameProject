@@ -104,6 +104,11 @@ public abstract class LooperAbstract<T> : ILooper<T> where T : ILoopItem
     private List<long> delList = new List<long>(); 
 
     /// <summary>
+    /// 待添加列表
+    /// </summary>
+    private IDictionary<long, T> addList = new Dictionary<long, T>(); 
+
+    /// <summary>
     /// 单位键ID 自增
     /// </summary>
     private static long keyId = 1024;
@@ -125,17 +130,18 @@ public abstract class LooperAbstract<T> : ILooper<T> where T : ILoopItem
             return;
         }
 
+        var keySet = itemDic.Keys;
         // 执行列表中的单位
-        foreach (var item in itemDic)
+        foreach (var key in keySet)
         {
-            var itemValue = item.Value;
-            if (!itemValue.IsEnd())
+            var item = itemDic[key];
+            if (!item.IsEnd())
             {
-                item.Value.Do();
+                item.Do();
             }
             else
             {
-                delList.Add(item.Key);
+                delList.Add(key);
             }
         }
 
@@ -144,8 +150,14 @@ public abstract class LooperAbstract<T> : ILooper<T> where T : ILoopItem
         {
             Remove(removeItem);
         }
+        // 添加对象
+        foreach (var kv in addList)
+        {
+            itemDic.Add(kv.Key, kv.Value);
+        }
         // 清空删除列表
         delList.Clear();
+        addList.Clear();
     }
 
     /// <summary>
@@ -165,7 +177,7 @@ public abstract class LooperAbstract<T> : ILooper<T> where T : ILoopItem
         {
             return -1;
         }
-        itemDic.Add(keyId, item);
+        addList.Add(keyId, item);
         return keyId++;
     }
 

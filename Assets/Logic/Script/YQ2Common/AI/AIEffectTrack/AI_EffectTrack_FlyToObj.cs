@@ -258,7 +258,7 @@ class TrackHitCheck
     public void MoveTo(float x,float z,Action<AI_FightUnit> hitRecall)
     {
         var distance = AI_Math.V2Distance(m_X, m_Z, x, z);
-        var harfW = SData_MapData.Single.TerrainCellBianchang * DiamondGridMap.harf_wxs;//六边形格子宽度的一半
+        var harfW = SData_MapData.Single.GetDataOfID(1).terrain_cell_bianchang * DiamondGridMap.harf_wxs;//六边形格子宽度的一半
         if (distance < harfW) return;//移动没超过半个格子宽度
 
         int cs = (int)(distance / harfW);//伤害检查迭代次数

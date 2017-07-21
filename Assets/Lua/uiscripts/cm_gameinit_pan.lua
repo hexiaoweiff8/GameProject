@@ -9,8 +9,9 @@ require("uiscripts/kejiP")
 require("uiscripts/Const")
 require("uiscripts/commonModel/card_Model")
 require("uiscripts/commonModel/user_Model")
+require("uiscripts/commonModel/item_Model")
 require("uiscripts/commonModel/currency_Model")
-require("uiscripts/commonModel/publicEquip_Model")
+require("uiscripts/commonModel/equip_Model")
 
 --引用工具类
 require("uiscripts/Util/stringUtil")
@@ -24,7 +25,10 @@ require("uiscripts/Util/skillUtil")
 require("uiscripts/Util/starUtil")
 require("uiscripts/Util/itemUtil")
 require("uiscripts/Util/qualityUtil")
-require("uiscripts/Util/publicEquip_Util")
+require("uiscripts/Util/equipUtil")
+require("uiscripts/Util/dotweenUtil")
+require("uiscripts/Util/borderUtil")
+
 
 
 
@@ -49,6 +53,7 @@ WNDTYPE = {
     ui_kejitree = "ui_kejitree",
     Cardyc = "ui_cardyc",
     Cangku = "ui_cangku",
+    QianDao = "ui_qiandao",
 }
 UiDefine = luacsv.new(require("pk_tabs/UiDefine"))
 -- 登录窗体组件名列表 
@@ -70,6 +75,7 @@ gameinit.wndlist = {
     {name = WNDTYPE.ui_kejitree, cm = "uiscripts/ui_kejitree"},
     {name = WNDTYPE.Cardyc, cm = "uiscripts/cardyc/wnd_cardyc_controller"},
     {name = WNDTYPE.Cangku, cm = "uiscripts/cangku/wnd_cangku_controller"},
+    {name = WNDTYPE.QianDao, cm = "uiscripts/qiandao/wnd_qiandao_controller"},
 }
 _all_Reg_Wnd_list = {}
 --- <summary>
@@ -192,6 +198,7 @@ function gameinit:coStartGame(parm)
     ui_manager = ui_manager()
     ui_manager:ShowWB(WNDTYPE.Healthadvice)
     self:coLoading();
+
 end
 -- 后台装资源
 function gameinit:coLoading(parm)

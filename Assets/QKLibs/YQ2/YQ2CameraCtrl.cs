@@ -69,41 +69,27 @@ public class YQ2CameraCtrl : MonoBehaviour
         m_ScrollObject = GetComponent<BoxScrollObject>();
 
         // 本地化数据层数据
-        StartCoroutine(InitData());
+        var cameraData = SData_MapData.Single.GetDataOfID(1);
+        m_CameraTurnaroundTime = cameraData.Camera_ZhuanshenTime;
+        m_TerrainCellBianchang = cameraData.terrain_cell_bianchang;
+        m_CameraYAroundMin = cameraData.CameraY_XuanzhuanMin;
+        m_CameraYAroundMax = cameraData.CameraY_XuanzhuanMax;
+        m_Camera_YOffsetMax = cameraData.Camera_YOffsetMax;
+        m_Camera_YOffsetMin = cameraData.Camera_YOffsetMin;
+        m_Camera_RotationMax = cameraData.Camera_RotationMax;
+        m_Camera_RotationMin = cameraData.Camera_RotationMin;
+        m_Camera_ZOffsetMax = cameraData.Camera_ZOffsetMax;
+        m_Camera_ZOffsetMin = cameraData.Camera_ZOffsetMin;
+        m_Camera_XOffsetMax = cameraData.Camera_XOffsetMax;
+        m_Camera_XOffsetMin = cameraData.Camera_XOffsetMin;
+        m_CameraTrnaroundSpeed = cameraData.CameraY_XuanzhuanSpeed;
+        m_FreeCamera_Scale_Speed = cameraData.FreeCamera_Scale_Speed;
+        m_Camera_Overall_Zoffset = cameraData.Camera_Overall_Zoffset;
+        m_Camera_Overall_Yoffset = cameraData.Camera_Overall_Yoffset;
+        m_Camera_Overall_Yrotate = cameraData.Camera_Overall_Yrotate;
+        m_Camera_Overall_Xrotate = cameraData.Camera_Overall_Xrotate;
 
         uf = GetComponent<UIFollow>();
-    }
-
-    /// <summary>
-    /// 初始化数据
-    /// 将数据层数据本地化
-    /// </summary>
-    IEnumerator InitData()
-    {
-        // 等待数据加载完毕
-        while (SData_MapData.Single == null)
-        {
-            yield return new WaitForEndOfFrame();
-        }
-        m_CameraTurnaroundTime = SData_MapData.Single.Camera_ZhuanshenTime;
-        m_TerrainCellBianchang = SData_MapData.Single.TerrainCellBianchang;
-        m_CameraYAroundMin = SData_MapData.Single.CameraY_XuanzhuanMin;
-        m_CameraYAroundMax = SData_MapData.Single.CameraY_XuanzhuanMax;
-        m_Camera_YOffsetMax = SData_MapData.Single.Camera_YOffsetMax;
-        m_Camera_YOffsetMin = SData_MapData.Single.Camera_YOffsetMin;
-        m_Camera_RotationMax = SData_MapData.Single.Camera_RotationMax;
-        m_Camera_RotationMin = SData_MapData.Single.Camera_RotationMin;
-        m_Camera_ZOffsetMax = SData_MapData.Single.Camera_ZOffsetMax;
-        m_Camera_ZOffsetMin = SData_MapData.Single.Camera_ZOffsetMin;
-        m_Camera_XOffsetMax = SData_MapData.Single.Camera_XOffsetMax;
-        m_Camera_XOffsetMin = SData_MapData.Single.Camera_XOffsetMin;
-        m_CameraTrnaroundSpeed = SData_MapData.Single.CameraY_XuanzhuanSpeed;
-        m_FreeCamera_Scale_Speed = SData_MapData.Single.FreeCamera_Scale_Speed;
-        m_Camera_Overall_Zoffset = SData_MapData.Single.Camera_Overall_Zoffset;
-        m_Camera_Overall_Yoffset = SData_MapData.Single.Camera_Overall_Yoffset;
-        m_Camera_Overall_Yrotate = SData_MapData.Single.Camera_Overall_Yrotate;
-        m_Camera_Overall_Xrotate = SData_MapData.Single.Camera_Overall_Xrotate;
-
     }
 
     /// <summary>

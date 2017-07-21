@@ -25,5 +25,10 @@ spriteNameUtil = class("spriteNameUtil")
     spriteNameUtil._ICON = "zhuangbei_xiangxishuxing_taozhuangtouxiangkuang"
     spriteNameUtil._RED = "zhuangbei_zhuangbeikuang_hongsepinzhi"
 
+
+    spriteNameUtil.COMPROPS_MOVE_UP = "zhuangbei_jiantou_xiangxishuxing_zhankai"
+    spriteNameUtil.COMPROPS_MOVE_DOWN = "zhuangbei_jiantou_xiangxishuxing_shouqi"
+
+
 return spriteNameUtil
 

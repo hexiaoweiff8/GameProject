@@ -67,18 +67,30 @@ public class UI_Equip_Item : UIScrollViewItemBase {
 
     public void setEquipmentLevel(int level)
     {
+        _cEquipment.SetActive(true);
         tEquipmentLevel.text = level.ToString();
     }
     public void setEquipped(bool Equipped)
     {
+        _cEquipment.SetActive(true );
         if (Equipped)
             sEquipped.spriteName = UI_Equip_Item.EQUIPPED;
         else sEquipped.spriteName = null;
     }
     public void setEquipmentLock(bool Locked)
     {
+        _cEquipment.SetActive(true);
         if (Locked)
             sLocked.spriteName = UI_Equip_Item.LOCKED;
         else sLocked.spriteName = null;
     }
+
+    public void setEmpty()
+    {
+        sIconSelectFrame.spriteName = "null";
+        sIcon.spriteName = "null";
+        sIconFrame.spriteName = "null";
+        _cEquipment.SetActive(false);
+    }
+
 }

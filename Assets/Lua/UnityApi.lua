@@ -14157,6 +14157,9 @@ name = nil
 -- property: HideFlags RanderControl.hideFlags	get	set	
 hideFlags = nil 
 --*
+----Void RanderControl:SyncData()
+function SyncData() end 
+
 ----Void RanderControl:Begin()
 function Begin() end 
 
@@ -15640,6 +15643,9 @@ function setEquipped() end
 
 ----Void UI_Cangku_Item:setEquipmentLock(Boolean Locked)
 function setEquipmentLock() end 
+
+----Void UI_Equip_Item:setEmpty()
+function setEmpty() end 
 
 UIDragScrollView = {} 
 --*

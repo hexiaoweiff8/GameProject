@@ -6,19 +6,12 @@ require("uiscripts/commonGameObj/cardhead")
 
 
 local cardhead
-
 local isInitUpLvLayer = false  --是否初始化升级界面
-local CardIndex
 function upLevel_controller:init( args )
     view:init_view(args)
 end
-
 --点击主界面升级按钮
-function upLevel_controller:show_UpLevel_Layer(cardIndex)
-    CardIndex = cardIndex
-    if not data:getDatas(CardIndex) then 
-        return 
-    end 
+function upLevel_controller:show_UpLevel_Layer()
     if not isInitUpLvLayer then--初始化升级界面
         --初始化升级界面的控件
         view:init_Uplevel_Panel()
@@ -44,18 +37,18 @@ end
 
 --刷新升级界面，更新数据
 function upLevel_controller:refresh_UpLevel_Layar()
-    
+
     --刷新升级界面的卡牌头像，显示默认星级
     cardhead:refresh(data.cardId, data.cardLv, data.starLv)
 
     view.cardLevLab.transform:GetComponent("UILabel").text = string.format("%s:%d",stringUtil:getString(20036),data.expPool)
     --最大等级判断
-    if data.cardLv >=Const.MAX_CARD_LV then 
+    if data.cardLv >=Const.MAX_CARD_LV then
         view.btn_upLevelP:SetActive(false)
         view.btn_maxLevelP:SetActive(true)
         view.uiSlide.transform:GetComponent("UISlider").value = 1
         view.expProLab.transform:GetComponent("UILabel").text = "MAX"
-        return 
+        return
     end
     view.btn_upLevelP:SetActive(true)
     view.btn_maxLevelP:SetActive(false)
@@ -66,32 +59,29 @@ end
 
 --点击升一级按钮
 function upLevel_controller:upLevelOne_CallBack()
-    if data:isCan_UpLevel() ~= 0 then
-        tips:show( tipsText )
+    local isCan_UpLevel = data:isCan_UpLevel()
+    if isCan_UpLevel ~= 0 then
+        UIToast.Show(isCan_UpLevel, nil, UIToast.ShowType.Upwards)
         return
     end
     Message_Manager:SendPB_CardUpLevel(data.cardId, 1)
-    
+
 end
 
 --点击升十级按钮
 function upLevel_controller:upLevelTen_CallBack()
-    if data:isCan_UpLevel() ~= 0 then
-        tips:show( tipsText )
+    local isCan_UpLevel = data:isCan_UpLevel()
+    if isCan_UpLevel ~= 0 then
+        UIToast.Show(isCan_UpLevel, nil, UIToast.ShowType.Upwards)
         return
     end
     Message_Manager:SendPB_CardUpLevel(data.cardId, 10)
 end
 
 --点击升级后刷新界面，在wndtz_login.lua中服务器返回数据后调用
-function upLevel_controller:upLevel_refresh()
+function upLevel_controller:upLevel_Success()
     -- body
-    wnd_cardyc_controller:refresh()
-    if not data:getDatas(CardIndex) then 
-        return 
-    end 
     self:refresh_UpLevel_Layar()
-    
 end
 
 return upLevel_controller

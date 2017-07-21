@@ -38,9 +38,11 @@ function SynergyItem:refresh(synergyCardID, state, isCanUp, index)
     local needCardLv = synergyUtil:getRequireCardLevel(synergyCardID,index)
     local needQualityLv = synergyUtil:getRequireCardQuality(synergyCardID,index)
 
-    local attributeName = attributeUtil:getAttributeName(synergyUtil:getSynergyAttribute(synergyCardID,index))
+    local synergyAttributeID = synergyUtil:getSynergyAttribute(synergyCardID,index)
+
+    local attributeName = attributeUtil:getAttributeName(synergyAttributeID)
     local attributePoint = synergyUtil:getSynergyPoint(synergyCardID,index)
-    local attributeSymbol = attributeUtil:getAttributeSymbol(synergyUtil:getSynergyAttribute(synergyCardID,index))
+    local attributeSymbol = attributeUtil:getAttributeSymbol(synergyAttributeID)
     --初始化协同选项
 
 

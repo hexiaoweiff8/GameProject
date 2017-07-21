@@ -14,7 +14,6 @@ wnd_cangku_model = {
 	serv_Items = {},-- 从服务器获取的Items数据(id,num)
 	-- serv_Equipment = {},-- 从服务器获取的Equipment数据
 	-- serv_fitEquipmentList = {},-- 从服务器获取的已穿戴装备的id列表
-	-- serv_CurrencyInfo = {},-- 从服务器获取的货币类信息
 
 	decomposition_Equipment = {},-- 装备分解状态时使用的临时表
 	Processed_Items = {},-- 处理后的仓库数据(全部,装备在前,道具在后)，用于显示在ScrollView上
@@ -124,6 +123,46 @@ function wnd_cangku_model:getLocalItemDetailByItemID(itemID)
 	Debugger.LogWarning(itemID.." not found in wnd_cangku_model:getLocalItemDetailByItemID(itemID)")
 	return nil	
 end
+--@Des 获取本地Item数据(引用)
+function wnd_cangku_model:getLocalItemDataRefByItemID(itemID)
+	for i = 1,#this.local_Items do
+		if this.local_Items[i]["ItemID"] == itemID then
+			return this.local_Items[i]
+		end
+	end
+	Debugger.LogWarning(itemID.." not found in wnd_cangku_model:getLocalItemRefByItemID(itemID)")
+	return nil	
+end
+--@Des 获取服务器Item数量
+function wnd_cangku_model:getServItemCountByItemID(itemID)
+	for i = 1,#this.Processed_Items do
+		if this.Processed_Items[i]["ItemID"] == itemID then
+			return this.Processed_Items[i].num
+		end
+	end
+	Debugger.LogWarning(itemID.." not found in wnd_cangku_model:getServItemCountByItemID(itemID)")
+	return 0
+end
+--@Des 获取服务器装备数量
+function wnd_cangku_model:getServEquipCountByEquipID(eid)
+	local count = 0
+	for i = 1,#this.Processed_Items do
+		if this.Processed_Items[i]["EquipID"] == eid then
+			count = count + 1
+		end
+	end
+	return count
+end
+--@Des 获取服务器Item数量(引用)
+function wnd_cangku_model:getServCardCountByCardID(cardID)
+	for i = 1,#this.Processed_Items do
+		if this.Processed_Items[i]["ArmyCardID"] == cardID then
+			return this.Processed_Items[i].num
+		end
+	end
+	Debugger.LogWarning(cardID.." not found in wnd_cangku_model:getServCardCountByCardID(itemID)")
+	return 0
+end
 
 function wnd_cangku_model:getUseTypeByItemID(itemID)
 	for i = 1,#this.local_Items do
@@ -162,6 +201,76 @@ function wnd_cangku_model:getIndexByID(id)
 	end
 	Debugger.LogWarning(id.." not found in wnd_cangku_model:getIndexByID(id)")
 	return nil
+end
+----------------------------------------------------------------
+--★Util
+function wnd_cangku_model:itemWhetherExist(id)
+	for i = 1,#this.serv_Items do
+		if this.serv_Items[i].id == id then
+			return true
+		end
+	end
+	return false
+end
+function wnd_cangku_model:equipWhetherExist(id)
+	for i = 1,#this.serv_Equipment do
+		if this.serv_Equipment[i].id == id then
+			return true
+		end
+	end
+	return false
+end
+----------------------------------------------------------------
+--★追加服务器数据
+--@Des 添加或更新Item数据
+--@Params 服务器传回的Item数据
+function wnd_cangku_model:addOrUpdateItemData(gw2c_item)
+	for k,v in ipairs(gw2c_item) do
+		local _id = v.id
+		local _num = v.num
+		local _Exist = this:itemWhetherExist(_id)
+		-- 如果本地存在Item,则更新本地数据，否则追加ItemData到本地Model中
+		if _Exist then
+			for i = 1,#this.serv_Items do
+				if this.serv_Items[i].id == _id then
+					this.serv_Items[i].num = _num
+					return
+				end
+			end
+		else
+			local item = {}
+			item = this:getLocalItemDetailByItemID(_id)
+
+			local _OverlapLimit = item["OverlapLimit"]
+			if _OverlapLimit ~= 1 then
+				if _num <= _OverlapLimit then -- 堆叠数量处理
+					-- print("物品数量：".._num.."  堆叠限制：".._OverlapLimit)
+					item.id = _id
+					item.num = _num
+					table.insert(this.serv_Items,item)
+				else 
+					-- print("物品数量超出限制：".._num.."  堆叠限制：".._OverlapLimit)
+					for i = 1,math.ceil(_num / _OverlapLimit) do
+						item.id = _id
+						if i ~= math.ceil(_num / _OverlapLimit) then
+							item = table.deepcopy(item)
+							item.num = _OverlapLimit
+							table.insert(this.serv_Items,item)
+						else
+							item = table.deepcopy(item)
+					 		item.num = _num - _OverlapLimit * (math.ceil(_num / _OverlapLimit) - 1)
+							table.insert(this.serv_Items,item)
+						end
+					end
+				end
+			end
+		end
+	end
+	require('uiscripts/cangku/scrollview/wnd_cangku_ScrollView_controller'):sortItems(this.serv_Items)
+	this.Processed_Items = {}
+	require('uiscripts/cangku/wnd_cangku_controller'):mergeServData()
+	
+	Debugger.Log("addOrUpdateItemData() completed.")
 end
 
 return wnd_cangku_model

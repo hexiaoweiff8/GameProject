@@ -527,7 +527,7 @@ function ui_fight:getModel(id, index)
             tempMod.eulerAngles = Vector3(0, -90, 0)
             local mt = tempMod.gameObject:GetComponent(typeof(RanderControl))
             mt.isEnemy = true
-            mt:Begin()
+            mt:SyncData()
             --mt:StartRanderControl()
             --mt.groupIndex = self.groupIndex
         else
@@ -737,7 +737,7 @@ function ui_fight:backCallback(tf, b)
         for i = 1, self.onPressArmytb[index].childCount do
             local rander = self.onPressArmytb[index]:GetChild(0).gameObject:GetComponent(typeof(RanderControl))--:Begin()--:StartRanderControl()
             self.onPressArmytb[index]:GetChild(0).parent = nil
-            rander:Begin()
+            rander:SyncData()
         end
         --玩家下兵寻路网格位置(敌人下兵平行位置)
         self.ctPosition = self.AstarFight:getNum(self.onPressArmytb[index].position)

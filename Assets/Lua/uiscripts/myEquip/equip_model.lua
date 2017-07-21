@@ -16,6 +16,7 @@ function equip_model:getDatas()
     end
     self.allEquipmentTbl = EquipModel.serv_Equipment
     self.equipOnBodyList = {}
+    self.myPower = currencyModel:getCurrentTbl().power
     self:initEquipOnBodyList()
     if isFirst then
         isFirst = false
@@ -63,18 +64,7 @@ function equip_model:initEquipListByType()
     end
     for i = 1, #self.equipListByType do
         if #self.equipListByType[i] ~= 0 then
-            table.sort(self.equipListByType[i],
-            function(a,b)
-                if a.isBad ~= b.isBad then
-                    return (a.isBad == 1 and {true} or {false})[1] -- 损坏度,坏的在前
-                elseif a.rarity ~= b.rarity then
-                    return a.rarity > b.rarity -- 装备品质高的在前
-                elseif a.lv ~= b.lv then
-                    return a.lv > b.lv -- lv大的在前
-                else
-                    return a.id < b.id -- id小的在前
-                end
-            end)
+            EquipUtil:sortEquipment(self.equipListByType[i])
         end
     end
 end

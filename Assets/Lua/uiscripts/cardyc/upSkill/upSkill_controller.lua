@@ -12,19 +12,15 @@ local isInitSptReset = false    --是否初始化技能重置界面
 local skillItems = {}
 local skillInfoItem
 local cardhead
-local CardIndex
 function upSkill_controller:init( args )
     view:init_view(args)
     
 end
 
-function upSkill_controller:refresh(cardIndex)
+function upSkill_controller:Refresh()
     -- body
     print("upSkill_controller refresh!!!!")
-    CardIndex = cardIndex
-    if not data:getDatas(CardIndex) then 
-        return 
-    end 
+    data:init_skillIDTable()
     self:skill_Body()
 end
 
@@ -109,18 +105,17 @@ end
 
 --点击技能升级按钮
 function upSkill_controller:skillItem_Up_CallBack(index)
-    if data:isCan_UpSkill(index) ~= 0 then
-        tips:show( tipsText )
+    local isCan_UpSkill = data:isCan_UpSkill(index)
+    if isCan_UpSkill ~= 0 then
+        UIToast.Show(isCan_UpSkill, nil, UIToast.ShowType.Upwards)
         return
     end
     UpSkillIndex = index
-    Message_Manager:SendPB_10014(data.cardId,index-1)
+    Message_Manager:SendPB_UpSkill(data.cardId,index-1)
 end
 --根据升级技能的index对界面进行刷新
-function upSkill_controller:upSkill_refresh()
-    wnd_cardyc_controller:refresh()
+function upSkill_controller:upSkill_Success()
     self:show_SkillItem_UpPanel(UpSkillIndex)
-    
 end
 
 
@@ -162,8 +157,7 @@ function upSkill_controller:perfect_Reset_CallBack()
     Message_Manager:SendPB_10015(data.cardId, 300)
 end
 --重置技能成功后对界面进行刷新
-function upSkill_controller:skillReset_refresh()
-    wnd_cardyc_controller:refresh()
+function upSkill_controller:skillReset_Success()
     view.sPtRPanel:SetActive(false)
 end
 return upSkill_controller

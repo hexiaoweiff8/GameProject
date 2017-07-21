@@ -30,7 +30,13 @@ end
 function cardUtil:getTrainCost(cardId)
     return sdata_armycardbase_data:GetFieldV("TrainCost",cardId)
 end
-
+--[[
+    根据卡牌ID获取卡牌描述
+    cardId  卡牌ID
+]]
+function cardUtil:getCardDes(cardId)
+    return sdata_armycardbase_data:GetFieldV("Des",cardId)
+end
 --[[
     获取卡牌升至该级所需的经验值
     cardLv  卡牌等级

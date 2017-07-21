@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
+using Util;
 
 /// <summary>
 /// Socket管理器
@@ -28,7 +29,7 @@ public class SocketManager : ILoopItem
             {
                 single = new SocketManager();
                 // 启动循环器
-                LooperManager.Single.Add(single);
+                single.Start();
             }
             return single;
         }
@@ -74,10 +75,10 @@ public class SocketManager : ILoopItem
 
     // ------------------------私有属性-----------------------------
 
-    /// <summary>
-    /// 缓冲区
-    /// </summary>
-    private readonly byte[] buffer = new byte[BuffSize];
+    ///// <summary>
+    ///// 缓冲区
+    ///// </summary>
+    //private readonly byte[] buffer = new byte[BuffSize];
 
     /// <summary>
     /// 已接收到的消息如果尚未能够解读则保存等待拼接
@@ -118,7 +119,15 @@ public class SocketManager : ILoopItem
         get { return actionId++; }
     }
 
+    /// <summary>
+    /// 自增编号
+    /// </summary>
     private static int actionId = 1024;
+
+    /// <summary>
+    /// 循环器ID
+    /// </summary>
+    private long looperId = -1;
 
 
     // --------------------------公共方法----------------------------
@@ -156,6 +165,27 @@ public class SocketManager : ILoopItem
     //}
 
     /// <summary>
+    /// 启动
+    /// </summary>
+    public void Start()
+    {
+        if (looperId > 0)
+        {
+            LooperManager.Single.Remove(looperId);
+        }
+        looperId = LooperManager.Single.Add(this);
+        dataActionList.Clear();
+    }
+
+    /// <summary>
+    /// 停止运行
+    /// </summary>
+    public void Stop()
+    {
+        LooperManager.Single.Remove(looperId);
+    }
+
+    /// <summary>
     /// 添加事件
     /// </summary>
     /// <param name="action"></param>
@@ -184,6 +214,14 @@ public class SocketManager : ILoopItem
         {
             dataActionList.Remove(id);
         }
+    }
+
+    /// <summary>
+    /// 清空所有action
+    /// </summary>
+    public void ClearAllAction()
+    {
+        dataActionList.Clear();
     }
 
 
@@ -286,9 +324,12 @@ public class SocketManager : ILoopItem
         // 异步请求建立链接
         var async = socket.BeginConnect(ipEndPoint, (ia) =>
         {
+            // 链接成功
+            ConnectSuccess = true;
             // 保存IP与Port
             connectingAddress = ip;
             connectingPort = port;
+            var buffer = new byte[BuffSize];
             // 接收消息Callback
             AsyncCallback receiveCallback = null;
             receiveCallback = (ayResult) =>
@@ -324,7 +365,7 @@ public class SocketManager : ILoopItem
             socket.BeginReceive(buffer, 0, BuffSize, SocketFlags.None, receiveCallback, socket);
         }, socket);
 
-        async.AsyncWaitHandle.WaitOne(5000, true);
+        async.AsyncWaitHandle.WaitOne(WaitTime, true);
 
         socket.EndConnect(async);
 
@@ -562,7 +603,9 @@ public class SocketManager : ILoopItem
     /// </summary>
     public void OnDestroy()
     {
-
+        Close();
+        looperId = -1;
+        ClearAllAction();
     }
 }
 

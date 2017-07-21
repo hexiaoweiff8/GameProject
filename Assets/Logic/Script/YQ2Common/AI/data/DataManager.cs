@@ -254,6 +254,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
         //var display = DP_FightPrefabManage.InstantiateAvatar(param);
         //通过对象池创建角色
         var display = DisplayerManager.Single.CreateAvatar(soldier.Name, param);
+        display.transform.position = new Vector3(param.X, 0, param.Y);
         // 设置父级
         ParentManager.Instance().SetParent(display, ParentManager.ClusterParent);
 

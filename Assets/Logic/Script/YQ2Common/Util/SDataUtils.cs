@@ -20,6 +20,12 @@ public class SDataUtils
 
         switch (index)
         {
+            case "mapData":
+                {
+                    SData_MapData.AutoInstance();
+                    SData_MapData.Single.setData(table1, table2);
+                }
+                break;
             case "constant":
                 {
                     SData_Constant.AutoInstance();

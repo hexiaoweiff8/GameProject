@@ -64,9 +64,7 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
     {
         if (displayPool.ContainsKey(soldiername) && displayPool[soldiername].Count > 0)
         {
-            var go = displayPool[soldiername].Pop();
-            Debug.Log("Go:" + go);
-            return go;
+            return displayPool[soldiername].Pop();
         }
         return DP_FightPrefabManage.InstantiateAvatar(param);
     }
@@ -78,7 +76,10 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
         if (control != null)
         {
             control.DestoryFSM();
-            control.bloodBarCom.DestorySelf();
+            if (control.bloodBarCom != null)
+            {
+                control.bloodBarCom.DestorySelf();
+            }
             control.gameObject.SetActive(false);
             GameObject.Destroy(control);
         }
@@ -178,6 +179,36 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
         return null;
     }
 
+
+    /// <summary>
+    /// 获取单位
+    /// </summary>
+    /// <param name="objType">单位类型</param>
+    /// <param name="id">单位唯一Id</param>
+    /// <returns>被获取单位(如果不存在返回Null</returns>
+    public DisplayOwner GetElementById(ObjectID.ObjectType objType, int id)
+    {
+        switch (objType)
+        {
+            // TODO 基地目前从士兵列表中获取
+            case ObjectID.ObjectType.MyJiDi:
+            case ObjectID.ObjectType.MySoldier:
+                if (_allMyDisPlayDict.ContainsKey(id))
+                {
+                    return _allMyDisPlayDict[id];
+                }
+                break;
+            case ObjectID.ObjectType.EnemyJiDi:
+            case ObjectID.ObjectType.EnemySoldier:
+                if (_allEnemyDisPlayDict.ContainsKey(id))
+                {
+                    return _allEnemyDisPlayDict[id];
+                }
+                break;
+        }
+        return null;
+    }
+
     /// <summary>
     /// 获取Display
     /// </summary>
@@ -252,6 +283,18 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
         return result;
     }
 
+    /// <summary>
+    /// 销毁单位
+    /// </summary>
+    /// <param name="display"></param>
+    public void DelDisplay(DisplayOwner display)
+    {
+        display.ClusterData.Stop();
+        ClusterManager.Single.Remove(display.ClusterData);
+        FightUnitFactory.DeleteUnit(display.ClusterData.AllData.MemberData);
+        GameObject.Destroy(display.ClusterData);
+    }
+
 
     //public List<DisplayOwner> GetElementsByScope(ICollisionGraphics graphics)
     //{
@@ -278,7 +321,7 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
     private void _destoryDisplay(Dictionary<int, DisplayOwner> dict, ObjectID objID)
     {
         ClusterManager.Single.Remove(dict[objID.ID].ClusterData);
-        //dict[objID.ID].RanderControl.DestoryFSM();
+        dict[objID.ID].RanderControl.DestoryFSM();
         dict[objID.ID].RanderControl.bloodBarCom.DestorySelf();
         GameObject.Destroy(dict[objID.ID].RanderControl.gameObject);
     }

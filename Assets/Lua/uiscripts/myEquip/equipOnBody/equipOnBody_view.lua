@@ -10,7 +10,7 @@ function euqipOnbody_view:init_view(args)
 
     self.btn_equipOnce = view.transform:Find("onBody/btn_equipOnce").gameObject
     self.btn_fixOnce = view.transform:Find("onBody/btn_fixOnce").gameObject
-
+    self.onceFixCost_lab = self.btn_fixOnce.transform:Find("costLab").gameObject
 
     self.equipItems = {}
     self.equipIcon = {}

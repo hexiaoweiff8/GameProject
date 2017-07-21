@@ -111,8 +111,9 @@
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestSocket.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestTargetSelecter.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestTimer.cs" />
+    <Compile Include="Assets\AStarSchoolBehaviour\Script\msg\MsgBattle.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\msg\MsgHead.cs" />
-    <Compile Include="Assets\AStarSchoolBehaviour\Script\msg\MsgOptional.cs" />
+    <Compile Include="Assets\AStarSchoolBehaviour\Script\msg\MsgId.cs" />
     <Compile Include="Assets\Logic\Script\AstarFight.cs" />
     <Compile Include="Assets\Logic\Script\Boot.cs" />
     <Compile Include="Assets\Logic\Script\DebugConfig.cs" />
@@ -301,6 +302,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Net\SocketManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\PoolLoader.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\QuadTree.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\RandomPacker.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\ResourceLoader.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\SDataUtils.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\Buff\BuffInfo.cs" />
@@ -416,6 +418,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equip_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equipdata.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equippower_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equiprecast_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equipsuit_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_item_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_kezhi_c.cs" />
@@ -836,6 +839,7 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIWidgetContainerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIWidgetWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UI_Cangku_ItemWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UI_Equip_ItemWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_AnimationBlendModeWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_AnimationClipWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_AnimationStateWrap.cs" />

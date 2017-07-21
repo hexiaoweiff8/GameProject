@@ -92,26 +92,26 @@ public class DP_CameraTrackObjectManage : MonoEX.Singleton<DP_CameraTrackObjectM
         float user_scale;
 
         if(!float.TryParse(yrot_str,out user_yrot))
-            user_yrot = SData_MapData.Single.CameraY_Xuanzhuan_End;
+            user_yrot = SData_MapData.Single.GetDataOfID(1).CameraY_Xuanzhuan_End;
 
         if (!float.TryParse(scale_str, out user_scale))
-            user_scale = SData_MapData.Single.FreeCamera_Scale_End;
+            user_scale = SData_MapData.Single.GetDataOfID(1).FreeCamera_Scale_End;
 
         float scale_start;
         float scale_end = user_scale;
-        if (user_scale < SData_MapData.Single.FreeCamera_Scale_StopRange_Min)
-            scale_start = SData_MapData.Single.FreeCamera_Scale_End; 
-         else if(user_scale>SData_MapData.Single.FreeCamera_Scale_StopRange_Max) 
-            scale_start = SData_MapData.Single.FreeCamera_Scale; 
+        if (user_scale < SData_MapData.Single.GetDataOfID(1).FreeCamera_Scale_StopRange_Min)
+            scale_start = SData_MapData.Single.GetDataOfID(1).FreeCamera_Scale_End;
+        else if (user_scale > SData_MapData.Single.GetDataOfID(1).FreeCamera_Scale_StopRange_Max)
+            scale_start = SData_MapData.Single.GetDataOfID(1).FreeCamera_Scale; 
         else 
             scale_start = user_scale;
 
         float yrot_start;
         float yrot_end = user_yrot;
-        if (user_yrot < SData_MapData.Single.CameraY_Xuanzhuan_StopRange_Min)
-            yrot_start = SData_MapData.Single.CameraY_Xuanzhuan_End; 
-        else if (user_yrot > SData_MapData.Single.CameraY_Xuanzhuan_StopRange_Max)
-            yrot_start = SData_MapData.Single.CameraY_Xuanzhuan_Start;
+        if (user_yrot < SData_MapData.Single.GetDataOfID(1).CameraY_Xuanzhuan_StopRange_Min)
+            yrot_start = SData_MapData.Single.GetDataOfID(1).CameraY_Xuanzhuan_End;
+        else if (user_yrot > SData_MapData.Single.GetDataOfID(1).CameraY_Xuanzhuan_StopRange_Max)
+            yrot_start = SData_MapData.Single.GetDataOfID(1).CameraY_Xuanzhuan_Start;
         else
             yrot_start = user_yrot;
 
@@ -168,9 +168,9 @@ public class DP_CameraTrackObjectManage : MonoEX.Singleton<DP_CameraTrackObjectM
         if (targerTrans != null)
         {
             // 读取系统配置旋转参数: 旋转半径, 旋转时y轴高度, 旋转速度
-            var rotationRedius = SData_MapData.Single.Camera_Rotate_Radius;
-            var rotationYOffset = SData_MapData.Single.Camera_Rotate_YOffset;
-            var rotationSpeed = SData_MapData.Single.Camera_Rotate_Speed;
+            var rotationRedius = SData_MapData.Single.GetDataOfID(1).Camera_Rotate_Radius;
+            var rotationYOffset = SData_MapData.Single.GetDataOfID(1).Camera_Rotate_Yoffset;
+            var rotationSpeed = SData_MapData.Single.GetDataOfID(1).Camera_Rotate_Speed;
 
             // 旋转计数
             var rotationTimes = 0;

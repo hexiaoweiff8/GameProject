@@ -11,7 +11,7 @@ local upSynergy = require("uiscripts/cardyc/upSynergy/upSynergy_controller")
 local upLevel = require("uiscripts/cardyc/upLevel/upLevel_controller")
 local upStar = require("uiscripts/cardyc/upStar/upStar_controller")
 
-require("uiscripts/tabsControl")
+local TabControl = require("uiscripts/tabsControl")
 
 
 
@@ -22,37 +22,14 @@ local tabBtn
 local tabPanel
 local tabControl
 
-
-function wnd_cardyc_controller:show3DModel()
-    --添加RenderTexture 实现UI上添加3d模型
-    local playerModelTexture = self.transform:Find("playerModelTexture")
-    local Camera3D = self.transform:Find("Camera3D")
-    self.myTexture = UnityEngine.RenderTexture(1024, 1024, 24)
-    self.myTexture:Create()
-    Camera3D:GetComponent(typeof(UnityEngine.Camera)).targetTexture = self.myTexture
-    playerModelTexture:GetComponent(typeof(UITexture)).mainTexture = self.myTexture
-    --添加玩家3d模型
-    tempMod = DP_FightPrefabManage.InstantiateAvatar(CreateActorParam(AvatarCM.Infantry_R, false, 0, "xuebaotujidui", "xuebaotujidui", true, 0, 0)).transform
-    --tempMod = DP_FightPrefabManage.InstantiateAvatar(CreateActorParam(AvatarCM.Infantry_R, false, 0, "gongjianbing", "gongjianbing", true, 0, 0)).transform
-    tempMod.parent = Camera3D
-    tempMod.localScale = Vector3(0.8, 0.8, 0.8);
-    tempMod.localRotation = Quaternion(0, 180, 0, 1);
-    tempMod.localPosition = Vector3(0, -7, 500);
-    tempMod.gameObject:SetActive(true)
-    tempMod.gameObject.layer = UnityEngine.LayerMask.NameToLayer("3DUI")
-
-    playerModelTexture:GetComponent(typeof(SpinWithMouse)).target = tempMod
-    UIEventListener.Get(playerModelTexture.gameObject).onPress = function(go, args)
-        if args then
-            --self:dianjikongbai()
-        end
-    end
-end
 function wnd_cardyc_controller:OnShowDone()
     --初始化view
     view:init_view(self)
     view:getView()
 
+    if not data:getDatas(cardIndex) then
+        return
+    end
 
     information:init(self)
     upSkill:init(self)
@@ -62,22 +39,11 @@ function wnd_cardyc_controller:OnShowDone()
     upStar:init(self)
 
     self:init_tabPanel()
-    self:refresh()
-    self:show3DModel()
-    
-end
 
---刷新
-function wnd_cardyc_controller:refresh()
-
-    if not data:getDatas(cardIndex) then 
-        return 
-    end 
     self:init_redDot()
     self:refresh_leftCard_Data()
-    self:refresh_TabBody_Data()
-    
 end
+
 
 
 
@@ -110,7 +76,7 @@ function wnd_cardyc_controller:refresh_leftCard_Data()
         upLevel:show_UpLevel_Layer(cardIndex)
     end
     UIEventListener.Get(view.btn_upStar).onClick = function()
-        upStar:show_UpStar_Layer(cardIndex) 
+        upStar:show_UpStar_Layer()
     end
     UIEventListener.Get(view.btn_left).onClick = function()
         if cardIndex > 1 then
@@ -118,8 +84,7 @@ function wnd_cardyc_controller:refresh_leftCard_Data()
             self:refresh()
         else
             --无更多卡牌
-            tipsText = stringUtil:getString(20701)
-            tips:show( tipsText )
+            UIToast.Show(stringUtil:getString(20701), nil, UIToast.ShowType.Upwards)
         end
     end
     UIEventListener.Get(view.btn_right).onClick = function()
@@ -128,18 +93,26 @@ function wnd_cardyc_controller:refresh_leftCard_Data()
             self:refresh()
         else
             --无更多卡牌
-            tipsText = stringUtil:getString(20701)
-            tips:show( tipsText )
+            UIToast.Show(stringUtil:getString(20701), nil, UIToast.ShowType.Upwards)
         end
     end
 end
 
-function wnd_cardyc_controller:refresh_TabBody_Data()
+function wnd_cardyc_controller:refresh_TabBody_Data(tabIndex)
     -- body
-    information:refresh(cardIndex)
-    upSkill:refresh(cardIndex)
-    upSoldier:refresh(cardIndex)
-    upSynergy:refresh(cardIndex)
+    if tabIndex == 1 then
+        information:Refresh()
+
+    elseif tabIndex == 2 then
+        upSkill:Refresh()
+
+    elseif tabIndex == 3 then
+        upSoldier:Refresh()
+
+    elseif tabIndex == 4 then
+        upSynergy:Refresh()
+
+    end
 end
 
 
@@ -151,7 +124,7 @@ function wnd_cardyc_controller:init_tabPanel()
         tabBtn[i].transform:Find("lab"):GetComponent("UILabel").text = stringUtil:getString(20019+i)
     end
     tabPanel = {view.informationBody_Panel,view.skillPanel,view.soldierPanel,view.synergyPanel}
-    tabControl=tabsControl(tabBtn, tabPanel)
+    tabControl = TabControl(tabBtn, tabPanel,self.refresh_TabBody_Data)
 end
 
 
@@ -192,28 +165,68 @@ function wnd_cardyc_controller:init_redDot()
         view.btn_synergy_redDot:SetActive(true)
     end
 
-    
+
 end
 
 
+--刷新
+function wnd_cardyc_controller:refresh()
+    if not data:getDatas(cardIndex) then
+        return
+    end
+    self:init_redDot()
+    self:refresh_leftCard_Data()
+    self:refresh_TabBody_Data(tabControl:getCurrentPanelIndex())
+
+end
 
 
+function wnd_cardyc_controller:upStar_Refresh()
+    self:refresh()
+    upStar:upStar_Success()
+end
 
+function wnd_cardyc_controller:upLevel_Refresh()
+    self:refresh()
+    upLevel:upLevel_Success()
+end
 
-
+function wnd_cardyc_controller:upSkill_Refresh()
+    self:refresh()
+    upSkill:upSkill_Success()
+end
+function wnd_cardyc_controller:SkillPointReset_Refresh()
+    self:refresh()
+    upSkill:skillReset_Success()
+end
+function wnd_cardyc_controller:upSoldier_Refresh()
+    self:refresh()
+end
+function wnd_cardyc_controller:upQuality_Refresh()
+    self:refresh()
+    information:upQuality_Success()
+end
+function wnd_cardyc_controller:equipSlot_Refresh()
+    self:refresh()
+    information:equipSlot_Success()
+end
+function wnd_cardyc_controller:upSynergy_Refresh()
+    self:refresh()
+    upSynergy:upSynergy_Success()
+end
 
 
 function wnd_cardyc_controller:OnHideFinish()
-	print("wnd_cardyc_controller:OnHideFinish.......")--隐藏主面板
+    print("wnd_cardyc_controller:OnHideFinish.......")--隐藏主面板
 end
 
 function wnd_cardyc_controller:RegStart()
-	print("wnd_cardyc_controller:RegStart.......")
+    print("wnd_cardyc_controller:RegStart.......")
     wnd_cardyc_controller = self
 end
 
 function wnd_cardyc_controller:OnLostInstance()
-	print("wnd_cardyc_controller:OnLostInstance.......")
+    print("wnd_cardyc_controller:OnLostInstance.......")
 end
 
 return wnd_cardyc_controller

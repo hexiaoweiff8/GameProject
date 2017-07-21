@@ -1,4 +1,4 @@
-upStar_controller = {}
+local upStar_controller = {}
 local view = require("uiscripts/cardyc/upStar/upStar_view")
 local data = require("uiscripts/cardyc/upStar/upStar_model")
 
@@ -13,18 +13,13 @@ local skillItem
 local isInitUpStarLayer = false --是否初始化升星界面
 local isInitUpStarSLayer = false --是否初始化升星成功界面
 local isinitSkillItem = false --是否初始化升星界面的技能头像
-local CardIndex
 function upStar_controller:init( args )
     view:init_view(args)
     
 end
 
 --显示升星界面
-function upStar_controller:show_UpStar_Layer(cardIndex)
-    CardIndex = cardIndex
-    if not data:getDatas(CardIndex) then 
-        return 
-    end 
+function upStar_controller:show_UpStar_Layer()
     if not isInitUpStarLayer then
         view:init_UpStarPanel()
         view.upStarPanel:SetActive(false)
@@ -48,6 +43,8 @@ function upStar_controller:show_UpStar_Layer(cardIndex)
 
     view.upStarPanel:SetActive(true)
 end
+
+
 
 function upStar_controller:refresh_UpStar_Layer()
     --初始化卡牌头像，
@@ -142,22 +139,18 @@ end
 
 --点击升星界面的升星按钮
 function upStar_controller:upStarPanel_btnUpStar_CallBack()
-    
-    if data:isCan_UpStar() ~= 0 then
-        tips:show( tipsText )
+    local isCan_UpStar = data:isCan_UpStar()
+    if isCan_UpStar ~= 0 then
+        UIToast.Show(isCan_UpStar, nil, UIToast.ShowType.Upwards)
         return
     end
     --发送请求升星
     --提升星级扣道具，升星成功
-    Message_Manager:SendPB_10010(data.cardId)
+    Message_Manager:SendPB_UpStar(data.cardId)
 end
 --升星成功后刷新
-function upStar_controller:upStar_refresh()
+function upStar_controller:upStar_Success()
     -- body
-    wnd_cardyc_controller:refresh()
-    if not data:getDatas(CardIndex) then 
-        return 
-    end 
     view.upStarPanel:SetActive(false)
     self:show_UpStar_Success()
 end

@@ -74,7 +74,6 @@ namespace Util
         /// <param name="isLoop">是否循环执行, 如果为true则每隔"存活时间"执行一次直至Kill掉(可能内存泄漏), 否则只执行一次</param>
         public Timer(float liveTime, bool isLoop = false)
         {
-            stopTime = TimerManager.Single.StartTimerTick + liveTime;
             LoopTime = liveTime;
             IsLoop = isLoop;
         }
@@ -82,7 +81,11 @@ namespace Util
 
         public Timer Start()
         {
+            //计时器复用
+            if (IsStop)
+                IsStop = false;
             // 加入TimeManager中
+            stopTime = TimerManager.Single.StartTimerTick + LoopTime;
             TimerManager.Single.AddTimer(this);
             return this;
         }
@@ -147,6 +150,7 @@ namespace Util
         {
             IsPause = false;
         }
+       
 
     }
 

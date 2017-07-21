@@ -70,6 +70,7 @@ public static class LuaBinder
 		UIScrollViewAdapterWrap.Register(L);
 		UIScrollViewItemBaseWrap.Register(L);
 		UI_Cangku_ItemWrap.Register(L);
+		UI_Equip_ItemWrap.Register(L);
 		UIDragScrollViewWrap.Register(L);
 		UIToastWrap.Register(L);
 		UIRectWrap.Register(L);

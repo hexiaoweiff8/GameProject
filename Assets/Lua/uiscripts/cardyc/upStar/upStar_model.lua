@@ -1,47 +1,24 @@
-local upStar_model={}
+local class = require("common/middleclass")
+local upStar_model=class("upStar_model", wnd_cardyc_model)
 
 
---获取数据库信息
-function upStar_model:getDatas(cardIndex)
-    print("================upStar_model:getDatas============start===========")
-    local _currencyTbl = currencyModel:getCurrentTbl()
-    local _cardTbl = cardModel:getCardTbl()    
-    if _currencyTbl == nil or _cardTbl == nil then
-        return false
-    end 
-    if not _cardTbl[cardIndex] then
-        return false
-    end 
-    self.expPool = _currencyTbl["expPool"]--经验池
-    self.badgeNum = _currencyTbl["coin"] --兵牌
-    self.cardId =_cardTbl[cardIndex].id
-    self.cardLv = _cardTbl[cardIndex].lv
-    self.starLv = _cardTbl[cardIndex].star
-    self.cardFragment = _cardTbl[cardIndex].num
-    print("================upStar_model:getDatas============end===========")
-    return true
-    
-end
 
 --判断是否可以升星
 function upStar_model:isCan_UpStar()
     --是否达到最大星级
     if self.starLv == Const.MAX_STAR_LV then
         print("卡牌已达最大星级")
-        tipsText = stringUtil:getString(20301)
-        return tipsText
+        return stringUtil:getString(20301)
     end
     --所需碎片是否足够
     if starUtil:getUpStarNeedFragment(self.starLv + 1) > self.cardFragment then
         print("卡牌升星所需碎片不足")
-        tipsText = stringUtil:getString(20302)
-        return tipsText
+        return stringUtil:getString(20302)
     end
     --所需兵牌是否足够
     if starUtil:getUpStarNeedCoin(self.starLv + 1) > self.badgeNum then
         print("卡牌升星所需兵牌不足")
-        tipsText = stringUtil:getString(20303)
-        return tipsText
+        return stringUtil:getString(20303)
     end
     return 0
 end

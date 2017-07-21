@@ -39,6 +39,7 @@ function equipOnBody_controller:showEquipsOnBody()
         ---
         self:refreshEquipItemByType(i)
     end
+    self:refreshOnceFixNeedPower()
 end
 
 ---
@@ -56,10 +57,19 @@ function equipOnBody_controller:addListener()
 
     UIEventListener.Get(view.btn_fixOnce).onClick = function()
         local fixEquips = data:getBadEquipList()
+
         if #fixEquips == 0 then
+            ---无可修理的装备
             UIToast.Show(stringUtil:getString(30102), nil, UIToast.ShowType.Upwards)
             return
         end
+
+        if not data:isCanFixOnce(fixEquips) then
+            ---能量点不足
+            UIToast.Show(stringUtil:getString(30108), nil, UIToast.ShowType.Upwards)
+            return
+        end
+
         Message_Manager:SendPB_EquipFixAll(fixEquips)
 
     end
@@ -74,6 +84,7 @@ function equipOnBody_controller:addListener()
     end
 end
 
+
 ---
 ---当穿戴的装备发生变化时刷新
 ---
@@ -84,15 +95,19 @@ function equipOnBody_controller:equipChangeRefresh()
             self:refreshEquipItemByType(equipType)
         end
     end
+    self:refreshOnceFixNeedPower()
+
 end
 ---
 ---穿戴装备无变化，装备信息发生变化时刷新
 ---刷新某一个
 ---
 function equipOnBody_controller:refresh(equipType)
-    if equipType then
-        self:refreshEquipItemByType(equipType)
+    if not equipType then
+        logWarnings("equipOnBody refresh error!!!")
     end
+    self:refreshEquipItemByType(equipType)
+    self:refreshOnceFixNeedPower()
 end
 ---
 ---刷新全部
@@ -141,6 +156,26 @@ function equipOnBody_controller:refreshEquipItemByType(equipType)
         view.equipItems[equipType].transform:GetComponent("UISprite").spriteName = spriteNameUtil["_EQUIPRARITY_"..1]
     end
 end
+
+---
+---刷新一键修理所需的能量点的显示
+---
+function equipOnBody_controller:refreshOnceFixNeedPower()
+    local badEquipList = data:getBadEquipList()
+    if #badEquipList == 0 then
+        view.onceFixCost_lab:SetActive(false)
+        return
+    end
+    view.onceFixCost_lab:SetActive(true)
+    local needPower = data:getFixOnceNeedPower(badEquipList)
+    view.onceFixCost_lab:GetComponent("UILabel").text = needPower
+    view.onceFixCost_lab:GetComponent("UILabel").color = COLOR.POWER_COST
+    if needPower > data.myPower then
+        view.onceFixCost_lab:GetComponent("UILabel").color = COLOR.Red
+    end
+end
+
+
 ---
 ---外部获取当前选择的装备类型
 ---

@@ -148,7 +148,8 @@ public class AI_Battlefield //: MonoEX.Singleton<AI_Battlefield>
         if (GridMap == null)
         {
             GridMap = new DiamondGridMap();
-            GridMap.Resize((byte)(SData_MapData.Single.MapMaxColumn + DiamondGridMap.SideSize * 2), (byte)(SData_MapData.Single.MapMaxRow + DiamondGridMap.SideSize * 2));
+            var mapData = SData_MapData.Single.GetDataOfID(1);
+            GridMap.Resize((byte)(mapData.MapMaxColumn + DiamondGridMap.SideSize * 2), (byte)(mapData.MapMaxRow + DiamondGridMap.SideSize * 2));
          } else
             GridMap.ClearItems();//清空格子地图中的对象
         EffectTrackManage.Reset();

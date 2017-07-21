@@ -53,6 +53,8 @@ end
 ---装备选项点击事件回调
 ---
 function equipItemControl:HandleOnItemClickedHandler(item_Component)
+    print(#_ItemsToShow)
+    print(item_Component.Index)
     _onItemClickEvent(_ItemsToShow[item_Component.Index + 1])
     self:HandleOnItemSelectedHandler(item_Component)
 end
@@ -61,6 +63,7 @@ end
 ---装备选项被选中时回调
 ---
 function equipItemControl:HandleOnItemSelectedHandler(item_Component)
+
     if _selectItem and _selectItem.Index ~= item_Component.Index then
         _selectItem:setIconSelectFrame(nil)
     end
@@ -81,7 +84,9 @@ end
 function equipItemControl:HandleOnItemLoadedHandler(item)
 
     local item_Component = item.gameObject:GetComponent(typeof(UI_Equip_Item))
-    if item_Component.Index+1 > #_ItemsToShow then
+    if item_Component.Index + 1 > #_ItemsToShow then
+        print("over==="..item_Component.Index + 1)
+        item_Component:setEmpty()
         return
     end
     item_Component.gameObject.name = "Index_"..item_Component.Index
@@ -118,8 +123,7 @@ function equipItemControl:HandleOnItemLoadedHandler(item)
     if _isBad == 1 then
         item_Component:setIcon(spriteNameUtil["RED"])
     end
-    --item_Component:setIcon(_ItemsToShow[item_Component.Index+1]['EquipIcon'])
-    --item_Component:setIcon(equipment_Atlas,_ItemsToShow[item_Component.Index+1]['EquipIcon']..".PNG")
+
     item_Component:setEquipmentLevel(_lv)
     item_Component:setEquipmentLock(_isLock)
     item_Component:setEquipped(_equipped)
@@ -128,6 +132,9 @@ function equipItemControl:HandleOnItemLoadedHandler(item)
     end
 
     UIEventListener.Get(item_Component.gameObject).onClick = function(go)
+        if item_Component.Index + 1 > #_ItemsToShow then
+            return
+        end
         self:HandleOnItemClickedHandler(go:GetComponent(typeof(UI_Equip_Item)))
     end
 

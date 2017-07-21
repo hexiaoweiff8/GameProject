@@ -120,13 +120,9 @@ function wnd_cangku_controller:initListener()
 	UIEventListener.Get(this.view.Panel_Detail_decomposition.Checkbox.Button_red).onClick = Checkbox_OnCheck
 	-- 确认分解逻辑
 	local OnConfirmDecomposition = function(_sellType,_Cost)
-		local diamondNum = 0  --currency.diamond (花钱充，花钱赠，免费送的和)
-	    for i,v in ipairs(this.model.serv_CurrencyInfo.diamond) do
-	    	diamondNum = diamondNum + v
-	    end
-		if (_sellType == 1 and {diamondNum} or {this.model.serv_CurrencyInfo.gold})[1] < _Cost then
-			print("当前钻石："..diamondNum)
-			print("当前金币："..this.model.serv_CurrencyInfo.gold)
+		if (_sellType == 1 and {currencyModel:getCurrentTbl().diamond} or {currencyModel:getCurrentTbl().gold})[1] < _Cost then
+			print("当前钻石："..currencyModel:getCurrentTbl().diamond)
+			print("当前金币："..currencyModel:getCurrentTbl().gold)
 			UIToast.Show("货币不足，无法分解",nil,UIToast.ShowType.Upwards)
 			return
 		end
@@ -141,7 +137,7 @@ function wnd_cangku_controller:initListener()
 			UIToast.Show("所选装备已分解.",nil,UIToast.ShowType.Queue)
 			local gw2c = gw2c_pb.SellEquip()
 		    gw2c:ParseFromString(body)
-		    this:updateServData(gw2c.currency,nil)
+		    currencyModel:initCurrencyTbl(gw2c.currency)
 		    -- 从装备表中删除装备，并刷新界面
 		    this:removeEquipmentByIDList(_equipList)
 		    -- 隐藏Mbox
@@ -299,9 +295,9 @@ function wnd_cangku_controller:SelectYekaButton(selectedButton)
 
 	selectedButton:GetComponent(typeof(UISprite)).atlas = mAtlas
 	selectedButton:GetComponent(typeof(UISprite)).spriteName = cstr.SELECTED_YEKA
-	this.view.Panel_Tab.sTabTop.transform.localPosition = Vector3(selectedButton.transform.localPosition.x,
-		selectedButton.transform.localPosition.y + selectedButton:GetComponent(typeof(UIWidget)).height / 2 + this.view.Panel_Tab.sTabTop:GetComponent(typeof(UIWidget)).height / 2,
-		selectedButton.transform.localPosition.z)
+	-- this.view.Panel_Tab.sTabTop.transform.localPosition = Vector3(selectedButton.transform.localPosition.x,
+	-- 	selectedButton.transform.localPosition.y + selectedButton:GetComponent(typeof(UIWidget)).height / 2 + this.view.Panel_Tab.sTabTop:GetComponent(typeof(UIWidget)).height / 2,
+	-- 	selectedButton.transform.localPosition.z)
 
 	local start, e = string.find(selectedButton.name, '_')
 	local Goods = string.sub(selectedButton.name,1,start-1)
@@ -386,7 +382,7 @@ function wnd_cangku_controller:showPanelByItemData(ItemData)
 					    local equip = gw2c.equip
 					    local items = gw2c.item
 					    for k,v in ipairs(items) do
-					    	this:updateServData(nil,nil,v)
+					    	this:updateServData(nil,v)
 					    	UIToast.Show("碎片剩余："..v.num,nil,UIToast.ShowType.Upwards)
 					    end
 					    this:insertServData(equip)
@@ -646,7 +642,8 @@ function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 				local on_10006_rec = function(body)
 					local gw2c = gw2c_pb.EquipRepair()
 					gw2c:ParseFromString(body)
-					this:updateServData(gw2c.currency,gw2c.equip)
+					currencyModel:initCurrencyTbl(gw2c.currency)
+					this:updateServData(gw2c.equip,nil)
 					equipDetail:showEquip(equip,this.view.Panel_Detail_equipment.panel,mDepth + 1)
 				end
 				Message_Manager:SendPB_10006(equip.id,on_10006_rec)
@@ -655,7 +652,8 @@ function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 			-- DONE: 装备界面：强化按钮
 			if equip.lv + 1 <= EquipUtil:getEquipmentPlusMAXLevel(equip.rarity) then
 
-				if this.model.serv_CurrencyInfo.power < equipDetail._EquipPlusCost then
+				local equipDetail_data = equipDetail:get_Data()
+				if currencyModel:getCurrentTbl().power < equipDetail_data.EquipPlusCost then
 					UIToast.Show("能量点不足",nil,UIToast.ShowType.Upwards)
 					return
 				end
@@ -667,7 +665,8 @@ function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 
 					Event.RemoveListener("10004", on_10004_rec)
 					-- 强化后刷新界面
-					this:updateServData(gw2c.currency,gw2c.equip)
+					currencyModel:setPower(gw2c.currency)
+					this:updateServData(gw2c.equip,nil)
 					cangkuItem:setEquipmentLevel(gw2c.equip.lv)
 					this:showEquipmentDetailsPanel(equip,cangkuItem)
 					UIToast.Show("已强化到+"..serv_equip.lv,nil,UIToast.ShowType.Upwards)
@@ -764,18 +763,19 @@ function wnd_cangku_controller:sortServData()
 			return false
 		end)
 	print("serv_Items排序完成..")
-	table.sort(this.model.serv_Equipment,
-		function(a,b)
-			if a.isBad ~= b.isBad then
-				return (a.isBad == 1 and {true} or {false})[1] -- 损坏度,坏的在前
-			elseif a.rarity ~= b.rarity then
-				return a.rarity > b.rarity -- 装备品质高的在前
-			elseif a.lv ~= b.lv then
-				return a.lv > b.lv -- lv大的在前
-			else
-				return a.id < b.id -- id小的在前
-			end
-		end)
+	-- table.sort(this.model.serv_Equipment,
+	-- 	function(a,b)
+	-- 		if a.isBad ~= b.isBad then
+	-- 			return (a.isBad == 1 and {true} or {false})[1] -- 损坏度,坏的在前
+	-- 		elseif a.lv ~= b.lv then
+	-- 			return a.lv > b.lv -- lv大的在前
+	-- 		elseif a.rarity ~= b.rarity then
+	-- 			return a.rarity > b.rarity -- 装备品质高的在前
+	-- 		else
+	-- 			return a.id < b.id -- id小的在前
+	-- 		end
+	-- 	end)
+	EquipUtil:sortEquipment(this.model.serv_Equipment)
 	print("serv_Equipment排序完成..")
 end
 
@@ -789,10 +789,7 @@ function wnd_cangku_controller:mergeServData()
 	end
 end
 --@params user_currency:服务器货币信息,user_equip:服务器装备数据
-function wnd_cangku_controller:updateServData(user_currency,user_equip,user_items)
-	if user_currency then
-		this.model.serv_CurrencyInfo = user_currency
-	end
+function wnd_cangku_controller:updateServData(user_equip,user_items)
 	if user_equip then
 		-- 根据装备唯一id查找本地待更新数据
 		for i = 1,#this.model.serv_Equipment do

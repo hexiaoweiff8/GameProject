@@ -1,32 +1,5 @@
-local upSkill_model={}
-
-
---获取数据库信息
-function upSkill_model:getDatas(cardIndex)
-    print("================upSkill_model:getDatas============start===========")
-    local _currencyTbl = currencyModel:getCurrentTbl()
-    local _cardTbl = cardModel:getCardTbl()
-    if _currencyTbl == nil or _cardTbl == nil then
-        return false
-    end 
-    if not _cardTbl[cardIndex] then
-        return false
-    end
-    self.badgeNum = _currencyTbl.coin --兵牌
-    self.totalSkPt = _currencyTbl.skillpt --技能点
-    self.cardId =_cardTbl[cardIndex].id
-    self.cardLv =_cardTbl[cardIndex].lv
-    self.starLv =_cardTbl[cardIndex].star
-    self.qualityLv = _cardTbl[cardIndex].rlv
-    self.skill_Lv_Table = _cardTbl[cardIndex].skill
-    self:init_skillIDTable()
-    print("================upSkill_model:getDatas============end===========")
-    return true
-    
-end
-
-
-
+local class = require("common/middleclass")
+local upSkill_model=class("upSkill_model", wnd_cardyc_model)
 --[[
                     技能部分
 ]]
@@ -42,30 +15,28 @@ function upSkill_model:init_skillIDTable()
 end
 --判断技能是否可以升级
 function upSkill_model:isCan_UpSkill(index)
-    local lv =self.skill_Lv_Table[index]
+    print(index,self.skill_Lv_Table[index])
+    local lv = self.skill_Lv_Table[index]
+
     if lv >= Const.MAX_SKILL_LV then
         print("已达最大等级！！！")
-        tipsText = stringUtil:getString(20401)
-        return tipsText
+        return stringUtil:getString(20401)
     end
     if index > self.starLv then
         print("请先提升卡牌星级")
-        tipsText = string.format(stringUtil:getString(20402), index)
-        return tipsText
+        return string.format(stringUtil:getString(20402), index)
     end
       --a.    技能等级<卡牌军阶  --b.  升级所需技能点≤持有技能点
     --判断技能等级<卡牌军阶
     if lv >= self.qualityLv then
         print("请先提升卡牌军阶")
-        tipsText = stringUtil:getString(20403)
-        return tipsText
+        return stringUtil:getString(20403)
     end
     --判断升级所需技能点≤持有技能点
     local skcost= skillUtil:getUpSkillNeedPoints(lv + 1)--获取升级所需的技能点
     if skcost >= self.totalSkPt then
         print("技能点数不足，请前往xxx获取")
-        tipsText = stringUtil:getString(20404)
-        return tipsText
+        return stringUtil:getString(20404)
     end
     return 0
 end

@@ -58,6 +58,13 @@ function Event.Brocast(event,...)
 		elseif ... == 10026 then error("errno: " .. ... .. " 所有的军阶卡槽必须激活")
 		elseif ... == 10027 then error("errno: " .. ... .. " 道具材料不足")
 		elseif ... == 10028 then error("errno: " .. ... .. " 该协同未达到升级条件")
+		elseif ... == 10029 then error("errno: " .. ... .. " 能量点不足")
+		elseif ... == 10030 then error("errno: " .. ... .. " 该装备等级已达上限")
+		elseif ... == 10031 then error("errno: " .. ... .. " 该物品不能出售")
+		elseif ... == 10032 then error("errno: " .. ... .. " 该碎片不存在")
+		elseif ... == 10033 then error("errno: " .. ... .. " 该商店不存在")
+		elseif ... == 10034 then error("errno: " .. ... .. " 刷新商店次数已达上限")
+		elseif ... == 15001 then error("errno: " .. ... .. " 此账号在其他地方登陆")	
 		else error("errno: " .. ... .. " have no event")
 		end
 	else

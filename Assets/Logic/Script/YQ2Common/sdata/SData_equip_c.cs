@@ -24,6 +24,11 @@ public class SData_equip_c : MonoEX.Singleton<SData_equip_c>
 					case "EquipType": dif.EquipType = (short)(double)o22; break;
 					case "SuitID": dif.SuitID = (short)(double)o22; break;
 					case "MainAttribute": dif.MainAttribute = (int)(double)o22; break;
+					case "ViceAttribute1": dif.ViceAttribute1 = (int)(double)o22; break;
+					case "ViceAttribute2": dif.ViceAttribute2 = (int)(double)o22; break;
+					case "ViceAttribute3": dif.ViceAttribute3 = (int)(double)o22; break;
+					case "ViceAttribute4": dif.ViceAttribute4 = (int)(double)o22; break;
+					case "ViceAttribute5": dif.ViceAttribute5 = (int)(double)o22; break;
                 }
             });
             if (Data.ContainsKey(dif.EquipID))
@@ -68,4 +73,24 @@ public struct equip_cInfo
 	 ///主属性
 	 /// </summary>
 	public int MainAttribute;
+	 /// <summary>
+	 ///副属性1
+	 /// </summary>
+	public int ViceAttribute1;
+	 /// <summary>
+	 ///副属性2
+	 /// </summary>
+	public int ViceAttribute2;
+	 /// <summary>
+	 ///副属性3
+	 /// </summary>
+	public int ViceAttribute3;
+	 /// <summary>
+	 ///副属性4
+	 /// </summary>
+	public int ViceAttribute4;
+	 /// <summary>
+	 ///副属性5
+	 /// </summary>
+	public int ViceAttribute5;
 }
