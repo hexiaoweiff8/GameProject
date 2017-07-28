@@ -22,7 +22,6 @@ function redDotControl:refresh_cardyc(cardIndex)
 end
 function redDotControl:getRD_UPSTAR(cardIndex)
     data = require("uiscripts/cardyc/upStar/upStar_model")
-    data:getDatas(cardIndex)
     if data:isCan_UpStar() == 0 then 
         redDotFlag.RD_UPSTAR = true
     else 
@@ -33,7 +32,6 @@ end
 
 function redDotControl:getRD_UPLEVEL(cardIndex)
     data = require("uiscripts/cardyc/upLevel/upLevel_model")
-    data:getDatas(cardIndex)
     if data:isCan_UpLevel() == 0 then 
         redDotFlag.RD_UPLEVEL = true
     else 
@@ -43,7 +41,6 @@ end
 
 function redDotControl:getRD_INFORMATION(cardIndex)
     data = require("uiscripts/cardyc/information/information_model")
-    data:getDatas(cardIndex)
     for i = 0, #data.slotState do 
         if data.slotState[i] == qualityUtil.EquipState.Enable_Enough then 
             redDotFlag.RD_INFORMATION = true
@@ -58,7 +55,6 @@ end
 
 function redDotControl:getRD_SKILL(cardIndex)
     data = require("uiscripts/cardyc/upSkill/upSkill_model")
-    data:getDatas(cardIndex)
     redDotFlag.RD_SKILL = false
     for i = 1, #data.skill_Lv_Table do
         redDotFlag.RD_SKILLITEMS[i] = false
@@ -71,7 +67,6 @@ end
 
 function redDotControl:getRD_SOLDIER(cardIndex)
     data = require("uiscripts/cardyc/upSoldier/upSoldier_model")
-    data:getDatas(cardIndex)
     if data:isCan_UpSoldier() == 0 then 
         redDotFlag.RD_SOLDIER = true
     else 
@@ -82,7 +77,6 @@ end
 
 function redDotControl:getRD_SYNERGY(cardIndex)
     data = require("uiscripts/cardyc/upSynergy/upSynergy_model")
-    data:getDatas(cardIndex)
     redDotFlag.RD_SYNERGY = false
     for i = 1, #data.synergyLvTbl do
         redDotFlag.RD_SYNERGYITEMS[i] = false

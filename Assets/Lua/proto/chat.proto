@@ -2,14 +2,15 @@ syntax = "proto2";
 
 message ChatRecord{
     required int32 rId			=1;
-    repeated int32 userName		=2;
-    required int32 content      =3;
+    repeated string userName	=2;
+    required string content     =3;
     required int32 time         =4;
 };
 
 
 message EnterChat{
-    required int32 type			=1;
+    //required int32 type		=1;
+    required string	token		=1;
 };
 
 

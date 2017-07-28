@@ -70,7 +70,7 @@ function equipSuitUtil:getSuitAttributeID(suitID, equipNum)
             return id
         end
     end
-    logWarnings("equipSuitUtil:getSuitAttributeID error!!!")
+    Debugger.LogWarning("equipSuitUtil:getSuitAttributeID error!!!")
     return nil
 end
 --[[
@@ -85,7 +85,7 @@ function equipSuitUtil:getSuitAttributeValue(suitID, equipNum)
             return id
         end
     end
-    logWarnings("equipSuitUtil:getSuitAttributeID error!!!")
+    Debugger.LogWarning("equipSuitUtil:getSuitAttributeID error!!!")
     return nil
 end
 

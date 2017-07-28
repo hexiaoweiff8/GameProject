@@ -237,37 +237,69 @@ public class SkillManager
     }
 
     /// <summary>
+    /// 判断技能是否可以释放
+    /// </summary>
+    /// <param name="skillbase">被释放技能</param>
+    /// <returns>是否可以被释放</returns>
+    public bool SkillCouldRelease(SkillBase skillbase)
+    {
+        var result = false;
+
+        var skillInfo = skillbase as SkillInfo;
+        if (skillInfo != null)
+        {
+            var objId = skillInfo.ReleaseMember.ClusterData.AllData.MemberData.ObjID;
+            if (!CDTimer.Instance().IsInCD(skillInfo.Num, objId.ID, skillInfo.CDGroup))
+            {
+                result = true;
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 将一个技能设置为CD状态
+    /// </summary>
+    /// <param name="skillInfo">被CD技能</param>
+    private void SetSkillInCD(SkillInfo skillInfo)
+    {
+        if (skillInfo != null)
+        {
+            var objId = skillInfo.ReleaseMember.ClusterData.AllData.MemberData.ObjID;
+            // 技能CDGroup
+            CDTimer.Instance().SetInCD(skillInfo.Num, skillInfo.CDTime, objId.ID, skillInfo.CDGroup);
+        }
+    }
+
+    /// <summary>
     /// 执行技能
     /// </summary>
-    /// <param name="skillInfo">技能对象</param>
+    /// <param name="skillBase">技能对象</param>
     /// <param name="packer">技能数据包</param>
     /// <param name="isSubSkill">是否为子技能</param>
-    public void DoShillInfo(SkillInfo skillInfo, FormulaParamsPacker packer, bool isSubSkill = false)
+    public void DoShillInfo(SkillBase skillBase, FormulaParamsPacker packer, bool isSubSkill = false)
     {
-        if (skillInfo == null)
+        if (skillBase == null)
         {
             throw new Exception("方程式对象为空.");
         }
         // 子级技能没有cd
         if (isSubSkill)
         {
-            DoFormula(skillInfo.GetFormula(packer));
+            DoFormula(skillBase.GetActionFormula(packer));
         }
         else
         {
-            var objId = packer.ReleaseMember.ClusterData.AllData.MemberData.ObjID.ID;
-            //var skillNum = skillInfo.Num;
-            // 技能是否在CD
-            if (!CDTimer.Instance().IsInCD(skillInfo.Num, objId, skillInfo.CDGroup))
+            if (SkillCouldRelease(skillBase))
             {
-                CDTimer.Instance().SetInCD(skillInfo.Num, skillInfo.CDTime, objId, skillInfo.CDGroup);
-                // 技能CDGroup
-                // 技能可释放次数-暂时不做
-                DoFormula(skillInfo.GetFormula(packer));
+                SetSkillInCD(skillBase as SkillInfo);
+                // TODO 技能可释放次数-暂时不做
+                DoFormula(skillBase.GetActionFormula(packer));
             }
             else
             {
-                Debug.Log("技能:" + skillInfo.Num + "在cd中");
+                Debug.Log("技能:" + skillBase.Num + "在cd中");
             }
             // 否则技能在CD中不能释放
         }

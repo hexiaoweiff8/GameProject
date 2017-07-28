@@ -28,6 +28,7 @@ public class DisplayOwner
     /// </summary>
     public RanderControl RanderControl { get; set; }
 
+
     ///// <summary>
     ///// 对象数据引用
     ///// </summary>

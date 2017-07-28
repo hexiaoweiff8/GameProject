@@ -85,11 +85,15 @@ function Config_Manager:LoadConfig()
     sdata_shopcommodity_data = luacsv.new(require("pk_tabs/commodity_c"))
     --商店货币表
     sdata_shopcurrency_data = luacsv.new(require("pk_tabs/currency_c"))
+    --卡牌商店页卡表
+    sdata_cardshop_data = luacsv.new(require("pk_tabs/cardshop_c"))
     --每日签到奖励表
     sdata_checkin_data = luacsv.new(require("pk_tabs/checkin_c"))
     --系统常量表
     sdata_systemconstant_data = luacsv.new(require("pk_tabs/systemconstant_c"))
-    
+    --聊天敏感词表
+    sdata_subtlecode_data = luacsv.new(require("pk_tabs/subtlecode_c"))
+
     -----------------------------------C#需要调用的配置表在以下位置添加---------------------------------------
     SDataUtils.setData("mapData", sdata_mapData_data.mData.head, sdata_mapData_data.mData.body)
     SDataUtils.setData("constant", sdata_constant_data.mData.head, sdata_constant_data.mData.body)

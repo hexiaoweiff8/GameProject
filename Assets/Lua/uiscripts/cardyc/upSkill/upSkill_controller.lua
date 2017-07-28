@@ -1,4 +1,4 @@
-upSkill_controller = {}
+local upSkill_controller = {}
 local view = require("uiscripts/cardyc/upSkill/upSkill_view")
 local data = require("uiscripts/cardyc/upSkill/upSkill_model")
 require("uiscripts/commonGameObj/skillItem")

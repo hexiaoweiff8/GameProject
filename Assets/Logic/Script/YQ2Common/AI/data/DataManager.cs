@@ -10,6 +10,8 @@ public class DataManager : MonoEX.Singleton<DataManager>
     private Dictionary<int, FightVO> _enemySoldiersDict;
     private Dictionary<int, JiDiVO> _myJidiDict;
     private Dictionary<int, JiDiVO> _enemyJidiDict;
+    private Dictionary<int, TurretVO> _myTurretDict;
+    private Dictionary<int, TurretVO> _enemyTurretDict;
     private Dictionary<int, TankVO> _myTankDict;
     private Dictionary<int, TankVO> _enemyTankDict;
     private Dictionary<int, ObstacleVO> _myObstacleDict;
@@ -22,6 +24,8 @@ public class DataManager : MonoEX.Singleton<DataManager>
         _enemySoldiersDict = new Dictionary<int, FightVO>();
         _myJidiDict = new Dictionary<int, JiDiVO>();
         _enemyJidiDict = new Dictionary<int, JiDiVO>();
+        _myTurretDict = new Dictionary<int, TurretVO>();
+        _enemyTurretDict = new Dictionary<int, TurretVO>();
         _myTankDict = new Dictionary<int, TankVO>();
         _enemyTankDict = new Dictionary<int, TankVO>();
         _myObstacleDict = new Dictionary<int, ObstacleVO>();
@@ -73,36 +77,61 @@ public class DataManager : MonoEX.Singleton<DataManager>
         {
             case ObjectID.ObjectType.MyJiDi:
                 var myJidi = value as JiDiVO;
-                result = CreateBase(myJidi, Utils.MyCamp, otherParam);
+                myJidi.Camp = Utils.MyCamp;
+                result = CreateBase(myJidi, otherParam);
                 break;
+
             case ObjectID.ObjectType.EnemyJiDi:
                 var enemyjidi = value as JiDiVO;
-                result = CreateBase(enemyjidi, Utils.EnemyCamp, otherParam);
+                enemyjidi.Camp = Utils.EnemyCamp;
+                result = CreateBase(enemyjidi, otherParam);
                 break;
+
             case ObjectID.ObjectType.MySoldier:
                 var mysoldier = value as FightVO;
                 // 设置阵营
                 mysoldier.Camp = Utils.MyCamp;
                 result = CreateSoldier(mysoldier, otherParam);
                 break;
+
             case ObjectID.ObjectType.EnemySoldier:
                 var enemysoldier = value as FightVO;
                 // 设置阵营
                 enemysoldier.Camp = Utils.EnemyCamp;
                 result = CreateSoldier(enemysoldier, otherParam);
                 break;
+
+            case ObjectID.ObjectType.MyTower:
+                // 我方防御塔
+                var myTurret = value as TurretVO;
+                // 设置阵营
+                myTurret.Camp = Utils.MyCamp;
+                result = CreateTurret(myTurret, otherParam);
+                break;
+
+            case ObjectID.ObjectType.EnemyTower:
+                // 敌方防御塔
+                var enemyTurret = value as TurretVO;
+                // 设置阵营
+                enemyTurret.Camp = Utils.EnemyCamp;
+                result = CreateTurret(enemyTurret, otherParam);
+                break;
+
             case ObjectID.ObjectType.MyTank:
                 var mytank = value as TankVO;
                 CreateMyTank(mytank);
                 break;
+
             case ObjectID.ObjectType.EnemyTank:
                 var enemyTank = value as TankVO;
                 CreateEnemyTank(enemyTank);
                 break;
+
             case ObjectID.ObjectType.MyObstacle:
                 var myobstacle = value as ObstacleVO;
                 CreateMyObstacle(myobstacle);
                 break;
+
             case ObjectID.ObjectType.EnemyObstacle:
                 var enemyobstacle = value as ObstacleVO;
                 CreateEnemyObstacle(enemyobstacle);
@@ -123,51 +152,52 @@ public class DataManager : MonoEX.Singleton<DataManager>
     /// <param name="camp">基地阵营</param>
     /// <param name="otherParam">其他参数</param>
     /// <returns></returns>
-    private DisplayOwner CreateBase(JiDiVO jidiVo, int camp, CreateActorParam otherParam)
+    private DisplayOwner CreateBase(JiDiVO jidiVo, CreateActorParam otherParam)
     {
         DisplayOwner result = null;
-        if (jidiVo == null)
+        if (jidiVo == null || otherParam == null)
         {
             return result;
         }
-        // 设置阵营
-        jidiVo.Camp = camp;
         // 根据等级获得对应数据
-        var enemyJidiConfig = SData_armybase_c.Single.GetDataOfID(Utils.BaseBaseId + otherParam.Level);
-        jidiVo.SetSoldierData(enemyJidiConfig);
-        _myJidiDict.Add(jidiVo.ObjID.ID, jidiVo);
+        var baseConfig = SData_armybase_c.Single.GetDataOfID(Utils.BaseBaseId + otherParam.Level);
+        jidiVo.SetSoldierData(baseConfig);
 
         // 创建基地模型
         // 从AB包中加载
+        // TODO 修改加载来源, 统一位置
         var baseObj = GameObjectExtension.InstantiateFromPacket("jidi", "zhujidi_model", null);
 
         // 设置父级
         ParentManager.Instance().SetParent(baseObj, ParentManager.BuildingParent);
         var mesh = baseObj.GetComponentInChildren<SkinnedMeshRenderer>();
         Texture texture = null;
-        switch (camp)
+        switch (jidiVo.Camp)
         {
             case Utils.MyCamp:
+                _myJidiDict.Add(jidiVo.ObjID.ID, jidiVo);
+                // 旋转角度
                 baseObj.transform.Rotate(new Vector3(0, 90, 0));
                 texture = PacketManage.Single.GetPacket("jidi").Load("zhujidi_b_texture") as Texture;
                 break;
             case Utils.EnemyCamp:
+                _enemyJidiDict.Add(jidiVo.ObjID.ID, jidiVo);
+                // 旋转角度
                 baseObj.transform.Rotate(new Vector3(0, -90, 0));
                 texture = PacketManage.Single.GetPacket("jidi").Load("zhujidi_r_texture") as Texture;
                 break;
         }
         mesh.material.mainTexture = texture;
-        baseObj.transform.position = new Vector3(otherParam.X, -35, otherParam.Y);
+        // 获取距离地面高度
+        var height = SData_Constant.Single.GetDataOfID(Utils.SurfaceTypeConstantId).Value;
+        baseObj.transform.position = new Vector3(otherParam.X, height, otherParam.Y);
 
-
+        // TODO 添加BuildingClusterData
         var cluster = baseObj.AddComponent<ClusterData>();
         // 设置在地面上
         cluster.Height = SData_Constant.Single.GetDataOfID(Utils.SurfaceTypeConstantId).Value;
         cluster.CollisionGroup = Utils.SurfaceCollisionGroup;
         cluster.AllData.MemberData = jidiVo;
-        //cluster.GroupId = 999;
-        //cluster.AllData.MemberData.MoveSpeed = 0;
-        //cluster.Diameter = 40;
         cluster.X = otherParam.X;
         cluster.Y = otherParam.Y;
         cluster.Stop();
@@ -191,6 +221,93 @@ public class DataManager : MonoEX.Singleton<DataManager>
         var triggerRunner = baseObj.AddComponent<TriggerRunner>();
         triggerRunner.Display = displayOwner;
 
+        return result;
+    }
+
+    /// <summary>
+    /// 创建防御塔
+    /// </summary>
+    /// <param name="turretVo">防御塔数据</param>
+    /// <param name="otherParam">其他参数</param>
+    /// <returns></returns>
+    private DisplayOwner CreateTurret(TurretVO turretVo, CreateActorParam otherParam)
+    {
+        if (turretVo == null || otherParam == null)
+        {
+            return null;
+        }
+
+        DisplayOwner result = null;
+
+        // 加载数据
+        var turretConfig = SData_armybase_c.Single.GetDataOfID(Utils.TurretBaseId + otherParam.Level);
+        turretVo.SetSoldierData(turretConfig);
+
+        // 从AB包中加载模型
+        // TODO 修改加载来源, 统一位置
+        var turretObj = GameObjectExtension.InstantiateFromPacket("turret", "TurretModel", null);
+
+        // 设置父级
+        ParentManager.Instance().SetParent(turretObj, ParentManager.BuildingParent);
+
+        var mesh = turretObj.GetComponentInChildren<SkinnedMeshRenderer>();
+        Texture texture = null;
+        // 区分阵营加载不同皮肤
+        switch (turretVo.Camp)
+        {
+            case Utils.MyCamp:
+                // 我方阵营
+                // 放入列表
+                _myTurretDict.Add(turretVo.ObjID.ID, turretVo);
+                // 旋转角度
+                turretObj.transform.Rotate(new Vector3(0, 90, 0));
+                // 更换皮肤
+                texture = PacketManage.Single.GetPacket("turret").Load("FY_lan") as Texture;
+                break;
+            case Utils.EnemyCamp:
+                // 敌方阵营
+                // 放入列表
+                _enemyTurretDict.Add(turretVo.ObjID.ID, turretVo);
+                // 旋转角度
+                turretObj.transform.Rotate(new Vector3(0, -90, 0));
+                // 更换皮肤
+                texture = PacketManage.Single.GetPacket("turret").Load("FY_hong") as Texture;
+                break;
+        }
+        mesh.material.mainTexture = texture;
+
+        // 设置位置
+        var height = SData_Constant.Single.GetDataOfID(Utils.SurfaceTypeConstantId).Value;
+        turretObj.transform.position = new Vector3(otherParam.X, height, otherParam.Y);
+
+        // 添加ClusterData
+        // TODO 添加BuildingClusterData
+        var cluster = turretObj.AddComponent<ClusterData>();
+        // 设置在地面上
+        cluster.Height = SData_Constant.Single.GetDataOfID(Utils.SurfaceTypeConstantId).Value;
+        cluster.CollisionGroup = Utils.SurfaceCollisionGroup;
+        cluster.AllData.MemberData = turretVo;
+        cluster.X = otherParam.X;
+        cluster.Y = otherParam.Y;
+        cluster.Stop();
+
+        // 添加至ClusterManager中
+        ClusterManager.Single.Add(cluster);
+
+        // 创建外层持有类
+        var displayOwner = new DisplayOwner(turretObj, cluster);
+        DisplayerManager.Single.AddElement(turretVo.ObjID, displayOwner);
+
+        // 创建RanderControl
+        var randerControl = turretObj.AddComponent<RanderControl>();
+        displayOwner.RanderControl = randerControl;
+        // 启动RanderControl
+        randerControl.Begin();
+
+        // 创建事件检查器
+        var triggerRunner = turretObj.AddComponent<TriggerRunner>();
+        triggerRunner.Display = displayOwner;
+        
         return result;
     }
 

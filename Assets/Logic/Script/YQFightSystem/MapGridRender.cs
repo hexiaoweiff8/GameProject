@@ -25,15 +25,15 @@ class MapGridRender : MonoBehaviour
         int h = AI_Single.Single.Battlefield.GridMap.m_height;
         var gobjs = AI_Single.Single.Battlefield.GridMap.m_Grids;
 
-        float hx = DiamondGridMap.harf_wxs * SData_MapData.Single.GetDataOfID(1).terrain_cell_bianchang - 0.05f;
-        float hy = SData_MapData.Single.GetDataOfID(1).terrain_cell_bianchang - 0.05f;
-        float harfC = SData_MapData.Single.GetDataOfID(1).terrain_cell_bianchang / 2 - 0.05f;
+        float hx = DiamondGridMap.harf_wxs * SData_mapdata.Single.GetDataOfID(1).terrain_cell_bianchang - 0.05f;
+        float hy = SData_mapdata.Single.GetDataOfID(1).terrain_cell_bianchang - 0.05f;
+        float harfC = SData_mapdata.Single.GetDataOfID(1).terrain_cell_bianchang / 2 - 0.05f;
 
         var p1 = new Vector3(-hx, 0.1f, -harfC);
-        var p2 = new Vector3(0, 0.1f, -SData_MapData.Single.GetDataOfID(1).terrain_cell_bianchang);
+        var p2 = new Vector3(0, 0.1f, -SData_mapdata.Single.GetDataOfID(1).terrain_cell_bianchang);
         var p3 = new Vector3(hx, 0.1f, -harfC);
         var p4 = new Vector3(hx, 0.1f, harfC);
-        var p5 = new Vector3(0, 0.1f, SData_MapData.Single.GetDataOfID(1).terrain_cell_bianchang);
+        var p5 = new Vector3(0, 0.1f, SData_mapdata.Single.GetDataOfID(1).terrain_cell_bianchang);
         var p6 = new Vector3(-hx, 0.1f, harfC);
 
 

@@ -1,5 +1,5 @@
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
---仓库字符串
+--字符串
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 cstr = {
 	EQUIPMENT_LOCKED = "cangku_anniu_suoding",
@@ -8,6 +8,7 @@ cstr = {
 	SELECTED = 'tongyong_xiantiao_xuanzhongkuang',
 	SELECTED_CB = "cangku_juxing_pinzhishaixuan_xuanzhong",
 	SELECTED_YEKA = "cangku_anniu_xuanzhong",
+	SELECTED_YEKA_EX = "duihuanshangdian_juxing_yekaxuanzhong",
 
 	QUALITY_WHITE = "tongyong_zhuangbeibiankuang_baise",
 	QUALITY_ORANGE = "tongyong_zhuangbeibiankuang_chengse",
@@ -22,6 +23,16 @@ cstr = {
 	QUALITY_BLUE_LAYER = "tongyong_zhuangbeikuangdi_lanse",
 	QUALITY_GREEN_LAYER = "tongyong_zhuangbeikuangdi_lvse",
 	QUALITY_PURPLE_LAYER = "tongyong_zhuangbeikuangdi_zise",
+
+	FLAG_STAR = "duihuanshangdian_tubiao_bukeshengxing",
+	FLAG_CARD = "duihuanshangdian_tubiao_bukeshengkapai",
+	FLAG_STAR_ENOUGH = "duihuanshangdian_tubiao_keshengxing",
+	FLAG_CARD_ENOUGH = "duihuanshangdian_tubiao_keshengkapai",
+
+	CARD_LEVELUP = "duihuanshangdian_juxing_shuzhi_shengkapai",
+	STAR_LEVELUP = "duihuanshangdian_juxing_shuzhi_shengxing",
+
+	CARD_INACTIVE = "duihuanshangdian_juxing_jiashenban",
 }
 
 cint = {

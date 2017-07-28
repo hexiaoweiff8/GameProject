@@ -1,4 +1,4 @@
-upSynergy_controller = {}
+local upSynergy_controller = {}
 local view = require("uiscripts/cardyc/upSynergy/upSynergy_view")
 local data = require("uiscripts/cardyc/upSynergy/upSynergy_model")
 

@@ -21,7 +21,6 @@ public class SData_armybase_c : MonoEX.Singleton<SData_armybase_c>
 					case "UniqueID": dif.UniqueID = (int)(double)o22; break;
 					case "ArmyID": dif.ArmyID = (int)(double)o22; break;
 					case "ArmyLevel": dif.ArmyLevel = (short)(double)o22; break;
-					case "ModelID": dif.ModelID = (string)o22; break;
 					case "Name": dif.Name = (string)o22; break;
 					case "AimGeneralType": dif.AimGeneralType = (short)(double)o22; break;
 					case "DeployTime": dif.DeployTime = (float)(double)o22; break;
@@ -46,13 +45,12 @@ public class SData_armybase_c : MonoEX.Singleton<SData_armybase_c>
 					case "CritDamage": dif.CritDamage = (float)(double)o22; break;
 					case "BulletType": dif.BulletType = (short)(double)o22; break;
 					case "BulletSpeed": dif.BulletSpeed = (float)(double)o22; break;
-					case "BulletMode": dif.BulletMode = (string)o22; break;
-					case "BulletPath": dif.BulletPath = (string)o22; break;
+					case "BulletModel": dif.BulletModel = (string)o22; break;
+					case "BulletPath": dif.BulletPath = (short)(double)o22; break;
 					case "MuzzleFlash": dif.MuzzleFlash = (string)o22; break;
 					case "Ballistic": dif.Ballistic = (string)o22; break;
 					case "GetHit": dif.GetHit = (string)o22; break;
 					case "AttackType": dif.AttackType = (short)(double)o22; break;
-					case "MultiAimMax": dif.MultiAimMax = (short)(double)o22; break;
 					case "AttackRange": dif.AttackRange = (float)(double)o22; break;
 					case "SightRange": dif.SightRange = (float)(double)o22; break;
 					case "IsHide": dif.IsHide = (short)(double)o22; break;
@@ -63,6 +61,9 @@ public class SData_armybase_c : MonoEX.Singleton<SData_armybase_c>
 					case "Skill3": dif.Skill3 = (int)(double)o22; break;
 					case "Skill4": dif.Skill4 = (int)(double)o22; break;
 					case "Skill5": dif.Skill5 = (int)(double)o22; break;
+					case "Pack": dif.Pack = (string)o22; break;
+					case "Texture": dif.Texture = (string)o22; break;
+					case "Prefab": dif.Prefab = (string)o22; break;
                 }
             });
             if (Data.ContainsKey(dif.UniqueID))
@@ -96,10 +97,6 @@ public struct armybase_cInfo
 	 /// </summary>
 	public short ArmyLevel;
 	 /// <summary>
-	 ///对应的模型资源文件名
-	 /// </summary>
-	public string ModelID;
-	 /// <summary>
 	 ///兵种名称
 	 /// </summary>
 	public string Name;
@@ -116,7 +113,7 @@ public struct armybase_cInfo
 	 /// </summary>
 	public short GeneralType;
 	 /// <summary>
-	 ///自身大兵种类型
+	 ///种族类型
 	 /// </summary>
 	public short ArmyType;
 	 /// <summary>
@@ -198,11 +195,11 @@ public struct armybase_cInfo
 	 /// <summary>
 	 ///子弹模型
 	 /// </summary>
-	public string BulletMode;
+	public string BulletModel;
 	 /// <summary>
 	 ///子弹轨迹
 	 /// </summary>
-	public string BulletPath;
+	public short BulletPath;
 	 /// <summary>
 	 ///枪口火焰
 	 /// </summary>
@@ -219,10 +216,6 @@ public struct armybase_cInfo
 	 ///攻击类型（单体/AOE）
 	 /// </summary>
 	public short AttackType;
-	 /// <summary>
-	 ///多目标攻击上限
-	 /// </summary>
-	public short MultiAimMax;
 	 /// <summary>
 	 ///攻击范围
 	 /// </summary>
@@ -263,4 +256,16 @@ public struct armybase_cInfo
 	 ///技能5
 	 /// </summary>
 	public int Skill5;
+	 /// <summary>
+	 ///包名
+	 /// </summary>
+	public string Pack;
+	 /// <summary>
+	 ///贴图
+	 /// </summary>
+	public string Texture;
+	 /// <summary>
+	 ///预制体
+	 /// </summary>
+	public string Prefab;
 }

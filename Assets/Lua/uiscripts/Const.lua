@@ -19,4 +19,11 @@ Const = class("Const")
         TOP_CENTER = 0,
         TOP_LEFT = 1
     }
+
+
+    Const.FIGHT_SKILLNUM = 3
+    Const.FIGHT_HANDCARD_NUM = 4
+
+    -- UIRoot的locationScale
+    Const.urlc = GameObject.Find("/UIRoot").transform.localScale.x
 return Const

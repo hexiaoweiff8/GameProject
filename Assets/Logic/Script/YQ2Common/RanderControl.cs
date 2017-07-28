@@ -5,25 +5,52 @@ using UnityEngine;
 
 public class RanderControl : MonoBehaviour
 {
+    /// <summary>
+    /// 血条对象
+    /// </summary>
     public BloodBar bloodBarCom;
+    
+    /// <summary>
+    /// 血条transform
+    /// </summary>
     [HideInInspector]
     public Transform bloodBar;
+
+    /// <summary>
+    /// 世界相机
+    /// </summary>
     [HideInInspector]
     public Camera NowWorldCamera;
+
+    /// <summary>
+    /// 单位头位置
+    /// </summary>
     [HideInInspector]
     public Transform Head;
+
+    /// <summary>
+    /// 单位是否为敌人
+    /// </summary>
     [HideInInspector]
     public bool isEnemy = false;
+
+    /// <summary>
+    /// 单位是否已经设置Shader
+    /// TODO 不应这么解决该问题
+    /// </summary>
     [HideInInspector]
     public bool isSetShader = false;
-    [HideInInspector]
-    public int groupIndex;
-    //static readonly GameObject ui_fightUgo = ;
+
     /// <summary>
     /// 显示对象动画控制
     /// </summary>
     [HideInInspector]
     public MFAModelRender ModelRander;
+
+    /// <summary>
+    /// 模型身上的动画组件
+    /// </summary>
+    private Animation _ani;
     
     /// <summary>
     /// 显示持有类
@@ -44,11 +71,11 @@ public class RanderControl : MonoBehaviour
     /// </summary>
     public void SyncData()
     {
-        if (FightDataSyncer.Single.IsStart)
+        if (GlobalData.FightData.IsOnline)
         {
             // 如果是联网战斗则同步数据
             GetDisplayOwner();
-            FightDataSyncer.Single.AddData(data);
+            FightDataSyncer.Single.AddOptionalData(data);
             Debug.Log("网络单位创建:" + transform.position.x + "," + transform.position.z);
         }
         else
@@ -88,7 +115,7 @@ public class RanderControl : MonoBehaviour
     private void LoadSource()
     {
         NowWorldCamera = GameObject.Find("/PTZCamera/SceneryCamera").GetComponent<Camera>();
-        Head = transform.Find("head");
+        Head = transform.Find("head").gameObject.transform;
         bloodBar = GameObjectExtension.InstantiateFromPacket("ui_fightU", "blood.prefab", GameObject.Find("ui_fightU")).transform;
         bloodBar.localScale = Vector3.zero;
         bloodBarCom = bloodBar.gameObject.AddComponent<BloodBar>();
@@ -117,6 +144,35 @@ public class RanderControl : MonoBehaviour
             // TODO 日了狗了 循环引用实在去不掉先这么写有空了改.
             var clusterData = gameObject.GetComponent<ClusterData>();
             data = DisplayerManager.Single.GetElementById(clusterData.AllData.MemberData.ObjID);
+        }
+    }
+
+    public void OnEnable()
+    {
+        _ani = transform.GetComponent<Animation>();
+    }
+    /// <summary>
+    /// 播放模型身上对应名字的动作 
+    /// </summary>
+    /// <param name="aniName"></param>
+    public void PlayAni(string aniName,WrapMode mode)
+    {
+        if (null == _ani)
+        {
+             Debug.LogError("模型身上需要挂Animation组件");
+             return;
+        }
+        try
+        {
+            if (_ani.clip.name != aniName)
+            {
+                _ani.wrapMode = mode;
+                _ani.PlayQueued(aniName);
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("播放动画失败！error:"+ex.Message);
         }
     }
 

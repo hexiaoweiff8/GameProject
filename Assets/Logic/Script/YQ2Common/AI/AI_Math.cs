@@ -11,7 +11,7 @@ public class AI_Math
 
     public static byte CalculateMassifX(int x, int z, ArmyFlag flag, bool indent)
     {
-        var re = flag == ArmyFlag.Attacker ? x : (SData_MapData.Single.GetDataOfID(1).MapMaxColumn - x + (z % 2 == 0 ? 1 : 2));
+        var re = flag == ArmyFlag.Attacker ? x : (SData_mapdata.Single.GetDataOfID(1).MapMaxColumn - x + (z % 2 == 0 ? 1 : 2));
         if(indent) re += flag == ArmyFlag.Attacker ? 1 : -1;
         return (byte)re;
     } 
@@ -83,7 +83,7 @@ public class AI_Math
 
     public static int GridDistance(float objWorldDistance)
     {
-        float fGDis = objWorldDistance / SData_MapData.Single.GetDataOfID(1).terrain_cell_bianchang / DiamondGridMap.wxs;//浮点格子距离
+        float fGDis = objWorldDistance / SData_mapdata.Single.GetDataOfID(1).terrain_cell_bianchang / DiamondGridMap.wxs;//浮点格子距离
         return (int)Math.Round(fGDis, MidpointRounding.AwayFromZero);
     }
 
@@ -107,7 +107,7 @@ public class AI_Math
         var bg = b.ownerGrid;
 
         var worldDistance = V2Distance( ag.WorldX,ag.WorldZ, bg.WorldX,bg.WorldZ);//世界距离
-        float fGDis = worldDistance / SData_MapData.Single.GetDataOfID(1).terrain_cell_bianchang / DiamondGridMap.wxs;//浮点格子距离
+        float fGDis = worldDistance / SData_mapdata.Single.GetDataOfID(1).terrain_cell_bianchang / DiamondGridMap.wxs;//浮点格子距离
         if ((int)Math.Round(fGDis, MidpointRounding.AwayFromZero) > gridDistance + a.ModelRange + b.ModelRange) return false;//超出射程
 
         return true;

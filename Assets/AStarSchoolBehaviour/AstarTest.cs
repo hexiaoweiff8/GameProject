@@ -171,12 +171,12 @@ public class AstarTest : MonoBehaviour
     {
         SlideCollisionDetection(1, 1, %0, 40, -1)
         {
-            If(1, 0, Health, 0_100)
-            {
+            //If(1, 0, Health, 0_100)
+            //{
                 HealthChange(1,0,0,0,1)
                 //PointToObj(1,test/TrailPrj,10,0,10,1,10),
                 Point(1,test/ExplordScope,1,%1,10,1,10),   
-            }
+            //}
         }
          
     }
@@ -199,13 +199,13 @@ public class AstarTest : MonoBehaviour
         {
             SlideCollisionDetection(1, 1, %0, 40, -1)
             {
-                If(1, 0, Health, 0_100)
-                {
+                //If(1, 0, Health, 0_100)
+                //{
                     Buff(1,1007, 1)
                     Buff(1,1008, 1)
                     //PointToObj(1,test/TrailPrj,10,0,10,1,10),
                     //Point(1,test/ExplordScope,1,%1,10,1,10),   
-                }
+                //}
             }
         }
 
@@ -319,7 +319,7 @@ public class AstarTest : MonoBehaviour
         Control();
         Scan();
         // 显示数据
-        //Log();
+        Log();
         //CheckTrigger();
     }
 

@@ -12184,6 +12184,163 @@ function Reposition() end
 ----Void UIGrid:ConstrainWithinPanel()
 function ConstrainWithinPanel() end 
 
+UITable = {} 
+--*
+--[Comment]
+--consturctor for UITable overrides:
+--*
+--UITable.New()
+--*
+
+function UITable.New() end
+--*
+--[Comment]
+-- property: Boolean UITable.repositionNow	set	
+repositionNow = nil 
+--*
+--[Comment]
+-- property: Boolean UITable.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean UITable.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean UITable.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform UITable.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject UITable.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String UITable.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String UITable.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags UITable.hideFlags	get	set	
+hideFlags = nil 
+--*
+----List`1 UITable:GetChildList()
+function GetChildList() end 
+
+----Void UITable:Reposition()
+function Reposition() end 
+
+UIInput = {} 
+--*
+--[Comment]
+--consturctor for UIInput overrides:
+--*
+--UIInput.New()
+--*
+
+function UIInput.New() end
+--*
+--[Comment]
+-- property: String UIInput.defaultText	get	set	
+defaultText = nil 
+--*
+--[Comment]
+-- property: Color UIInput.defaultColor	get	set	
+defaultColor = nil 
+--*
+--[Comment]
+-- property: Boolean UIInput.inputShouldBeHidden	get	
+inputShouldBeHidden = nil 
+--*
+--[Comment]
+-- property: String UIInput.value	get	set	
+value = nil 
+--*
+--[Comment]
+-- property: Boolean UIInput.isSelected	get	set	
+isSelected = nil 
+--*
+--[Comment]
+-- property: Int32 UIInput.cursorPosition	get	set	
+cursorPosition = nil 
+--*
+--[Comment]
+-- property: Int32 UIInput.selectionStart	get	set	
+selectionStart = nil 
+--*
+--[Comment]
+-- property: Int32 UIInput.selectionEnd	get	set	
+selectionEnd = nil 
+--*
+--[Comment]
+-- property: UITexture UIInput.caret	get	
+caret = nil 
+--*
+--[Comment]
+-- property: Boolean UIInput.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean UIInput.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean UIInput.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform UIInput.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject UIInput.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String UIInput.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String UIInput.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags UIInput.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void UIInput:Set(String value,Boolean notify)
+function Set() end 
+
+----String UIInput:Validate(String val)
+function Validate() end 
+
+----Void UIInput:Start()
+function Start() end 
+
+----Boolean UIInput:ProcessEvent(Event ev)
+function ProcessEvent() end 
+
+----Void UIInput:Submit()
+function Submit() end 
+
+----Void UIInput:UpdateLabel()
+function UpdateLabel() end 
+
+----Void UIInput:RemoveFocus()
+function RemoveFocus() end 
+
+----Void UIInput:SaveValue()
+function SaveValue() end 
+
+----Void UIInput:LoadValue()
+function LoadValue() end 
+
 UITexture = {} 
 --*
 --[Comment]
@@ -14073,9 +14230,6 @@ function _GetWnd() end
 ----Void WndManage:_OnWndHide(String wndName)
 function _OnWndHide() end 
 
-----Int32 WndManage.LoadMainBaseActors()
-function WndManage.LoadMainBaseActors() end 
-
 ----Void WndManage:LogicInit_Go()
 function LogicInit_Go() end 
 
@@ -14162,6 +14316,12 @@ function SyncData() end
 
 ----Void RanderControl:Begin()
 function Begin() end 
+
+----Void RanderControl:OnEnable()
+function OnEnable() end 
+
+----Void RanderControl:PlayAni(String aniName,WrapMode mode)
+function PlayAni() end 
 
 ----Void RanderControl:DestoryFSM()
 function DestoryFSM() end 
@@ -14542,6 +14702,10 @@ AstarFight = {}
 function AstarFight.New() end
 --*
 --[Comment]
+-- property: AstarFight AstarFight.Instance	get	set	
+Instance = nil 
+--*
+--[Comment]
 -- property: Boolean AstarFight.useGUILayout	get	set	
 useGUILayout = nil 
 --*
@@ -14573,8 +14737,11 @@ name = nil
 -- property: HideFlags AstarFight.hideFlags	get	set	
 hideFlags = nil 
 --*
-----Void AstarFight:InitMap()
+----Void AstarFight:InitMap(Int32[][] obMapInfo,Int32[][] buildingMapInfo)
 function InitMap() end 
+
+----Void AstarFight:Clear()
+function Clear() end 
 
 ----Void AstarFight:isZhangAi(Vector3 mp,Int32 index)
 function isZhangAi() end 
@@ -14590,6 +14757,9 @@ function getNum() end
 
 ----Void AstarFight:setMaxX(Single X)
 function setMaxX() end 
+
+----Void AstarFight:OnDestroy()
+function OnDestroy() end 
 
 UIFollow = {} 
 --*
@@ -15190,8 +15360,16 @@ function VOBase.New() end
 AntiArmor = nil 
 --*
 --[Comment]
--- property: String VOBase.ModelID	get	set	
-ModelID = nil 
+-- property: String VOBase.ModelPack	get	set	
+ModelPack = nil 
+--*
+--[Comment]
+-- property: String VOBase.ModelName	get	set	
+ModelName = nil 
+--*
+--[Comment]
+-- property: String VOBase.ModelTexture	get	set	
+ModelTexture = nil 
 --*
 --[Comment]
 -- property: Single VOBase.MoveSpeed	get	set	
@@ -15644,6 +15822,84 @@ function setEquipped() end
 ----Void UI_Cangku_Item:setEquipmentLock(Boolean Locked)
 function setEquipmentLock() end 
 
+UI_Equip_Item = {} 
+--*
+--[Comment]
+--consturctor for UI_Equip_Item overrides:
+--*
+--UI_Equip_Item.New()
+--*
+
+function UI_Equip_Item.New() end
+--*
+--[Comment]
+-- property: GameObject UI_Equip_Item.cEquipment	get	set	
+cEquipment = nil 
+--*
+--[Comment]
+-- property: Int32 UI_Equip_Item.Index	get	set	
+Index = nil 
+--*
+--[Comment]
+-- property: Vector2 UI_Equip_Item.Size	get	set	
+Size = nil 
+--*
+--[Comment]
+-- property: Vector2 UI_Equip_Item.Position	get	set	
+Position = nil 
+--*
+--[Comment]
+-- property: Boolean UI_Equip_Item.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean UI_Equip_Item.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean UI_Equip_Item.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform UI_Equip_Item.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject UI_Equip_Item.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String UI_Equip_Item.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String UI_Equip_Item.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags UI_Equip_Item.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void UI_Equip_Item:setIcon(String spriteName)
+--Void UI_Equip_Item:setIcon(UIAtlas atlas,String spriteName)
+function setIcon() end 
+
+----Void UI_Equip_Item:setIconFrame(String spriteName)
+--Void UI_Equip_Item:setIconFrame(UIAtlas atlas,String spriteName)
+function setIconFrame() end 
+
+----Void UI_Equip_Item:setIconSelectFrame(String spriteName)
+function setIconSelectFrame() end 
+
+----Void UI_Equip_Item:setEquipmentLevel(Int32 level)
+function setEquipmentLevel() end 
+
+----Void UI_Equip_Item:setEquipped(Boolean Equipped)
+function setEquipped() end 
+
+----Void UI_Equip_Item:setEquipmentLock(Boolean Locked)
+function setEquipmentLock() end 
+
 ----Void UI_Equip_Item:setEmpty()
 function setEmpty() end 
 
@@ -15703,11 +15959,191 @@ UIToast = {}
 function UIToast.New() end
 --*
 ----Void UIToast.Show(String messageToShow,TweenCallback callback,ShowType showType)
+--Void UIToast.Show(String messageToShow)
 function UIToast.Show() end 
 
-ShowType = {} 
+SceneChanger = {} 
+--*
+----Int32 SceneChanger.LoadFight(Action callback)
+function SceneChanger.LoadFight() end 
 
-Queue = nil;
+----Int32 SceneChanger.LoadChooseFight(Action callback)
+function SceneChanger.LoadChooseFight() end 
 
-Upwards = nil;
+----Int32 SceneChanger.LoadScene(FightParameter param,Action callback)
+function SceneChanger.LoadScene() end 
+
+FightManager = {} 
+--*
+--[Comment]
+--consturctor for FightManager overrides:
+--*
+--FightManager.New()
+--*
+
+function FightManager.New() end
+--*
+--[Comment]
+-- property: FightManager FightManager.Single	get	
+Single = nil 
+--*
+----Void FightManager:StartFight(Int32 mapId,MapDataParamsPacker mapDataPacker,Boolean isOnline)
+function StartFight() end 
+
+----Void FightManager:EndFight()
+function EndFight() end 
+
+----Void FightManager:InitMap()
+function InitMap() end 
+
+MapDataParamsPacker = {} 
+--*
+--[Comment]
+--consturctor for MapDataParamsPacker overrides:
+--*
+--MapDataParamsPacker.New()
+--*
+
+function MapDataParamsPacker.New() end
+--*
+ChatBubbleAni = {} 
+--*
+--[Comment]
+--consturctor for ChatBubbleAni overrides:
+--*
+--ChatBubbleAni.New()
+--*
+
+function ChatBubbleAni.New() end
+--*
+--[Comment]
+-- property: Boolean ChatBubbleAni.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean ChatBubbleAni.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean ChatBubbleAni.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform ChatBubbleAni.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject ChatBubbleAni.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String ChatBubbleAni.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String ChatBubbleAni.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags ChatBubbleAni.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void ChatBubbleAni.NextMessageAni(Int32 index,GameObject go1,GameObject go2)
+function ChatBubbleAni.NextMessageAni() end 
+
+chatItem = {} 
+--*
+--[Comment]
+--consturctor for chatItem overrides:
+--*
+--chatItem.New()
+--*
+
+function chatItem.New() end
+--*
+--[Comment]
+-- property: Boolean chatItem.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean chatItem.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean chatItem.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform chatItem.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject chatItem.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String chatItem.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String chatItem.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags chatItem.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void chatItem:showItemByType(Int32 type)
+function showItemByType() end 
+
+LoopItemScrollView = {} 
+--*
+--[Comment]
+--consturctor for LoopItemScrollView overrides:
+--*
+--LoopItemScrollView.New()
+--*
+
+function LoopItemScrollView.New() end
+--*
+--[Comment]
+-- property: Boolean LoopItemScrollView.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean LoopItemScrollView.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean LoopItemScrollView.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform LoopItemScrollView.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject LoopItemScrollView.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String LoopItemScrollView.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String LoopItemScrollView.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags LoopItemScrollView.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void LoopItemScrollView:Init(List`1 datas,DelegateHandler onItemInitCallback)
+function Init() end 
+
+----Void LoopItemScrollView:InitScrollView()
+function InitScrollView() end 
+
+----Void LoopItemScrollView:UpdateInBack(Int32 uid,String username,String content,String time,Int32 type)
+function UpdateInBack() end 
 

@@ -206,6 +206,8 @@ public static class CustomSettings
         _GT(typeof (UISprite)),
         _GT(typeof (UISlider)),
         _GT(typeof (UIGrid)),
+        _GT(typeof (UITable)),
+        _GT(typeof (UIInput)),
         _GT(typeof (UITexture)),
         _GT(typeof (UIScrollView)),
         _GT(typeof (UICamera)),
@@ -264,7 +266,12 @@ public static class CustomSettings
         _GT(typeof (UI_Equip_Item)),
         _GT(typeof (UIDragScrollView)),
         _GT(typeof (UIToast)),
-        _GT(typeof (UIToast.ShowType))
+        _GT(typeof (SceneChanger)),
+        _GT(typeof (FightManager)),
+        _GT(typeof (MapManager.MapDataParamsPacker)),
+        _GT(typeof(ChatBubbleAni)),
+        _GT(typeof(chatItem)),
+        _GT(typeof(LoopItemScrollView)),
     };
 
 

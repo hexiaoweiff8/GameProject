@@ -115,6 +115,18 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
                 // 将基地放入建筑列表
                 enemyBuilding.Add(objId.ID, owner);
                 break;
+            case  ObjectID.ObjectType.MyTower:
+                // 我方防御塔放入我方列表
+                _allMyDisPlayDict.Add(objId.ID, owner);
+                // 将防御塔放入建筑列表
+                myBuilding.Add(objId.ID, owner);
+                break;
+            case ObjectID.ObjectType.EnemyTower:
+                // 敌方防御塔放入敌方列表
+                _allEnemyDisPlayDict.Add(objId.ID, owner);
+                // 将防御塔放入建筑列表
+                enemyBuilding.Add(objId.ID, owner);
+                break;
         }
     }
 
@@ -158,25 +170,11 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
     /// <returns>被获取单位(如果不存在返回Null</returns>
     public DisplayOwner GetElementById(ObjectID objId)
     {
-        switch (objId.ObjType)
+        if (objId == null)
         {
-            // TODO 基地目前从士兵列表中获取
-            case ObjectID.ObjectType.MyJiDi:
-            case ObjectID.ObjectType.MySoldier:
-                if (_allMyDisPlayDict.ContainsKey(objId.ID))
-                {
-                    return _allMyDisPlayDict[objId.ID];
-                }
-                break;
-            case ObjectID.ObjectType.EnemyJiDi:
-            case ObjectID.ObjectType.EnemySoldier:
-                if (_allEnemyDisPlayDict.ContainsKey(objId.ID))
-                {
-                    return _allEnemyDisPlayDict[objId.ID];
-                }
-                break;
+            return null;
         }
-        return null;
+        return GetElementById(objId.ObjType, objId.ID);
     }
 
 
@@ -193,6 +191,7 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
             // TODO 基地目前从士兵列表中获取
             case ObjectID.ObjectType.MyJiDi:
             case ObjectID.ObjectType.MySoldier:
+            case ObjectID.ObjectType.MyTower:
                 if (_allMyDisPlayDict.ContainsKey(id))
                 {
                     return _allMyDisPlayDict[id];
@@ -200,6 +199,7 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
                 break;
             case ObjectID.ObjectType.EnemyJiDi:
             case ObjectID.ObjectType.EnemySoldier:
+            case ObjectID.ObjectType.EnemyTower:
                 if (_allEnemyDisPlayDict.ContainsKey(id))
                 {
                     return _allEnemyDisPlayDict[id];

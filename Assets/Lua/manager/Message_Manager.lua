@@ -719,6 +719,22 @@ function Message_Manager:SendPB_10030(CallBack)
         Event.AddListener("10030",CallBack)
     end
 end
+--================================================================
+--@Des 购买卡牌
+--@params cardId 卡牌id
+--================================================================
+function Message_Manager:SendPB_10031(cardId,CallBack)
+    local c2gw = c2gw_pb:BuyCard()
+
+    c2gw.cardId = cardId
+
+    local msg = c2gw:SerializeToString()
+
+    Message_Manager:createSendPBHeader(10031,msg)
+    if CallBack then
+        Event.AddListener("10031",CallBack)
+    end
+end
 
 function Message_Manager:createSendPBHeader(msgId, body)
     local header = header_pb.Header()

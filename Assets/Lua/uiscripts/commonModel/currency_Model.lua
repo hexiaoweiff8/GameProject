@@ -6,7 +6,7 @@
 local class = require("common/middleclass")
 local Currency = class("Currency")
 --金币, 钻石, 技能点, 经验池, 兵牌, 体力
-function Currency:initialize(gold,diamond,skillPt,expPool,coin,tili,power,PkPt)
+function Currency:initialize(gold,diamond,skillPt,expPool,coin,tili,power,PkPt,HumanPt,OrcPt,OmnicPt)
     self.gold = gold
     self.diamond = diamond
     self.skillPt = skillPt
@@ -15,6 +15,9 @@ function Currency:initialize(gold,diamond,skillPt,expPool,coin,tili,power,PkPt)
     self.tili = tili
     self.power = power
     self.PkPt = PkPt
+    self.HumanPt = HumanPt
+    self.OrcPt = OrcPt
+    self.OmnicPt = OmnicPt
 end
 
 ---
@@ -30,7 +33,7 @@ function currencyModel:initCurrencyTbl(currency)
         diamondNum = diamondNum+v
     end
     print( string.format(
-        "currency==> gold:%d, diamond:%d, skillPt:%d, expPool:%d, coin:%d, tili:%d, power:%d, PkPt:%d",
+        "currency==> gold:%d, diamond:%d, skillPt:%d, expPool:%d, coin:%d, tili:%d, power:%d, PkPt:%d, HumanPt:%d,OrcPt:%d,OmnicPt:%d",
         currency.gold,
         diamondNum,
         currency.skillPt,
@@ -38,9 +41,24 @@ function currencyModel:initCurrencyTbl(currency)
         currency.coin,
         currency.tili,
         currency.power,
-        currency.PkPt) )
+        currency.PkPt,
+        currency.HumanPt,
+        currency.OrcPt,
+        currency.OmnicPt
+        ) )
     --金币 -钻石 -技能点 -经验池 -兵牌 -体力
-    currencyTbl = Currency(currency.gold, diamondNum, currency.skillPt, currency.expPool, currency.coin, currency.tili, currency.power, currency.PkPt)
+    currencyTbl = Currency(
+        currency.gold,
+        diamondNum,
+        currency.skillPt,
+        currency.expPool,
+        currency.coin,
+        currency.tili,
+        currency.power,
+        currency.PkPt,
+        currency.HumanPt,
+        currency.OrcPt,
+        currency.OmnicPt)
 end
 
 ---设置金币数量
@@ -152,6 +170,46 @@ end
 function currencyModel:addPkpt(currency)
     if currency.Pkpt then
         currencyTbl.PkPt = currencyTbl.PkPt + currency.PkPt
+    end
+end
+
+---设置竞技点数
+function currencyModel:setHumanPt(currency)
+    if currency.HumanPt then
+        currencyTbl.HumanPt = currency.HumanPt
+    end
+end
+---增加竞技点数
+function currencyModel:addHumanPt(currency)
+    if currency.HumanPt then
+        currencyTbl.HumanPt = currencyTbl.HumanPt + currency.HumanPt
+    end
+end
+
+---设置竞技点数
+function currencyModel:setOrcPt(currency)
+    if currency.OrcPt then
+        currencyTbl.OrcPt = currency.OrcPt
+    end
+end
+---增加竞技点数
+function currencyModel:addOrcPt(currency)
+    if currency.OrcPt then
+        currencyTbl.OrcPt = currencyTbl.OrcPt + currency.OrcPt
+    end
+end
+
+
+---设置竞技点数
+function currencyModel:setOmnicPt(currency)
+    if currency.OmnicPt then
+        currencyTbl.PkPt = currency.OmnicPt
+    end
+end
+---增加竞技点数
+function currencyModel:addOmnicPt(currency)
+    if currency.OmnicPt then
+        currencyTbl.OmnicPt = currencyTbl.OmnicPt + currency.OmnicPt
     end
 end
 

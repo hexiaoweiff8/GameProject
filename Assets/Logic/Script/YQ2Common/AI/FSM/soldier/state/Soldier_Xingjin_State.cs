@@ -29,8 +29,7 @@ public class Soldier_Xingjin_State : SoldierFSMState
         clusterData = fsm.Display.ClusterData as ClusterData;
 
         // 切换动作
-        var myself = fsm.Display.RanderControl;
-        //myself.ModelRander.SetClip("run".GetHashCode());
+        SwitchAnim(fsm, SoldierAnimConst.XINGJIN, WrapMode.Loop);
 
         // 重新寻路
         ReFindPath();

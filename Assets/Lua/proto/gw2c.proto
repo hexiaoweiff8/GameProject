@@ -147,4 +147,9 @@ message SignIn {
     repeated Item item              =5;
 }
 
+message BuyCard {
+    required Card card              =1;
+    required Currency currency      =2;
+}
+
 

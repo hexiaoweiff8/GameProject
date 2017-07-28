@@ -29,7 +29,7 @@ public class VOBaseWrap
 		L.RegVar("BulletType", get_BulletType, set_BulletType);
 		L.RegVar("BulletSpeed", get_BulletSpeed, set_BulletSpeed);
 		L.RegVar("AttackType", get_AttackType, set_AttackType);
-		L.RegVar("MultiAimMax", get_MultiAimMax, set_MultiAimMax);
+        //L.RegVar("MultiAimMax", get_MultiAimMax, set_MultiAimMax);
 		L.RegVar("SightRange", get_SightRange, set_SightRange);
 		L.RegVar("IsHide", get_IsHide, set_IsHide);
 		L.RegVar("IsAntiHide", get_IsAntiHide, set_IsAntiHide);
@@ -40,7 +40,9 @@ public class VOBaseWrap
 		L.RegVar("Skill4", get_Skill4, set_Skill4);
 		L.RegVar("Skill5", get_Skill5, set_Skill5);
 		L.RegVar("AntiArmor", get_AntiArmor, set_AntiArmor);
-		L.RegVar("ModelID", get_ModelID, set_ModelID);
+		L.RegVar("ModelPack", get_ModelPack, set_ModelPack);
+		L.RegVar("ModelName", get_ModelName, set_ModelName);
+		L.RegVar("ModelTexture", get_ModelTexture, set_ModelTexture);
 		L.RegVar("MoveSpeed", get_MoveSpeed, set_MoveSpeed);
 		L.RegVar("AttackRange", get_AttackRange, set_AttackRange);
 		L.RegVar("Hit", get_Hit, set_Hit);
@@ -461,24 +463,24 @@ public class VOBaseWrap
 		}
 	}
 
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_MultiAimMax(IntPtr L)
-	{
-		object o = null;
+    //[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+    //static int get_MultiAimMax(IntPtr L)
+    //{
+    //    object o = null;
 
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			VOBase obj = (VOBase)o;
-			short ret = obj.MultiAimMax;
-			LuaDLL.lua_pushnumber(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MultiAimMax on a nil value" : e.Message);
-		}
-	}
+    //    try
+    //    {
+    //        o = ToLua.ToObject(L, 1);
+    //        VOBase obj = (VOBase)o;
+    //        short ret = obj.MultiAimMax;
+    //        LuaDLL.lua_pushnumber(L, ret);
+    //        return 1;
+    //    }
+    //    catch(Exception e)
+    //    {
+    //        return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MultiAimMax on a nil value" : e.Message);
+    //    }
+    //}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_SightRange(IntPtr L)
@@ -671,7 +673,7 @@ public class VOBaseWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_ModelID(IntPtr L)
+	static int get_ModelPack(IntPtr L)
 	{
 		object o = null;
 
@@ -679,13 +681,51 @@ public class VOBaseWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			VOBase obj = (VOBase)o;
-			string ret = obj.ModelID;
+			string ret = obj.ModelPack;
 			LuaDLL.lua_pushstring(L, ret);
 			return 1;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index ModelID on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index ModelPack on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_ModelName(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			string ret = obj.ModelName;
+			LuaDLL.lua_pushstring(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index ModelName on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_ModelTexture(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			string ret = obj.ModelTexture;
+			LuaDLL.lua_pushstring(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index ModelTexture on a nil value" : e.Message);
 		}
 	}
 
@@ -1354,24 +1394,24 @@ public class VOBaseWrap
 		}
 	}
 
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_MultiAimMax(IntPtr L)
-	{
-		object o = null;
+    //[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+    //static int set_MultiAimMax(IntPtr L)
+    //{
+    //    object o = null;
 
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			VOBase obj = (VOBase)o;
-			short arg0 = (short)LuaDLL.luaL_checknumber(L, 2);
-			obj.MultiAimMax = arg0;
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MultiAimMax on a nil value" : e.Message);
-		}
-	}
+    //    try
+    //    {
+    //        o = ToLua.ToObject(L, 1);
+    //        VOBase obj = (VOBase)o;
+    //        short arg0 = (short)LuaDLL.luaL_checknumber(L, 2);
+    //        obj.MultiAimMax = arg0;
+    //        return 0;
+    //    }
+    //    catch(Exception e)
+    //    {
+    //        return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MultiAimMax on a nil value" : e.Message);
+    //    }
+    //}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_SightRange(IntPtr L)
@@ -1564,7 +1604,7 @@ public class VOBaseWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_ModelID(IntPtr L)
+	static int set_ModelPack(IntPtr L)
 	{
 		object o = null;
 
@@ -1573,12 +1613,50 @@ public class VOBaseWrap
 			o = ToLua.ToObject(L, 1);
 			VOBase obj = (VOBase)o;
 			string arg0 = ToLua.CheckString(L, 2);
-			obj.ModelID = arg0;
+			obj.ModelPack = arg0;
 			return 0;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index ModelID on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index ModelPack on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_ModelName(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			string arg0 = ToLua.CheckString(L, 2);
+			obj.ModelName = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index ModelName on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_ModelTexture(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			string arg0 = ToLua.CheckString(L, 2);
+			obj.ModelTexture = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index ModelTexture on a nil value" : e.Message);
 		}
 	}
 

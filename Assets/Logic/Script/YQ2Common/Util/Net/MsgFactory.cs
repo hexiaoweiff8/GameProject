@@ -9,6 +9,14 @@ using System.Text;
 public static class MsgFactory
 {
     /// <summary>
+    /// 唯一Id起始值
+    /// </summary>
+    public static int UniqueIdStart
+    {
+        set { addtionOpUniqueNum = value; }
+    }
+
+    /// <summary>
     /// 操作唯一编号
     /// </summary>
     private static int addtionOpUniqueNum = 1024;
@@ -82,7 +90,98 @@ public static class MsgFactory
             OpUniqueNum = opUniqueNum,
             OpSourceUserId = opSourceUserId,
             OpParams = opParams
-        }; 
+        };
+
+        return result;
+    }
+
+    /// <summary>
+    /// 创建战斗请求消息
+    /// </summary>
+    /// <param name="baseLevel">基地等级</param>
+    /// <param name="turretLevel">防御塔等级</param>
+    /// <param name="race">种族</param>
+    /// <param name="param">其他参数</param>
+    /// <returns></returns>
+    public static MsgAskBattleRequest GetMsgAskBattleRequest(int baseLevel, int turretLevel, int race, string param)
+    {
+        MsgAskBattleRequest result = null;
+
+        result = new MsgAskBattleRequest()
+        {
+            BaseLevel = baseLevel,
+            TurretLevel = turretLevel,
+            Race = race,
+            Params = param
+        };
+
+        return result;
+    }
+
+    /// <summary>
+    /// 创建战斗回复消息
+    /// </summary>
+    /// <param name="baseLevel">基地等级</param>
+    /// <param name="turretLevel">防御塔等级</param>
+    /// <param name="race">种族</param>
+    /// <param name="enemyBaseLevel">敌方基地等级</param>
+    /// <param name="enemyTurretLevel">敌方防御塔等级</param>
+    /// <param name="enemyRace">敌方种族</param>
+    /// <param name="randomSeed">随机种子</param>
+    /// <param name="uniqueIdStart">唯一Id起始值</param>
+    /// <param name="param">其他参数</param>
+    /// <returns></returns>
+    public static MsgAskBattleResponse GetMsgAskBattleResponse(int baseLevel, int turretLevel, int race, int enemyBaseLevel, int enemyTurretLevel, int enemyRace, int randomSeed, int uniqueIdStart, string param)
+    {
+        MsgAskBattleResponse result = null;
+
+        result = new MsgAskBattleResponse()
+        {
+            BaseLevel = baseLevel,
+            TurretLevel = turretLevel,
+            Race = race,
+            EnemyBaseLevel = enemyBaseLevel,
+            EnemyTurretLevel = enemyTurretLevel,
+            EnemyRace = enemyRace,
+            RandomSeed = randomSeed,
+            UniqueIdStart = uniqueIdStart,
+            Params = param
+        };
+
+        return result;
+    }
+
+    /// <summary>
+    /// 战斗开始请求消息
+    /// </summary>
+    /// <param name="param">其他参数</param>
+    /// <returns></returns>
+    public static MsgBattleStartRequest GetMsgBattleStartRequest(string param)
+    {
+        MsgBattleStartRequest result = null;
+
+        result = new MsgBattleStartRequest()
+        {
+            Params = param
+        };
+
+        return result;
+    }
+
+
+    /// <summary>
+    /// 战斗开始请求回复消息
+    /// </summary>
+    /// <param name="param">其他参数</param>
+    /// <returns></returns>
+    public static MsgBattleStartResponse GetMsgBattleStartResponse(string param)
+    {
+        MsgBattleStartResponse result = null;
+
+        result = new MsgBattleStartResponse()
+        {
+            Params = param
+        };
 
         return result;
     }

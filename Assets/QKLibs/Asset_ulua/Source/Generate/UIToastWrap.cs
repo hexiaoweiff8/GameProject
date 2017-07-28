@@ -42,24 +42,38 @@ public class UIToastWrap
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 3);
-			string arg0 = ToLua.CheckString(L, 1);
-			DG.Tweening.TweenCallback arg1 = null;
-			LuaTypes funcType2 = LuaDLL.lua_type(L, 2);
+			int count = LuaDLL.lua_gettop(L);
 
-			if (funcType2 != LuaTypes.LUA_TFUNCTION)
+			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(string)))
 			{
-				 arg1 = (DG.Tweening.TweenCallback)ToLua.CheckObject(L, 2, typeof(DG.Tweening.TweenCallback));
+				string arg0 = ToLua.ToString(L, 1);
+				UIToast.Show(arg0);
+				return 0;
+			}
+			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(string), typeof(DG.Tweening.TweenCallback), typeof(UIToast.ShowType)))
+			{
+				string arg0 = ToLua.ToString(L, 1);
+				DG.Tweening.TweenCallback arg1 = null;
+				LuaTypes funcType2 = LuaDLL.lua_type(L, 2);
+
+				if (funcType2 != LuaTypes.LUA_TFUNCTION)
+				{
+					 arg1 = (DG.Tweening.TweenCallback)ToLua.ToObject(L, 2);
+				}
+				else
+				{
+					LuaFunction func = ToLua.ToLuaFunction(L, 2);
+					arg1 = DelegateFactory.CreateDelegate(typeof(DG.Tweening.TweenCallback), func) as DG.Tweening.TweenCallback;
+				}
+
+				UIToast.ShowType arg2 = (UIToast.ShowType)ToLua.ToObject(L, 3);
+				UIToast.Show(arg0, arg1, arg2);
+				return 0;
 			}
 			else
 			{
-				LuaFunction func = ToLua.ToLuaFunction(L, 2);
-				arg1 = DelegateFactory.CreateDelegate(typeof(DG.Tweening.TweenCallback), func) as DG.Tweening.TweenCallback;
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: UIToast.Show");
 			}
-
-			UIToast.ShowType arg2 = (UIToast.ShowType)ToLua.CheckObject(L, 3, typeof(UIToast.ShowType));
-			UIToast.Show(arg0, arg1, arg2);
-			return 0;
 		}
 		catch(Exception e)
 		{

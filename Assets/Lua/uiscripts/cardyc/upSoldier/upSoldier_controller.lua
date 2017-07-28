@@ -1,4 +1,4 @@
-upSoldier_controller = {}
+local upSoldier_controller = {}
 require("uiscripts/commonGameObj/cardhead")
 local view = require("uiscripts/cardyc/upSoldier/upSoldier_view")
 local data = require("uiscripts/cardyc/upSoldier/upSoldier_model")
@@ -39,7 +39,7 @@ function upSoldier_controller:Refresh()
         --显示兵员等级达到最大时的可携带兵员数量
         view.soldierP_desLab.transform:GetComponent("UILabel").text
         = string.format(stringUtil:getString(20504)
-        ,data:getSoldierLimit(data.soldierLv))
+        ,soldierUtil:getSoldierLimit(data.cardId,data.soldierLv))
         return
     end
 
@@ -54,11 +54,11 @@ function upSoldier_controller:Refresh()
     --显示兵员当前和下一等级可携带兵员数量
     view.soldierP_desLab.transform:GetComponent("UILabel").text
          =  string.format(stringUtil:getString(20503)
-            ,data:getSoldierLimit(data.soldierLv)
-            ,data:getSoldierLimit(data.soldierLv + 1))
+            ,soldierUtil:getSoldierLimit(data.cardId,data.soldierLv)
+            ,soldierUtil:getSoldierLimit(data.cardId,data.soldierLv + 1))
     --设置兵员升级消耗显示
-    local needCardNum = data:getUpSoldierNeedGoods("Card",data.soldierLv + 1)
-    local needCoinNum = data:getUpSoldierNeedGoods("Coin",data.soldierLv + 1)
+    local needCardNum = soldierUtil:getUpSoldierNeedCardNum(data.soldierLv)
+    local needCoinNum = soldierUtil:getUpSoldierNeedCoinNum(data.soldierLv)
     view.soldierP_cardNeedL.transform:GetComponent("UILabel").text = string.format("x%d",needCardNum)
     view.soldierP_badgeNeednumL.transform:GetComponent("UILabel").text = string.format("x%d",needCoinNum)
     view.soldierP_cardHavaLab.transform:GetComponent("UILabel").text = string.format("(%s%d)",stringUtil:getString(20028),data.cardFragment)

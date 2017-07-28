@@ -52,7 +52,7 @@ public class TestFormulaConstruct : MonoBehaviour
 	    if (Input.GetMouseButtonUp(0))
 	    {
             // 创建技能
-	        var formula = skillInfo2.GetFormula(new FormulaParamsPacker()
+	        var formula = skillInfo2.GetActionFormula(new FormulaParamsPacker()
 	        {
 	            StartPos = new Vector3(10, 0, 10),
                 TargetPos = new Vector3(100, 0, 0),

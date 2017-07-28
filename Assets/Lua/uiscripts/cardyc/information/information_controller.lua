@@ -1,4 +1,4 @@
-information_controller = {}
+local information_controller = {}
 local view = require("uiscripts/cardyc/information/information_view")
 local data = require("uiscripts/cardyc/information/information_model")
 

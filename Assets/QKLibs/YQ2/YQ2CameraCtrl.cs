@@ -69,7 +69,7 @@ public class YQ2CameraCtrl : MonoBehaviour
         m_ScrollObject = GetComponent<BoxScrollObject>();
 
         // 本地化数据层数据
-        var cameraData = SData_MapData.Single.GetDataOfID(1);
+        var cameraData = SData_mapdata.Single.GetDataOfID(1);
         m_CameraTurnaroundTime = cameraData.Camera_ZhuanshenTime;
         m_TerrainCellBianchang = cameraData.terrain_cell_bianchang;
         m_CameraYAroundMin = cameraData.CameraY_XuanzhuanMin;

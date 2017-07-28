@@ -6,20 +6,19 @@ using System.Text;
 
 
 /// <summary>
-/// 技能基类
+/// 能力基类
 /// </summary>
-public class SkillBase
+public class AbilityBase
 {
-
     /// <summary>
     /// ID
     /// </summary>
     public int Num { get; protected set; }
-     
+
     /// <summary>
     /// 唯一自增ID
     /// </summary>
-    public long AddtionId { get; private set; }
+    public long AddtionId { get; protected set; }
 
     /// <summary>
     /// 保存技能等级数据列表
@@ -27,49 +26,23 @@ public class SkillBase
     public List<List<string>> DataList = new List<List<string>>();
 
     /// <summary>
-    /// 触发条件Level1
-    /// </summary>
-    public TriggerLevel1 TriggerLevel1 { get; set; }
-
-    /// <summary>
-    /// 触发条件Level2
-    /// </summary>
-    public TriggerLevel2 TriggerLevel2 { get; set; }
-
-    /// <summary>
-    /// 技能的持有者
-    /// </summary>
-    public DisplayOwner ReleaseMember { get; set; }
-
-    /// <summary>
-    /// buff的Tick时间(单位 秒)
-    /// 每次tick执行一次
-    /// </summary>
-    public float TickTime { get; set; }
-
-
-    /// <summary>
-    /// 修改数据
-    /// 使用反射赋值
-    /// </summary>
-    public VOBase ChangeData { get; set; }
-
-    /// <summary>
-    /// 已经修改的数据总量
-    /// 在buff Detach时进行删除用
-    /// </summary>
-    public VOBase ChangedData { get; set; }
-
-    /// <summary>
-    /// 数据变更类型字典
-    /// (数据变更字段, 数据变更类型0:绝对值(加),1:百分比(1+值 乘))
-    /// </summary>
-    public Dictionary<string, ChangeDataType> ChangeDataTypeDic = new Dictionary<string, ChangeDataType>();
-
-    /// <summary>
     /// 技能的数据域
     /// </summary>
     public SkillDataScope SkillDataScope = new SkillDataScope();
+
+    /// <summary>
+    /// 技能唯一自增ID
+    /// </summary>
+    protected static long addtionId = 1024;
+
+
+    public AbilityBase()
+    {
+        AddtionId = addtionId++;
+    }
+
+
+    
 
     /// <summary>
     /// buff触发行为
@@ -87,16 +60,165 @@ public class SkillBase
     protected IFormulaItem detachFormulaItem = null;
 
     /// <summary>
-    /// 技能唯一自增ID
+    /// 添加触发行为生成器
     /// </summary>
-    protected static long addtionId = 1024;
-
-
-    public SkillBase()
+    /// <param name="formulaItem">行为单元生成器</param>
+    public void AddActionFormulaItem(IFormulaItem formulaItem)
     {
-        AddtionId = addtionId++;
+        if (formulaItem == null)
+        {
+            throw new Exception("行为节点为空");
+        }
+        if (actionFormulaItem == null)
+        {
+            actionFormulaItem = formulaItem;
+        }
+        else
+        {
+            actionFormulaItem.After(formulaItem);
+        }
     }
 
+    /// <summary>
+    /// 添加创建行为生成器
+    /// </summary>
+    /// <param name="formulaItem">行为单元生成器</param>
+    public void AddAttachFormulaItem(IFormulaItem formulaItem)
+    {
+        if (formulaItem == null)
+        {
+            throw new Exception("行为节点为空");
+        }
+        if (attachFormulaItem == null)
+        {
+            attachFormulaItem = formulaItem;
+        }
+        else
+        {
+            attachFormulaItem.After(formulaItem);
+        }
+    }
+
+    /// <summary>
+    /// 添加销毁行为生成器
+    /// </summary>
+    /// <param name="formulaItem">行为单元生成器</param>
+    public void AddDetachFormulaItem(IFormulaItem formulaItem)
+    {
+        if (formulaItem == null)
+        {
+            throw new Exception("行为节点为空");
+        }
+        if (detachFormulaItem == null)
+        {
+            detachFormulaItem = formulaItem;
+        }
+        else
+        {
+            detachFormulaItem.After(formulaItem);
+        }
+    }
+
+
+    /// <summary>
+    /// 获取Action行为链生成器
+    /// </summary>
+    /// <returns></returns>
+    public IFormulaItem GetActionFormulaItem()
+    {
+        return actionFormulaItem;
+    }
+    
+    /// <summary>
+    /// 获取Attach行为链生成器
+    /// </summary>
+    /// <returns></returns>
+    public IFormulaItem GetAttachFormulaItem()
+    {
+        return attachFormulaItem;
+    }
+
+    /// <summary>
+    /// 获取Detach行为链生成器
+    /// </summary>
+    /// <returns></returns>
+    public IFormulaItem GetDetachFormulaItem()
+    {
+        return detachFormulaItem;
+    }
+
+    /// <summary>
+    /// 获取buff创建时行为
+    /// </summary>
+    /// <param name="paramsPacker">构造行为数据</param>
+    /// <returns>创建时行为链</returns>
+    public IFormula GetAttachFormula(FormulaParamsPacker paramsPacker)
+    {
+        IFormula result = null;
+        if (paramsPacker == null)
+        {
+            throw new Exception("参数封装为空.");
+        }
+        if (attachFormulaItem == null)
+        {
+            return result;
+        }
+        result = GetIFormula(paramsPacker, attachFormulaItem);
+
+        return result;
+    }
+
+
+    /// <summary>
+    /// 获取buff销毁行为
+    /// </summary>
+    /// <param name="paramsPacker">构造行为数据</param>
+    /// <returns>销毁时行为链</returns>
+    public IFormula GetDetachFormula(FormulaParamsPacker paramsPacker)
+    {
+        IFormula result = null;
+        if (paramsPacker == null)
+        {
+            throw new Exception("参数封装为空.");
+        }
+        if (detachFormulaItem == null)
+        {
+            return result;
+        }
+        result = GetIFormula(paramsPacker, detachFormulaItem);
+        //if (result != null)
+        //{
+        //    result.After(new Formula((callback) =>
+        //    {
+        //        Debug.Log("删除buff:" + addtionId);
+        //        // 执行结束删除当前buff的具体实现引用
+        //        BuffManager.Single.DelBuffInstance(AddtionId);
+        //        callback();
+        //    }));
+        //}
+        return result;
+    }
+
+    /// <summary>
+    /// 获取buff触发行为
+    /// </summary>
+    /// <param name="paramsPacker">参数封装</param>
+    /// <returns>行为链</returns>
+    public IFormula GetActionFormula(FormulaParamsPacker paramsPacker)
+    {
+        if (paramsPacker == null)
+        {
+            throw new Exception("参数封装为空.");
+        }
+        IFormula result = null;
+
+        if (actionFormulaItem == null)
+        {
+            return null;
+        }
+        result = GetIFormula(paramsPacker, actionFormulaItem);
+        return result;
+    }
 
 
 
@@ -138,7 +260,69 @@ public class SkillBase
 
         return result;
     }
+}
 
+/// <summary>
+/// 技能基类
+/// </summary>
+public class SkillBase : AbilityBase
+{
+
+    /// <summary>
+    /// 触发条件Level1
+    /// </summary>
+    public TriggerLevel1 TriggerLevel1 { get; set; }
+
+    /// <summary>
+    /// 触发条件Level2
+    /// </summary>
+    public TriggerLevel2 TriggerLevel2 { get; set; }
+
+    /// <summary>
+    /// 技能的持有者
+    /// </summary>
+    public DisplayOwner ReleaseMember { get; set; }
+
+    /// <summary>
+    /// buff的Tick时间(单位 秒)
+    /// 每次tick执行一次
+    /// </summary>
+    public float TickTime { get; set; }
+
+    /// <summary>
+    /// 修改数据
+    /// 使用反射赋值
+    /// </summary>
+    public VOBase ChangeData { get; set; }
+
+    /// <summary>
+    /// 已经修改的数据总量
+    /// 在buff/skill Detach时进行删除用
+    /// </summary>
+    public VOBase ChangedData { get; set; }
+
+    /// <summary>
+    /// 数据变更类型字典
+    /// (数据变更字段, 数据变更类型0:绝对值(加),1:百分比(1+值 乘))
+    /// </summary>
+    public Dictionary<string, ChangeDataType> ChangeDataTypeDic = new Dictionary<string, ChangeDataType>();
+
+
+    ///// <summary>
+    ///// 技能是否释放完毕
+    ///// </summary>
+    //public bool IsDone { get; private set; }
+    /// <summary>
+    /// 描述
+    /// </summary>
+    public string Description { get; set; }
+
+
+
+    public SkillBase() : base()
+    {
+
+    }
 
     /// <summary>
     /// 附加时的增加属性
@@ -342,6 +526,40 @@ public class SkillBase
                 field.SetValue(memberData, Convert.ChangeType((sourceValue - plusValue), field.FieldType));
             }
         }
+    }
+
+
+
+
+    /// <summary>
+    /// 获取替换数据后的技能说明
+    /// </summary>
+    /// <returns>技能说明(用数据替换掉替换符的说明)</returns>
+    public string GetReplacedDescription(int level)
+    {
+        if (level <= 0)
+        {
+            return null;
+        }
+        if (DataList == null || DataList.Count == 0)
+        {
+            throw new Exception("没有数据,DataList为空");
+        }
+        if (level > DataList.Count)
+        {
+            throw new Exception("输入等级:" + level + "大于最高等级" + DataList.Count);
+        }
+
+        // 复制说明, 防止修改原有数据
+        var result = string.Copy(Description);
+
+        var dataLine = DataList[level - 1];
+        for (var i = 0; i < dataLine.Count; i++)
+        {
+            result = result.Replace("{%" + i + "}", dataLine[i]);
+        }
+
+        return result;
     }
 
 }

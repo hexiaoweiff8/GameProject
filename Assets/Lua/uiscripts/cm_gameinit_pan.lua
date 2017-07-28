@@ -20,6 +20,7 @@ require("uiscripts/Util/colorUtil")
 require("uiscripts/Util/spriteNameUtil")
 require("uiscripts/Util/attributeUtil")
 require("uiscripts/Util/equipSuitUtil")
+require("uiscripts/Util/soldierUtil")
 require("uiscripts/Util/synergyUtil")
 require("uiscripts/Util/skillUtil")
 require("uiscripts/Util/starUtil")
@@ -43,6 +44,7 @@ WNDTYPE = {
     Healthadvice = "ui_healthadvice",
     Prefight = "ui_prefight",
     ui_fight = "ui_fightU",
+    ui_fight2 = "ui_fightU2",
     ui_pause = "ui_pauseU",
     ui_quitGame = "ui_quitGame",
     quiteEnsure_ui = "ui_quiteensure",
@@ -53,7 +55,11 @@ WNDTYPE = {
     ui_kejitree = "ui_kejitree",
     Cardyc = "ui_cardyc",
     Cangku = "ui_cangku",
+    Shop = "ui_shop",
+    CardShop = "ui_cardshop",
     QianDao = "ui_qiandao",
+    chatBubble = "ui_chatBubble",
+    chatWindow = "ui_chatWindow",
 }
 UiDefine = luacsv.new(require("pk_tabs/UiDefine"))
 -- 登录窗体组件名列表 
@@ -64,10 +70,11 @@ local lgwnds = {
 gameinit.wndlist = {
     {name = WNDTYPE.Login, cm = "uiscripts/wndtz_login"},
     {name = WNDTYPE.ui_fight, cm = "uiscripts/ui_fight"},
+    {name = WNDTYPE.ui_fight2, cm = "uiscripts/fight/fight_controller"},
     {name = WNDTYPE.ui_pause, cm = "uiscripts/ui_pause"},
     {name = WNDTYPE.ui_quitGame, cm = "uiscripts/ui_quitGame"},
     {name = WNDTYPE.quiteEnsure_ui, cm = "uiscripts/ui_pause"},
-    {name = WNDTYPE.Prefight, cm = "uiscripts/wnd_prefight"},
+    {name = WNDTYPE.Prefight, cm = "uiscripts/ui_prefight"},
     {name = WNDTYPE.ui_equip2, cm = "uiscripts/myEquip/equip_controller"},
     {name = WNDTYPE.ui_equip, cm = "uiscripts/ui_equip"},
     {name = WNDTYPE.ui_chongzhu, cm = "uiscripts/ui_chongzhu"},
@@ -75,8 +82,11 @@ gameinit.wndlist = {
     {name = WNDTYPE.ui_kejitree, cm = "uiscripts/ui_kejitree"},
     {name = WNDTYPE.Cardyc, cm = "uiscripts/cardyc/wnd_cardyc_controller"},
     {name = WNDTYPE.Cangku, cm = "uiscripts/cangku/wnd_cangku_controller"},
+    {name = WNDTYPE.Shop, cm = "uiscripts/shop/wnd_shop_controller"},
+    {name = WNDTYPE.CardShop, cm = "uiscripts/shop_card/wnd_cardshop_controller"},
     {name = WNDTYPE.QianDao, cm = "uiscripts/qiandao/wnd_qiandao_controller"},
-}
+    {name = WNDTYPE.chatBubble, cm = "uiscripts/chat/chatBubble/chatBubble_controller"},
+    {name = WNDTYPE.chatWindow, cm = "uiscripts/chat/chatWindow_controller"},}
 _all_Reg_Wnd_list = {}
 --- <summary>
 --- 初始化窗体

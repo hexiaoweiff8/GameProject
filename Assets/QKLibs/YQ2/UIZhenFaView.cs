@@ -87,8 +87,8 @@ public class UIZhenFaView : MonoBehaviour {
 
 
         float x,z;
-        DiamondGridMap.Grid2World(SData_MapData.Single.GetDataOfID(1).MapMaxRow + DiamondGridMap.SideSize * 2, unit.x, unit.z, out   x, out   z);
-        if (unit.indent) x += SData_MapData.Single.GetDataOfID(1).terrain_cell_bianchang * DiamondGridMap.wxs / 2f;
+        DiamondGridMap.Grid2World(SData_mapdata.Single.GetDataOfID(1).MapMaxRow + DiamondGridMap.SideSize * 2, unit.x, unit.z, out   x, out   z);
+        if (unit.indent) x += SData_mapdata.Single.GetDataOfID(1).terrain_cell_bianchang * DiamondGridMap.wxs / 2f;
 
         x /= DiamondGridMap.VerticalSpacingFactor;
         z /= DiamondGridMap.VerticalSpacingFactor;

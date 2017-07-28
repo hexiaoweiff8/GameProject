@@ -6,7 +6,7 @@ local data ={
 		[2]={2,"CritPara1",0},
 		[3]={3,"ReduceDamagePara1",2000},
 		[4]={4,"AntiOverflowPara1",-0.4},
-		[5]={5,"SurfacePositionY",-33},
+		[5]={5,"SurfacePositionY",1},
 		[6]={6,"AirPositionY",40},
 	}
 }

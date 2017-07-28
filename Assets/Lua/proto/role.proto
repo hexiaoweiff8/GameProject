@@ -9,6 +9,9 @@ message Currency{
     required int32 tili         =6;
     required int32 power        =7;
     required int32 PkPt         =8;
+    required int32 HumanPt      =9;
+    required int32 OrcPt        =10;
+    required int32 OmnicPt      =11;
 };
 
 
@@ -23,6 +26,7 @@ message Card{
     repeated int32 team			=8;
     repeated int32 skill		=9;
     required int32 lv           =10;
+    required int32 buy          =11;
 };
 
 

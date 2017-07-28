@@ -64,7 +64,13 @@ public class UtilsWrap
 		L.RegConstant("AirCollisionGroup", 2);
 		L.RegConstant("SurfaceTypeConstantId", 5);
 		L.RegConstant("AirTypeConstantId", 6);
+		L.RegConstant("HumanArmyType", 1);
+		L.RegConstant("OrcArmyType", 2);
+		L.RegConstant("MechanicArmyType", 3);
+		L.RegConstant("BaseArmyType", 4);
+		L.RegConstant("TurretArmyType", 5);
 		L.RegConstant("BaseBaseId", 220001000);
+		L.RegConstant("TurretBaseId", 220002000);
 		L.RegConstant("AngleToPi", 0.0174532923847437);
 		L.RegConstant("PiToAngle", 57.2957801818848);
 		L.RegConstant("EffectLayer", 12);

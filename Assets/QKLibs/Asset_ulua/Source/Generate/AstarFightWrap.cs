@@ -8,11 +8,13 @@ public class AstarFightWrap
 	{
 		L.BeginClass(typeof(AstarFight), typeof(UnityEngine.MonoBehaviour));
 		L.RegFunction("InitMap", InitMap);
+		L.RegFunction("Clear", Clear);
 		L.RegFunction("isZhangAi", isZhangAi);
 		L.RegFunction("setAllZhenxingList", setAllZhenxingList);
 		L.RegFunction("setZhenxingInfo", setZhenxingInfo);
 		L.RegFunction("getNum", getNum);
 		L.RegFunction("setMaxX", setMaxX);
+		L.RegFunction("OnDestroy", OnDestroy);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("DiameterX", get_DiameterX, set_DiameterX);
@@ -29,6 +31,7 @@ public class AstarFightWrap
 		L.RegVar("PathPoint", get_PathPoint, set_PathPoint);
 		L.RegVar("PathPointFather", get_PathPointFather, set_PathPointFather);
 		L.RegVar("ItemCount", get_ItemCount, set_ItemCount);
+		L.RegVar("Instance", get_Instance, null);
 		L.EndClass();
 	}
 
@@ -37,9 +40,27 @@ public class AstarFightWrap
 	{
 		try
 		{
+			ToLua.CheckArgsCount(L, 3);
+			AstarFight obj = (AstarFight)ToLua.CheckObject(L, 1, typeof(AstarFight));
+			int[][] arg0 = ToLua.CheckObjectArray<int[]>(L, 2);
+			int[][] arg1 = ToLua.CheckObjectArray<int[]>(L, 3);
+			obj.InitMap(arg0, arg1);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Clear(IntPtr L)
+	{
+		try
+		{
 			ToLua.CheckArgsCount(L, 1);
 			AstarFight obj = (AstarFight)ToLua.CheckObject(L, 1, typeof(AstarFight));
-			obj.InitMap();
+			obj.Clear();
 			return 0;
 		}
 		catch(Exception e)
@@ -131,6 +152,22 @@ public class AstarFightWrap
 			AstarFight obj = (AstarFight)ToLua.CheckObject(L, 1, typeof(AstarFight));
 			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
 			obj.setMaxX(arg0);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int OnDestroy(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			AstarFight obj = (AstarFight)ToLua.CheckObject(L, 1, typeof(AstarFight));
+			obj.OnDestroy();
 			return 0;
 		}
 		catch(Exception e)
@@ -420,6 +457,20 @@ public class AstarFightWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index ItemCount on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_Instance(IntPtr L)
+	{
+		try
+		{
+			ToLua.Push(L, AstarFight.Instance);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
 		}
 	}
 

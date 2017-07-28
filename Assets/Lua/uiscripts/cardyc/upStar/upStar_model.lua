@@ -11,12 +11,12 @@ function upStar_model:isCan_UpStar()
         return stringUtil:getString(20301)
     end
     --所需碎片是否足够
-    if starUtil:getUpStarNeedFragment(self.starLv + 1) > self.cardFragment then
+    if starUtil:getUpStarNeedFragment(self.starLv) > self.cardFragment then
         print("卡牌升星所需碎片不足")
         return stringUtil:getString(20302)
     end
     --所需兵牌是否足够
-    if starUtil:getUpStarNeedCoin(self.starLv + 1) > self.badgeNum then
+    if starUtil:getUpStarNeedCoin(self.starLv) > self.badgeNum then
         print("卡牌升星所需兵牌不足")
         return stringUtil:getString(20303)
     end

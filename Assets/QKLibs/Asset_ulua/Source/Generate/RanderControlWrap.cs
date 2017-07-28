@@ -9,6 +9,8 @@ public class RanderControlWrap
 		L.BeginClass(typeof(RanderControl), typeof(UnityEngine.MonoBehaviour));
 		L.RegFunction("SyncData", SyncData);
 		L.RegFunction("Begin", Begin);
+		L.RegFunction("OnEnable", OnEnable);
+		L.RegFunction("PlayAni", PlayAni);
 		L.RegFunction("DestoryFSM", DestoryFSM);
 		L.RegFunction("SetBloodBarValue", SetBloodBarValue);
 		L.RegFunction("__eq", op_Equality);
@@ -19,7 +21,6 @@ public class RanderControlWrap
 		L.RegVar("Head", get_Head, set_Head);
 		L.RegVar("isEnemy", get_isEnemy, set_isEnemy);
 		L.RegVar("isSetShader", get_isSetShader, set_isSetShader);
-		L.RegVar("groupIndex", get_groupIndex, set_groupIndex);
 		L.RegVar("ModelRander", get_ModelRander, set_ModelRander);
 		L.EndClass();
 	}
@@ -48,6 +49,40 @@ public class RanderControlWrap
 			ToLua.CheckArgsCount(L, 1);
 			RanderControl obj = (RanderControl)ToLua.CheckObject(L, 1, typeof(RanderControl));
 			obj.Begin();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int OnEnable(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			RanderControl obj = (RanderControl)ToLua.CheckObject(L, 1, typeof(RanderControl));
+			obj.OnEnable();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int PlayAni(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			RanderControl obj = (RanderControl)ToLua.CheckObject(L, 1, typeof(RanderControl));
+			string arg0 = ToLua.CheckString(L, 2);
+			UnityEngine.WrapMode arg1 = (UnityEngine.WrapMode)ToLua.CheckObject(L, 3, typeof(UnityEngine.WrapMode));
+			obj.PlayAni(arg0, arg1);
 			return 0;
 		}
 		catch(Exception e)
@@ -221,25 +256,6 @@ public class RanderControlWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_groupIndex(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			RanderControl obj = (RanderControl)o;
-			int ret = obj.groupIndex;
-			LuaDLL.lua_pushinteger(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index groupIndex on a nil value" : e.Message);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_ModelRander(IntPtr L)
 	{
 		object o = null;
@@ -369,25 +385,6 @@ public class RanderControlWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index isSetShader on a nil value" : e.Message);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_groupIndex(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			RanderControl obj = (RanderControl)o;
-			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
-			obj.groupIndex = arg0;
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index groupIndex on a nil value" : e.Message);
 		}
 	}
 

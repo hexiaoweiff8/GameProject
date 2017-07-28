@@ -64,19 +64,18 @@ public class MapManager : Singleton<MapManager>
     }
 
 
-
-
     /// <summary>
     /// 解析建筑地图
     /// </summary>
-    /// <param name="buildingMap">地图数据</param>
-    public void AnalysisBuidingMap(int[][] buildingMap)
+    /// <param name="mapData">地图数据</param>
+    /// <param name="packer">数据包装</param>
+    public void AnalysisMap(int[][] mapData, MapDataParamsPacker packer = null)
     {
 
         // 获取基地位置
-        for (var row = 0; row < buildingMap.Length; row++)
+        for (var row = 0; row < mapData.Length; row++)
         {
-            var line = buildingMap[row];
+            var line = mapData[row];
             for (var col = 0; col < line.Length; col++)
             {
                 var cell = line[col];
@@ -86,41 +85,52 @@ public class MapManager : Singleton<MapManager>
                         // 无障碍
                         break;
                     case Utils.Obstacle:
-                        // 障碍物
-                        {
-                            var paramObj = new CreateActorParam(col, row);
-                            FightUnitFactory.CreateUnit((int) ObjectID.ObjectType.NPCObstacle, paramObj);
-                        }
+                    {
+                            // 障碍物
+                        var paramObj = new CreateActorParam(col, row);
+                        FightUnitFactory.CreateUnit((int) ObjectID.ObjectType.NPCObstacle, paramObj);
+                    }
                         break;
                     case Utils.MyBaseId:
-                        // 我方基地
                         {
-                            // TODO 当前基地等级
-                            var pos = Utils.NumToPosition(LoadMap.Single.transform.position, new Vector2(col, row),
-                                ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth,
-                                ClusterManager.Single.MapHeight);
-                            var paramObj = new CreateActorParam(pos.x, pos.z, 1);
-                            FightUnitFactory.CreateUnit((int)ObjectID.ObjectType.MyJiDi, paramObj);
-                        }
+                            // 我方基地
+                        var pos = Utils.NumToPosition(LoadMap.Single.transform.position, new Vector2(col, row),
+                            ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth,
+                            ClusterManager.Single.MapHeight);
+                        var paramObj = new CreateActorParam(pos.x, pos.z, packer.BaseLevel);
+                        FightUnitFactory.CreateUnit((int) ObjectID.ObjectType.MyJiDi, paramObj);
+                    }
                         break;
                     case Utils.MyTurretId:
+                    {
                         // 我方防御塔
-
+                        var pos = Utils.NumToPosition(LoadMap.Single.transform.position, new Vector2(col, row),
+                            ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth,
+                            ClusterManager.Single.MapHeight);
+                        var paramObj = new CreateActorParam(pos.x, pos.z, packer.TurretLevel);
+                        FightUnitFactory.CreateUnit((int)ObjectID.ObjectType.MyTower, paramObj);
+                    }
                         break;
                     case Utils.EnemyBaseId:
-                        // 敌方基地
                         {
-                            // TODO 当前基地等级
-                            var pos = Utils.NumToPosition(LoadMap.Single.transform.position, new Vector2(col, row),
-                                ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth,
-                                ClusterManager.Single.MapHeight);
-                            var paramObj = new CreateActorParam(pos.x, pos.z, 1);
-                            FightUnitFactory.CreateUnit((int)ObjectID.ObjectType.EnemyJiDi, paramObj);
-                        }
+                            // 敌方基地
+                        var pos = Utils.NumToPosition(LoadMap.Single.transform.position, new Vector2(col, row),
+                            ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth,
+                            ClusterManager.Single.MapHeight);
+                        var paramObj = new CreateActorParam(pos.x, pos.z, packer.EnemyBaseLevel);
+                        FightUnitFactory.CreateUnit((int) ObjectID.ObjectType.EnemyJiDi, paramObj);
+                    }
                         break;
                     case Utils.EnemyTurretId:
+                    {
                         // 敌方防御塔
 
+                        var pos = Utils.NumToPosition(LoadMap.Single.transform.position, new Vector2(col, row),
+                            ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth,
+                            ClusterManager.Single.MapHeight);
+                        var paramObj = new CreateActorParam(pos.x, pos.z, packer.TurretLevel);
+                        FightUnitFactory.CreateUnit((int)ObjectID.ObjectType.EnemyTower, paramObj);
+                    }
                         break;
                 }
             }
@@ -166,5 +176,45 @@ public class MapManager : Singleton<MapManager>
         }
 
         return mapInfo;
+    }
+
+    /// <summary>
+    /// 地图数据包装类
+    /// </summary>
+    public class MapDataParamsPacker
+    {
+        /// <summary>
+        /// 地图Id
+        /// </summary>
+        public int MapId = -1;
+
+        /// <summary>
+        /// 我方基地等级
+        /// </summary>
+        public int BaseLevel = 1;
+
+        /// <summary>
+        /// 我方防御塔等级
+        /// </summary>
+        public int TurretLevel = 1;
+
+        /// <summary>
+        /// 我方种族
+        /// </summary>
+        public int Race = 0;
+
+        /// <summary>
+        /// 敌方基地等级
+        /// </summary>
+        public int EnemyBaseLevel = 1;
+
+        /// <summary>
+        /// 敌方防御塔等级
+        /// </summary>
+        public int EnemyTurretLevel = 1;
+        /// <summary>
+        /// 敌方种族
+        /// </summary>
+        public int EnemyRace = 0;
     }
 }

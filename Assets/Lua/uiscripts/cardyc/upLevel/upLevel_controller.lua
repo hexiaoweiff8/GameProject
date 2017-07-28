@@ -1,4 +1,4 @@
-upLevel_controller = {}
+local upLevel_controller = {}
 local view = require("uiscripts/cardyc/upLevel/upLevel_view")
 local data = require("uiscripts/cardyc/upLevel/upLevel_model")
 

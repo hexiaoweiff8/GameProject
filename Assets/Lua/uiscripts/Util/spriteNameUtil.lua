@@ -29,6 +29,9 @@ spriteNameUtil = class("spriteNameUtil")
     spriteNameUtil.COMPROPS_MOVE_UP = "zhuangbei_jiantou_xiangxishuxing_zhankai"
     spriteNameUtil.COMPROPS_MOVE_DOWN = "zhuangbei_jiantou_xiangxishuxing_shouqi"
 
+    spriteNameUtil.FIGHT_LEFTCARD_BG = "zhandou_shengyubingli_kapai"
+    spriteNameUtil.FIGHT_LEFTCARD_MORE = "zhandou_shenyubingli_gengduo"
+
 
 return spriteNameUtil
 

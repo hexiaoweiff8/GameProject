@@ -32,7 +32,7 @@ function ui_fight:OnShowDone()
     local localpaiStr = "101001,101002,101003,101004,101005,101006,101007,101008,101009,101001,101002,101003,101004,101005,101006,101007,101008,101009"
     -- -- localpaiStr = "1,2,3,4,5,6"
     --剩余牌库
-    self.paiKutb = string.splitToInt(localpaiStr, ",")  
+    self.paiKutb = string.splitToInt(localpaiStr, ",")
     --打乱牌库
     table.upset(self.paiKutb)
     --当前手牌库
@@ -204,7 +204,7 @@ function ui_fight:OnShowDone()
                 self.allrenderZhenxingList = self.AstarFight:setAllZhenxingList(self.paiKutb, self.paiKuLeveltb)
             end
         end
-        self.AstarFight:InitMap()
+        --self.AstarFight:InitMap()
     end)
     local cardBoxCollider = self.transform:Find("currentCards_bg/currentCard" .. 1):GetComponent(typeof(UnityEngine.BoxCollider)).size
     -----------------------------------卡牌UI获取
@@ -455,7 +455,6 @@ function WANJIAXIABING(self)
     end
     --如果敌人费够
     if self.enemyNowFei >= sdata_armycardbase_data:GetFieldV("TrainCost", tempID) then
-        print("WANJIAXIABING")
         local ct = self:getModel(tempID, 5)
         --增加敌人出牌UI
         local euc = GameObject.Instantiate(self.enemyUsedCard)
@@ -638,7 +637,7 @@ end
 --事件处理
 function ui_fight:doEvent(tf, var, isXiaBing)
     if isXiaBing > 0 then -- 下兵或回收事件
-        lgyPrint("下兵或回收事件" .. isXiaBing)
+        lgyPrint("下兵或回收事件")
         if isXiaBing > 2 then --拖动下兵
             -- 下兵事件
             -- 将下兵消息发送

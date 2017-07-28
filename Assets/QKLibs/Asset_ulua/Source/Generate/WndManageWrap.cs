@@ -17,7 +17,6 @@ public class WndManageWrap
 		L.RegFunction("PreLoadDepend", PreLoadDepend);
 		L.RegFunction("_GetWnd", _GetWnd);
 		L.RegFunction("_OnWndHide", _OnWndHide);
-		L.RegFunction("LoadMainBaseActors", LoadMainBaseActors);
 		L.RegFunction("LogicInit_Go", LogicInit_Go);
 		L.RegFunction("LogicInit_GetInitProgress", LogicInit_GetInitProgress);
 		L.RegFunction("__tostring", ToLua.op_ToString);
@@ -220,22 +219,6 @@ public class WndManageWrap
 			string arg0 = ToLua.CheckString(L, 2);
 			obj._OnWndHide(arg0);
 			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int LoadMainBaseActors(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 0);
-			int o = WndManage.LoadMainBaseActors();
-			LuaDLL.lua_pushinteger(L, o);
-			return 1;
 		}
 		catch(Exception e)
 		{

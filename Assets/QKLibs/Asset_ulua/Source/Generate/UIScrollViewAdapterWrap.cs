@@ -23,6 +23,7 @@ public class UIScrollViewAdapterWrap
 		L.RegVar("_spacing_line", get__spacing_line, set__spacing_line);
 		L.RegVar("_itemsVisible_row", get__itemsVisible_row, set__itemsVisible_row);
 		L.RegVar("_itemsVisible_line", get__itemsVisible_line, set__itemsVisible_line);
+		L.RegVar("_spacing", get__spacing, set__spacing);
 		L.RegVar("WhetherAutomaticallyFill", get_WhetherAutomaticallyFill, set_WhetherAutomaticallyFill);
 		L.RegVar("_itemsList", get__itemsList, set__itemsList);
 		L.RegFunction("OnListMovedHandler", UIScrollViewAdapter_OnListMovedHandler);
@@ -305,6 +306,25 @@ public class UIScrollViewAdapterWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get__spacing(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIScrollViewAdapter obj = (UIScrollViewAdapter)o;
+			float ret = obj._spacing;
+			LuaDLL.lua_pushnumber(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index _spacing on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_WhetherAutomaticallyFill(IntPtr L)
 	{
 		object o = null;
@@ -527,6 +547,25 @@ public class UIScrollViewAdapterWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index _itemsVisible_line on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set__spacing(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIScrollViewAdapter obj = (UIScrollViewAdapter)o;
+			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
+			obj._spacing = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index _spacing on a nil value" : e.Message);
 		}
 	}
 

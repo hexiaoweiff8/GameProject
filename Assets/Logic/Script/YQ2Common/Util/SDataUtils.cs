@@ -22,8 +22,8 @@ public class SDataUtils
         {
             case "mapData":
                 {
-                    SData_MapData.AutoInstance();
-                    SData_MapData.Single.setData(table1, table2);
+                    SData_mapdata.AutoInstance();
+                    SData_mapdata.Single.setData(table1, table2);
                 }
                 break;
             case "constant":

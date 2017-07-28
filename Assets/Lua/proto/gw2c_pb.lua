@@ -92,6 +92,9 @@ local SIGNIN_CARD_FIELD = protobuf.FieldDescriptor();
 local SIGNIN_EQUIP_FIELD = protobuf.FieldDescriptor();
 local SIGNIN_CURRENCY_FIELD = protobuf.FieldDescriptor();
 local SIGNIN_ITEM_FIELD = protobuf.FieldDescriptor();
+BUYCARD = protobuf.Descriptor();
+local BUYCARD_CARD_FIELD = protobuf.FieldDescriptor();
+local BUYCARD_CURRENCY_FIELD = protobuf.FieldDescriptor();
 
 SELECTROLE_USER_FIELD.name = "user"
 SELECTROLE_USER_FIELD.full_name = ".SelectRole.user"
@@ -947,7 +950,37 @@ SIGNIN.enum_types = {}
 SIGNIN.fields = {SIGNIN_SIGN_FIELD, SIGNIN_CARD_FIELD, SIGNIN_EQUIP_FIELD, SIGNIN_CURRENCY_FIELD, SIGNIN_ITEM_FIELD}
 SIGNIN.is_extendable = false
 SIGNIN.extensions = {}
+BUYCARD_CARD_FIELD.name = "card"
+BUYCARD_CARD_FIELD.full_name = ".BuyCard.card"
+BUYCARD_CARD_FIELD.number = 1
+BUYCARD_CARD_FIELD.index = 0
+BUYCARD_CARD_FIELD.label = 2
+BUYCARD_CARD_FIELD.has_default_value = false
+BUYCARD_CARD_FIELD.default_value = nil
+BUYCARD_CARD_FIELD.message_type = role_pb.CARD
+BUYCARD_CARD_FIELD.type = 11
+BUYCARD_CARD_FIELD.cpp_type = 10
 
+BUYCARD_CURRENCY_FIELD.name = "currency"
+BUYCARD_CURRENCY_FIELD.full_name = ".BuyCard.currency"
+BUYCARD_CURRENCY_FIELD.number = 2
+BUYCARD_CURRENCY_FIELD.index = 1
+BUYCARD_CURRENCY_FIELD.label = 2
+BUYCARD_CURRENCY_FIELD.has_default_value = false
+BUYCARD_CURRENCY_FIELD.default_value = nil
+BUYCARD_CURRENCY_FIELD.message_type = role_pb.CURRENCY
+BUYCARD_CURRENCY_FIELD.type = 11
+BUYCARD_CURRENCY_FIELD.cpp_type = 10
+
+BUYCARD.name = "BuyCard"
+BUYCARD.full_name = ".BuyCard"
+BUYCARD.nested_types = {}
+BUYCARD.enum_types = {}
+BUYCARD.fields = {BUYCARD_CARD_FIELD, BUYCARD_CURRENCY_FIELD}
+BUYCARD.is_extendable = false
+BUYCARD.extensions = {}
+
+BuyCard = protobuf.Message(BUYCARD)
 BuyShopGood = protobuf.Message(BUYSHOPGOOD)
 CardCarryup = protobuf.Message(CARDCARRYUP)
 CardFeed = protobuf.Message(CARDFEED)

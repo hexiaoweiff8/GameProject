@@ -65,7 +65,8 @@ end
     cardId  卡牌id
 ]]
 function cardUtil:getCardArmyType(cardId)
-    return cardId % 101000
+    --return cardId % 101000
+    return 1
 end
 --[[
     获取克制关系信息,后期要改

@@ -203,17 +203,48 @@ public class Utils
     /// </summary>
     public const int AirTypeConstantId = 6;
 
+
+    /// <summary>
+    /// 兵种类型-人族
+    /// </summary>
+    public const int HumanArmyType = 1;
+
+    /// <summary>
+    /// 兵种类型-兽族
+    /// </summary>
+    public const int OrcArmyType = 2;
+
+    /// <summary>
+    /// 兵种类型-机械
+    /// </summary>
+    public const int MechanicArmyType = 3;
+
+    /// <summary>
+    /// 兵种类型-基地
+    /// </summary>
+    public const int BaseArmyType = 4;
+
+    /// <summary>
+    /// 兵种类型-防御塔
+    /// </summary>
+    public const int TurretArmyType = 5;
+
     // ----------------------------单位大类型-----------------------------
 
 
-    // ----------------------------基地BaseID---------------------------------
+    // ----------------------------BaseID---------------------------------
 
     /// <summary>
     /// 基地baseId
     /// </summary>
     public const int BaseBaseId = 220001000;
 
-    // ----------------------------基地BaseID---------------------------------
+    /// <summary>
+    /// 防御塔baseId
+    /// </summary>
+    public const int TurretBaseId = 220002000;
+
+    // ----------------------------BaseID---------------------------------
 
     // ----------------------------操作---------------------------------------
 

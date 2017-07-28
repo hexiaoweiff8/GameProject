@@ -87,7 +87,7 @@ function upStar_controller:refresh_UpStar_Layer()
 
     
     --设置需要和拥有的兵牌数量    
-    local needCoin = starUtil:getUpStarNeedCoin(data.starLv + 1)
+    local needCoin = starUtil:getUpStarNeedCoin(data.starLv)
     view.upStarP_badgeNeedNumL.transform:GetComponent("UILabel").text = string.format("X%d",needCoin)
     local lab1 = string.format("([97ff03]%s%d[-])",stringUtil:getString(20028), data.badgeNum)
     if data.badgeNum < needCoin then
@@ -95,7 +95,7 @@ function upStar_controller:refresh_UpStar_Layer()
     end
     view.upStarP_badgeHaveNumL.transform:GetComponent("UILabel").text = lab1
     --设置需要和拥有的卡牌数量
-    local needFragment = starUtil:getUpStarNeedFragment(data.starLv + 1)
+    local needFragment = starUtil:getUpStarNeedFragment(data.starLv)
     view.upStarP_cardNeedNumL.transform:GetComponent("UILabel").text = string.format("X%d", needFragment)
     local lab2 = string.format("([97ff03]%s%d[-])",stringUtil:getString(20028),data.cardFragment)
     if data.cardFragment < needFragment then

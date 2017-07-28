@@ -1,5 +1,5 @@
 local class = require("common/middleclass")
-tabsControl = class("tabsControl")
+local tabsControl = class("tabsControl")
 
 local tabButtonTable = {}
 local tabPanelTabel = {}

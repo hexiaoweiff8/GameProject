@@ -12,7 +12,6 @@ local equipPage_model = class("equipPage_model",equip_model)
 ---equipType    装备类型
 ---
 local _EquipsList = {}
-local _currentType = {}
 function equipPage_model:getEquipListByType(equipType)
     _EquipsList = {}
     for i = 1, #self.equipListByType[equipType] do

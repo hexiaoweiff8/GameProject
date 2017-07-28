@@ -82,12 +82,10 @@ public class ClusterManager : ILoopItem
     /// </summary>
     private TargetList<PositionObject> targetList;
 
-
     /// <summary>
     /// 已对比碰撞对象ID的列表
     /// </summary>
     private Dictionary<long, bool> areadyCollisionList = new Dictionary<long, bool>();
-
 
     /// <summary>
     /// 暂停标志

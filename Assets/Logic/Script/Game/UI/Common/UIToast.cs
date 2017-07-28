@@ -34,6 +34,20 @@ public class UIToast {
                 break;
         }
     }
+    /// <summary>
+    /// 简化的调用方法
+    /// </summary>
+    /// <param name="messageToShow"></param>
+    public static void Show(string messageToShow)
+    {
+        if (ToastManager._ins == null)
+        {
+            ToastManager.init();
+        }
+        if (messageToShow == null || messageToShow == string.Empty)
+            return;
+        ToastManager._ins.popToast(messageToShow, null);
+    }
     class ToastManager : MonoBehaviour
     {
         public static ToastManager _ins;

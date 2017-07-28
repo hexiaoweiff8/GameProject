@@ -142,7 +142,7 @@ public class BuffManager
                 }
             }
         }
-        result = CopySkillInfo(result);
+        result = CopyBuffInfo(result);
         // 将实现放入实现列表
         buffInstanceDic.Add(result.AddtionId, result);
         result.ReceiveMember = receive;
@@ -182,7 +182,7 @@ public class BuffManager
     /// </summary>
     /// <param name="buffInfo">被复制信息</param>
     /// <returns>复制数据</returns>
-    public BuffInfo CopySkillInfo([NotNull]BuffInfo buffInfo)
+    public BuffInfo CopyBuffInfo([NotNull]BuffInfo buffInfo)
     {
         BuffInfo result = null;
         result = new BuffInfo(buffInfo.Num)

@@ -31,7 +31,8 @@ public class SData_item_c : MonoEX.Singleton<SData_item_c>
 					case "OverlapLimit": dif.OverlapLimit = (short)(double)o22; break;
 					case "SaleGold": dif.SaleGold = (int)(double)o22; break;
 					case "ComposeNum": dif.ComposeNum = (short)(double)o22; break;
-					case "SelfUse": dif.SelfUse = (short)(double)o22; break;
+					case "ComposeID": dif.ComposeID = (int)(double)o22; break;
+					case "ComposeQuality": dif.ComposeQuality = (short)(double)o22; break;
                 }
             });
             if (Data.ContainsKey(dif.ItemID))
@@ -105,7 +106,11 @@ public struct item_cInfo
 	 /// </summary>
 	public short ComposeNum;
 	 /// <summary>
-	 ///自使用
+	 ///合成ID
 	 /// </summary>
-	public short SelfUse;
+	public int ComposeID;
+	 /// <summary>
+	 ///合成品质
+	 /// </summary>
+	public short ComposeQuality;
 }

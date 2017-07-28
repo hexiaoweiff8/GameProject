@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using LuaInterface;
 
-public class SData_MapData : MonoEX.Singleton<SData_MapData>
+public class SData_mapdata : MonoEX.Singleton<SData_mapdata>
 {
     public void setData(LuaTable table1, LuaTable table2)
     {
@@ -13,7 +13,7 @@ public class SData_MapData : MonoEX.Singleton<SData_MapData>
         });
         SDataUtils.dealTable(table2, (Object o1, Object o2) =>
         {
-            MapDataInfo dif = new MapDataInfo();
+            mapdataInfo dif = new mapdataInfo();
             SDataUtils.dealTable((LuaTable)o2, (Object o11, Object o22) =>
             {
                 switch (head[(int)(double)o11 - 1])
@@ -63,17 +63,17 @@ public class SData_MapData : MonoEX.Singleton<SData_MapData>
         });
     }
 
-    public MapDataInfo GetDataOfID(int Id)
+    public mapdataInfo GetDataOfID(int Id)
     {
-        if (!Data.ContainsKey(Id)) throw new Exception(String.Format("MapDataInfo::GetDataOfID() not found data  Id:{0}", Id));
+        if (!Data.ContainsKey(Id)) throw new Exception(String.Format("mapdataInfo::GetDataOfID() not found data  Id:{0}", Id));
         return Data[Id];
     }
 
-    internal Dictionary<int, MapDataInfo> Data = new Dictionary<int, MapDataInfo>();
+    internal Dictionary<int, mapdataInfo> Data = new Dictionary<int, mapdataInfo>();
 }
 
 
-public struct MapDataInfo
+public struct mapdataInfo
 {
 	 /// <summary>
 	 ///
@@ -160,11 +160,11 @@ public struct MapDataInfo
 	 /// </summary>
 	public float FreeCamera_Scale_Speed;
 	 /// <summary>
-	 ///
+	 ///相机左侧最大值
 	 /// </summary>
 	public float FreeCameraXmin;
 	 /// <summary>
-	 ///
+	 ///相机右侧最大值
 	 /// </summary>
 	public float FreeCameraXmax;
 	 /// <summary>
@@ -208,11 +208,11 @@ public struct MapDataInfo
 	 /// </summary>
 	public short Camera_ZhuanshenCD;
 	 /// <summary>
-	 ///
+	 ///相机高度
 	 /// </summary>
 	public float Camera_Overall_Yoffset;
 	 /// <summary>
-	 ///
+	 ///相机Z轴偏移
 	 /// </summary>
 	public float Camera_Overall_Zoffset;
 	 /// <summary>

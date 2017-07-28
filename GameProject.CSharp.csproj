@@ -11,13 +11,16 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>5.4.1f1</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +31,7 @@
     <WarningLevel>4</WarningLevel>
     <DefineConstants>DEBUG;TRACE;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_4_1;UNITY_5_4;UNITY_5;UNITY_64;ENABLE_NEW_BUGREPORTER;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_DUCK_TYPING;ENABLE_EDITOR_RETINA;ENABLE_RETINA_GUISTYLES;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SPRITERENDERER_FLIPPING;ENABLE_SPRITES;ENABLE_SPRITE_POLYGON;ENABLE_TERRAIN;ENABLE_RAKNET;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_COLLAB;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_METRICS;ENABLE_EDITOR_METRICS_CACHING;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;INCLUDE_PUBNUB;ENABLE_LOCALIZATION;ENABLE_ANDROID_ATLAS_ETC1_COMPRESSION;ENABLE_EDITOR_TESTS_RUNNER;UNITY_STANDALONE_WIN;UNITY_STANDALONE;ENABLE_SUBSTANCE;ENABLE_TEXTUREID_MAP;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_UNITYWEBREQUEST;ENABLE_EVENT_QUEUE;ENABLE_CLUSTERINPUT;ENABLE_WEBSOCKET_HOST;ENABLE_MONO;DEVELOPMENT_BUILD;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;UNITY_TEAM_LICENSE;ENABLE_VSTU;UNITY_PRO_LICENSE;FEAT_SAFE</DefineConstants>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -38,6 +42,7 @@
     <WarningLevel>4</WarningLevel>
     <DefineConstants>TRACE;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_4_1;UNITY_5_4;UNITY_5;UNITY_64;ENABLE_NEW_BUGREPORTER;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_DUCK_TYPING;ENABLE_EDITOR_RETINA;ENABLE_RETINA_GUISTYLES;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SPRITERENDERER_FLIPPING;ENABLE_SPRITES;ENABLE_SPRITE_POLYGON;ENABLE_TERRAIN;ENABLE_RAKNET;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_COLLAB;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_METRICS;ENABLE_EDITOR_METRICS_CACHING;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;INCLUDE_PUBNUB;ENABLE_LOCALIZATION;ENABLE_ANDROID_ATLAS_ETC1_COMPRESSION;ENABLE_EDITOR_TESTS_RUNNER;UNITY_STANDALONE_WIN;UNITY_STANDALONE;ENABLE_SUBSTANCE;ENABLE_TEXTUREID_MAP;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_UNITYWEBREQUEST;ENABLE_EVENT_QUEUE;ENABLE_CLUSTERINPUT;ENABLE_WEBSOCKET_HOST;ENABLE_MONO;DEVELOPMENT_BUILD;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;UNITY_TEAM_LICENSE;ENABLE_VSTU;UNITY_PRO_LICENSE;FEAT_SAFE</DefineConstants>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
@@ -111,9 +116,6 @@
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestSocket.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestTargetSelecter.cs" />
     <Compile Include="Assets\AStarSchoolBehaviour\Script\TestTimer.cs" />
-    <Compile Include="Assets\AStarSchoolBehaviour\Script\msg\MsgBattle.cs" />
-    <Compile Include="Assets\AStarSchoolBehaviour\Script\msg\MsgHead.cs" />
-    <Compile Include="Assets\AStarSchoolBehaviour\Script\msg\MsgId.cs" />
     <Compile Include="Assets\Logic\Script\AstarFight.cs" />
     <Compile Include="Assets\Logic\Script\Boot.cs" />
     <Compile Include="Assets\Logic\Script\DebugConfig.cs" />
@@ -123,6 +125,28 @@
     <Compile Include="Assets\Logic\Script\Game\DTPathFind\DetourCommon.cs" />
     <Compile Include="Assets\Logic\Script\Game\DTPathFind\DetourNode.cs" />
     <Compile Include="Assets\Logic\Script\Game\DTPathFind\DetourStatus.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\CommandFramework\CommandArgumentAttribute.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\CommandFramework\CommandAttribute.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\CommandFramework\CommandBase.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\CommandFramework\CommandEntryAttribute.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\CommandFramework\CommandMethod.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\CommandFramework\CommandRegister.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\CommandFramework\CommandsRepository.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\Commands\Add.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\Commands\Batch.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\Commands\CommonCommands.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\Commands\Del.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\Commands\DelAll.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\Commands\Util\Util.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\ConsoleFramework\ConsoleAction\ConsoleAction.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\ConsoleFramework\ConsoleAction\ConsoleCloseAction.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\ConsoleFramework\ConsoleAction\ConsoleOpenAction.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\ConsoleFramework\ConsoleAction\ConsoleSubmitAction.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\ConsoleFramework\ConsoleCommandHistory.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\ConsoleFramework\ConsoleGUI.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\ConsoleFramework\ConsoleInput.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\ConsoleFramework\ConsoleLog.cs" />
+    <Compile Include="Assets\Logic\Script\Game\DeveloperConsole\ConsoleToggler.cs" />
     <Compile Include="Assets\Logic\Script\Game\Framework\AppFacade.cs" />
     <Compile Include="Assets\Logic\Script\Game\Framework\AppView.cs" />
     <Compile Include="Assets\Logic\Script\Game\Framework\AssetBundleLoader.cs" />
@@ -166,6 +190,12 @@
     <Compile Include="Assets\Logic\Script\Game\UI\Cangku\UIScrollViewAdapter.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\Cangku\UIScrollViewItemBase.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\Cangku\UI_Cangku_Item.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\Chat\ChatBubble\ChatBubbleAni.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\Chat\ChatWindowPanel.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\Chat\LoopItemData.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\Chat\LoopItemObject.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\Chat\LoopItemScrollView.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\Chat\chatItem.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\Common\Tuple.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\Common\UIToast.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\DragableCard.cs" />
@@ -245,6 +275,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\FSM\soldier\trigger\XingjinTrigger.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\FSM\soldier\trigger\ZhuiJiTrigger.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\FSM\soldier\trigger\ZhunbeizhandouTrigger.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\AI\Fight\FightManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\FightEndAdjust.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\HurtResult.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\School\ClusterData.cs" />
@@ -270,6 +301,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\vo\PenhuobingVO.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\vo\SoldierVO.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\vo\TankVO.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\vo\TurretVO.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\vo\VOBase.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\CObjects\CExtendClass.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\CObjects\CGameItem.cs" />
@@ -294,17 +326,22 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\GeneralAttack\PointToObjScopeGeneralAttack.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\GeneralAttack\PointToPositionScopeGeneralAttack.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\GeneralAttack\PositionScopeGeneralAttack.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\GlobalData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\ItemSelecter.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Looper.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Map\MapManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Net\FightDataSyncer.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Net\MsgFactory.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Net\SocketManager.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Net\msg\MsgBattle.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Net\msg\MsgHead.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Net\msg\MsgId.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\PoolLoader.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\QuadTree.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\RandomPacker.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\ResourceLoader.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\SDataUtils.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\SceneChanger.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\Buff\BuffInfo.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\Buff\BuffManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\BuffFormulaItem.cs" />
@@ -315,6 +352,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\FormulaConstructor.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\FormulaParamsPacker.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\FormulaParamsPackerFactroy.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\Remain\RemainInfo.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\HealthChangeFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\HealthScopeFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\IFormulaItem.cs" />
@@ -324,12 +362,14 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\PointFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\PointToObjFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\PointToPointFormulaItem.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\Remain\RemainManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\ResistDemageFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillAddition.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillBase.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillInfo.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillManager.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillMixer.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillTriggerData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SlideCollisionDetectionFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\TriggerRunner.cs" />
@@ -352,7 +392,6 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\patrol\PatrolManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\patrol\SinglePatrol.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_Army.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_ArmyBase_C.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_Audio.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_AudioFx.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_AvatarAct.cs" />
@@ -373,7 +412,6 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_JunLingbaoData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_KeyValue.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_KeyValueMath.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_MapData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_MissionCity.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_MissionMonster.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_MissionState.cs" />
@@ -399,6 +437,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_Zhenfa.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armyaim_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armyaoe_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armybase_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armycardbase_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armycardexp_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armycardquality_c.cs" />
@@ -415,6 +454,8 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_attribute_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_attributetplan_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_avatarcost_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_commodity_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_currency_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equip_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equipdata.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equippower_c.cs" />
@@ -422,11 +463,15 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equipsuit_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_item_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_kezhi_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_mapdata.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_pack_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_refresh_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_selectchest_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_shop_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_skill_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_soldierRender_data.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_soldier_data.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_subtlecode_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_tech_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_userdata_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\Sdata_Soldiers.cs" />
@@ -766,6 +811,7 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\BaseWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\BoxScrollObjectWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\ByteBufferWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\ChatBubbleAniWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\ClusterDataWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\ClusterManagerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\CreateActorParamWrap.cs" />
@@ -783,18 +829,22 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\DelegateFactory.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\DisplayOwnerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\EasyTouchWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\FightManagerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\FightUnitFactoryWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\FileSystem_RES_LOCATIONWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\GAMELOGWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\GameObjectExtensionWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\HUDTextWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\LGYLOGWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\LoopItemObjectWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\LoopItemScrollViewWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\LuaBehaviourWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\LuaBinder.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\LuaHelperWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\LuaInterface_DebuggerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\MFAModelRenderWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\ManagerWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\MapManager_MapDataParamsPackerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\MonoEX_SingletonAuto_DP_BattlefieldWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\MonoEX_Singleton_DP_CameraTrackObjectManageWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\MoveRecordWrap.cs" />
@@ -806,6 +856,7 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\PositionTransformWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\RanderControlWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\SDataUtilsWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\SceneChangerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\ScrollObjectWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\SpinWithMouseWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\TimeTickerWrap.cs" />
@@ -821,6 +872,7 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIEventListenerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIFollowWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIGridWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIInputWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UILabelWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIPanelEXWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIPanelWrap.cs" />
@@ -832,6 +884,7 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIScrollViewWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UISliderWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UISpriteWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UITableWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UITextureWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIToastWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIToast_ShowTypeWrap.cs" />
@@ -931,6 +984,7 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\VOBaseWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\WndManageWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\WndWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\chatItemWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\wndShowHideInfoWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\LuaConst.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\ToLua\BaseType\LuaInterface_EventObjectWrap.cs" />
@@ -1193,6 +1247,7 @@
     <None Include="Assets\Resources\Shader\QK - DriftingCloud.shader" />
     <None Include="Assets\Resources\Shader\QK_Colored_Gray.shader" />
     <None Include="Assets\Resources\Transparent_Colored_Gray.shader" />
+    <None Include="Assets\Resources\UI_Console\ui_console_texture.txt" />
     <None Include="Assets\Resources\sdata_template.txt" />
     <None Include="Assets\StreamingAssets\Android\files.txt" />
     <None Include="Assets\StreamingAssets\Android\lua\pack_script\pk_script\_tmp.txt" />

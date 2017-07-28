@@ -42,27 +42,27 @@ public class TestSocket : MonoBehaviour
     private void Start()
     {
         // 注册事件
-        SocketManager.Single.AddDataAction((data) =>
-        {
-            isReceivedServerMsg = true;
-            var dataStr = Encoding.UTF8.GetString(data);
-            //// 判断是否为头数据
-            //if (dataStr.StartsWith("head"))
-            //{
-            //    head = Encoding.UTF8.GetBytes(dataStr.Replace("head", ""));
-            //}
-            // 接收protoBuf数据并解析打印
-            Debug.Log("收到" + dataStr);
+        //SocketManager.Single.RegAction(1, (data) =>
+        //{
+        //    isReceivedServerMsg = true;
+        //    var dataStr = Encoding.UTF8.GetString(data);
+        //    //// 判断是否为头数据
+        //    //if (dataStr.StartsWith("head"))
+        //    //{
+        //    //    head = Encoding.UTF8.GetBytes(dataStr.Replace("head", ""));
+        //    //}
+        //    // 接收protoBuf数据并解析打印
+        //    Debug.Log("收到" + dataStr);
 
-            if (data.Length > 3)
-            {
-                var td = SocketManager.DeSerialize<MsgOptional>(data);
-                if (td != null)
-                {
-                    Debug.Log(td.OpType + "," + td.OpParams);
-                }
-            }
-        });
+        //    if (data.Length > 3)
+        //    {
+        //        var td = SocketManager.DeSerialize<MsgOptional>(data);
+        //        if (td != null)
+        //        {
+        //            Debug.Log(td.OpType + "," + td.OpParams);
+        //        }
+        //    }
+        //});
         Connect();
 
         var objectId = new ObjectID();

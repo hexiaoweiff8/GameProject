@@ -21,16 +21,16 @@ public class DiamondGridMap : I_Map
     {
         get
         {
-            return 1.5f * SData_MapData.Single.GetDataOfID(1).terrain_cell_bianchang;
+            return 1.5f * SData_mapdata.Single.GetDataOfID(1).terrain_cell_bianchang;
             //return 0.866050808f * SData_MapData.Single.TerrainCellBianchang*2; //垂直间隔系数 垂直间隔/格子宽
         }
     }
 
     public DiamondGridMap()
     {
-        mWidthSpacingFactor = SData_MapData.Single.GetDataOfID(1).terrain_cell_bianchang * wxs;
-        mSideRight = (short)(SideSize + SData_MapData.Single.GetDataOfID(1).MapMaxColumn - 1);
-        mSideBottom = (short)(SideSize + SData_MapData.Single.GetDataOfID(1).MapMaxRow - 1);
+        mWidthSpacingFactor = SData_mapdata.Single.GetDataOfID(1).terrain_cell_bianchang * wxs;
+        mSideRight = (short)(SideSize + SData_mapdata.Single.GetDataOfID(1).MapMaxColumn - 1);
+        mSideBottom = (short)(SideSize + SData_mapdata.Single.GetDataOfID(1).MapMaxRow - 1);
     }
   
     public static float WidthSpacingFactor
@@ -174,7 +174,7 @@ public class DiamondGridMap : I_Map
 
         if (z % 2 != 1) out_x += harf_wxs;//z为偶数的时候，错半个格子
 
-        out_x *= SData_MapData.Single.GetDataOfID(1).terrain_cell_bianchang;
+        out_x *= SData_mapdata.Single.GetDataOfID(1).terrain_cell_bianchang;
     }
 
     /*
@@ -196,7 +196,7 @@ public class DiamondGridMap : I_Map
     public void World2Grid(float x, float z, out int out_x, out int out_z)
     {
         out_z = m_height - (int)(z / VerticalSpacingFactor);
-        x /= SData_MapData.Single.GetDataOfID(1).terrain_cell_bianchang;
+        x /= SData_mapdata.Single.GetDataOfID(1).terrain_cell_bianchang;
         if (z % 2 != 1) x -= harf_wxs;
         out_x = (int)(x / wxs);
 

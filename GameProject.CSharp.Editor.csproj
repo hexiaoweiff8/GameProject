@@ -430,6 +430,7 @@
     <None Include="Assets\Resources\Shader\QK - DriftingCloud.shader" />
     <None Include="Assets\Resources\Shader\QK_Colored_Gray.shader" />
     <None Include="Assets\Resources\Transparent_Colored_Gray.shader" />
+    <None Include="Assets\Resources\UI_Console\ui_console_texture.txt" />
     <None Include="Assets\Resources\sdata_template.txt" />
     <None Include="Assets\StreamingAssets\Android\files.txt" />
     <None Include="Assets\StreamingAssets\Android\lua\pack_script\pk_script\_tmp.txt" />

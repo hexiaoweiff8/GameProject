@@ -22,7 +22,42 @@ public class TriggerRunner : MonoBehaviour
     /// </summary>
     private Action<TriggerLevel1, TriggerLevel2, TriggerData, AllData> settlementDamageOrCure;
 
-    void Awake()
+    ///// <summary>
+    ///// 技能释放包装类字典
+    ///// ObjectId.ID, SkillReleasePacker
+    ///// </summary>
+    //private static Dictionary<int, SkillReleasePacker> skillReleasePackerDic = new Dictionary<int, SkillReleasePacker>();
+
+    ///// <summary>
+    ///// 被释放技能列表
+    ///// </summary>
+    //private List<SkillReleasePacker> skillReleasePackerList = new List<SkillReleasePacker>();
+
+
+    ///// <summary>
+    ///// 添加技能被释放
+    ///// </summary>
+    ///// <param name="objId">释放者Id</param>
+    ///// <param name="packer">释放技能详情</param>
+    //public static void AddSkillReleasePacker(ObjectID objId, SkillReleasePacker packer)
+    //{
+    //    if (objId == null || packer == null)
+    //    {
+    //        return;
+    //    }
+    //    skillReleasePackerDic.Add(objId.ID, packer);
+    //}
+
+    ///// <summary>
+    ///// 清空被释放技能
+    ///// </summary>
+    //public static void ClearSkillReleasePacker()
+    //{
+    //    skillReleasePackerDic.Clear();
+    //}
+
+
+    private void Awake()
     {
         // 初始化事件
         settlementDamageOrCure = (type1, type2, trigger, alldata) =>
@@ -78,42 +113,66 @@ public class TriggerRunner : MonoBehaviour
     }
 
 
-    void Update()
+    private void Update()
     {
+        //// 检测并执行技能释放
+        //CheckReleaseSkills();
+        // 检查光环
+        CheckHalo(Display);
         // 处理事件
-        CheckTrigger(Display.ClusterData.AllData);
+        CheckTrigger(Display);
     }
 
 
     /// <summary>
     /// 检测当前单位的触发事件
     /// </summary>
-    private void CheckTrigger(AllData alldata)
+    private void CheckTrigger(DisplayOwner display)
     {
-        if (gameObject.name.StartsWith("zhujidi"))
+        var allData = display.ClusterData.AllData;
+        if (allData.MemberData != null)
         {
-            int i = 0;
-        }
-        if (alldata.MemberData != null)
-        {
-            // 触发当前单位的所有事件
-            SkillManager.Single.SetEachAction(alldata.MemberData.ObjID, (type1, type2, trigger) =>
+            // 抛出None事件用于持续技能执行
+            SkillManager.Single.SetTriggerData(new TriggerData()
             {
-                if (alldata.SkillInfoList != null)
+                ReceiveMember = display,
+                ReleaseMember = display,
+                TypeLevel1 = TriggerLevel1.None,
+                TypeLevel2 = TriggerLevel2.None
+            });
+            // 触发当前单位的所有事件
+            SkillManager.Single.SetEachAction(allData.MemberData.ObjID, (type1, type2, trigger) =>
+            {
+                if (allData.SkillInfoList != null)
                 {
                     // 触发skill类
-                    SkillManager.Single.CheckAndDoSkillInfo(alldata.SkillInfoList, trigger);
+                    SkillManager.Single.CheckAndDoSkillInfo(allData.SkillInfoList, trigger);
                 }
-                if (alldata.BuffInfoList != null)
+                if (allData.BuffInfoList != null)
                 {
                     // 技能触发完毕开始触发buff类
-                    BuffManager.Single.CheckAndDoBuffInfo(alldata.BuffInfoList, trigger);
+                    BuffManager.Single.CheckAndDoBuffInfo(allData.BuffInfoList, trigger);
                 }
                 // 计算伤害
-                settlementDamageOrCure(type1, type2, trigger, alldata);
-            },
-            true);
+                settlementDamageOrCure(type1, type2, trigger, allData);
+            }, true);
             PushTriggerData();
+        }
+    }
+
+    /// <summary>
+    /// 检查光环
+    /// </summary>
+    /// <param name="display">被检查单位</param>
+    private void CheckHalo(DisplayOwner display)
+    {
+        // 执行光环
+        var allData = display.ClusterData.AllData;
+        if (allData.MemberData == null) return;
+        // 检查光环
+        foreach (var halo in allData.HaloInfoList)
+        {
+            
         }
     }
 
@@ -131,82 +190,69 @@ public class TriggerRunner : MonoBehaviour
     }
 
     ///// <summary>
-    ///// 结算当前单位的血量
+    ///// 检查释放技能
     ///// </summary>
-    //private void SettlementDamageOrCure(AllData alldata)
+    //private void CheckReleaseSkills()
     //{
-    //    var isOneHealth = false;
-    //    if (alldata.MemberData != null && alldata.SkillInfoList != null)
+    //    lock (skillReleasePackerList)
     //    {
-    //        var demage = 0f;
-    //        var cure = 0f;
-
-    //        // 先计算治疗量
-    //        var cureList = SkillManager.Single.GetSkillTriggerDataList(alldata.MemberData.ObjID, TriggerLevel1.Fight, TriggerLevel2.BeCure);
-    //        if (cureList != null && cureList.Count > 0)
+    //        foreach (var skillReleasePacker in skillReleasePackerList)
     //        {
-    //            // 计算治疗量总和
-    //            cure += cureList.Sum(attackMember => attackMember.HealthChangeValue);
+    //            // 技能释放者
+    //            // 技能接收者
+    //            // 技能
+    //            // fsm 中带技能
+    //            if (skillReleasePacker.SkillReceiveMember.ClusterData != null
+    //                && skillReleasePacker.SkillReceiveMember.GameObj != null)
+    //            {
+    //                SkillManager.Single.DoShillInfo(skillReleasePacker.Skill,
+    //                    FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(skillReleasePacker.Skill,
+    //                        skillReleasePacker.SkillReleaseMember,
+    //                        skillReleasePacker.SkillReceiveMember));
+    //            }
     //        }
-
-    //        // 再计算伤害量
-    //        // 获取被击列表
-    //        var attackList = SkillManager.Single.GetSkillTriggerDataList(alldata.MemberData.ObjID, TriggerLevel1.Fight, TriggerLevel2.BeAttack);
-    //        // 检测是否被击
-    //        if (attackList != null && attackList.Count > 0)
+    //        // 将释放完毕的技能删除, 如果未释放完毕则等待
+    //        for (var i = 0; i < skillReleasePackerList.Count; i++)
     //        {
-    //            // 计算血量变动总和
-    //            // 这里返回的都是负值所以使用+=
-    //            demage += attackList.Sum(attackMember => attackMember.HealthChangeValue);
-    //            Debug.Log("伤害值:" + demage);
-    //            // 如果单位死亡在抛出一个死亡事件
-    //            // 检测致死攻击
-    //            if (alldata.MemberData.CurrentHP - demage < Utils.ApproachZero)
+    //            var skillReleasePacker = skillReleasePackerList[i];
+    //            if (skillReleasePacker.Skill.IsDone)
     //            {
-    //                // 检测最后一个
-    //                var lastHitMember = attackList[attackList.Count - 1];
-    //                // 并判断该伤害是否致死, 如果不致死则生命值设置为1
-    //                if (lastHitMember.IsNotLethal)
-    //                {
-    //                    isOneHealth = true;
-    //                }
-    //                else
-    //                {
-    //                    // 抛出致死攻击事件
-    //                    SkillManager.Single.SetTriggerData(new TriggerData()
-    //                    {
-    //                        HealthChangeValue = lastHitMember.HealthChangeValue,
-    //                        ReceiveMember = lastHitMember.ReceiveMember,
-    //                        ReleaseMember = lastHitMember.ReleaseMember,
-    //                        TypeLevel1 = TriggerLevel1.Fight,
-    //                        TypeLevel2 = TriggerLevel2.LethalHit
-    //                    });
-    //                }
+    //                skillReleasePackerList.RemoveAt(i);
+    //                i--;
     //            }
-
-
-    //            // 如果有伤害吸收则将伤害计算到技能的伤害吸收中
-    //            if (demage < Utils.ApproachZero)
-    //            {
-    //                // 检测是否有伤害吸收的buff/skill
-    //                // 触发吸收伤害事件
-    //            }
-
-    //            // 结算血量变动
-    //            if (isOneHealth)
-    //            {
-    //                // 收到非致死超过血量的伤害, 生命值设置为1
-    //                alldata.MemberData.CurrentHP = 1;
-    //            }
-    //            else
-    //            {
-    //                // 正常扣血
-    //                alldata.MemberData.CurrentHP += cure - demage;
-    //            }
-    //            // 刷新血条
-    //            //fsm.Display.RanderControl.SetBloodBarValue();
     //        }
     //    }
     //}
+
+
+    private void OnDestroy()
+    {
+        // TODO 释放
+        // TODO 死亡时将未释放技能进行释放
+        // 清空事件
+        //ClearSkillReleasePacker();
+    }
+}
+
+/// <summary>
+/// 技能释放包装类
+/// </summary>
+public class SkillReleasePacker
+{
+
+    /// <summary>
+    /// 技能释放者
+    /// </summary>
+    public DisplayOwner SkillReleaseMember { get; set; }
+
+    /// <summary>
+    /// 技能接受者
+    /// </summary>
+    public DisplayOwner SkillReceiveMember { get; set; }
+
+    /// <summary>
+    /// 被释放技能
+    /// </summary>
+    public SkillBase Skill { get; set; }
 
 }

@@ -5,8 +5,14 @@ using System.IO;
 using System.Text;
 using Util;
 
+/// <summary>
+/// 战斗逻辑
+/// </summary>
 public class AstarFight : MonoBehaviour
 {
+
+
+    public static AstarFight Instance { get; private set; }
 
     /// <summary>
     /// 寻路X轴宽度
@@ -134,6 +140,8 @@ public class AstarFight : MonoBehaviour
     private readonly int[][] serchPathArray = new int[10][];
     void Start()
     {
+        // 保存实例化对象
+        Instance = this;
         // 初始化
         Init();
     }
@@ -190,26 +198,32 @@ public class AstarFight : MonoBehaviour
         // 初始化TimerManager
         TimerManager.Single.Do();
 
-        // TODO 如果是联网战斗
-        // 启动战斗数据同步
-        FightDataSyncer.Single.Start();
+        // 初始化单位
+        // InitMap();
     }
 
     /// <summary>
     /// 初始化地图
     /// </summary>
-    public void InitMap()
+    public void InitMap(int[][] obMapInfo, int[][] buildingMapInfo)
     {
-        //var mapInfoPath = Application.dataPath + Path.AltDirectorySeparatorChar + "mapinfo";
-        //var mapInfoStr = Utils.LoadFileInfo(mapInfoPath);
-        //mapInfoData = DeCodeInfo(mapInfoStr);
-        // TODO 加载0001地图第1层 后期该值由外部传入
-        // TODO 同时加载两层 
-        mapInfoData = MapManager.Instance().GetMapInfoById(1, 1);
-        var mapInfoBuildingData = MapManager.Instance().GetMapInfoById(1, 2);
+        //// 判断是否已经设置数据
+        //if (!GlobalData.FightData.IsSetData)
+        //{
+        //    Debug.LogError("战斗数据未设置.");
+        //    return;
+        //}
+        Clear();
+        // 清理数据
+        // 加载障碍曾
+        mapInfoData = obMapInfo;
+        // 加载建筑层
+        var mapInfoBuildingData = buildingMapInfo;
 
         MapWidth = mapInfoData[0].Length;
         MapHeight = mapInfoData.Length;
+
+        // 目标点向对方基地/炮塔前进
         if (TargetX >= MapWidth || TargetX < 0)
         {
             TargetX = MapWidth - 1;
@@ -219,9 +233,32 @@ public class AstarFight : MonoBehaviour
             TargetY = MapHeight - 1;
         }
         LoadMap.Init(mapInfoData, UnitWidth);
-        // 解析地图
-        MapManager.Instance().AnalysisBuidingMap(mapInfoData);
-        MapManager.Instance().AnalysisBuidingMap(mapInfoBuildingData);
+        // 解析地图障碍层
+        MapManager.Instance().AnalysisMap(mapInfoData);
+        // 创建建筑层, 并传入基地等级
+        MapManager.Instance().AnalysisMap(mapInfoBuildingData, new MapManager.MapDataParamsPacker()
+        {
+            MapId = GlobalData.FightData.MapId,
+            BaseLevel = GlobalData.FightData.BaseLevel,
+            TurretLevel = GlobalData.FightData.TurretLevel,
+            Race = GlobalData.FightData.Race,
+            EnemyBaseLevel = GlobalData.FightData.EnemyBaseLevel,
+            EnemyRace = GlobalData.FightData.EnemyRace,
+            EnemyTurretLevel = GlobalData.FightData.EnemyTurretLevel
+        });
+    }
+
+    /// <summary>
+    /// 清理数据
+    /// </summary>
+    public void Clear()
+    {
+        // 清理单位
+        ClusterManager.Single.ClearAll();
+        // 清理本地缓存
+        mapInfoData = null;
+        TargetX = 0;
+        TargetY = 0;
     }
 
 
@@ -673,6 +710,13 @@ public class AstarFight : MonoBehaviour
         ClusterManager.Single.Add(clusterData);
         // 外层对象持有ClusterData引用
         displayOwner.ClusterData = clusterData;
+    }
+
+
+    public void OnDestroy()
+    {
+        // 销毁时清空引用
+        Instance = null;
     }
 
 }

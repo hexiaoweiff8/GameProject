@@ -20,13 +20,17 @@ public class LogicInit
         m_logicInitProgress = 0;
 
         List<string> packs = new List<string>();
+        // TODO 需要管理包加载
         packs.Add("packets");
         packs.Add("core");
         packs.Add("sc_main");
+        packs.Add("tzbd_01");
+        packs.Add("tzbd_99");
         packs.Add("uisound");
         packs.Add("scene_main");
-        // TODO 需要管理包加载
+        packs.Add("xuebaotujidui");
         packs.Add("jidi");
+        packs.Add("turret");
 
 
 
@@ -79,9 +83,9 @@ public class LogicInit
         //实例化服务器虚机
         QKNodeSDK_CLR.Node.AutoInstance();
 
-        SData_SenceDefine.AutoInstance();
-        m_logicInitProgress = 0.5f;
-        yield return null;
+        //SData_SenceDefine.AutoInstance();
+        //m_logicInitProgress = 0.5f;
+        //yield return null;
 
         SData_Id2String.AutoInstance();
         m_logicInitProgress = 0.55f;
@@ -167,7 +171,7 @@ public class LogicInit
 
         SData_FightKeyValue.AutoInstance();
 
-        SData_MapData.AutoInstance();
+        SData_mapdata.AutoInstance();
         m_logicInitProgress = 0.9f;
         yield return null;
 
@@ -201,7 +205,7 @@ public class LogicInit
             var scrollAreaLimiterObj = GameObject.Find("/ScrollAreaLimiter");
             var scrollAreaLimiter = scrollAreaLimiterObj.GetComponent<ScrollAreaLimiter>();
 
-            var mapData = SData_MapData.Single.GetDataOfID(1);
+            var mapData = SData_mapdata.Single.GetDataOfID(1);
             var xmin = mapData.FreeCameraXmin;
             var xmax = mapData.FreeCameraXmax;
 

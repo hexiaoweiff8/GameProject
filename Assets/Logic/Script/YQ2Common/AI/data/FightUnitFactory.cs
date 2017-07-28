@@ -27,6 +27,14 @@ public class FightUnitFactory {
                 vo = new FightVO();
                 vo.ObjID = new ObjectID(ObjectID.ObjectType.EnemySoldier);
                 break;
+            case (int)ObjectID.ObjectType.MyTower:
+                vo = new TurretVO();
+                vo.ObjID = new ObjectID(ObjectID.ObjectType.MyTower);
+                break;
+            case (int)ObjectID.ObjectType.EnemyTower:
+                vo = new TurretVO();
+                vo.ObjID = new ObjectID(ObjectID.ObjectType.EnemyTower);
+                break;
             case (int)ObjectID.ObjectType.MyTank:
                 vo = null;
                 break;

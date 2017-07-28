@@ -104,7 +104,7 @@ end
 ---
 function equipOnBody_controller:refresh(equipType)
     if not equipType then
-        logWarnings("equipOnBody refresh error!!!")
+        Debugger.LogWarning("equipOnBody refresh error!!!")
     end
     self:refreshEquipItemByType(equipType)
     self:refreshOnceFixNeedPower()

@@ -21,9 +21,10 @@ public class VOBase
     private float _hit;
     private float _attackRange;
     private float _moveSpeed;
-    private string _modelID;
     private int _camp;
-
+    private string _modelPack;
+    private string _modelName;
+    private string _modelTexture;
 
 
     public int UniqueID;
@@ -110,11 +111,11 @@ public class VOBase
     /// </summary>
     [SkillAddition]
     public short AttackType;
-    /// <summary>
-    /// 多目标攻击上限
-    /// </summary>
-    [SkillAddition]
-    public short MultiAimMax;
+    ///// <summary>
+    ///// 多目标攻击上限
+    ///// </summary>
+    //[SkillAddition]
+    //public short MultiAimMax;
     /// <summary>
     ///视野范围
     /// </summary>
@@ -171,13 +172,28 @@ public class VOBase
         get { return _antiArmor; }
         set { _antiArmor = value; }
     }
+
     /// <summary>
-    /// 对应的模型资源文件名
+    /// 对应的模型资源包名
     /// </summary>
-    public string ModelID
+    public string ModelPack
     {
-        get { return _modelID; }
-        set { _modelID = value; }
+        get { return _modelPack; }  
+        set { _modelPack = value; }
+    }
+    /// <summary>
+    /// 对应模型的预设名字
+    /// </summary>
+    public string ModelName
+    {
+        get { return _modelName; }
+        set { _modelName = value; }
+    }
+
+    public string ModelTexture
+    {
+        get { return _modelTexture;}
+        set { _modelTexture = value; }
     }
 
     /// <summary>
@@ -377,7 +393,6 @@ public class VOBase
         Hit = data.Hit;
         AttackRange = data.AttackRange;
         MoveSpeed = data.MoveSpeed;
-        ModelID = data.ModelID;
         UniqueID = data.UniqueID;
         ArmyLevel = data.ArmyLevel;
         AimGeneralType = data.AimGeneralType;
@@ -395,7 +410,7 @@ public class VOBase
         BulletType = data.BulletType;
         BulletSpeed = data.BulletSpeed;
         AttackType = data.AttackType;
-        MultiAimMax = data.MultiAimMax;
+        //MultiAimMax = data.MultiAimMax;
         SightRange = data.SightRange;
         IsHide = data.IsHide == 1;
         IsAntiHide = data.IsAntiHide == 1;
@@ -405,6 +420,7 @@ public class VOBase
         Skill3 = data.Skill3;
         Skill4 = data.Skill4;
         Skill5 = data.Skill5;
+
     }
 
 

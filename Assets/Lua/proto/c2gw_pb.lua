@@ -76,6 +76,8 @@ BUYSHOPGOOD = protobuf.Descriptor();
 local BUYSHOPGOOD_SHOPID_FIELD = protobuf.FieldDescriptor();
 local BUYSHOPGOOD_GOODID_FIELD = protobuf.FieldDescriptor();
 local BUYSHOPGOOD_COMMID_FIELD = protobuf.FieldDescriptor();
+BUYCARD = protobuf.Descriptor();
+local BUYCARD_CARDID_FIELD = protobuf.FieldDescriptor();
 
 LOGINGAME_TOKEN_FIELD.name = "token"
 LOGINGAME_TOKEN_FIELD.full_name = ".LoginGame.token"
@@ -717,7 +719,25 @@ BUYSHOPGOOD.enum_types = {}
 BUYSHOPGOOD.fields = {BUYSHOPGOOD_SHOPID_FIELD, BUYSHOPGOOD_GOODID_FIELD, BUYSHOPGOOD_COMMID_FIELD}
 BUYSHOPGOOD.is_extendable = false
 BUYSHOPGOOD.extensions = {}
+BUYCARD_CARDID_FIELD.name = "cardId"
+BUYCARD_CARDID_FIELD.full_name = ".BuyCard.cardId"
+BUYCARD_CARDID_FIELD.number = 1
+BUYCARD_CARDID_FIELD.index = 0
+BUYCARD_CARDID_FIELD.label = 2
+BUYCARD_CARDID_FIELD.has_default_value = false
+BUYCARD_CARDID_FIELD.default_value = 0
+BUYCARD_CARDID_FIELD.type = 5
+BUYCARD_CARDID_FIELD.cpp_type = 1
 
+BUYCARD.name = "BuyCard"
+BUYCARD.full_name = ".BuyCard"
+BUYCARD.nested_types = {}
+BUYCARD.enum_types = {}
+BUYCARD.fields = {BUYCARD_CARDID_FIELD}
+BUYCARD.is_extendable = false
+BUYCARD.extensions = {}
+
+BuyCard = protobuf.Message(BUYCARD)
 BuyShopGood = protobuf.Message(BUYSHOPGOOD)
 CardCarryup = protobuf.Message(CARDCARRYUP)
 CardFeed = protobuf.Message(CARDFEED)

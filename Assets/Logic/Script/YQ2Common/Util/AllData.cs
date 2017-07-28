@@ -34,9 +34,9 @@ public class AllData : ISelectWeightDataHolder
     /// </summary>
     public IList<BuffInfo> BuffInfoList = new List<BuffInfo>();
 
+    /// <summary>
+    /// 光环列表
+    /// </summary>
+    public IList<RemainInfo> HaloInfoList = new List<RemainInfo>();
 
-
-
-    // ---------------------------公共方法------------------------------
-    //public 
 }

@@ -55,40 +55,40 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
     }
     #endregion
 
-    private UIScrollView _scrollView;//NGUI控件
-    private UIPanel _panel; //NGUI控件UIScrollView中的Panel实例
+    private UIScrollView            _scrollView;//NGUI控件
+    private UIPanel                 _panel; //NGUI控件UIScrollView中的Panel实例
 
-    public ScrollOrientation _scrollOrientation;
+    public ScrollOrientation        _scrollOrientation;
 
     [SerializeField][Header("Multi Line")]
-    private bool EnableMultiLine;//多行多列
+    private bool                    EnableMultiLine;//多行多列
     [SerializeField]
-    public int _spacing_row, _spacing_line;//行间距/列间距
-    public int _itemsVisible_row, _itemsVisible_line;//每行每列可显示的总数
+    public int                      _spacing_row, _spacing_line;//行间距/列间距
+    public int                      _itemsVisible_row, _itemsVisible_line;//每行每列可显示的总数
+    [SerializeField][Header("Single Row/Line")]
+    public float                    _spacing;//列表项间距，单行或单列
     [Header("Properties")]
-    public bool WhetherAutomaticallyFill = false;//生成Items时是否自动补齐行/列
+    public bool                     WhetherAutomaticallyFill = false;//生成Items时是否自动补齐行/列
 
-    private UIPanel _viewport;//视口范围控件
+    private UIPanel                 _viewport;//视口范围控件
 
-    private Transform _content;//列表项容器控件
-
-    private float _spacing;//列表项间距，单行或单列
-
+    private Transform               _content;//列表项容器控件
+    
     public List<UIScrollViewItemBase> _itemsList;//列表项数组
 
-    private float _itemSize;//列表项占大小
-    private Vector2 _itemSize_ml;//列表项占大小,EnableMultiLine == true
+    private float                   _itemSize;//列表项占大小
+    private Vector2                 _itemSize_ml;//列表项占大小,EnableMultiLine == true
 
-    private float _lastPosition;//记录滚动前的位置
+    private float                   _lastPosition;//记录滚动前的位置
 
-    private int _itemsTotal;//当Create(...)被调用时确定列表项总数
-    private int _itemsVisible;//列表显示项的个数
+    private int                     _itemsTotal;//当Create(...)被调用时确定列表项总数
+    private int                     _itemsVisible;//列表显示项的个数
 
-    private int _itemsToRecycleBefore;
-    private int _itemsToRecycleAfter;
+    private int                     _itemsToRecycleBefore;
+    private int                     _itemsToRecycleAfter;
 
-    private int _firstItemIndex;
-    private int _lastItemIndex;//列表末尾项的index
+    private int                     _firstItemIndex;
+    private int                     _lastItemIndex;//列表末尾项的index
 
     #region MonoBehaviour
     void Awake () {
@@ -250,7 +250,10 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
 
         _scrollView.DisableSpring();
         _scrollView.restrictWithinPanel = false;
-        _scrollView.MoveRelative(new Vector3(0, _scrollView.panel.clipOffset.y, 0));
+        if (_scrollOrientation == ScrollOrientation.VERTICAL)
+            _scrollView.MoveRelative(new Vector3(0, _scrollView.panel.clipOffset.y, 0));
+        if (_scrollOrientation == ScrollOrientation.HORIZONTAL)
+            _scrollView.MoveRelative(new Vector3(_scrollView.panel.clipOffset.x, 0, 0));
 
         for (int i = _itemsList.Count - 1; i >= 0; i--)
         {
@@ -467,11 +470,13 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
             //print("_itemsList.Count" + _itemsList.Count);
             //print("==========================================");
 
-            if (_itemsToRecycleAfter >= ((_itemsList.Count / _itemsVisible_row - _itemsVisible_line) / 2) && _lastItemIndex > _itemsList.Count - 1)
+            if (_itemsToRecycleAfter >= ((_itemsList.Count / _itemsVisible - _itemsVisible_line) / 2) && _lastItemIndex > _itemsList.Count - 1)
             {
                 RecycleItem(ScrollDirection.PREVIOUS);
 
-                _lastItemIndex -= _itemsVisible_row;
+                //FIXED: 2017-7-21  修复了一个bug，该bug导致单行向前滚动时，加载索引不正确的问题 
+                //_lastItemIndex -= _itemsVisible;
+                _lastItemIndex--;
             }
             else
             {
@@ -526,15 +531,19 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
                     switch (_scrollOrientation)
                     {
                         case ScrollOrientation.HORIZONTAL://水平滚动方向，只改变x值
-                            //firstItem.Position = new Vector2(lastItem.Position.x + targetPosition, firstItem.Position.y);
+                            firstItem.Position = new Vector2(lastItem.Position.x + targetPosition, firstItem.Position.y);
                             break;
 
                         case ScrollOrientation.VERTICAL://垂直滚动方向，只改变y值
-                            firstItem.Position = new Vector2(firstItem.Position.x, lastItem.Position.y + targetPosition);
+                            /* y轴向下为负 */
+                            //FIXED: 2017-07-21 修复了一个bug,该bug在单列模式下向下滚动时,列表项坐标计算错误,无法正常循环
+                            firstItem.Position = new Vector2(firstItem.Position.x, lastItem.Position.y - targetPosition);
                             break;
                     }
                     //print(firstItem.gameObject.name + "移至队尾");
+                    //print("参与运算变量_lastItemIndex = " + _lastItemIndex);
                     firstItem.Index = _lastItemIndex;
+                    //print("预加载Index = " + firstItem.Index);
                     firstItem.transform.SetAsLastSibling();
 
                     _itemsList.RemoveAt(0);
@@ -552,11 +561,15 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
                             break;
 
                         case ScrollOrientation.VERTICAL:
-                            lastItem.Position = new Vector2(lastItem.Position.x, firstItem.Position.y - targetPosition);
+                            /* y轴向上为正 */
+                            //FIXED: 2017-07-21 修复了一个bug,该bug在单列模式下向上滚动时,列表项坐标计算错误,无法正常循环
+                            lastItem.Position = new Vector2(lastItem.Position.x, firstItem.Position.y + targetPosition);
                             break;
                     }
-                    //print(lastItem.gameObject.name+ "移至队头");
+                    //print(lastItem.gameObject.name + "移至队头");
+                    //print("参与运算变量_lastItemIndex = " + _lastItemIndex + " _itemsList.Count = " + _itemsList.Count);
                     lastItem.Index = _lastItemIndex - _itemsList.Count;
+                    //print("预加载Index = " + lastItem.Index);
                     lastItem.transform.SetAsFirstSibling();
 
                     _itemsList.RemoveAt(_itemsList.Count - 1);
@@ -586,6 +599,7 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
                     switch (_scrollOrientation)
                     {
                         case ScrollOrientation.HORIZONTAL://水平滚动方向，只改变x值
+                            /* TODO: 水平滚动方向逻辑处理未完成 */
                             //firstItem.Position = new Vector2(lastItem.Position.x + targetPosition, firstItem.Position.y);
                             break;
 
@@ -631,7 +645,7 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
                     }
                     for (int i = 0; i < lastItems.Length; i++)
                     {
-                        //CHANGED: 2017-7-05 尾行回收bug修复
+                        //FIXED: 2017-7-05 尾行回收bug修复
                         lastItems[i].Index = _firstItemIndex + _itemsVisible_row - i - 1;
                         lastItems[i].transform.SetAsFirstSibling();
 
@@ -699,8 +713,8 @@ public class UIScrollViewAdapter : MonoBehaviour , ObjectPool<GameObject>
                 //水平滚动时，GetContentPosition()返回x值，x轴向右为+，
                 //上次的位置值(x)小于当前位置值则是向后移动(逻辑上)
                 //print("_lastPosition < GetContentPosition() ? ScrollDirection.PREVIOUS : ScrollDirection.NEXT");
-                print("_lastPosition = "+ _lastPosition);
-                print("GetContentPosition() = " + GetContentPosition());
+                //print("_lastPosition = "+ _lastPosition);
+                //print("GetContentPosition() = " + GetContentPosition());
                 return _lastPosition < GetContentPosition() ? ScrollDirection.PREVIOUS : ScrollDirection.NEXT;
 
             case ScrollOrientation.VERTICAL:

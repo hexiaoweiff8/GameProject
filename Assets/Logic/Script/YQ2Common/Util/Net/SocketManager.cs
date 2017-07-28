@@ -109,20 +109,20 @@ public class SocketManager : ILoopItem
     /// 数据Action
     /// 当有能够读取的数据时调用所有Action
     /// </summary>
-    private Dictionary<int, Action<byte[]>> dataActionList = new Dictionary<int, Action<byte[]>>();
+    private Dictionary<int, List<Action<MsgHead>>> dataActionList = new Dictionary<int, List<Action<MsgHead>>>();
 
-    /// <summary>
-    /// 事件自增编号
-    /// </summary>
-    private static int ActionId
-    {
-        get { return actionId++; }
-    }
+    ///// <summary>
+    ///// 事件自增编号
+    ///// </summary>
+    //private static int ActionId
+    //{
+    //    get { return actionId++; }
+    //}
 
-    /// <summary>
-    /// 自增编号
-    /// </summary>
-    private static int actionId = 1024;
+    ///// <summary>
+    ///// 自增编号
+    ///// </summary>
+    //private static int actionId = 1024;
 
     /// <summary>
     /// 循环器ID
@@ -188,31 +188,59 @@ public class SocketManager : ILoopItem
     /// <summary>
     /// 添加事件
     /// </summary>
+    /// <param name="msgId">消息Id</param>
     /// <param name="action"></param>
-    public void AddDataAction(Action<byte[]> action)
+    public void RegAction(int msgId, Action<MsgHead> action)
     {
-        dataActionList.Add(ActionId, action);
+        if (action == null)
+        {
+            return;
+        }
+        if (ContainsAction(msgId))
+        {
+            dataActionList[msgId].Add(action);
+        }
+        else
+        {
+            dataActionList.Add(msgId, new List<Action<MsgHead>>()
+            {
+                action
+            });
+        }
+    }
+
+    /// <summary>
+    /// 添加事件
+    /// </summary>
+    /// <param name="msgId">消息Id</param>
+    /// <param name="actionList">事件列表</param>
+    public void RegAction(int msgId, List<Action<MsgHead>> actionList)
+    {
+        foreach (var action in actionList)
+        {
+            RegAction(msgId, action);
+        }
     }
 
     /// <summary>
     /// 是否存在该Id事件
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="msgId"></param>
     /// <returns></returns>
-    public bool ContainsAction(int id)
+    public bool ContainsAction(int msgId)
     {
-        return dataActionList.ContainsKey(id);
+        return dataActionList.ContainsKey(msgId);
     }
 
     /// <summary>
-    /// 删除
+    /// 删除事件
     /// </summary>
-    /// <param name="id"></param>
-    public void RemoveAction(int id)
+    /// <param name="msgId"></param>
+    public void RemoveAction(int msgId)
     {
-        if (ContainsAction(id))
+        if (ContainsAction(msgId))
         {
-            dataActionList.Remove(id);
+            dataActionList.Remove(msgId);
         }
     }
 
@@ -571,14 +599,24 @@ public class SocketManager : ILoopItem
                 if (bContinue)
                 {
                     data = ByteUtils.ReadMsg(ref receivedBuffer);
+
+                    // 解析数据头
+                    var msgHead = DeSerialize<MsgHead>(data);
                     // 抛出数据事件
-                    foreach (var action in dataActionList)
+                    foreach (var actionList in dataActionList)
                     {
-                        action.Value(data);
+                        if (msgHead.msgId == actionList.Key)
+                        {
+                            foreach (var action in actionList.Value)
+                            {
+                                action(msgHead);
+                            }
+                        }
                     }
                 }
                 else
                 {
+                    // 数据读取完毕, 清空缓存区
                     if (receivedBuffer.Length != 0)
                     {
                         receivedBuffer = new byte[0];

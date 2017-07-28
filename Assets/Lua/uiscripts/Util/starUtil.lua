@@ -36,18 +36,26 @@ function starUtil:getCardStarDefense(cardId, starLv)
 end
 
 --[[
-    获取升至该星级所需卡牌碎片数量
+    获取升星所需卡牌碎片数量
     starLv  卡牌星级
 ]]
 function starUtil:getUpStarNeedFragment(starLv)
-    return sdata_armycardstarcost_data:GetFieldV("CardNum", starLv) 
+    if starLv >= Const.MAX_STAR_LV then
+        Debugger.LogWarning("星级已达最大！！")
+        return
+    end
+    return sdata_armycardstarcost_data:GetFieldV("CardNum", starLv + 1)
 end
 --[[
-    获取升至该星级兵牌数量
+    获取升星兵牌数量
     starLv  卡牌星级
 ]]
 function starUtil:getUpStarNeedCoin(starLv)
-    return sdata_armycardstarcost_data:GetFieldV("Coin", starLv) 
+    if starLv >= Const.MAX_STAR_LV then
+        Debugger.LogWarning("星级已达最大！！")
+        return
+    end
+    return sdata_armycardstarcost_data:GetFieldV("Coin", starLv + 1)
 end
 
 

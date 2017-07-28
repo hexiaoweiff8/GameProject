@@ -368,7 +368,7 @@ public class TestTargetSelecter : MonoBehaviour
             member.AllData.MemberData.Accuracy = 0.9f;
             member.AllData.MemberData.SpreadRange = 10;
 
-            memberData.MultiAimMax = 10;
+            //memberData.MultiAimMax = 10;
             MemberList.Add(member);
             if (i == 0)
             {

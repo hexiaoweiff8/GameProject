@@ -12,11 +12,39 @@ public class Soldier_Siwang_State : SoldierFSMState
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
         base.DoBeforeEntering(fsm);
-        //fsm.Display.ClusterData.Stop();
-        //ClusterManager.Single.Remove(fsm.Display.ClusterData);
-        //FightUnitFactory.DeleteUnit(fsm.Display.ClusterData.AllData.MemberData);
+
         // 释放死亡时技能
         var allData = fsm.Display.ClusterData.AllData;
+
+        // 判断死亡单位类型
+        switch (allData.MemberData.ArmyType)
+        {
+            // 人族
+            case Utils.HumanArmyType:
+            // 兽族
+            case Utils.OrcArmyType:
+            // 机械
+            case Utils.MechanicArmyType:
+
+                break;
+
+            // 基地
+            case Utils.BaseArmyType:
+            {
+                // 一方胜利
+                Debug.Log("一方基地被摧毁,战斗结束.");
+            }
+                break;
+            // 防御塔
+            case Utils.TurretArmyType:
+            {
+                Debug.Log("一方防御塔被摧毁,可拖兵范围变更.");
+            }
+                break;
+        }
+        // 如果是基地
+
+        // 如果是防御塔
 
         // 死亡时检测技能
         if (allData.SkillInfoList != null)
@@ -32,7 +60,6 @@ public class Soldier_Siwang_State : SoldierFSMState
         }
         // 删除单位
         DisplayerManager.Single.DelDisplay(fsm.Display);
-        //Object.Destroy(fsm.Display.ClusterData);
     }
 
     public override void Action(SoldierFSMSystem fsm)

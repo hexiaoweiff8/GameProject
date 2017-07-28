@@ -167,6 +167,7 @@ public class Soldier_PutongGongji_State : SoldierFSMState
                             });
                     break;
             }
+            SwitchAnim(fsm, SoldierAnimConst.GONGJI,WrapMode.Loop);
         }
 
         if (normalGeneralAttack != null)
