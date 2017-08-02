@@ -99,7 +99,7 @@ public class SkillManager
     /// <param name="skillNum">技能ID</param>
     /// <param name="skillHolder">技能持有单位</param>
     /// <returns>技能实例</returns>
-    public SkillInfo CreateSkillInfo(int skillNum, DisplayOwner skillHolder = null)
+    public SkillInfo CreateSkillInfo(int skillNum, DisplayOwner skillHolder)
     {
         SkillInfo result = null;
 
@@ -225,7 +225,8 @@ public class SkillManager
     /// 执行方程式
     /// </summary>
     /// <param name="formula">方程式对象</param>
-    public void DoFormula(IFormula formula)
+    /// <param name="callback">完成回调</param>
+    public void DoFormula(IFormula formula, Action callback = null)
     {
         if (formula == null)
         {
@@ -233,7 +234,7 @@ public class SkillManager
         }
 
         CoroutineManage.AutoInstance();
-        CoroutineManage.Single.StartCoroutine(LoopDoFormula(formula));
+        CoroutineManage.Single.StartCoroutine(LoopDoFormula(formula, callback));
     }
 
     /// <summary>
@@ -278,7 +279,8 @@ public class SkillManager
     /// <param name="skillBase">技能对象</param>
     /// <param name="packer">技能数据包</param>
     /// <param name="isSubSkill">是否为子技能</param>
-    public void DoShillInfo(SkillBase skillBase, FormulaParamsPacker packer, bool isSubSkill = false)
+    /// <param name="callback">结束回调</param>
+    public void DoSkillInfo(SkillBase skillBase, FormulaParamsPacker packer, bool isSubSkill = false, Action callback = null)
     {
         if (skillBase == null)
         {
@@ -294,12 +296,11 @@ public class SkillManager
             if (SkillCouldRelease(skillBase))
             {
                 SetSkillInCD(skillBase as SkillInfo);
-                // TODO 技能可释放次数-暂时不做
-                DoFormula(skillBase.GetActionFormula(packer));
+                DoFormula(skillBase.GetActionFormula(packer), callback);
             }
             else
             {
-                Debug.Log("技能:" + skillBase.Num + "在cd中");
+                //Debug.Log("技能:" + skillBase.Num + "在cd中");
             }
             // 否则技能在CD中不能释放
         }
@@ -312,7 +313,8 @@ public class SkillManager
     /// <param name="skillNum">技能ID</param>
     /// <param name="packer">技能数据包</param>
     /// <param name="isSubSkill">是否为子技能</param>
-    public void DoSkillNum(int skillNum, FormulaParamsPacker packer, bool isSubSkill = false)
+    /// <param name="callback">结束回调</param>
+    public void DoSkillNum(int skillNum, FormulaParamsPacker packer, bool isSubSkill = false, Action callback = null)
     {
         //if (!SkillInfoDic.ContainsKey(skillNum))
         //{
@@ -321,7 +323,7 @@ public class SkillManager
 
         // 创建新的技能实例
         var skillInfo = CreateSkillInfo(skillNum, packer.ReleaseMember);
-        DoShillInfo(skillInfo, packer, isSubSkill);
+        DoSkillInfo(skillInfo, packer, isSubSkill, callback);
     }
 
     /// <summary>
@@ -422,7 +424,7 @@ public class SkillManager
             // 将触发数据传入
             paramsPacker.TriggerData = triggerData;
             // 触发技能
-            DoShillInfo(skill, paramsPacker);
+            DoSkillInfo(skill, paramsPacker);
         }
     }
 
@@ -447,7 +449,7 @@ public class SkillManager
     /// <summary>
     /// 携程循环
     /// </summary>
-    private IEnumerator LoopDoFormula(IFormula formula)
+    private IEnumerator LoopDoFormula(IFormula formula, Action endCallback = null)
     {
         if (formula != null)
         {
@@ -465,7 +467,7 @@ public class SkillManager
                     //Debug.Log("Callback");
                     isWaiting = false;
                 };
-                topNode.Do(callback);
+                topNode.Do(callback, formula.DataScope);
                 if (topNode.FormulaType == Formula.FormulaWaitType)
                 {
                     while (isWaiting)
@@ -474,6 +476,10 @@ public class SkillManager
                     }
                 }
                 topNode = topNode.NextFormula;
+                if (endCallback != null)
+                {
+                    endCallback();
+                }
 
             } while (topNode != null && topNode.CanMoveNext);
             // 如果完成回调不为空则回调

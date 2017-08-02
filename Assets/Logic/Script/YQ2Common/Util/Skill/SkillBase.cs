@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using JetBrains.Annotations;
 
 
 /// <summary>
@@ -28,7 +29,23 @@ public class AbilityBase
     /// <summary>
     /// 技能的数据域
     /// </summary>
-    public SkillDataScope SkillDataScope = new SkillDataScope();
+    public DataScope DataScope = new DataScope();
+
+    /// <summary>
+    /// 技能的持有者
+    /// </summary>
+    public DisplayOwner ReleaseMember { get; set; }
+
+    /// <summary>
+    /// 等级
+    /// </summary>
+    public int Level = 1;
+
+    /// <summary>
+    /// 能力共享数据
+    /// 在执行流程内
+    /// </summary>
+    public Dictionary<string, string> ShareData = new Dictionary<string, string>();
 
     /// <summary>
     /// 技能唯一自增ID
@@ -256,6 +273,8 @@ public class AbilityBase
         {
             // 获取构造器链head
             result = result.GetFirst();
+            // 设置行为链链头的数据域
+            result.DataScope = DataScope;
         }
 
         return result;
@@ -277,11 +296,6 @@ public class SkillBase : AbilityBase
     /// 触发条件Level2
     /// </summary>
     public TriggerLevel2 TriggerLevel2 { get; set; }
-
-    /// <summary>
-    /// 技能的持有者
-    /// </summary>
-    public DisplayOwner ReleaseMember { get; set; }
 
     /// <summary>
     /// buff的Tick时间(单位 秒)
@@ -566,9 +580,9 @@ public class SkillBase : AbilityBase
 
 
 /// <summary>
-/// 技能数据域
+/// 数据域
 /// </summary>
-public class SkillDataScope
+public class DataScope
 {
 
     /// <summary>
@@ -591,10 +605,10 @@ public class SkillDataScope
     /// </summary>
     private Dictionary<string, bool> dataScopeBool = new Dictionary<string, bool>();
 
-    ///// <summary>
-    ///// 数据域-string
-    ///// </summary>
-    //private Dictionary<string, string> dataScopeString = new Dictionary<string, string>();
+    /// <summary>
+    /// 数据域-string
+    /// </summary>
+    private Dictionary<string, string> dataScopeString = new Dictionary<string, string>();
 
 
 
@@ -650,10 +664,10 @@ public class SkillDataScope
     }
 
 
-    //public string GetString(string key)
-    //{
-    //    return dataScopeString[key];
-    //}
+    public string GetString(string key)
+    {
+        return dataScopeString[key];
+    }
 
 
     public void SetFloat(string key, float value)
@@ -700,17 +714,17 @@ public class SkillDataScope
             dataScopeBool.Add(key, value);
         }
     }
-    //public void SetString(string key, string value)
-    //{
-    //    if (dataScopeString.ContainsKey(key))
-    //    {
-    //        dataScopeString[key] = value;
-    //    }
-    //    else
-    //    {
-    //        dataScopeString.Add(key, value);
-    //    }
-    //}
+    public void SetString(string key, string value)
+    {
+        if (dataScopeString.ContainsKey(key))
+        {
+            dataScopeString[key] = value;
+        }
+        else
+        {
+            dataScopeString.Add(key, value);
+        }
+    }
 
     //public T Get<T>(string key)
     //{
@@ -764,3 +778,85 @@ public class SkillDataScope
     //    }
     //}
 }
+
+///// <summary>
+///// 能力数据包装类
+///// </summary>
+//public class AbilityShareData<T>
+//{
+
+//    /// <summary>
+//    /// 共享数据
+//    /// </summary>
+//    private Dictionary<string, T> shareDataDic = new Dictionary<string, T>();
+
+//    /// <summary>
+//    /// 添加数据
+//    /// </summary>
+//    /// <param name="key">数据key</param>
+//    /// <param name="val"></param>
+//    public void AddData([NotNull]string key, T val)
+//    {
+//        if (Contains(key))
+//        {
+//            shareDataDic[key] = val;
+//        }
+//        else
+//        {
+//            shareDataDic.Add(key, val);
+//        }
+//    }
+
+//    /// <summary>
+//    /// 获取数据
+//    /// </summary>
+//    /// <param name="key">数据key</param>
+//    /// <returns></returns>
+//    public T Get([NotNull] string key)
+//    {
+//        if (Contains(key))
+//        {
+//            return shareDataDic[key];
+//        }
+//        return default(T);
+//    }
+
+//    /// <summary>
+//    /// 是否包含Key数据
+//    /// </summary>
+//    /// <param name="key">数据key</param>
+//    /// <returns></returns>
+//    public bool Contains([NotNull]string key)
+//    {
+//        return shareDataDic.ContainsKey(key);
+//    }
+
+//    /// <summary>
+//    /// 删除Key
+//    /// </summary>
+//    /// <param name="key">数据key</param>
+//    public void Remove([NotNull]string key)
+//    {
+//        if (Contains(key))
+//        {
+//            shareDataDic.Remove(key);
+//        }
+//    }
+
+//    /// <summary>
+//    /// 获取数据
+//    /// </summary>
+//    /// <param name="key"></param>
+//    /// <returns></returns>
+//    public T this[[NotNull]string key]
+//    {
+//        get
+//        {
+//            if (Contains(key))
+//            {
+//                return shareDataDic[key];
+//            }
+//            return default(T);
+//        }
+//    }
+//}

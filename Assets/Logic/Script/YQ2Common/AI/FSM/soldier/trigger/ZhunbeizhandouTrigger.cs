@@ -66,7 +66,7 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger
         //    fsm.Display.ClusterData.MemberData.Camp, true);
 
         // 目标选择器选择目标列表
-        var list = TargetSelecter.Single.TargetFilter(searchData,
+        var list = TargetSelecter.TargetFilter(searchData,
             ClusterManager.Single.CheckRange(pos, searchData.AllData.MemberData.AttackRange, searchData.AllData.MemberData.Camp, true));
 
         Utils.DrawGraphics(new CircleGraphics(pos, searchData.AllData.MemberData.AttackRange), Color.yellow);

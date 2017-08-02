@@ -20,63 +20,69 @@ end
 
 cardModel = {}
 local cardTbl = {}
-
+local cardSortTbl = {}
+local cardTbl_Length = 0
 ---
 ---从服务器获取卡牌数据
 ---
 function cardModel:initCardTbl(cards)
+    cardTbl_Length = 0
     for k, v in ipairs(cards) do
         --卡牌ID -经验 -星级 -兵员等级 -军阶等级 -数量
         print( string.format("card==> id:%d, exp:%d, star:%d, slv:%d, rlv:%d, num:%d, buy:%d",v.id, v.exp, v.star, v.slv, v.rlv, v.num,v.lv,v.buy) )
         print( string.format("teamNum:%d, skillNum:%d, slotNum:%d", #v.team, #v.skill,  #v.slot) )
         --print(v.skill[1])
-        cardTbl[k] = Card(v.id, v.exp, v.star, v.slv, v.rlv, v.num, v.slot, v.skill, v.team,v.lv,v.buy)
+        cardTbl_Length = cardTbl_Length + 1
+        cardTbl[v.id] = Card(v.id, v.exp, v.star, v.slv, v.rlv, v.num, v.slot, v.skill, v.team,v.lv,v.buy)
+        table.insert(cardSortTbl, v.id)
     end
+    table.sort(cardSortTbl, function (a,b)
+        return a < b
+    end)
 end
 
 ---
----添加卡牌
+---添加多张卡牌
 ---
 function cardModel:addCards(cards)
     for _, v in ipairs(cards) do
        self:addCard(v)
     end
 end
-
+---
+---添加一张卡牌
+---
 function cardModel:addCard(card)
-    local cardNum = #cardTbl    ---当前卡牌数量
-    local newCardNum = 0        ---新卡牌的数量
-    local isHave = false    ---判断新添加的卡牌是否存在
-    for _, j in ipairs(cardTbl) do
-        if j.id == card.id then
-            j.num = j.num + card.num
-            isHave = true
-            break
-        end
+    if cardTbl[card.id] then
+        cardTbl[card.id].num = cardTbl[card.id].num + card.num
+    else
+        cardTbl_Length = cardTbl_Length + 1
+        cardTbl[card.id] = Card(card.id, card.exp, card.star, card.slv, card.rlv, card.num, card.slot, card.skill, card.team,card.lv, card.buy)
+        table.insert(cardSortTbl, card.id)
     end
-    ---不存在则创建新卡牌
-    if not isHave then
-        newCardNum = newCardNum + 1
-        cardTbl[cardNum + newCardNum] = Card(card.id, card.exp, card.star, card.slv, card.rlv, card.num, card.slot, card.skill, card.team,card.lv,card.buy)
-    end
+    table.sort(cardSortTbl, function (a,b)
+        return a < b
+    end)
 end
+
+
 ---
 ---改变某张卡牌的属性
 ---
 function cardModel:setCardInfo(card)
-    for k, v in ipairs(cardTbl) do
-        if v.id == card.id then
-            v.exp = card.exp
-            v.star = card.star
-            v.slv = card.slv
-            v.rlv = card.rlv
-            v.num = card.num
-            v.slot = card.slot
-            v.skill = card.skill
-            v.team = card.team
-            v.lv = card.lv
-            v.buy = card.buy
-        end
+    if cardTbl[card.id] then
+        cardTbl[card.id].exp = card.exp
+        cardTbl[card.id].star = card.star
+        cardTbl[card.id].slv = card.slv
+        cardTbl[card.id].rlv = card.rlv
+        cardTbl[card.id].num = card.num
+        cardTbl[card.id].slot = card.slot
+        cardTbl[card.id].skill = card.skill
+        cardTbl[card.id].team = card.team
+        cardTbl[card.id].lv = card.lv
+        cardTbl[card.id].buy = card.buy
+    else
+        Debugger.LogWarning("要修改信息卡牌不存在！！！！")
     end
 end
 
@@ -85,12 +91,13 @@ end
 ---cardId   卡牌Id
 ---
 function cardModel:getCardByID(cardId)
-    for k, v in ipairs(cardTbl) do
-        if v.id == cardId then
-            return v
-        end
+
+    if cardTbl[cardId] then
+        return cardTbl[cardId]
+    else
+        Debugger.LogWarning("卡牌不存在！！！！")
+        return nil
     end
-    return nil
 end
 
 ---
@@ -98,25 +105,43 @@ end
 ---cardId   卡牌Id
 ---
 function cardModel:getCardNum(cardId)
-    for k, v in ipairs(cardTbl) do
-        if v.id == cardId then
-           return v.num
-        end
+    if cardTbl[cardId] then
+        return cardTbl[cardId].num
+    else
+        Debugger.LogWarning("卡牌不存在！！！！")
+        return nil
     end
-    return nil
 end
+
 ---
 ---获取卡牌的购买次数
 ---
 function cardModel:getCardBuy(cardId)
-    for k, v in ipairs(cardTbl) do
-        if v.id == cardId then
-            return v.buy
-        end
+    if cardTbl[cardId] then
+        return cardTbl[cardId].buy
+    else
+        return 0
     end
-    return 0
 end
-
+---
+---获取卡牌列表
+---
 function cardModel:getCardTbl()
     return cardTbl
+end
+
+
+---
+---获取卡牌排序列表
+---
+function cardModel:getCardSortTbl()
+    return cardSortTbl
+end
+
+
+---
+---获取卡牌数量
+---
+function cardModel:getCardTblLength()
+    return cardTbl_Length
 end

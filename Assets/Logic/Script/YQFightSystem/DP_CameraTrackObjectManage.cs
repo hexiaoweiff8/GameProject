@@ -18,40 +18,6 @@ public class DP_CameraTrackObjectManage : MonoEX.Singleton<DP_CameraTrackObjectM
         YQ2CameraCtrl.Single.OnUserYRot += OnInterruptLookAround;
         YQ2CameraCtrl.Single.OnInterruptObjMode += OnInterruptLookAround;
     }
-    /// <summary>
-    /// 设置一个新的追随物
-    /// </summary>
-    /// <param name="actorID">演员ID</param>
-    /// <param name="lockOP">是否锁相机操作</param>
-    public void SetTrackActor(DPActorType actorType, int actorID, bool lockOP)
-    {
-        if (m_CurrTrackActorID == actorID&&YQ2CameraCtrl.Single.IsObjMode) return;//当前已经锁定了这个角色
-
-        Transform tr; float dirX; DP_BattlefieldDraw.Single.GetActorTransfrom(actorID, out tr, out dirX);
-        if (tr == null) return;//没有找到对应的演员
-
-        YQ2CameraCtrl.Single.SwapTrackObject(tr.position,dirX,false);  
-        YQ2CameraCtrl.Single.EnabledTouch = !lockOP;
-        m_CurrTrackActorID = actorID;
-        m_CurrTrackActorIsDirRight = dirX > 0;
-
-        /*
-        if (actorType == DPActorType.Avatar)
-        {
-            m_CurrTrackHeroActorID = actorID;
-
-           switch(m_LookAroundStep)
-            {
-                case LookAroundStep.SelectObj:
-                    m_LookAroundStep = LookAroundStep.LookArounding;
-                    break;
-                case LookAroundStep.LookArounding:
-                    OnInterruptLookAround();//打断
-                    break;
-            }
-        }*/
-    }
-
 
     public void CancelTrackActor(int actorID)
     {
@@ -141,9 +107,6 @@ public class DP_CameraTrackObjectManage : MonoEX.Singleton<DP_CameraTrackObjectM
 
 
         YQ2CameraCtrl.Single.EnabledAll = true;//启用相机控制
-    
-
-         if (complateRecall!=null) complateRecall();
     }
 
     /// <summary>

@@ -60,7 +60,7 @@ public class HealthScopeFormulaItem : AbstractFormulaItem
         var myLower = HealthLowerLimit;
         var myType = FormulaType;
 
-        result = new Formula((callback) =>
+        result = new Formula((callback, scope) =>
         {
             // 判断单位是否在指定血量百分比内
             //if(paramsPacker.ReceiverMenber)

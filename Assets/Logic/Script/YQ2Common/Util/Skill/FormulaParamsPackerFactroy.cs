@@ -77,6 +77,7 @@ public class FormulaParamsPackerFactroy
             Skill = skill,
             StartPos = startObj != null ? startObj.ClusterData.transform.position : Vector3.zero,
             TargetPos = targetObj != null ? targetObj.ClusterData.transform.position : Vector3.zero,
+            SkillLevel = skill == null ? 1 : skill.Level
         };
 
         return result;
@@ -124,7 +125,7 @@ public class FormulaParamsPackerFactroy
         {
             DataList = skill.DataList,
             // TODO 技能等级, 最大目标数量
-            SkillLevel = 1,
+            SkillLevel = skill.Level,
             SkillNum = skill.Num,
             ReceiverMenber = startObj,
             ReleaseMember = targetObj,

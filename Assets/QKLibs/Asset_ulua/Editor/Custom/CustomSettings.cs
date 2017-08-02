@@ -223,7 +223,6 @@ public static class CustomSettings
         _GT(typeof (UIEventListener)),
         _GT(typeof (UIDragObjectEX)),
         _GT(typeof (DP_FightPrefabManage)),
-        _GT(typeof (AvatarCM)),
         _GT(typeof (RuntimePlatform)),
         _GT(typeof (EasyTouch)),
         _GT(typeof (BaseFinger)),

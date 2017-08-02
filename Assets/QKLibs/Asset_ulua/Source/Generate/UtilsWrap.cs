@@ -51,6 +51,7 @@ public class UtilsWrap
 		L.RegConstant("MemberItemTypeOmnic", 3);
 		L.RegConstant("EnemyCamp", 2);
 		L.RegConstant("MyCamp", 1);
+		L.RegConstant("NeutralCamp", 0);
 		L.RegConstant("BulletTypeNormal", 1);
 		L.RegConstant("BulletTypeScope", 2);
 		L.RegConstant("AOEObjScope", 1);
@@ -73,6 +74,7 @@ public class UtilsWrap
 		L.RegConstant("TurretBaseId", 220002000);
 		L.RegConstant("AngleToPi", 0.0174532923847437);
 		L.RegConstant("PiToAngle", 57.2957801818848);
+		L.RegConstant("TicksTimeToSecond", 10000000);
 		L.RegConstant("EffectLayer", 12);
 		L.RegVar("RadianToAngle", get_RadianToAngle, null);
 		L.RegVar("AngleToRadian", get_AngleToRadian, null);

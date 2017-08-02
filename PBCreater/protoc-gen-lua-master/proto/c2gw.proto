@@ -1,0 +1,162 @@
+syntax = "proto2";
+import "role.proto";
+
+
+message LoginGame {
+    required string token       =1;
+    required int32  hostId      =2;
+}
+
+
+message RegisterRole {
+    required string userName    =1;
+    optional int32  hostId      =2;
+    required string mac         =3;
+    required string idfa        =4;
+    required string googleId    =5;
+    required string chlId       =6;
+}
+
+
+message EquipLvlup {
+    required int32 equipId      =1;
+}
+
+
+message EquipLock {
+    required int32 equipId      =1;
+    required int32 isLock       =2;
+}
+
+
+message EquipRepair {
+    required int32 equipId      =1;
+}
+
+
+message EquipRemake {
+    required int32 equipId      =1;
+    required int32 viceId       =2;
+}
+
+
+message EquipConfirmRemake {
+    required int32 equipId      =1;
+    required int32 viceId       =2;
+    required int32 indexId      =3;
+}
+
+
+message CardFeed {
+    required int32 cardId       =1;
+    required int32 lvs          =2;
+}
+
+
+message CardStarup {
+    required int32 cardId       =1;
+}
+
+
+message CardCarryup {
+    required int32 cardId       =1;
+}
+
+
+message CardTakeMedal {
+    required int32 cardId       =1;
+    required int32 slotId       =2;
+}
+
+
+message CardRankup {
+    required int32 cardId       =1;
+}
+
+
+message SkillLevelup {
+    required int32 cardId       =1;
+    required int32 skillId      =2;
+}
+
+
+message SkillReset {
+    required int32 cardId       =1;
+    required int32 cost         =2;
+}
+
+
+message SciLvlup {
+    required int32 sciId        =1;
+}
+
+
+message SciSpeed {
+    required int32 sciId        =1;
+}
+
+
+message CardUnionLvlup {
+    required int32 cardId       =1;
+    required int32 unionId      =2;
+}
+
+
+message GetMailReward {
+    required string id          =1;
+}
+
+
+message EquipFit {
+    repeated int32 lst          =1;
+}
+
+
+message SellItem {
+    repeated Item item          =1;
+}
+
+
+message SellEquip {
+    required int32  sellType    =1;
+    repeated int32  equip       =2;
+}
+
+
+message ComposeEquip {
+    required int32  itemId      =1;
+}
+
+
+message ReadMail {
+    required string id          =1;
+}
+
+
+message DelMail {
+    required string id          =1;
+}
+
+
+message GetShopDetail {
+    required int32 shopId       =1;
+}
+
+
+message RefreshShop {
+    required int32 shopId       =1;
+}
+
+
+message BuyShopGood {
+    required int32 shopId       =1;
+    required int32 goodId       =2;
+    required int32 commId       =3;
+}
+
+
+message BuyCard {
+    required int32 cardId       =1;
+}
+
+

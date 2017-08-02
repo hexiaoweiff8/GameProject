@@ -107,9 +107,8 @@ public class RemainManager
     /// </summary>
     /// <param name="remainId">RemainID</param>
     /// <param name="release">Remain的释放者</param>
-    /// <param name="remainRank">Remain等级</param>
     /// <returns></returns>
-    public RemainInfo CreateRemainInfo(int remainId, DisplayOwner release, int remainRank = 1)
+    public RemainInfo CreateRemainInfo(int remainId, DisplayOwner release)
     {
         RemainInfo result = null;
 
@@ -125,14 +124,16 @@ public class RemainManager
             else
             {
                 // TODO 加载文件从包中加载 检测文件是否存在
-                var file = new FileInfo(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "BuffScript" + remainId + ".txt");
+                var file =
+                    new FileInfo(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "RemainScript" +
+                                 remainId + ".txt");
                 if (file.Exists)
                 {
                     // 加载文件内容
                     var buffTxt = Utils.LoadFileInfo(file);
                     if (!string.IsNullOrEmpty(buffTxt))
                     {
-                        result = FormulaConstructor.BuffConstructor(buffTxt);
+                        result = FormulaConstructor.RemainConstructor(buffTxt);
                         // 将其放入缓存
                         AddRemainInfo(result);
                     }
@@ -143,14 +144,19 @@ public class RemainManager
                 }
             }
         }
+
+        if (result == null)
+        {
+            return null;
+        }
+
         result = CopyRemainInfo(result);
         // 将实现放入实现列表
         remainInstanceDic.Add(result.AddtionId, result);
-        result.ReceiveMember = receive;
         result.ReleaseMember = release;
-        result.BuffRank = remainRank;
         return result;
     }
+
 
 
 
@@ -164,7 +170,19 @@ public class RemainManager
         RemainInfo result = null;
         result = new RemainInfo(remainInfo.Num)
         {
-
+            ActionTime = remainInfo.ActionTime,
+            ActionCamp = remainInfo.ActionCamp,
+            CouldActionOnAir = remainInfo.CouldActionOnAir,
+            CouldActionOnBuilding = remainInfo.CouldActionOnBuilding,
+            CouldActionOnSurface = remainInfo.CouldActionOnSurface,
+            DataList = remainInfo.DataList,
+            DuringTime = remainInfo.DuringTime,
+            FixPostion = remainInfo.FixPostion,
+            HasActionFormula = remainInfo.HasActionFormula,
+            HasAttachFormula = remainInfo.HasAttachFormula,
+            HasDetachFormula = remainInfo.HasDetachFormula,
+            IsFollow = remainInfo.IsFollow,
+            Range = remainInfo.Range
         };
         result.AddActionFormulaItem(remainInfo.GetActionFormulaItem());
         result.AddAttachFormulaItem(remainInfo.GetAttachFormulaItem());

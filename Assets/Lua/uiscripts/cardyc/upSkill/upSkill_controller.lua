@@ -150,11 +150,11 @@ end
 --普通重置
 function upSkill_controller:normal_Reset_CallBack()
     --已解锁的技能等级变为1级，返还升级所用的技能卡数目的80%加至总技能卡中
-    Message_Manager:SendPB_10015(data.cardId, 100)
+    Message_Manager:SendPB_SkillPointReset(data.cardId, 100)
 end
 --完美重置
 function upSkill_controller:perfect_Reset_CallBack()
-    Message_Manager:SendPB_10015(data.cardId, 300)
+    Message_Manager:SendPB_SkillPointReset(data.cardId, 300)
 end
 --重置技能成功后对界面进行刷新
 function upSkill_controller:skillReset_Success()

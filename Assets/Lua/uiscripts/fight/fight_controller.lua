@@ -7,7 +7,7 @@ local fight_controller = class("fight_controller", wnd_base)
 
 local _view = require("uiscripts/fight/fight_view")
 local _data = require("uiscripts/fight/fight_model")
-local leftCard = require("uiscripts/fight/leftCard/leftCard_controller")
+local restCard = require("uiscripts/fight/restCard/restCard_controller")
 local skill = require("uiscripts/fight/skill/skill_controller")
 local userInfo = require("uiscripts/fight/userInfo/userInfo_controller")
 local cardInHand = require("uiscripts/fight/cardInHand/cardInHand_controller")
@@ -19,9 +19,9 @@ require("uiscripts/fight/touchControl")
 require("uiscripts/fight/modelControl")
 require("uiscripts/fight/AStarControl")
 
---function Onfs()
---    ui_manager:ShowWB(WNDTYPE.ui_fight2)
---end
+function Onfs()
+    ui_manager:ShowWB(WNDTYPE.ui_fight2)
+end
 local _isPause = false
 function fight_controller:OnShowDone()
     ---
@@ -30,7 +30,7 @@ function fight_controller:OnShowDone()
     _view:init(self)
     _data:getDatas()
 
-    coroutine.start(function()--开场还没加载到所以用协程
+    local fun = function()--开场还没加载到所以用协程
         while _view.canotRect == nil do
             coroutine.wait(0.1)
             _view.canotRect = GameObject.Find("/SceneRoot/canotRectGo")
@@ -41,15 +41,20 @@ function fight_controller:OnShowDone()
                 ---
                 ---初始化各部分显示
                 ---
-                leftCard:Init(self)
+                restCard:Init(self)
                 skill:Init(self)
                 userInfo:Init(self)
                 cardInHand:Init(self)
                 power:Init(self)
                 enemyCard:Init(self)
+
+
+                self:initJumpButton()
+
             end
         end
-    end)
+    end
+    coroutine.start(fun)
 
 
 
@@ -58,10 +63,27 @@ function fight_controller:OnShowDone()
 
     self:initPause()
     ui_manager:DestroyWB(WNDTYPE.Prefight)
-
 end
 
 
+function fight_controller:initJumpButton()
+    local myMainBuild = GameObject.Find("/BuildingParent").transform:GetChild(3)
+    local myFirstSoldier = GameObject.Find("/BuildingParent").transform:GetChild(2)
+    UIEventListener.Get(_view.jumpToMyMain).onPress = function (go, args)
+        if args then
+            if myMainBuild then
+                _view.UIFollow.target = myMainBuild
+            end
+        end
+    end
+    UIEventListener.Get(_view.jumpToFirst).onPress = function (go, args)
+        if args then
+            if myFirstSoldier then
+                _view.UIFollow.target = myFirstSoldier
+            end
+        end
+    end
+end
 
 ---初始化游戏暂停功能
 function fight_controller:initPause()
@@ -89,25 +111,13 @@ end
 
 ---出牌或回收后，下一张牌替换
 function fight_controller:nextCard(cardIndex)
-    --牌库第一张补充到手牌
-    if _data.nextCard then
-        _data.nowHandpaiKutb[cardIndex] = _data.nextCard
-    else
-        _data.nowHandpaiKutb[cardIndex] = nil
-    end
-    --获取下一张卡牌
-    if #_data.paiKutb > 0 then --牌库有牌
-        _data.nextCard = _data.paiKutb[1]
-        table.remove(_data.paiKutb, 1)
-    else
-        _data.nextCard = nil
-    end
+    _data:refreshMyCards(cardIndex)
     -- 延迟1秒刷新显示
     local t = TimeTicker()
     t:Start(1)
     t.OnEnd = function(go)
         cardInHand:Refresh(cardIndex)
-        leftCard:Refresh()
+        restCard:Refresh()
     end
 end
 
@@ -176,50 +186,6 @@ function ENEMY_DROP_CARD()
     _data.enemyNowFei = _data.enemyNowFei - _data.enemyPaiKutb[1].TrainCost
     table.remove(_data.enemyPaiKutb, 1)
 end
-function WANJIAXIABING(self)
-    -- TODODO
-    -- if 1 then
-    --     return
-    -- end
-    ------------------------------
-    if #_data.enemyPaiKutb == 0 then
-        return
-    end
-    local tempID
-    --因费不够该出的卡牌id
-    if self.nextEnemyCardFei then
-        tempID = self.nextEnemyCardID
-    else
-        tempID = _data.enemyPaiKutb[1].id
-        table.remove(_data.enemyPaiKutb, 1)
-    end
-    --如果敌人费够
-    if _data.enemyNowFei >= sdata_armycardbase_data:GetFieldV("TrainCost", tempID) then
-        local ct = ModelControl:createEnemyModel(tempID)
-        ----增加敌人出牌UI
-        --local euc = GameObject.Instantiate(self.enemyUsedCard)
-        ----点击敌人出的卡牌相机跟随该敌兵
-        --UIEventListener.Get(euc.gameObject).onPress = function(go, args)
-        --    if args then
-        --        self.UIFollow.target = ct
-        --    end
-        --end
-        --euc.gameObject:SetActive(true)
-        --euc.parent = self.enemyUsedCardsGridTf
-        --euc.localScale = self.enemyUsedCard.localScale
-        --euc:Find("Sprite"):GetComponent(typeof(UISprite)).spriteName = sdata_armycardbase_data:GetFieldV("IconID", tempID)
-        ----敌人出牌UI几秒后消失
-        --self.enemyUsedCardsGrid:Reposition()
-        --self.coroutineTb[#self.coroutineTb + 1] = coroutine.start(function()
-        --    coroutine.wait(10)
-        --    Object.Destroy(euc.gameObject)
-        --end)
-        _data.enemyNowFei = _data.enemyNowFei - sdata_armycardbase_data:GetFieldV("TrainCost", tempID)
-    else --敌人费不够记录下次该出的牌和费
-        self.nextEnemyCardID = tempID
-        self.nextEnemyCardFei = sdata_armycardbase_data:GetFieldV("TrainCost", tempID)
-    end
-end
 ---自己下兵
 function DROP_CARD(cardIndex)
     ModelControl:activeModel(cardIndex)
@@ -229,6 +195,9 @@ end
 ---回收卡牌
 function RECOVERY_CARD(cardIndex)
     _data.nowFei = _data.nowFei + cardUtil:getTrainCost(_data.nowHandpaiKutb[cardIndex].id) * 0.5
+    if _data.nowFei > _data.allFei then
+        _data.nowFei = _data.allFei
+    end
     fight_controller:nextCard(cardIndex)
 end
 ---暂停恢复回调方法

@@ -75,10 +75,13 @@ public class SkillFormulaItem : AbstractFormulaItem
         var myFormulaType = FormulaType;
         var mySkillNum = SkillNum;
 
-        result = new Formula((callback) =>
+        result = new Formula((callback, scope) =>
         {
+            var skill = SkillManager.Single.CreateSkillInfo(mySkillNum);
+            // 继承数据域
+            skill.DataScope = scope;
             // 数据依靠传递
-            SkillManager.Single.DoSkillNum(mySkillNum, paramsPacker, true);
+            SkillManager.Single.DoSkillInfo(skill, paramsPacker, true);
             callback();
         }, myFormulaType);
 

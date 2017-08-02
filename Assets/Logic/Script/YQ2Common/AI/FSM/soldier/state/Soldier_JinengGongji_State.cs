@@ -26,7 +26,7 @@ public class Soldier_JinengGongji_State : SoldierFSMState
         if (fsm.IsCanInJinenggongji && fsm.EnemyTarget.ClusterData != null && fsm.EnemyTarget.GameObj != null)
         {
             // TODO 改为抛出技能的释放
-            SkillManager.Single.DoShillInfo(fsm.Skill, FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(fsm.Skill,
+            SkillManager.Single.DoSkillInfo(fsm.Skill, FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(fsm.Skill,
                 fsm.Display,
                 fsm.EnemyTarget));
             // 攻击动作

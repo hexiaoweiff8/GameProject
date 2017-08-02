@@ -15,47 +15,48 @@ end
 
 itemModel = {}
 local itemTbl = {}
+local itemTbl_Length = 0
 ---
 ---初始化物品表
 ---
 function itemModel:initItemTbl(items)
-    for k, v in ipairs(items) do
-        print( string.format("Item==> id:%d, num:%d",v.id, v.num) )
-        itemTbl[k] = Item(v.id, v.num)
-    end
-end
-
-
----
----添加物品
----
-function itemModel:addItem(items)
-    local itemNum = #itemTbl    ---当前卡牌数量
-    local newCardNum = 0        ---新卡牌的数量
+    itemTbl_Length = 0
     for _, v in ipairs(items) do
-        local isHave = false    ---判断新添加的卡牌是否存在
-        for _, j in ipairs(itemTbl) do
-            if j.id == v.id then
-                j.num = j.num + v.num
-                isHave = true
-                break
-            end
-        end
-        ---不存在则创建新卡牌
-        if not isHave then
-            newCardNum = newCardNum + 1
-            itemTbl[itemNum + newCardNum] = Item(v.id, v.num)
-        end
+        print( string.format("Item==> id:%d, num:%d",v.id, v.num) )
+        itemTbl_Length = itemTbl_Length + 1
+        itemTbl[v.id] = Item(v.id, v.num)
     end
 end
 
 ---
----改变某物品的属性
+---添加多个物品
 ---
-function itemModel:setItem(item)
-    for _, v in ipairs(itemTbl) do
-        if v.id == item.id then
-            v.num = item.num
+function cardModel:addItems(items)
+    for _, v in ipairs(items) do
+        self:addItem(v)
+    end
+end
+---
+---添加一个物品
+---
+function cardModel:addItem(item)
+    if itemTbl[item.id] then
+        itemTbl[item.id].num = itemTbl[item.id].num + item.num
+    else
+        itemTbl_Length = itemTbl_Length + 1
+        itemTbl[item.id] = Item(item.id, item.num)
+    end
+end
+
+---
+---改变物品的属性
+---
+function itemModel:setItems(items)
+    for _, v in ipairs(items) do
+        if itemTbl[v.id] then
+            itemTbl[v.id].num = v.num
+        else
+            Debugger.LogWarning("要修改信息物品不存在！！！！")
         end
     end
 end
@@ -64,12 +65,11 @@ end
 ---获取某一件物品的数量
 ---
 function itemModel:getItemNum(itemId)
-    for _, v in ipairs(itemTbl) do
-        if v.id == itemId then
-            return v.num
-        end
+    if itemTbl[itemId] then
+        return itemTbl[itemId].num
+    else
+        return 0
     end
-    return nil
 end
 
 ---
@@ -77,4 +77,11 @@ end
 ---
 function itemModel:getItemTbl()
     return itemTbl
+end
+
+---
+---获取物品表的长度
+---
+function itemModel:getItemTblLength()
+    return itemTbl_Length
 end

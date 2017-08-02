@@ -175,13 +175,6 @@ public abstract class SoldierFSMState
 }
 
 
-
-
-
-
-
-
-
 /// <summary>
 /// 士兵的各个状态
 /// </summary>

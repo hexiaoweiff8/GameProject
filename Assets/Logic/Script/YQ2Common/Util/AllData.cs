@@ -37,6 +37,6 @@ public class AllData : ISelectWeightDataHolder
     /// <summary>
     /// 光环列表
     /// </summary>
-    public IList<RemainInfo> HaloInfoList = new List<RemainInfo>();
+    public IList<RemainInfo> RemainInfoList = new List<RemainInfo>();
 
 }

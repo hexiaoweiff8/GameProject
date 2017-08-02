@@ -31,12 +31,6 @@ static class DP_FightEvent
     public delegate void onActorMove(int actorID);
 
     /// <summary>
-    /// 战斗结束事件
-    /// </summary>
-    public static event onFightEnd OnFightEnd;
-    public delegate void onFightEnd(FightResult result);
-
-    /// <summary>
     /// 手动激活事件
     /// </summary>
     public static event onShoudongActive OnShoudongActive;
@@ -48,23 +42,9 @@ static class DP_FightEvent
     public static event Action OnFirstTouchScene;
 
 
-    /// <summary>
-    /// 英雄死亡事件
-    /// </summary>
-    public static event onHeroDie OnHeroDie;
-    public delegate void onHeroDie(int heroID, ArmyFlag flag);
-    public static void PostHeroDie(int heroID, ArmyFlag flag) { if (OnHeroDie != null) OnHeroDie(heroID, flag); }
-
-    
-    
-    
-
-    public static void PostActorMove(int actorID) { if (OnActorMove != null) OnActorMove(actorID); }
-    public static void PostFightEnd(FightResult result) { if(OnFightEnd!=null) OnFightEnd(result); }
 
     public static void PostFirstTouchScene() { if(OnFirstTouchScene!=null) OnFirstTouchScene(); }
 
-    public static void PostShoudongActive(int heroID, int count) { if (OnShoudongActive!=null) OnShoudongActive(heroID, count); }
 
 
 } 

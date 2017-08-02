@@ -11,6 +11,7 @@ function fight_model:getDatas()
     -- 是否暂停
     self.ispause = false
 
+
 ---卡牌数据部分---
     self.enemyPaiKutb = {}
 
@@ -23,7 +24,7 @@ function fight_model:getDatas()
     self.AllCardIDtb = {}
     --所有卡牌等级表
     self.AllCardLeveltb = {}
-    self:initLeftCards()
+    self:initMyCards()
     self:initAllCardsTbl()
 
 
@@ -38,45 +39,15 @@ function fight_model:getDatas()
     --敌人当前费
     self.enemyNowFei = 900
 
-    -- 下方卡牌缩放间距
-    self.onPressMyCardSpantb = {}
-    -- 拖动中的卡牌模型table
-    self.onPressArmytb = {}
-    -- UI卡牌table
-    self.nowMyCardtb = {}
-    -- UI卡牌CDtable
-    self.nowMyCardCDtbUISpritetb = {}
-    -- UI技能table
-    self.uiSkilltb = {}
-    -- UI卡牌原始位置
-    self.myCardConstPostb = {}
-    -- 卡牌缩放间距
-    self.cardScaleSpan = 67
-    -- UI卡牌原始位置
-    self.myCardConstPostb = {}
-    -- 敌方下次出的卡牌ID
-    self.nextEnemyCardID = nil
-    -- 敌方下次出的卡牌费
-    self.nextEnemyCardFei = nil
 
-    -- 拖动中的卡牌table
-    self.onPressMyCardtb = {}
-
-    -- 卡牌大碰撞框
-    self.bigCardBoxCollider = {}
-    -- 卡牌选中状态
-    self.isCardSelected = {false, false, false, false}
-    --myTouchCount
-    self.myTouchCount = 0
+----临时血量
+    self.MyZhuJiDi_HP = 100
 
 
-    --兵阵型右边最宽距离
-    self.maxSpan = {}
-    --组ID
-    self.groupIndex = 0
-
-
-    --self.feiBounds = Bounds(Vector3(self.feiBg.localPosition.x, self.feiBg.localPosition.y, 0), Vector3(feiUIWidget.width, feiUIWidget.height, 0))
+    ---临时我的主基地的位置
+    self.myMainPosition = Vector3(0,0,0)
+    ---临时排头兵的位置
+    self.firstPosition = Vector3(0,0,0)
 
 
 end
@@ -84,37 +55,64 @@ end
 
 
 ---初始化剩余卡牌信息
-function fight_model:initLeftCards()
+function fight_model:initMyCards()
+    sdata_testcardplan_data:Foreach(
+    function (key, value)
+            local card = {
+                id = 0,
+                num = 0,
+                rarity = 0,
+                TrainCost = 0
+            }
+            card.id = value[1]
+            card.num = value[2]
+            card.rarity = value[3]
+            print(card.id)
 
-    for i = 1, 9 do
-        local card = {
-            id = 0,
-            num = 0,
-            TrainCost = 0
-        }
-        card.id = 101000 + i
-        card.num = i
-        card.TrainCost = cardUtil:getTrainCost(card.id)
-        table.insert(self.enemyPaiKutb, card)
-        table.insert(self.paiKutb, card)
-    end
+            card.TrainCost = cardUtil:getTrainCost(card.id)
+            table.insert(self.enemyPaiKutb, card)
+            table.insert(self.paiKutb, card)
+    end)
     --打乱敌人牌库
     table.upset(self.enemyPaiKutb)
-    --打乱自身牌库
-    table.upset(self.paiKutb)
-
     --取前4张为手牌库
     for i = 1, 4 do
-        self.nowHandpaiKutb[i] = self.paiKutb[1]
-        table.remove(self.paiKutb, 1)
+        self.nowHandpaiKutb[i] = self:getNextCard()
     end
 
     --获取下一张牌
-    self.nextCard = self.paiKutb[1]
-    table.remove(self.paiKutb, 1)
-
+    self.nextCard = self:getNextCard()
 end
 
+function fight_model:refreshMyCards(cardIndex)
+    --牌库第一张补充到手牌
+    if self.nextCard then
+        self.nowHandpaiKutb[cardIndex] = self.nextCard
+    else
+        self.nowHandpaiKutb[cardIndex] = nil
+    end
+
+    --获取下一张牌
+    self.nextCard = self:getNextCard()
+end
+
+
+function fight_model:getNextCard()
+    --打乱自身牌库
+    table.upset(self.paiKutb)
+    local nextCard
+    --判断盘库是否有牌
+    if #self.paiKutb >= 1 and self.paiKutb[1].num > 0 then
+        nextCard = self.paiKutb[1]
+        self.paiKutb[1].num = self.paiKutb[1].num - 1
+        if self.paiKutb[1].num == 0 then
+            table.remove(self.paiKutb, 1)
+        end
+        return nextCard
+    else
+        return nil
+    end
+end
 
 ---获取游戏中要用到的所有卡牌信息
 function fight_model:initAllCardsTbl()

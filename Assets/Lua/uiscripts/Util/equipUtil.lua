@@ -1,12 +1,11 @@
+require('uiscripts/cangku/util/table_count')
 EquipUtil = {}
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --@Des 混合本地/服务器数据
 --	   调用顺序:
 --		1.initModel()方法初始化公用Model的local_Equipment表
 --		2.getEquipData()存储服务器装备表数据到公用Model的serv_Equipment表
 --@params user_equip:服务器装备表数据
 --@return (table)混合了本地装备表信息的服务器装备表副本
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:getEquipData(user_equip)
 	
 	local Processed_Equipment = {}
@@ -44,20 +43,23 @@ function EquipUtil:getEquipData(user_equip)
 	                })
 	            end
 	        end
-			table.insert(Processed_Equipment,equip)
+	        -- NOTE: 2017-07-28尝试更改equip数据存储格式
+			--[[
+				由原来的table.insert改为根据装备唯一id字段存储以提升增删改性能
+			]]
+			-- table.insert(Processed_Equipment,equip)
+			Processed_Equipment[equip.id] = equip
 		end
 		equip = {}
     end
 
     return Processed_Equipment
 end
-
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+--@Obsolete 由于装备表结构修改,该排序方法已弃用
 --@Des 对传入的装备表根据给定规则排序
 --@params Equipment(table*):装备列表引用
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:sortEquipment(Equipment)
-	if Equipment == nil or #Equipment == 0 then
+	if Equipment == nil or table.count(Equipment) == 0 then
 		return
 	end
 	table.sort(Equipment,
@@ -74,13 +76,12 @@ function EquipUtil:sortEquipment(Equipment)
 		end)
 end
 
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
 --@Des 获取装备主属性字符串
 --@params EquipID(number):装备ID
 --		  AttributeID(number):属性ID(从服务器获取)
 --		  lv(number):装备等级
 --@return (string)装备主属性字符串
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:getEquipmentMainAttributeStr(EquipID,AttributeID,lv)
 	local _PlanID = EquipModel:getLocalEquipmentDetailByEquipID(EquipID)["MainAttribute"]
 	local _AttributeID = AttributeID
@@ -105,11 +106,9 @@ function EquipUtil:getEquipmentMainAttributeStr(EquipID,AttributeID,lv)
 	return str
 end
 
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --@Des 获取装备主属性数值
 --@params equip:装备Data(混合数据)
 --@return 装备主属性数值
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:getMainAttributeValue(equip)
 	local _PlanID = equip.MainAttribute
 	local _AttributeID = equip.fst_attr
@@ -122,11 +121,10 @@ function EquipUtil:getMainAttributeValue(equip)
 
 	return _AttributeValue
 end
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
 --@Des 获取装备副属性字符串
 --@params equip*:装备Data(混合数据)
 --@return (string)装备副属性字符串
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:getEquipmentSubAttributeStr(equip)
 	local _AttributeID 
 	local _lv = equip.lv
@@ -172,11 +170,10 @@ function EquipUtil:getEquipmentSubAttributeStr(equip)
 
 	return str
 end
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
 --@Des 获取装备副属性字符串表
 --@params equip*:装备Data(混合数据)
 --@return （table）副属性字符串表
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:getEquipmentSubAttributeStrList(equip)
 	local _AttributeID
 	local _lv = equip.lv
@@ -199,7 +196,7 @@ function EquipUtil:getEquipmentSubAttributeStrList(equip)
 	end
 	return strList
 end
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
 --@Des 获取套装效果字符串,该方法使用储存在公用Model的serv_fitEquipmentList表查询已穿戴的装备
 --@params SuitID:套装id
 --@return	list = { suitAttr }
@@ -207,7 +204,6 @@ end
 --		str,        --套装属性字符串
 --		actNum      --属性激活次数
 --	}
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:getSuitAttrbuteList(SuitID)
 	local list = {}
 	local suitNumList = equipSuitUtil:getSuitNumList(SuitID)
@@ -235,12 +231,9 @@ function EquipUtil:getSuitAttrbuteList(SuitID)
 	return list
 end
 
-
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --@Des 获取套装效果字符串,不受已穿戴的装备数量的影响
 --@params SuitID:套装id
 --@return (string)套装效果字符串
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:getEquipmentSuitEffectNormalStr(SuitID)
 
 	local str = ''
@@ -276,11 +269,9 @@ function EquipUtil:getQualitySpriteStr(Quality)
 	else return cstr.QUALITY_RED end
 end
 
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --@Des 获取装备最高强化等级
 --@params Quality:装备品质
 --@return (int)装备最高强化等级
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:getEquipmentPlusMAXLevel(Quality)
 	require('uiscripts/cangku/const/wnd_cangku_Const')
 	if Quality == 1 then
@@ -296,12 +287,11 @@ function EquipUtil:getEquipmentPlusMAXLevel(Quality)
 	else
 		return cint.QUALITY_6_MAXLEVEL end
 end
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
 --@Des 获取强化到下一等级所需要的能量点
 --@params currentLV:装备当前等级
 --		  Quality:装备品质
 --@return (int or Str)强化到下一等级所需要的能量点
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:getEquipmentPlusCost(currentLV,Quality)
 	if sdata_equippower_data == nil then
 		print("sdata_equippower_data")
@@ -321,11 +311,10 @@ function EquipUtil:getEquipmentFixCost(currentLV, Quality)
 	end
 	return math.ceil(sdata_equippower_data:GetFieldV('Quality'..Quality,currentLV) / 10)
 end
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
 --@Des 获取强化到下一等级提升数值
 --@params equip:装备Data
 --@return 强化到下一等级提升数值
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:getEquipmentLevelUpOffsetStr(equip)
 	local _PlanID = equip["MainAttribute"]
 	local _AttributeID = equip.fst_attr
@@ -341,25 +330,24 @@ function EquipUtil:getEquipmentLevelUpOffsetStr(equip)
 		return str
 	end
 end
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
 --@Des 获取套装id通过装备唯一id
 --@params id:装备唯一id
 --@return (int)装备SuitID
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:getEquipmentSuitIDByID(id)
-	for i = 1,#EquipModel.serv_Equipment do
-		if EquipModel.serv_Equipment[i].id == id then
-			return EquipModel.serv_Equipment[i]["SuitID"]
-		end
-	end
-	Debugger.LogWarning(id.." not found in EquipUtil:getEquipmentSuitIDByID(id)")
-	return nil
+	-- for i = 1,#EquipModel.serv_Equipment do
+	-- 	if EquipModel.serv_Equipment[i].id == id then
+	-- 		return EquipModel.serv_Equipment[i]["SuitID"]
+	-- 	end
+	-- end
+	-- Debugger.LogWarning(id.." not found in EquipUtil:getEquipmentSuitIDByID(id)")
+	-- return nil
+	return EquipModel.serv_Equipment[id]["SuitID"]
 end
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
 --@Des 通过装备唯一id查询装备是否已装备
 --@params id:装备唯一id
 --@return bool
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:whetherHasBeenEquipped(id)
 	for k,v in ipairs(EquipModel.serv_fitEquipmentList) do
 		if v == id then
@@ -368,11 +356,10 @@ function EquipUtil:whetherHasBeenEquipped(id)
 	end
 	return false
 end
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
 --@Des 检查是否存在重复装备
 --@params equip:混合数据
 --@return (bool)equipped,(int)index(重复装备在serv_fitEquipmentList表中的索引)
---■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function EquipUtil:whetherRepeatEquipped(equip)
 	for i = #EquipModel.serv_fitEquipmentList,1,-1 do
 		local _EquipType = EquipModel:getLocalEquipmentTypeByServID(EquipModel.serv_fitEquipmentList[i])

@@ -152,4 +152,22 @@ message BuyCard {
     required Currency currency      =2;
 }
 
+message BuyAvoidTime {
+    repeated Item item              =1;
+    required Currency currency      =2;
+    required Pvp pvp                =3;
+}
+
+message GetEquip {
+    repeated Equip equip            =1;
+}
+
+message GetCard {
+    repeated Card card              =1;
+}
+
+message SetCardGroup {
+    repeated int32 lst              =1;
+}
+
 

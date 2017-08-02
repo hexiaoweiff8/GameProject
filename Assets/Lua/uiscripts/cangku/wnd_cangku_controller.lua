@@ -1,33 +1,27 @@
 require('uiscripts/cangku/util/deepcopy')
 require('uiscripts/cangku/util/shallowcopy')
+require('uiscripts/cangku/util/table_count')
 require('uiscripts/cangku/const/wnd_cangku_Const')
-wnd_cangku_controller = {
-
-	view,
-	model,
-	scrollViewController,
-
-	-- variable
-	_DecompositionPanelState = nil,--记录装备分解面板checkbox勾选状态
-	_selectedYekaButton,--记录已选择的页卡按钮
-	_currentPanel_right,--记录当前显示在右边的panel
-
-	-- function
-	initTabButton,--初始化页卡按钮
-	initListener,--添加按钮事件
-
-	SelectYekaButton,--切换页卡功能
-
-	show,--显示，隐藏panel
-	hide,
-	showPanelByItemData,--通过Item数据决定显示何面板
-	showEquipmentDetailsPanel,--显示装备详细面板
-
-	processServData, -- 处理服务器数据
-	sortServData, -- 对服务器数据列表排序
-	mergeServData, -- 合并 装备/道具数据
-	updateServData, -- 更新model服务器数据
-}
+--[[
+	wnd_cangku_controller:
+		variable:
+			view
+			model
+			scrollViewController
+			_DecompositionPanelState 记录装备分解面板checkbox勾选状态
+			_selectedYekaButton 记录已选择的页卡按钮
+			_currentPanel_right 记录当前显示在右边的panel
+		function:
+			OnShowDone() extend wnd_base:OnShowDone()
+			show() 显示panel
+			hide() 隐藏panel
+			showPanelByItemData() 通过Item数据决定显示何面板
+			showEquipmentDetailsPanel() 显示装备详细面板
+			processServData() 处理服务器数据
+			sortProcessedData() 对混合数据列表排序
+			mergeServData() 合并 装备/道具数据
+			updateServData() 更新model服务器数据
+]]
 local class = require("common/middleclass")
 wnd_cangku_controller = class("wnd_cangku_controller",wnd_base)
 
@@ -158,7 +152,7 @@ function wnd_cangku_controller:initListener()
 	local OnPerfectClick = function()
 
 		if #this.scrollViewController._selectedItems == 0 then
-			UIToast.Show("还没有选中任何要分解的装备",nil,UIToast.ShowType.Upwards)
+			UIToast.Show("还没有选中任何要分解的装备")
 			return
 		end
 		
@@ -199,7 +193,7 @@ function wnd_cangku_controller:initListener()
 	UIEventListener.Get(this.view.Panel_Detail_decomposition.Button_decomposition_normal).onClick = function()
 
 		if #this.scrollViewController._selectedItems == 0 then
-			UIToast.Show("还没有选中任何要分解的装备",nil,UIToast.ShowType.Upwards)
+			UIToast.Show("还没有选中任何要分解的装备")
 			return
 		end
 		
@@ -374,7 +368,7 @@ function wnd_cangku_controller:showPanelByItemData(ItemData)
 		end
 	
 		UIEventListener.Get(this.view.Panel_Detail_item.Button_path).onClick = function()
-				-- TODO: 碎片详细面板:添加途径/合成按钮的实现
+				-- DONE: 碎片详细面板:添加途径/合成按钮的实现
 				if ItemData.num >= ItemData["ComposeNum"] then
 					local on_10024_rec = function(body)
 						local gw2c = gw2c_pb.ComposeEquip()
@@ -383,7 +377,7 @@ function wnd_cangku_controller:showPanelByItemData(ItemData)
 					    local items = gw2c.item
 					    for k,v in ipairs(items) do
 					    	this:updateServData(nil,v)
-					    	UIToast.Show("碎片剩余："..v.num,nil,UIToast.ShowType.Upwards)
+					    	UIToast.Show("碎片剩余："..v.num)
 					    end
 					    this:insertServData(equip)
 					    Event.RemoveListener("10024",on_10024_rec)	
@@ -612,7 +606,7 @@ function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 				if _repeat then
 					this:unloadEquipmentByID(this.model.serv_fitEquipmentList[_repeatIndex])
 					table.remove(this.model.serv_fitEquipmentList,_repeatIndex)
-					UIToast.Show("存在相同部位装备,将卸下之前装备",nil,UIToast.ShowType.Upwards)
+					UIToast.Show("存在相同部位装备,将卸下之前装备")
 				end
 				table.insert(this.model.serv_fitEquipmentList,equip.id)
 			end
@@ -654,7 +648,7 @@ function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 
 				local equipDetail_data = equipDetail:get_Data()
 				if currencyModel:getCurrentTbl().power < equipDetail_data.EquipPlusCost then
-					UIToast.Show("能量点不足",nil,UIToast.ShowType.Upwards)
+					UIToast.Show("能量点不足")
 					return
 				end
 				local on_10004_rec = function(body)
@@ -669,7 +663,7 @@ function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 					this:updateServData(gw2c.equip,nil)
 					cangkuItem:setEquipmentLevel(gw2c.equip.lv)
 					this:showEquipmentDetailsPanel(equip,cangkuItem)
-					UIToast.Show("已强化到+"..serv_equip.lv,nil,UIToast.ShowType.Upwards)
+					UIToast.Show("已强化到+"..serv_equip.lv)
 				end
 				Message_Manager:SendPB_10004(equip.id,on_10004_rec)
 			else
@@ -677,7 +671,7 @@ function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 					-- TODO:装备重铸
 
 				else
-					UIToast.Show("该装备无法重铸",nil,UIToast.ShowType.Upwards)
+					UIToast.Show("该装备无法重铸")
 				end
 			end
 		end
@@ -717,7 +711,12 @@ function wnd_cangku_controller:processServData(user_item)
 					-- print("物品数量："..v.num.."  堆叠限制：".._OverlapLimit)
 					item.id = v.id
 					item.num = v.num
-					table.insert(this.model.serv_Items,item)
+					-- NOTE: 2017-07-28更改Items数据存储格式
+					--[[
+						由原来的table.insert改为根据ItemID字段存储以提升增删改性能
+					]]
+					-- table.insert(this.model.serv_Items,item)
+					this.model.serv_Items[item['ItemID']] = item
 				else 
 					-- print("物品数量超出限制："..v.num.."  堆叠限制：".._OverlapLimit)
 					for i = 1,math.ceil(v.num / _OverlapLimit) do
@@ -725,12 +724,16 @@ function wnd_cangku_controller:processServData(user_item)
 						if i ~= math.ceil(v.num / _OverlapLimit) then
 							item = table.deepcopy(item)
 							item.num = _OverlapLimit
-							table.insert(this.model.serv_Items,item)
+							-- NOTE: 2017-07-28更改Items数据存储格式
+							-- table.insert(this.model.serv_Items,item)
+							this.model.serv_Items[item['ItemID']] = item
 						else
 							item = table.deepcopy(item)
 							-- TODO: 未详细测试计算结果，数量可能与预期不同
 							item.num = v.num - _OverlapLimit * (math.ceil(v.num / _OverlapLimit) - 1)
-							table.insert(this.model.serv_Items,item)
+							-- NOTE: 2017-07-28更改Items数据存储格式
+							-- table.insert(this.model.serv_Items,item)
+							this.model.serv_Items[item['ItemID']] = item
 						end
 					end
 				end
@@ -738,31 +741,31 @@ function wnd_cangku_controller:processServData(user_item)
 		end
 		item = {}
     end
-    print("Items："..#this.model.serv_Items)
+    print("ItemsCount："..table.count(this.model.serv_Items))
 end
-
-function wnd_cangku_controller:sortServData()
+--@Des 对混合数据进行排序
+function wnd_cangku_controller:sortProcessedData()
 	--非装备道具：合成 => 功能类型<UseType>  => 品质<Quality> => ID => 专有ID（仅对不可叠加的物品有效）
-	table.sort(this.model.serv_Items,
-		function(a,b)
-			if a["ItemID"] ~= nil and b["ItemID"] ~= nil then
-				if a.num >= a["ComposeNum"] and b.num < b["ComposeNum"] then -- 可以合成的在前
-					return true
-				elseif a.num < a["ComposeNum"] and b.num >= b["ComposeNum"] then
-					return false
-				elseif a["UseType"] ~= b["UseType"] then
-					return a["UseType"] < b["UseType"] -- UseType小的在前
-				elseif a["Quality"] ~= b["Quality"] then
-					return a["Quality"] > b["Quality"] -- Quality大的在前
-				elseif a["ItemID"] ~= b["ItemID"] then
-					return a["ItemID"] < b["ItemID"] -- ItemID小的在前
-				else
-					return a.num > b.num -- 另外一种情况，物品堆叠数量超出时，数量多的在前
-				end 
-			end
-			return false
-		end)
-	print("serv_Items排序完成..")
+	-- table.sort(this.model.serv_Items,
+	-- 	function(a,b)
+	-- 		if a["ItemID"] ~= nil and b["ItemID"] ~= nil then
+	-- 			if a.num >= a["ComposeNum"] and b.num < b["ComposeNum"] then -- 可以合成的在前
+	-- 				return true
+	-- 			elseif a.num < a["ComposeNum"] and b.num >= b["ComposeNum"] then
+	-- 				return false
+	-- 			elseif a["UseType"] ~= b["UseType"] then
+	-- 				return a["UseType"] < b["UseType"] -- UseType小的在前
+	-- 			elseif a["Quality"] ~= b["Quality"] then
+	-- 				return a["Quality"] > b["Quality"] -- Quality大的在前
+	-- 			elseif a["ItemID"] ~= b["ItemID"] then
+	-- 				return a["ItemID"] < b["ItemID"] -- ItemID小的在前
+	-- 			else
+	-- 				return a.num > b.num -- 另外一种情况，物品堆叠数量超出时，数量多的在前
+	-- 			end 
+	-- 		end
+	-- 		return false
+	-- 	end)
+	-- print("serv_Items排序完成..")
 	-- table.sort(this.model.serv_Equipment,
 	-- 	function(a,b)
 	-- 		if a.isBad ~= b.isBad then
@@ -775,51 +778,97 @@ function wnd_cangku_controller:sortServData()
 	-- 			return a.id < b.id -- id小的在前
 	-- 		end
 	-- 	end)
-	EquipUtil:sortEquipment(this.model.serv_Equipment)
-	print("serv_Equipment排序完成..")
+	-- EquipUtil:sortEquipment(this.model.serv_Equipment)
+	-- print("serv_Equipment排序完成..")
+	table.sort(this.model.Processed_Items,function(a,b)
+		-- a和b都是装备的情况
+		if a.eid ~= nil and b.eid ~= nil then
+			if a.isBad ~= b.isBad then
+				return (a.isBad == 1 and {true} or {false})[1] -- 损坏度,坏的在前
+			elseif a.lv ~= b.lv then
+				return a.lv > b.lv -- lv大的在前
+			elseif a.rarity ~= b.rarity then
+				return a.rarity > b.rarity -- 装备品质高的在前
+			else
+				return a.id < b.id -- id小的在前
+			end
+		-- a和b都是道具的情况
+		elseif a["ItemID"] ~= nil and b["ItemID"] ~= nil then
+			if a.num >= a["ComposeNum"] and b.num < b["ComposeNum"] then -- 可以合成的在前
+				return true
+			elseif a.num < a["ComposeNum"] and b.num >= b["ComposeNum"] then
+				return false
+			elseif a["UseType"] ~= b["UseType"] then
+				return a["UseType"] < b["UseType"] -- UseType小的在前
+			elseif a["Quality"] ~= b["Quality"] then
+				return a["Quality"] > b["Quality"] -- Quality大的在前
+			elseif a["ItemID"] ~= b["ItemID"] then
+				return a["ItemID"] < b["ItemID"] -- ItemID小的在前
+			else
+				return a.num > b.num -- 另外一种情况，物品堆叠数量超出时，数量多的在前
+			end
+		-- a是装备b是道具的情况
+		elseif a.eid ~= nil and b["ItemID"] ~= nil then
+			return true
+		-- a是道具b是装备的情况
+		elseif a["ItemID"] ~= nil and b.eid ~= nil then
+			return false
+		else
+			error("FIXME!")
+		end
+	end)
 end
-
+--@Des 合并装备,道具数据
 function wnd_cangku_controller:mergeServData()
 	-- 先插入装备，后插入道具
-	for i = 1,#this.model.serv_Equipment do
-		table.insert(this.model.Processed_Items,this.model.serv_Equipment[i])
+	-- for i = 1,#this.model.serv_Equipment do
+	-- 	table.insert(this.model.Processed_Items,this.model.serv_Equipment[i])
+	-- end
+	-- for i = 1,#this.model.serv_Items do
+	-- 	table.insert(this.model.Processed_Items,this.model.serv_Items[i])
+	-- end
+	-- NOTE: 2017-07-28更改Items数据存储格式
+	for _,v in pairs(this.model.serv_Equipment) do
+		table.insert(this.model.Processed_Items,v)
 	end
-	for i = 1,#this.model.serv_Items do
-		table.insert(this.model.Processed_Items,this.model.serv_Items[i])
+	for _,v in pairs(this.model.serv_Items) do
+		table.insert(this.model.Processed_Items,v)
 	end
+	print("Processed_Items : "..#this.model.Processed_Items)
 end
 --@params user_currency:服务器货币信息,user_equip:服务器装备数据
 function wnd_cangku_controller:updateServData(user_equip,user_items)
 	if user_equip then
 		-- 根据装备唯一id查找本地待更新数据
-		for i = 1,#this.model.serv_Equipment do
-			if this.model.serv_Equipment[i].id == user_equip.id then
-				local equip = this.model.serv_Equipment[i]
-				equip.eid = user_equip.eid
-				equip.lv = user_equip.lv
-				equip.rarity = user_equip.rarity
-				equip.fst_attr = user_equip.fst_attr
-				equip.sndAttr = { remake = {} }
-				equip.isLock = user_equip.isLock
-				equip.isBad = user_equip.isBad
-				for k, v in ipairs(user_equip.sndAttr) do
-		           	table.insert(equip.sndAttr,
-		           	{
-		           		id = v.id,
-						val = v.val,
-						isRemake = v.isRemake,
-			        })
-		            for kk, vv in ipairs(v.remake) do
-		                table.insert(equip.sndAttr.remake,
-		                {
-							id = vv.id,
-							val = vv.val,
-		                })
-		            end
-		        end
-		        return
-			end
-		end
+		-- for i = 1,#this.model.serv_Equipment do
+		-- 	if this.model.serv_Equipment[i].id == user_equip.id then
+				
+		-- 	end
+		-- end
+		local equip = this.model.serv_Equipment[user_equip.id]
+			equip.eid = user_equip.eid
+			equip.lv = user_equip.lv
+			equip.rarity = user_equip.rarity
+			equip.fst_attr = user_equip.fst_attr
+			equip.sndAttr = { remake = {} }
+			equip.isLock = user_equip.isLock
+			equip.isBad = user_equip.isBad
+			for k, v in ipairs(user_equip.sndAttr) do
+	           	table.insert(equip.sndAttr,
+	           	{
+	           		id = v.id,
+					val = v.val,
+					isRemake = v.isRemake,
+		        })
+	            for kk, vv in ipairs(v.remake) do
+	                table.insert(equip.sndAttr.remake,
+	                {
+						id = vv.id,
+						val = vv.val,
+	                })
+	            end
+	        end
+	        return
 	end
 	if user_items then
 		if user_items.num == 0 then
@@ -829,7 +878,7 @@ function wnd_cangku_controller:updateServData(user_equip,user_items)
 		end
 	end
 end
-
+--@Des 向model中添加装备数据
 function wnd_cangku_controller:insertServData(user_equip)
 	if user_equip then
 		local equip = this.model:getLocalEquipmentDetailByEquipID(user_equip.eid)
@@ -856,12 +905,18 @@ function wnd_cangku_controller:insertServData(user_equip)
                 })
             end
         end
-        table.insert(this.model.serv_Equipment,equip) 
-        this.scrollViewController:sortEquipment(this.model.serv_Equipment)
+        -- table.insert(this.model.serv_Equipment,equip)
+        this.model.serv_Equipment[equip.id] = equip
+        if this.scrollViewController.serv_Equipment_array ~= nil then
+        	table.insert(this.scrollViewController.serv_Equipment_array,this.model.serv_Equipment[equip.id])
+        end
+        -- this.scrollViewController:sortEquipment(this.model.serv_Equipment)
 	end
 	
 	this.model.Processed_Items = {}
 	this:mergeServData()
+	this.scrollViewController.currentItems = this.model.Processed_Items
+	this.scrollViewController:refreshList()
 end
 ----------------------------------------------------------------
 --★Util
@@ -961,28 +1016,31 @@ function wnd_cangku_controller:LoadDecompositionPanelState()
 end
 --@Des 更新Model中指定itemID的物品数据
 function wnd_cangku_controller:updateItemData(itemID,num)
-	for k,v in ipairs(this.model.serv_Items) do
-		if v.id == itemID then
-			v.num = num
-			break
-		end
-	end
+	-- for k,v in ipairs(this.model.serv_Items) do
+	-- 	if v.id == itemID then
+	-- 		v.num = num
+	-- 		break
+	-- 	end
+	-- end
+	this.model.serv_Items[itemID].num = num
 	this.scrollViewController:refreshList()
 end
 --@Des 从Model删除指定itemID的物品
 function wnd_cangku_controller:removeItemByItemID(itemID)
-	for k,v in ipairs(this.model.serv_Items) do
-		if v.id == itemID then
-			table.remove(this.model.serv_Items,k)
-			break
-		end
-	end
 	for k,v in ipairs(this.model.Processed_Items) do
 		if v.id == itemID then
 			table.remove(this.model.Processed_Items,k)
 			break
 		end 
 	end
+	-- for k,v in ipairs(this.model.serv_Items) do
+	-- 	if v.id == itemID then
+	-- 		table.remove(this.model.serv_Items,k)
+	-- 		break
+	-- 	end
+	-- end
+	this.model.serv_Items[itemID] = nil
+
 	local _UseType = this.model:getUseTypeByItemID(itemID)
 	if _UseType == 1 or _UseType == 2 then
 		this.scrollViewController.Items_filterByUseType_1_2 = nil
@@ -1033,11 +1091,12 @@ function wnd_cangku_controller:unloadEquipmentByID(id)
 	-- 刷新列表显示
 	this.scrollViewController:refreshList()
 end
---@Des 卸下指定id的装备
+--@Des 删除指定id的装备
 --@params equipList:装备唯一id列表
 function wnd_cangku_controller:removeEquipmentByIDList(equipList)
 	for i = 1,#equipList do
-		table.remove(this.model.serv_Equipment,this.model:getIndexByID(equipList[i]))
+		-- table.remove(this.model.serv_Equipment,this.model:getIndexByID(equipList[i]))
+		this.model.serv_Equipment[equipList[i]] = nil
 	end
 	this.model.Processed_Items = {}
 	this:mergeServData()

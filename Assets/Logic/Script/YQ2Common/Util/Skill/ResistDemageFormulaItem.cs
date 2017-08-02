@@ -79,18 +79,18 @@ public class ResistDemageFormulaItem : AbstractFormulaItem
         var mySkill = paramsPacker.Skill;
         var myTrigger = paramsPacker.TriggerData;
 
-        result = new Formula((callback) =>
+        result = new Formula((callback, scope) =>
         {
 
         },
         myFormulaType);
 
         Debug.Log("构造伤害吸收行为");
-        if (mySkill.SkillDataScope.GetFloat("ResistDemage") == null)
+        if (mySkill.DataScope.GetFloat("ResistDemage") == null)
         {
             // 缓存数据
-            mySkill.SkillDataScope.SetFloat("ResistDemage", myResistDemage);
-            mySkill.SkillDataScope.SetFloat("AllResistDemage", myResistDemage);
+            mySkill.DataScope.SetFloat("ResistDemage", myResistDemage);
+            mySkill.DataScope.SetFloat("AllResistDemage", myResistDemage);
         }
         Debug.Log("当前生命值变动量:" + myTrigger.HealthChangeValue);
 
@@ -99,7 +99,7 @@ public class ResistDemageFormulaItem : AbstractFormulaItem
         {
             return result;
         }
-        var nowCouldResistDemage = mySkill.SkillDataScope.GetFloat("ResistDemage");
+        var nowCouldResistDemage = mySkill.DataScope.GetFloat("ResistDemage");
         // 伤害吸收结束
         if (nowCouldResistDemage <= 0)
         {
@@ -120,7 +120,7 @@ public class ResistDemageFormulaItem : AbstractFormulaItem
                     myTrigger.HealthChangeValue -= nowCouldResistDemage.Value;
                 }
                 // 清空伤害吸收
-                mySkill.SkillDataScope.SetFloat("ResistDemage", 0);
+                mySkill.DataScope.SetFloat("ResistDemage", 0);
             }
             else
             {
@@ -130,7 +130,7 @@ public class ResistDemageFormulaItem : AbstractFormulaItem
 
                 Debug.Log("剩余伤害:" + myTrigger.HealthChangeValue);
                 // 设置剩余伤害量
-                mySkill.SkillDataScope.SetFloat("ResistDemage", nowCouldResistDemage.Value);
+                mySkill.DataScope.SetFloat("ResistDemage", nowCouldResistDemage.Value);
             }
 
             // 判断是否到达伤害吸收上限
@@ -144,7 +144,7 @@ public class ResistDemageFormulaItem : AbstractFormulaItem
                     var subSkill = new SkillInfo(packer.SkillNum);
                     subSkill.DataList = packer.DataList;
                     subSkill.AddActionFormulaItem(SubFormulaItem);
-                    SkillManager.Single.DoShillInfo(subSkill, packer, true);
+                    SkillManager.Single.DoSkillInfo(subSkill, packer, true);
                 }
             }
             // 伤害被吸收

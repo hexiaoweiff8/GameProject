@@ -11,6 +11,9 @@ public class NetworkManagerWrap
 		L.RegFunction("OnSocketData", OnSocketData);
 		L.RegFunction("SendConnect", SendConnect);
 		L.RegFunction("SendMessage", SendMessage);
+		L.RegFunction("getYsocket", getYsocket);
+		L.RegFunction("SendMessageByUDP", SendMessageByUDP);
+		L.RegFunction("ConnectUDP", ConnectUDP);
 		L.RegFunction("AddEvent", AddEvent);
 		L.RegFunction("OnInit", OnInit);
 		L.RegFunction("OnUnLoad", OnUnLoad);
@@ -120,6 +123,57 @@ public class NetworkManagerWrap
 			{
 				return LuaDLL.luaL_throw(L, "invalid arguments to method: NetworkManager.SendMessage");
 			}
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int getYsocket(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			NetworkManager obj = (NetworkManager)ToLua.CheckObject(L, 1, typeof(NetworkManager));
+			System.Net.Sockets.Socket o = obj.getYsocket();
+			ToLua.PushObject(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int SendMessageByUDP(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			NetworkManager obj = (NetworkManager)ToLua.CheckObject(L, 1, typeof(NetworkManager));
+			byte[] arg0 = ToLua.CheckByteBuffer(L, 2);
+			obj.SendMessageByUDP(arg0);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int ConnectUDP(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			NetworkManager obj = (NetworkManager)ToLua.CheckObject(L, 1, typeof(NetworkManager));
+			bool o = obj.ConnectUDP();
+			LuaDLL.lua_pushboolean(L, o);
+			return 1;
 		}
 		catch(Exception e)
 		{

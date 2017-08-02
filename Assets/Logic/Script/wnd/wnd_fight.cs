@@ -14,69 +14,9 @@ class wnd_fight : wnd_base
         WndManage.Single.RegWnd(ResName, "ui_fight",15, WndFadeMode.Alpha, WndAnimationMode.situ);
         Single = this; 
     }
-
-    void StopMPTweens()
-    {
-        if (LeftHeroPanel != null) LeftHeroPanel.StopMPTweens();
-        if (RightHeroPanel != null) RightHeroPanel.StopMPTweens();
-    }
-
-    public void OnFightAIEnd()
-    {
-         StopMPTweens();
-        m_IsFightAIEnd = true;
-    }
-
-    /// <summary>
-    /// 播放显示界面动画
-    /// </summary>
-    public void PlayShowAnimation()
-    {
-        GameObject  radar_widget = m_instance.FindWidget("radar_widget");
-        var wndRoot = radar_widget.transform.parent.gameObject;
-        wndRoot.SetActive(true);//激活界面
-
-        //播放动画
-        var animator = wndRoot.GetComponent<Animator>();
-        animator.enabled = true;
-        animator.PlayInFixedTime("show", 0, 0);
-    }
-
-    /// <summary>
-    /// 显示战斗倒计时
-    /// </summary>
-    /// <param name="durationTime">剩余时间 秒</param>
-    public void ShowFightCountDown(float durationTime,bool isRed)
-    {
-        PauseWidget.SetActive(true);//激活倒计时面板
-
-        var timeT = GameObjectExtension.FindChild(PauseWidget.transform,"time_bg/txt");
-        var label = timeT.GetComponent<UILabel>();
-        label.color = isRed ? Color.red : Color.white;
-
-        RemoveCountDownTweener();
-        //用补间来显示时间
-        CountDownTweener = DOTween.To(
-            () => durationTime,
-            (v) =>
-            {
-                durationTime = v;
-                int fen = (int)((int)durationTime / 60);
-                int miao = (int)((int)durationTime % 60);
-
-                string showtxt  = string.Format("{0}:{1}", fen, miao);
-                label.text = showtxt;
-            },
-            0,
-            durationTime
-            ).SetAutoKill().SetEase(Ease.Linear);
-    }
-
     protected override void OnLostInstance()
     {
         EagleEyeMap = null;
-        LeftHeroPanel = null;
-        RightHeroPanel = null;
         m_IsInitd = false;
         HeroSelectframe = null;
         //解除事件绑定
@@ -146,12 +86,6 @@ class wnd_fight : wnd_base
 
         var rotationTransform = ptzCamera.GetComponent<RotationTransform>();
         rotationTransform.OnValueChanged += OnCameraRotation;
-
-        if (LeftHeroPanel != null) LeftHeroPanel.Dispose();
-        if (RightHeroPanel != null) RightHeroPanel.Dispose();
-        LeftHeroPanel = new exui_LeftHeroPanel();//初始化进攻方英雄面板
-        RightHeroPanel = new exui_RightHeroPanel();//初始化防御方英雄面板
-         
 
         // 绑定雷达点击事件
         GameObject radarView = m_instance.FindWidget("radar_widget/content/radar_mid/radar_view");
@@ -419,8 +353,6 @@ class wnd_fight : wnd_base
     {
         m_IsInitd = false; 
         if ( EagleEyeMap != null) EagleEyeMap.Clear();
-        if(LeftHeroPanel!=null) LeftHeroPanel.Reset();
-        if (RightHeroPanel != null) RightHeroPanel.Reset();
         RemoveCountDownTweener();
         m_IsFightAIEnd = false;
         m_KillCount = 0;
@@ -439,8 +371,6 @@ class wnd_fight : wnd_base
 
     UIWidget RadarHeroHead;
     GameObject PauseWidget;//倒计时显示隐藏控制
-    public exui_LeftHeroPanel LeftHeroPanel = null;
-    public exui_RightHeroPanel RightHeroPanel = null;
     public UIEagleEyeMap EagleEyeMap;
     public static wnd_fight Single = null;
     Tweener CountDownTweener;//倒计时tweener

@@ -127,6 +127,21 @@ public class VOBase
     [SkillAddition]
     public bool IsHide;
     /// <summary>
+    /// 是否为机械单位
+    /// </summary>
+    [SkillAddition]
+    public bool IsMechanic;
+    /// <summary>
+    /// 是否近战
+    /// </summary>
+    [SkillAddition]
+    public bool IsMelee;
+    /// <summary>
+    /// 是否为召唤生物
+    /// </summary>
+    [SkillAddition]
+    public bool IsSummon;
+    /// <summary>
     /// 是否反隐形
     /// </summary>
     [SkillAddition]

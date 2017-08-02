@@ -51,10 +51,17 @@ public class DP_FightPrefabManage
         //scene_mainPacket.Load("spotlight") as GameObject
         Object3D_Prefabs["spotlight"] = PacketManage.Single.GetPacket("spotlight").Load("spotlight") as GameObject;
     }
-
+    /// <summary>
+    /// 创建模型 沿用重构以前的名字 为了兼容lua里现成的调用
+    /// </summary>
+    /// <param name="param"></param>
+    /// <returns></returns>
     public static GameObject InstantiateAvatar(CreateActorParam param)
     {
-        GameObject obj = GameObjectExtension.InstantiateFromPacket("xuebaotujidui", "Xuebaotujidui@Model", null);
+        
+        var config = SData_armybase_c.Single.GetDataOfID(param.SoldierID);
+        var modelname = config.Prefab + "@model";
+        GameObject obj = GameObjectExtension.InstantiateFromPacket(config.Pack, modelname, null);
         var render = obj.AddComponent<MFAModelRender>();
         render.MeshPackName = param.MeshPackName;//包名
         render.TexturePackName = param.TexturePackName;

@@ -58,6 +58,9 @@ function fight_view:init(arg)
     --HUDText
     self.hudtext = view.transform:Find("HUDText"):GetComponent(typeof(HUDText))
 
+    ---跳转按钮
+    self.jumpToMyMain = view.transform:Find("btn_main").gameObject
+    self.jumpToFirst = view.transform:Find("btn_first").gameObject
 
 end
 

@@ -29,6 +29,9 @@ public static class FormulaConstructor
         {"Buff", typeof(BuffFormulaItem)},
         {"HealthChange", typeof(HealthChangeFormulaItem)},
         {"ResistDemage", typeof(ResistDemageFormulaItem)},
+        {"Remain", typeof(RemainFormulaItem)},
+        {"TargetPointSelector", typeof(TargetPointSelectorFormulaItem)},
+        
     };
 
 
@@ -467,6 +470,223 @@ public static class FormulaConstructor
     ]
     */
 
+
+    /// <summary>
+    /// 解析Remain
+    /// </summary>
+    /// <param name="info">字符串数据源</param>
+    /// <returns>Remain类</returns>
+    public static RemainInfo RemainConstructor(string info)
+    {
+        RemainInfo result = null;
+
+        if (info != null)
+        {
+            // 技能ID
+            var remainId = 0;
+            // 数据括号
+            var dataBraket = false;
+            // 当前行为栈层级
+            var stackLevel = 0;
+            // 创建临时堆栈, 存储不同层级的行为链
+            var stack = new Stack<IFormulaItem>();
+            // Remain触发时行为
+            IFormulaItem actionFormulaItem = new PauseFormulaItem();
+            // Remain创建行为
+            IFormulaItem attachFormulaItem = new PauseFormulaItem();
+            // Remain销毁行为
+            IFormulaItem detachFormulaItem = new PauseFormulaItem();
+            IFormulaItem tmpItem = null;
+
+            var isAction = false;
+            var isAttach = false;
+            var isDetach = false;
+
+            // 解析字符串
+            // 根据对应行为列表创建Formula
+            var infoLines = info.Split('\n');
+            for (var i = 0; i < infoLines.Length; i++)
+            {
+                var line = infoLines[i];
+                // 消除空格
+                line = line.Trim();
+                // 跳过空行
+                if (string.IsNullOrEmpty(line))
+                {
+                    continue;
+                }
+                // 跳过注释行
+                if (line.StartsWith("//"))
+                {
+                    continue;
+                }
+
+                // 如果是技能描述开始
+                if (line.StartsWith("RemainNum"))
+                {
+                    // 读取技能号
+                    var pos = GetSmallBraketPos(line);
+                    var start = pos[0];
+                    var end = pos[1];
+
+                    // 读取技能ID
+                    var strSkillId = line.Substring(start + 1, end - start - 1);
+                    remainId = Convert.ToInt32(strSkillId);
+                    // 创建新技能
+                    result = new RemainInfo(remainId);
+                }
+                else if (line.Equals("Action"))
+                {
+                    // Remain触发时行为
+                    //tmpItem = actionFormulaItem;
+                    isAction = true;
+                    isAttach = false;
+                    isDetach = false;
+                }
+                else if (line.Equals("Enter"))
+                {
+                    // Remain 创建时行为
+                    //tmpItem = attachFormulaItem;
+
+                    isAction = false;
+                    isAttach = true;
+                    isDetach = false;
+                }
+                else if (line.Equals("Out"))
+                {
+                    // Remain 销毁时行为
+                    //tmpItem = detachFormulaItem;
+
+                    isAction = false;
+                    isAttach = false;
+                    isDetach = true;
+                }
+                else if (line.StartsWith("{"))
+                {
+                    // 开始括号内容
+                    stackLevel++;
+
+                    // 将上级FormulaItem push进堆栈
+                    stack.Push(tmpItem);
+                    // 如果是第一级的则根据不同行为分派不同formulaItem
+                    if (stackLevel == 1)
+                    {
+                        if (isAttach)
+                        {
+                            tmpItem = attachFormulaItem;
+                            result.HasAttachFormula = true;
+                        }
+                        else if (isAction)
+                        {
+                            tmpItem = actionFormulaItem;
+                            result.HasActionFormula = true;
+                        }
+                        else if (isDetach)
+                        {
+                            tmpItem = detachFormulaItem;
+                            result.HasDetachFormula = true;
+                        }
+                    }
+                    else
+                    {
+                        tmpItem = null;
+                    }
+                }
+                else if (line.StartsWith("}"))
+                {
+                    // 关闭括号内容
+                    stackLevel--;
+                    // 将上级FormulaItem pop出来
+                    var prvLevelItem = stack.Pop();
+                    if (prvLevelItem != null && tmpItem != null)
+                    {
+                        prvLevelItem.AddSubFormulaItem(tmpItem.GetFirst());
+                        tmpItem = prvLevelItem;
+                    }
+                    else
+                    {
+                        tmpItem = null;
+                    }
+                }
+                else if (line.StartsWith("["))
+                {
+                    // 数据开始
+                    dataBraket = true;
+                }
+                else if (line.StartsWith("]"))
+                {
+                    // 数据结束
+                    dataBraket = true;
+                }
+                else if (stackLevel > 0)
+                {
+                    // 解析行为脚本
+                    tmpItem = TransBehavior(line, tmpItem);
+                }
+                else if (dataBraket)
+                {
+                    // 解析数据脚本
+                    TransData(result, line);
+                }
+            }
+
+            if (result == null)
+            {
+                throw new Exception("技能没有编号!");
+            }
+            // remain触发(时间)行为
+            actionFormulaItem = actionFormulaItem.GetFirst();
+            result.AddActionFormulaItem(actionFormulaItem);
+            // remain进入范围行为
+            attachFormulaItem = attachFormulaItem.GetFirst();
+            result.AddAttachFormulaItem(attachFormulaItem);
+            // remain出范围行为
+            detachFormulaItem = detachFormulaItem.GetFirst();
+            result.AddDetachFormulaItem(detachFormulaItem);
+        }
+
+        return result;
+    }
+    // remain结构例子
+    /*
+    RemainNum(10000)
+    // remain时间行为
+    Action
+    {
+       PointToPoint(1,key,0,1,10,1,1),     // 需要等待其结束, 特效key(对应key,或特效path), 释放位置, 命中位置, 速度10, 飞行轨迹类型
+       Point(0,key,1,0,3),                // 不需要等待其结束, 特效key(对应key,或特效path), 释放位置, 播放速度, 持续3秒
+       CollisionDetection(1, 1, 10, 0, 10001)
+       {
+           Calculate(1,0,%0)
+       }
+    }
+    // 进入remain时行为
+    Enter
+    {
+        XXXXXXXXXXXXXXXX
+    }
+    // 出remain时行为
+    Out 
+    {
+        XXXXXXXXXXXXXXXXXXX
+    }
+    [
+        Range       // 作用范围
+        DuringTime  // 作用总时间
+        ActionTime  // Action时间间隔
+        IsFollow    // 是否跟随释放者
+        ActionCamp  // 作用阵营
+        CouldActionOnAir        // 是否可以作用到空中单位
+        CouldActionOnSurface    // 是否可以作用到地面单位
+        CouldActionOnBuilding   // 是否可以作用到建筑单位
+        // 数据
+        1, 100,,,,,
+        2, 200
+      
+    ]
+    */
+
+
     /// <summary>
     /// 获取行为链
     /// </summary>
@@ -817,6 +1037,94 @@ public static class FormulaConstructor
             var dataArray = line.Split(',');
             var dataList = dataArray.ToList();
             buffInfo.DataList.Add(dataList);
+        }
+        else
+        {
+            ValidSmallBraketIndex(start, end, line);
+        }
+    }
+
+
+    /// <summary>
+    /// 解析Remain数据
+    /// </summary>
+    /// <param name="remainInfo">Remain类</param>
+    /// <param name="line">数据行</param>
+    private static void TransData(RemainInfo remainInfo, string line)
+    {
+
+        // 解析数据
+        if (remainInfo == null)
+        {
+            throw new Exception("remainID未指定.remain类为空");
+        }
+
+        var pos = GetSmallBraketPos(line, false);
+        var start = pos[0];
+        var end = pos[1];
+        // 编号长度
+        var length = end - start - 1;
+        if (end > 0 && start > 0)
+        {
+            var symbol = line.Substring(0, start).Trim();
+            switch (symbol)
+            {
+                // 总持续时间
+                case "DuringTime":
+                {
+                    remainInfo.DuringTime = Convert.ToSingle(line.Substring(start + 1, length).Trim());
+                }
+                    break;
+                // 作用时间间隔
+                case "ActionTime":
+                {
+                    remainInfo.ActionTime = Convert.ToSingle(line.Substring(start + 1, length).Trim());
+                }
+                    break;
+                // 作用范围
+                case "Range":
+                {
+                    remainInfo.Range = Convert.ToInt32(line.Substring(start + 1, length).Trim());
+                }
+                    break;
+                // 是否跟随
+                case "IsFollow":
+                {
+                    remainInfo.IsFollow = Convert.ToBoolean(line.Substring(start + 1, length).Trim());
+                }
+                    break;
+                // 作用阵营
+                case "ActionCamp":
+                {
+                    remainInfo.ActionCamp = Convert.ToInt32(line.Substring(start + 1, length).Trim());
+                }
+                    break;
+                // 是否可以作用到空中单位
+                case "CouldActionOnAir":
+                {
+                    remainInfo.CouldActionOnAir = Convert.ToBoolean(line.Substring(start + 1, length).Trim());
+                }
+                    break;
+                // 是否可以作用到地面单位
+                case "CouldActionOnSurface":
+                {
+                    remainInfo.CouldActionOnSurface = Convert.ToBoolean(line.Substring(start + 1, length).Trim());
+                }
+                    break;
+                // 是否可以作用到建筑
+                case "CouldActionOnBuilding":
+                {
+                    remainInfo.CouldActionOnBuilding = Convert.ToBoolean(line.Substring(start + 1, length).Trim());
+                }
+                    break;
+            }
+        }
+        else if (start < 0 && end < 0)
+        {
+            // 解析数据脚本
+            var dataArray = line.Split(',');
+            var dataList = dataArray.ToList();
+            remainInfo.DataList.Add(dataList);
         }
         else
         {

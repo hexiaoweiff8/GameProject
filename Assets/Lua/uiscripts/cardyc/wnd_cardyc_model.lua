@@ -15,22 +15,22 @@ function wnd_cardyc_model:getDatas(cardIndex)
 
     ---获取卡牌表中的数据。
     local _cardTbl = cardModel:getCardTbl()
-    if _cardTbl == nil then
+    local _cardSortTbl = cardModel:getCardSortTbl()
+    local _cardId = _cardSortTbl[cardIndex]
+    ---判断卡牌是否存在
+    if not _cardId and not _cardTbl[_cardId] then
         return false
     end
-    if not _cardTbl[cardIndex] then
-        return false
-    end
-    self.cardId = _cardTbl[cardIndex].id
-    self.cardLv = _cardTbl[cardIndex].lv
-    self.starLv = _cardTbl[cardIndex].star
-    self.qualityLv = _cardTbl[cardIndex].rlv
-    self.cardFragment = _cardTbl[cardIndex].num
-    self.synergyLvTbl = _cardTbl[cardIndex].team--协同表
-    self.soldierLv = _cardTbl[cardIndex].slv
-    self.skill_Lv_Table = _cardTbl[cardIndex].skill
-    self.cardExp  = _cardTbl[cardIndex].exp
-    self.slotState = _cardTbl[cardIndex].slot
+    self.cardId = _cardTbl[_cardId].id
+    self.cardLv = _cardTbl[_cardId].lv
+    self.starLv = _cardTbl[_cardId].star
+    self.qualityLv = _cardTbl[_cardId].rlv
+    self.cardFragment = _cardTbl[_cardId].num
+    self.synergyLvTbl = _cardTbl[_cardId].team--协同表
+    self.soldierLv = _cardTbl[_cardId].slv
+    self.skill_Lv_Table = _cardTbl[_cardId].skill
+    self.cardExp  = _cardTbl[_cardId].exp
+    self.slotState = _cardTbl[_cardId].slot
 
     ---获取经济表中的数据
     local _currencyTbl = currencyModel:getCurrentTbl()
@@ -50,13 +50,9 @@ function wnd_cardyc_model:getDatas(cardIndex)
 
     print("================wnd_cardyc_model:getDatas============end===========")
     return true
-    
+
 end
 
---获取卡牌数量
-function wnd_cardyc_model:getCardNum()
-    return #cardModel:getCardTbl()
-end
 
 
 

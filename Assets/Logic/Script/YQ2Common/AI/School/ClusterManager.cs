@@ -26,7 +26,7 @@ public class ClusterManager : ILoopItem
     private static ClusterManager single = null;
 
     // -------------------------公有属性-------------------------------
-    public Vector3 MovementPlanePosition;
+    //public Vector3 MovementPlanePosition;
 
     /// <summary>
     /// 地图宽度
@@ -38,11 +38,11 @@ public class ClusterManager : ILoopItem
     /// </summary>
     public float MapHeight;
     
-    /// <summary>
-    /// 判定前方角度
-    /// 在单位前方ForwardAngle角度内为该单位forward
-    /// </summary>
-    public float ForwardAngle = 90;
+    ///// <summary>
+    ///// 判定前方角度
+    ///// 在单位前方ForwardAngle角度内为该单位forward
+    ///// </summary>
+    //public float ForwardAngle = 90;
 
     /// <summary>
     /// 碰撞拥挤权重
@@ -57,7 +57,7 @@ public class ClusterManager : ILoopItem
     /// <summary>
     /// 摩擦力系数
     /// </summary>
-    public float Friction = 5;
+    //public float Friction = 5;
 
     /// <summary>
     /// 单位格子宽度
@@ -651,7 +651,7 @@ public class ClusterManager : ILoopItem
                         // 最小距离
                         var minDistance = member.Diameter * 0.5f + closeMember.Diameter * 0.5f;
                         // 质量比例
-                        var qualityRate =  member.Quality / closeMember.Quality;
+                        var qualityRate = Math.Min(member.Quality / closeMember.Quality, CollisionWeight);
                         // 插入深度
                         var insertDis = minDistance - diffPosition.magnitude;
                         // 基础排斥力
@@ -667,8 +667,17 @@ public class ClusterManager : ILoopItem
                             // 碰撞单位是否可移动
                             if (closeMember.CouldMove)
                             {
+                                var offPos = diffCollisionThoughDir*qualityRate;
+                                //if (offPos.magnitude > insertDis)
+                                //{
+                                //    offPos = offPos.normalized * insertDis * 2;
+                                //}
+                                //else
+                                //{
+                                //    offPos = offPos * 0.1f;
+                                //}
                                 // 直接设置未碰撞位置
-                                closeMember.Position -= diffCollisionThoughDir;
+                                closeMember.Position -= offPos;
                                 // 影响速度
                                 closeMember.SpeedDirection -= diffCollisionThoughDir * qualityRate;
                             }

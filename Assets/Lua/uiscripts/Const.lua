@@ -13,14 +13,6 @@ Const = class("Const")
     Const.EQUIP_TYPE_NUM = 8
     Const.EQUIP_NORMALPROP_NUM = 5
     Const.EQUIP_ONBODY_MAX_NUM = 8
-
-
-    Const.SUIT_PROP_PIVOT ={
-        TOP_CENTER = 0,
-        TOP_LEFT = 1
-    }
-
-
     Const.FIGHT_SKILLNUM = 3
     Const.FIGHT_HANDCARD_NUM = 4
 

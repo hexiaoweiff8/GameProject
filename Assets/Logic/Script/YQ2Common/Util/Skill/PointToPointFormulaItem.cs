@@ -168,7 +168,7 @@ public class PointToPointFormulaItem : AbstractFormulaItem
         var scaleY = ScaleY;
         var scaleZ = ScaleZ;
 
-        IFormula result = new Formula((callback) =>
+        IFormula result = new Formula((callback, scope) =>
         {
             // 判断发射与接收位置
             var releasePosition = myRelsPos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;

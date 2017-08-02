@@ -5,13 +5,13 @@ using System.Collections;
 /// </summary>
 public class SoldierAnimConst
 {
-    public const string XINGJIN = "Yidong";
-    public const string DAIJI = "Daiji";
-    public const string GONGJI = "Gongji";
-    public const string SHENGLI = "Shengli";
-    public const string SHIBAI = "Shibai";
-    public const string SIWANG_HUOYAN = "Siwang_huoyan";
-    public const string SIWANG_ZIDAN = "Siwang_zidan";
+    public const string XINGJIN = "yidong";
+    public const string DAIJI = "daiji";
+    public const string GONGJI = "gongji";
+    public const string SHENGLI = "shengli";
+    public const string SHIBAI = "shibai";
+    public const string SIWANG_HUOYAN = "siwang_huoyan";
+    public const string SIWANG_ZIDAN = "siwang_zidan";
     public const string ZHUANGTIAN = "zhuangtian";
 }
 

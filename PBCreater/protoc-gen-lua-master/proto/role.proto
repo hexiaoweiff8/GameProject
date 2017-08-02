@@ -1,0 +1,138 @@
+syntax = "proto2";
+
+message Currency{
+    required int32 gold			=1;
+    repeated int32 diamond		=2;
+    required int32 skillPt      =3;
+    required int32 expPool      =4;
+    required int32 coin         =5;
+    required int32 tili         =6;
+    required int32 power        =7;
+    required int32 PkPt         =8;
+    required int32 HumanPt      =9;
+    required int32 OrcPt        =10;
+    required int32 OmnicPt      =11;
+};
+
+
+message Card{
+    required int32 id			=1;
+    required int32 exp			=2;
+    required int32 star			=3;
+    required int32 slv			=4;
+    required int32 rlv			=5;
+    required int32 num			=6;
+    repeated int32 slot			=7;
+    repeated int32 team			=8;
+    repeated int32 skill		=9;
+    required int32 lv           =10;
+    required int32 buy          =11;
+};
+
+
+message Item{
+    required int32 id			=1;
+    required int32 num			=2;
+};
+
+
+message RemakeItem{
+    required int32 id			=1;
+    required float val			=2;
+};
+
+
+message SndAttr{
+    required int32 id			=1;
+    required float val			=2;
+    required int32 isRemake		=3;
+    repeated RemakeItem remake	=4;
+};
+
+
+message Equip{
+    required int32 id			=1;
+    required int32 eid			=2;
+    required int32 lv			=3;
+    required int32 rarity		=4;
+    required int32 fst_attr     =5;
+    repeated SndAttr sndAttr    =6;
+    required int32 isLock       =7;
+    required int32 isBad        =8;
+};
+
+
+message OpFields{
+    optional int32 equipId		=1;
+};
+
+
+message Sci{
+    required int32 id           =1;
+    required int32 lv           =2;
+    required int32 due          =3;
+};
+
+
+message Rewardfrm{
+    required string type        =1;
+    required string name        =2;
+    required int32  num         =3;
+    optional int32  ex          =4[default=0];
+};
+
+
+message Mail{
+    required string _id         =1;
+    required string title       =2;
+    required string sender      =3;
+    required int32 receiver     =4;
+    required string content     =5;
+    repeated Rewardfrm rewards = 6;
+    required int32 time         =7;
+    required string way         =8;
+    required int32 new          =9;
+    required int32 autoDel      =10;
+};
+
+
+message GoodItem{
+    required int32 id           =1;
+    required int32 isSold       =2;
+};
+
+
+message ShopItem{
+    repeated GoodItem good      =1;
+    required int32 cnt          =2;
+};
+
+
+message Sign{
+    required int32 isSigned     =1;
+    required int32 days         =2;
+};
+
+message Role{
+    required int32 uId			=1;
+    required int32 hostId		=2;
+    required int32 rId			=3;
+    required string userName	=4;
+    required int32 exp			=5;
+    required int32 vipexp		=6;
+    required int32 lv           =7;
+    required int32 vip          =8;
+    required Currency currency  =9;
+    repeated Card card          =10;
+    repeated Item item          =11;
+    repeated Equip equip        =12;
+    optional OpFields opFields  =13;
+    repeated Sci sci            =14;
+    repeated int32 fitEquip     =15;
+    required int32 sex          =16;
+    repeated ShopItem shop      =17;
+    required Sign sign          =18;
+};
+
+
+

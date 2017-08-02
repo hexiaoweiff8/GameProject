@@ -53,8 +53,6 @@ end
 ---装备选项点击事件回调
 ---
 function equipItemControl:HandleOnItemClickedHandler(item_Component)
-    print(#_ItemsToShow)
-    print(item_Component.Index)
     _onItemClickEvent(_ItemsToShow[item_Component.Index + 1])
     self:HandleOnItemSelectedHandler(item_Component)
 end
@@ -85,7 +83,6 @@ function equipItemControl:HandleOnItemLoadedHandler(item)
 
     local item_Component = item.gameObject:GetComponent(typeof(UI_Equip_Item))
     if item_Component.Index + 1 > #_ItemsToShow then
-        print("over==="..item_Component.Index + 1)
         item_Component:setEmpty()
         return
     end

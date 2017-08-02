@@ -96,8 +96,10 @@ public class BuffFormulaItem : AbstractFormulaItem
         {
             throw new Exception("Buff:" + BuffNum + "不存在");
         }
-        result = new Formula((callback) =>
+        result = new Formula((callback, scope) =>
         {
+            // 继承数据域
+            buffInfo.DataScope = scope;
             // 向目标身上挂载buff
             // 并执行buffAttach
             BuffManager.Single.DoBuff(buffInfo, BuffDoType.Attach, FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(buffInfo.ReleaseMember, buffInfo.ReceiveMember, buffInfo, 1, buffInfo.IsNotLethal));

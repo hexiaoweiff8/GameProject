@@ -30,18 +30,86 @@ public class IfFormulaItem : AbstractFormulaItem
     /// </summary>
     private static Dictionary<string, Func<FormulaParamsPacker, string[], bool>> registerCondition = new Dictionary<string, Func<FormulaParamsPacker, string[], bool>>()
     {
-        // 判断生命
-        {"Health", (packer, args) =>
+        // 判断生命(半分比, 绝对值)
         {
-            var min = Convert.ToSingle(args[0]);
-            var max = Convert.ToSingle(args[1]);
-            var data = packer.ReceiverMenber.ClusterData.AllData.MemberData;
-            if (data.TotalHp*max*0.01f >= data.CurrentHP && data.TotalHp*min*0.01f <= data.CurrentHP)
+            "Health", (packer, args) =>
             {
-                return true;
+                var min = Convert.ToSingle(args[0]);
+                var max = Convert.ToSingle(args[1]);
+                var data = packer.ReceiverMenber.ClusterData.AllData.MemberData;
+                if (data.TotalHp*max*0.01f >= data.CurrentHP - 1 && data.TotalHp*min*0.01f <= data.CurrentHP + 1)
+                {
+                    return true;
+                }
+                return false;
             }
-            return false;
-        }
+        },
+        // 阵营
+        {
+            "Camp", (packer, args) =>
+            {
+                if (!args.Any()) return false;
+                var targetCamp = packer.ReceiverMenber.ClusterData.AllData.MemberData.Camp;
+                return args.Any(arg => Convert.ToInt32(arg) == targetCamp);
+            }
+        },
+        // 空地建筑
+        {
+            "GeneralType", (packer, args) =>
+            {
+                if (!args.Any()) return false;
+                var generalType = packer.ReceiverMenber.ClusterData.AllData.MemberData.GeneralType;
+                return args.Any(arg => Convert.ToInt32(arg) == generalType);
+            }
+        },
+        // 隐形
+        {
+            "IsHide", (packer, args) =>
+            {
+                if (!args.Any()) return false;
+                var isHide = packer.ReceiverMenber.ClusterData.AllData.MemberData.IsHide;
+                return args.Any(arg => Convert.ToBoolean(arg) == isHide);
+            }
+        },
+        // 种族
+        {
+            "ArmyType", (packer, args) =>
+            {
+                if (!args.Any()) return false;
+                var armyType = packer.ReceiverMenber.ClusterData.AllData.MemberData.ArmyType;
+                return args.Any(arg => Convert.ToInt32(arg) == armyType);
+            }
+        },
+        // 是否机械
+        {
+            "IsMechanic", (packer, args) =>
+            {
+                if (!args.Any()) return false;
+                var isMechanic = packer.ReceiverMenber.ClusterData.AllData.MemberData.IsMechanic;
+                return args.Any(arg => Convert.ToBoolean(arg) == isMechanic);
+            }
+        },
+        // 是否近战
+        {
+            "IsMelee", (packer, args) =>
+            {
+                if (!args.Any()) return false;
+                var isMelee = packer.ReceiverMenber.ClusterData.AllData.MemberData.IsMelee;
+                return args.Any(arg => Convert.ToBoolean(arg) == isMelee);
+            }
+        },
+        // 是否是XX召唤生物(具体类型ID)
+        {
+            "Summon", (packer, args) =>
+            {
+                if (!args.Any()) return false;
+                if (packer.ReceiverMenber.ClusterData.AllData.MemberData.IsSummon)
+                {
+                    var armyId = packer.ReceiverMenber.ClusterData.AllData.MemberData.ArmyID;
+                    return args.Any(arg => Convert.ToInt32(arg) == armyId); 
+                }
+                return false;
+            }
         },
     };
 
@@ -93,7 +161,7 @@ public class IfFormulaItem : AbstractFormulaItem
 
         var check = registerCondition[myCondition];
         // 创建行为
-        result = new Formula((callback) =>
+        result = new Formula((callback, scope) =>
         {
             // 如果符合条件则执行子级技能
             // 否则继续
@@ -106,7 +174,7 @@ public class IfFormulaItem : AbstractFormulaItem
                     var subSkill = new SkillInfo(paramsPacker.SkillNum);
                     subSkill.DataList = paramsPacker.DataList;
                     subSkill.AddActionFormulaItem(SubFormulaItem);
-                    SkillManager.Single.DoShillInfo(subSkill, paramsPacker, true);
+                    SkillManager.Single.DoSkillInfo(subSkill, paramsPacker, true);
                 }
             }
             else if (IsBreak > 0)

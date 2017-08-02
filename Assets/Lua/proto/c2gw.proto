@@ -160,3 +160,13 @@ message BuyCard {
 }
 
 
+message BuyAvoidTime {
+    required int32 id           =1;
+}
+
+
+message SetCardGroup {
+    repeated int32 lst          =1;
+}
+
+

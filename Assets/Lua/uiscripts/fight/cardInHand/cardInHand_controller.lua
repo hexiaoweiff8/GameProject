@@ -41,6 +41,7 @@ function cardInHand_controller:Refresh(cardIndex)
                 _view.handCards_bigCollider[var].size = _data.bigColliderSize
                 _view.handCards_bigCollider[var].enabled = false
 
+
                 TweenPosition.Begin( _view.handCards[var], 0.2, _data.myCardConstPostb[var], true)
                 TweenScale.Begin( _view.handCards[var], 0.2, Vector3.one)
             else
@@ -49,7 +50,12 @@ function cardInHand_controller:Refresh(cardIndex)
         end
     end
 
-    ModelControl:InitMyModels(_data.nowHandpaiKutb)
+    if not cardIndex then
+        ModelControl:InitMyModels(_data.nowHandpaiKutb)
+    else
+        ModelControl:RefreshMyModels( _data.nowHandpaiKutb[cardIndex],cardIndex)
+    end
+
 end
 
 
@@ -103,7 +109,7 @@ function cardInHand_controller:AddListener()
                 local isC, hit = UnityEngine.Physics.Raycast(ray, hit, 1000, 256)--256 == bit.lshift(1, 8) == 1<<8
                 AStarControl:setZhangAi(hit.point, cardIndex)
 
-            elseif area == _data.AREA_TODO.RECOVERY then---卡牌回收
+            elseif area == _data.AREA_TODO.RECYCLE then---卡牌回收
             go.transform.localScale = Vector3.one
                 model.gameObject:SetActive(false)
             end
@@ -261,7 +267,7 @@ function cardInHand_controller:doEvent(go,cardIndex)
             Event.Brocast(GameEventType.DROP_CARD, cardIndex)
         end
         ---卡牌回收
-    elseif area == _data.AREA_TODO.RECOVERY then
+    elseif area == _data.AREA_TODO.RECYCLE then
         if _data.nowFei >= _data.allFei then
             UIToast.Show("能量已满", nil, UIToast.ShowType.Upwards)
             go.transform.localScale = Vector3.one

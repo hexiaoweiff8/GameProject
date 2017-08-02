@@ -12,6 +12,8 @@ using System.Text;
 public class Formula : IFormula
 {
 
+
+    // -------------------------属性---------------------------
     /// <summary>
     /// 下一个节点
     /// </summary>
@@ -40,16 +42,6 @@ public class Formula : IFormula
     /// </summary>
     public const int FormulaWaitType = 1;
 
-
-    /// <summary>
-    /// 是否可以继续执行下一个节点
-    /// 如果该值为false则不能获取下一节点
-    /// </summary>
-    private bool canMoveNext = true;
-
-    // -------------------------属性---------------------------
-
-
     /// <summary>
     /// 行为链类型
     /// 0: 无需等待直接继续下一节点
@@ -62,11 +54,15 @@ public class Formula : IFormula
     }
 
     /// <summary>
+    /// 数据域
+    /// </summary>
+    public DataScope DataScope { get; set; }
+
+    /// <summary>
     /// 当前节点执行的操作 
     /// 外部只读
     /// </summary>
-    public Action<Action> Do { get; protected set; }
-
+    public Action<Action, DataScope> Do { get; protected set; }
 
     /// <summary>
     /// 行为链执行方式
@@ -75,13 +71,15 @@ public class Formula : IFormula
     /// </summary>
     protected int formulaType = FormulaNotWaitType;
 
+    /// <summary>
+    /// 是否可以继续执行下一个节点
+    /// 如果该值为false则不能获取下一节点
+    /// </summary>
+    private bool canMoveNext = true;
+
 
     // -----------------------公用方法-----------------------
 
-    //protected Formula()
-    //{
-
-    //}
 
     /// <summary>
     /// 构建方法
@@ -89,7 +87,7 @@ public class Formula : IFormula
     /// </summary>
     /// <param name="doForWaitAction">当前节点的行为</param>
     /// <param name="type">执行类型, 0:不等待是否执行完毕继续下一届点, 1:等待节点执行完毕调用回调.</param>
-    public Formula(Action<Action> doForWaitAction, int type = FormulaNotWaitType)
+    public Formula(Action<Action, DataScope> doForWaitAction, int type = FormulaNotWaitType)
     {
         Do = doForWaitAction;
         formulaType = type;

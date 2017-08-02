@@ -46,7 +46,6 @@ public class FormulaParamsPacker
     /// <summary>
     /// 当前技能
     /// </summary>
-    [NotNull]
     public SkillBase Skill { get; set; }
 
     /// <summary>

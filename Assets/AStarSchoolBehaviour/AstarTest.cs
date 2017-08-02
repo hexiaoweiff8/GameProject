@@ -128,6 +128,9 @@ public class AstarTest : MonoBehaviour
     private IList<PositionObject> itemList = new List<PositionObject>();
 
 
+    private RemainInfo remain = null;
+
+
     
 
     void Start ()
@@ -136,7 +139,7 @@ public class AstarTest : MonoBehaviour
         string formulaStr = @"SkillNum(1001)
 {
         Point(1,test/ExplordScope,0,0,3,10,1,10),
-        CollisionDetection(0, 10, 1, 0, -1, 10, 0, 0)
+        CollisionDetection(0, 10, 1, 0, -1, 10, 0, 0, -1, 1)
         {
             Skill(1, 1002, 1)
             //PointToObj(1,test/TrailPrj,10,0,10,1,10),
@@ -219,6 +222,50 @@ public class AstarTest : MonoBehaviour
             Description(Test{%0},测试{%1})
             100, 5
         ]
+";
+        string formulaStr8 = @"SkillNum(1008)
+        {
+            // 选择目标点
+            TargetPointSelector(1,0,10,10)
+            Remain(1, 2, 10000, false)
+        }
+
+        [
+            CDTime(1)
+            CDGroup(2)
+            Icon(test/Icon1)
+            ReleaseTime(10)
+            TriggerLevel1(1)
+            TriggerLevel2(1)
+            Description(Test{%0},测试{%1})
+            100, 5
+        ]
+";
+        string formulaStr9 = @"SkillNum(1009)
+        {
+            CollisionDetection(0, 50, 1, 0, -1, 10, 0, 0, 101009, 1)
+            {
+                If(1,0,IsMechanic,false_true)
+                {
+                    PointToObj(1,test/TrailPrj,10,0,10,1,10),
+                    Point(1,test/ExplordScope,1,0,3,10,1,10),
+                }
+            }
+            // 选择目标点
+            // TargetPointSelector(1,0,10,10)
+            // Remain(1, 2, 10000, false)
+        }
+
+        [
+            CDTime(1)
+            CDGroup(2)
+            Icon(test/Icon1)
+            ReleaseTime(10)
+            TriggerLevel1(1)
+            TriggerLevel2(1)
+            Description(Test{%0},测试{%1})
+            100, 5
+        ]
 "; 
         string buffStr1 = @"BuffNum(1007)
         Action
@@ -255,6 +302,29 @@ public class AstarTest : MonoBehaviour
         ]
 ";
 
+        // 光环1
+        string remainStr1 = @"RemainNum(10000)
+        Action
+        {
+            //Point(1,test/ExplordScope,0,3,10,1,10)
+        }
+        Enter
+        {
+            Point(1,test/ExplordScope,0,5,10,1,10)
+        }
+        Out
+        {
+            Point(1,test/ExplordScope,0,5,10,1,10)
+        }
+        [
+            Range(60)
+            DuringTime(10)
+            ActionTime(1)
+            ActionCamp(1)
+            IsFollow(false)
+        ]
+";
+
 
         var skillInfo = FormulaConstructor.SkillConstructor(formulaStr);
         var skillInfo2 = FormulaConstructor.SkillConstructor(formulaStr2);
@@ -262,8 +332,13 @@ public class AstarTest : MonoBehaviour
         var skillInfo4 = FormulaConstructor.SkillConstructor(formulaStr4);
         var skillInfo5 = FormulaConstructor.SkillConstructor(formulaStr5);
         var skillInfo7 = FormulaConstructor.SkillConstructor(formulaStr7);
+        var skillInfo8 = FormulaConstructor.SkillConstructor(formulaStr8);
+        var skillInfo9 = FormulaConstructor.SkillConstructor(formulaStr9);
+
         var buffInfo1 = FormulaConstructor.BuffConstructor(buffStr1);
         var buffInfo2 = FormulaConstructor.BuffConstructor(buffStr2);
+
+        remain = FormulaConstructor.RemainConstructor(remainStr1);
 
         SkillManager.Single.AddSkillInfo(skillInfo);
         SkillManager.Single.AddSkillInfo(skillInfo2);
@@ -271,8 +346,13 @@ public class AstarTest : MonoBehaviour
         SkillManager.Single.AddSkillInfo(skillInfo4);
         SkillManager.Single.AddSkillInfo(skillInfo5);
         SkillManager.Single.AddSkillInfo(skillInfo7);
+        SkillManager.Single.AddSkillInfo(skillInfo8);
+        SkillManager.Single.AddSkillInfo(skillInfo9);
+
         BuffManager.Single.AddBuffInfo(buffInfo1);
         BuffManager.Single.AddBuffInfo(buffInfo2);
+
+        RemainManager.Single.AddRemainInfo(remain);
 
         // 启动TriggerTicker
         TriggerTicker.Single.Start();
@@ -304,13 +384,19 @@ public class AstarTest : MonoBehaviour
                 }
             });
 
-        Debug.LogError(RandomPacker.Single.GetRangeI(0, 100));
-        RandomPacker.Single.SetSeed(100);
-        Debug.LogError(RandomPacker.Single.GetRangeI(0, 100));
-        Debug.LogError(RandomPacker.Single.GetRangeI(0, 100));
-        RandomPacker.Single.SetSeed(100);
-        Debug.LogError(RandomPacker.Single.GetRangeI(0, 100));
-        Debug.LogError(RandomPacker.Single.GetRangeI(0, 100));
+        //Debug.LogError(RandomPacker.Single.GetRangeI(0, 100));
+        //RandomPacker.Single.SetSeed(100);
+        //Debug.LogError(RandomPacker.Single.GetRangeI(0, 100));
+        //Debug.LogError(RandomPacker.Single.GetRangeI(0, 100));
+        //RandomPacker.Single.SetSeed(100);
+        //Debug.LogError(RandomPacker.Single.GetRangeI(0, 100));
+        //Debug.LogError(RandomPacker.Single.GetRangeI(0, 100));
+        //Debug.Log(Vector2.Angle(new Vector2(1, -1), new Vector2(1, 1)));
+        //Debug.Log(Vector2.Angle(new Vector2(1, -1), Vector2.up));
+        //Debug.Log(Vector2.Angle(new Vector2(1, 1), Vector2.up));
+        //Debug.Log(Vector2.Angle(Vector2.right, Vector2.left));
+
+
     }
     
     void Update()
@@ -319,8 +405,8 @@ public class AstarTest : MonoBehaviour
         Control();
         Scan();
         // 显示数据
-        Log();
-        //CheckTrigger();
+        // Log();
+        // CheckTrigger();
     }
 
 
@@ -351,12 +437,13 @@ public class AstarTest : MonoBehaviour
             Physics.Raycast(ray, out hit);
             if (hit.collider != null && hit.collider.name.Equals(LoadMap.MapPlane.name))
             {
-               
-                SkillManager.Single.DoSkillNum(1007, new FormulaParamsPacker()
+
+                SkillManager.Single.DoSkillNum(1009, new FormulaParamsPacker()
                 {
                     StartPos = new Vector3(hit.point.x, 0, hit.point.z),
-                    TargetPos = new Vector3(hit.point.x - 40, 0, hit.point.z + 40),
+                    TargetPos = new Vector3(hit.point.x, 0, hit.point.z),
                     ReleaseMember = new DisplayOwner(scaner.gameObject, scaner),
+                    ReceiverMenber = new DisplayOwner(scaner.gameObject, scaner),
                 });
             }
         }
@@ -703,9 +790,10 @@ public class AstarTest : MonoBehaviour
             school.AllData.MemberData = new VOBase()
             {
                 AttackRange = 20,
-                SpaceSet = 3,
                 ObjID = objId,
-                MoveSpeed = 60
+                MoveSpeed = 60,
+                GeneralType = 1,
+                Camp = i % 2
             };
             //school.GroupId = 1;
             // TODO 物理信息中一部分来自于数据
@@ -714,7 +802,7 @@ public class AstarTest : MonoBehaviour
             school.transform.localPosition = new Vector3((i % 3) * 2 + start.x, start.y, i / 3 * 2 + start.z);
             school.name = "item" + i;
             school.TargetPos = target;
-            school.Diameter = i == 0 ? 10 : 3;
+            school.Diameter = (i == 0 ? 10 : 3) * 5;
             school.PushTargetList(Utils.NumToPostionByList(LoadMap.transform.position, cloneList, UnitWidth, MapWidth, MapHeight));
             //school.Moveing = (a) => { Debug.Log(a.name + "Moving"); };
 
@@ -748,10 +836,17 @@ public class AstarTest : MonoBehaviour
             school.AllData.MemberData.CurrentHP = 99;
             school.AllData.MemberData.TotalHp = 100;
 
+
             // 创建测试技能
-            school.AllData.SkillInfoList=new List<SkillInfo>()
+            school.AllData.SkillInfoList = new List<SkillInfo>()
             {
                 
+            };
+
+            // 创建测试光环
+            school.AllData.RemainInfoList = new List<RemainInfo>()
+            {
+                //remain,
             };
 
 
@@ -759,6 +854,7 @@ public class AstarTest : MonoBehaviour
             ClusterManager.Single.Add(school);
             var displayOwner = new DisplayOwner(schoolItem, school);
             DisplayerManager.Single.AddElement(objId, displayOwner);
+            remain.ReleaseMember = displayOwner;
 
             if (IsFSM)
             {

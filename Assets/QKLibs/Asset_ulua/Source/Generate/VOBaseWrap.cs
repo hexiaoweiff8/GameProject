@@ -29,7 +29,6 @@ public class VOBaseWrap
 		L.RegVar("BulletType", get_BulletType, set_BulletType);
 		L.RegVar("BulletSpeed", get_BulletSpeed, set_BulletSpeed);
 		L.RegVar("AttackType", get_AttackType, set_AttackType);
-        //L.RegVar("MultiAimMax", get_MultiAimMax, set_MultiAimMax);
 		L.RegVar("SightRange", get_SightRange, set_SightRange);
 		L.RegVar("IsHide", get_IsHide, set_IsHide);
 		L.RegVar("IsAntiHide", get_IsAntiHide, set_IsAntiHide);
@@ -462,25 +461,6 @@ public class VOBaseWrap
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index AttackType on a nil value" : e.Message);
 		}
 	}
-
-    //[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-    //static int get_MultiAimMax(IntPtr L)
-    //{
-    //    object o = null;
-
-    //    try
-    //    {
-    //        o = ToLua.ToObject(L, 1);
-    //        VOBase obj = (VOBase)o;
-    //        short ret = obj.MultiAimMax;
-    //        LuaDLL.lua_pushnumber(L, ret);
-    //        return 1;
-    //    }
-    //    catch(Exception e)
-    //    {
-    //        return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MultiAimMax on a nil value" : e.Message);
-    //    }
-    //}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_SightRange(IntPtr L)
@@ -1393,25 +1373,6 @@ public class VOBaseWrap
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index AttackType on a nil value" : e.Message);
 		}
 	}
-
-    //[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-    //static int set_MultiAimMax(IntPtr L)
-    //{
-    //    object o = null;
-
-    //    try
-    //    {
-    //        o = ToLua.ToObject(L, 1);
-    //        VOBase obj = (VOBase)o;
-    //        short arg0 = (short)LuaDLL.luaL_checknumber(L, 2);
-    //        obj.MultiAimMax = arg0;
-    //        return 0;
-    //    }
-    //    catch(Exception e)
-    //    {
-    //        return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MultiAimMax on a nil value" : e.Message);
-    //    }
-    //}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_SightRange(IntPtr L)

@@ -40,8 +40,8 @@ public class PauseFormulaItem : AbstractFormulaItem
         IFormula result = null;
         // 数据本地化
         var myCheckTime = CheckTime;
-        
-        result = new Formula((callback) =>
+
+        result = new Formula((callback, scope) =>
         {
             //Debug.Log("Pause");
             var timer = new Timer(myCheckTime);

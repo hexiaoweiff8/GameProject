@@ -7,11 +7,11 @@ local enemyCard_controller = {}
 local _view = require("uiscripts/fight/enemyCard/enemyCard_view")
 local _data = require("uiscripts/fight/enemyCard/enemyCard_model")
 
-
+local timerTbl = {}
+local cardTbl = {}
+local index = 0
 function enemyCard_controller:Init(view)
     _view:initView(view)
-    -- 敌方下次出的卡牌费
-    self.nextEnemyCardFei = nil
 end
 
 function enemyCard_controller:AIDropCard()
@@ -28,6 +28,13 @@ end
 
 
 function enemyCard_controller:addEnemyCardHistoryUI(cardID)
+    index = index + 1
+    if index > 5 then
+        Object.Destroy(cardTbl[1])
+        table.remove(cardTbl,1)
+        timerTbl[1]:Kill()
+        table.remove(timerTbl, 1)
+    end
     --增加敌人出牌UI
     local euc = GameObject.Instantiate(_view.enemyUsedCard)
     euc:SetActive(true)
@@ -45,11 +52,14 @@ function enemyCard_controller:addEnemyCardHistoryUI(cardID)
             end
         end
     end
+
+    table.insert(cardTbl, euc)
     --敌人出牌UI几秒后消失
-    coroutine.start(function()
-        coroutine.wait(10)
+    local cardTimer = TimeUtil:CreateTimer(10, function ()
         Object.Destroy(euc.gameObject)
+        timerTbl[1]:Kill()
     end)
+    table.insert(timerTbl, cardTimer)
 
 end
 

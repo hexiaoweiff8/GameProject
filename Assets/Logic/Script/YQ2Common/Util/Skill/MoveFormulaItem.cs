@@ -95,7 +95,7 @@ public class MoveFormulaItem : AbstractFormulaItem
             return null;
         }
 
-        IFormula result = new Formula((callback) =>
+        IFormula result = new Formula((callback, scope) =>
         {
             if (myIsBlink)
             {

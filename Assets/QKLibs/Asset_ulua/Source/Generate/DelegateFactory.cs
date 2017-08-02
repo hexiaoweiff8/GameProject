@@ -69,6 +69,8 @@ public static class DelegateFactory
 		dict.Add(typeof(UIProgressBar.OnDragFinished), UIProgressBar_OnDragFinished);
 		dict.Add(typeof(UIGrid.OnReposition), UIGrid_OnReposition);
 		dict.Add(typeof(System.Comparison<UnityEngine.Transform>), System_Comparison_UnityEngine_Transform);
+		dict.Add(typeof(UITable.OnReposition), UITable_OnReposition);
+		dict.Add(typeof(UIInput.OnValidate), UIInput_OnValidate);
 		dict.Add(typeof(UIScrollView.OnDragNotification), UIScrollView_OnDragNotification);
 		dict.Add(typeof(UICamera.GetKeyStateFunc), UICamera_GetKeyStateFunc);
 		dict.Add(typeof(UICamera.GetAxisFunc), UICamera_GetAxisFunc);
@@ -142,6 +144,7 @@ public static class DelegateFactory
 		dict.Add(typeof(UIScrollViewAdapter.OnItemSelectedHandler), UIScrollViewAdapter_OnItemSelectedHandler);
 		dict.Add(typeof(UIScrollViewAdapter.OnListMovedHandler), UIScrollViewAdapter_OnListMovedHandler);
 		dict.Add(typeof(UIScrollViewItemBase.OnSelectedHandler), UIScrollViewItemBase_OnSelectedHandler);
+		dict.Add(typeof(LoopItemScrollView.DelegateHandler), LoopItemScrollView_DelegateHandler);
 	}
 
     [NoToLuaAttribute]
@@ -2740,6 +2743,104 @@ public static class DelegateFactory
 		{
 			System_Comparison_UnityEngine_Transform_Event target = new System_Comparison_UnityEngine_Transform_Event(func, self);
 			System.Comparison<UnityEngine.Transform> d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UITable_OnReposition_Event : LuaDelegate
+	{
+		public UITable_OnReposition_Event(LuaFunction func) : base(func) { }
+		public UITable_OnReposition_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call()
+		{
+			func.Call();
+		}
+
+		public void CallWithSelf()
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UITable_OnReposition(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UITable.OnReposition fn = delegate() { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UITable_OnReposition_Event target = new UITable_OnReposition_Event(func);
+			UITable.OnReposition d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UITable_OnReposition_Event target = new UITable_OnReposition_Event(func, self);
+			UITable.OnReposition d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UIInput_OnValidate_Event : LuaDelegate
+	{
+		public UIInput_OnValidate_Event(LuaFunction func) : base(func) { }
+		public UIInput_OnValidate_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public char Call(string param0, int param1, char param2)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.Push(param1);
+			func.Push(param2);
+			func.PCall();
+			char ret = (char)func.CheckNumber();
+			func.EndPCall();
+			return ret;
+		}
+
+		public char CallWithSelf(string param0, int param1, char param2)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.Push(param1);
+			func.Push(param2);
+			func.PCall();
+			char ret = (char)func.CheckNumber();
+			func.EndPCall();
+			return ret;
+		}
+	}
+
+	public static Delegate UIInput_OnValidate(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UIInput.OnValidate fn = delegate(string param0, int param1, char param2) { return '\0'; };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UIInput_OnValidate_Event target = new UIInput_OnValidate_Event(func);
+			UIInput.OnValidate d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UIInput_OnValidate_Event target = new UIInput_OnValidate_Event(func, self);
+			UIInput.OnValidate d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}
@@ -6185,6 +6286,55 @@ public static class DelegateFactory
 		{
 			UIScrollViewItemBase_OnSelectedHandler_Event target = new UIScrollViewItemBase_OnSelectedHandler_Event(func, self);
 			UIScrollViewItemBase.OnSelectedHandler d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class LoopItemScrollView_DelegateHandler_Event : LuaDelegate
+	{
+		public LoopItemScrollView_DelegateHandler_Event(LuaFunction func) : base(func) { }
+		public LoopItemScrollView_DelegateHandler_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(LoopItemObject param0, LoopItemData param1)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.PushObject(param1);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(LoopItemObject param0, LoopItemData param1)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.PushObject(param1);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate LoopItemScrollView_DelegateHandler(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			LoopItemScrollView.DelegateHandler fn = delegate(LoopItemObject param0, LoopItemData param1) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			LoopItemScrollView_DelegateHandler_Event target = new LoopItemScrollView_DelegateHandler_Event(func);
+			LoopItemScrollView.DelegateHandler d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			LoopItemScrollView_DelegateHandler_Event target = new LoopItemScrollView_DelegateHandler_Event(func, self);
+			LoopItemScrollView.DelegateHandler d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}

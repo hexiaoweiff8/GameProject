@@ -1,0 +1,155 @@
+syntax = "proto2";
+import "role.proto";
+
+
+message SelectRole {
+    required  Role  user          =1;
+}
+
+
+message EquipLvlup {
+    required  Equip  equip          =1;
+    required  Currency currency     =2;
+}
+
+message EquipLock {
+    required  Equip  equip          =1;
+}
+
+message EquipRepair {
+    required  Equip  equip          =1;
+    required  Currency currency     =2;
+}
+
+message EquipRemake {
+    required  Equip  equip          =1;
+    repeated  Item item             =2;
+}
+
+message EquipConfirmRemake {
+    required  Equip  equip          =1;
+}
+
+message CardFeed {
+    required  Card  card            =1;
+    required  Currency currency     =2;
+}
+
+message CardStarup {
+    required  Card  card            =1;
+    required  Currency currency     =2;
+}
+
+message CardCarryup {
+    required  Card  card            =1;
+    required  Currency currency     =2;
+}
+
+message CardRankup {
+    required  Card  card            =1;
+    required  Currency currency     =2;
+}
+
+message CardTakeMedal {
+    required  Card card             =1;
+    repeated  Item item             =2;
+}
+
+message SkillLevelup {
+    required  Card  card            =1;
+    required  Currency currency     =2;
+}
+
+message SkillReset {
+    required  Card  card            =1;
+    required  Currency currency     =2;
+}
+
+message PublicNote {
+    required  string  msg           =1;
+}
+
+message SciLvlup {
+    required  Sci  sci              =1;
+    required  Currency currency     =2;
+}
+
+message SciSpeed {
+    required  Sci  sci              =1;
+    required  Currency currency     =2;
+}
+
+message CardUnionLvlup {
+    required  Card  card            =1;
+    required  Currency currency     =2;
+}
+
+message GetMailList {
+    repeated Mail mails             =1;
+}
+
+message GetMailReward {
+    repeated Card card              =1;
+    repeated Equip equip            =2;
+    required Currency currency      =3;
+    repeated Item item              =4;
+}
+
+message EquipFit {
+    repeated int32 lst              =1;
+}
+
+message SellItem {
+    repeated Item item              =1;
+    required Currency currency      =2;
+}
+
+message SellEquip {
+    required Currency currency      =1;
+}
+
+message ComposeEquip {
+    required Equip equip            =1;
+    repeated Item item              =2;
+}
+
+message ReadMail {
+    required Mail mail              =1;
+    repeated Card card              =2;
+    repeated Equip equip            =3;
+    required Currency currency      =4;
+    repeated Item item              =5;
+}
+
+message GetShopDetail {
+    required ShopItem shop          =1;
+}
+
+message RefreshShop {
+    required ShopItem shop          =1;
+    repeated Item item              =2;
+    required Currency currency      =3;
+}
+
+message BuyShopGood {
+    required ShopItem shop          =1;
+    repeated Card card              =2;
+    repeated Equip equip            =3;
+    required Currency currency      =4;
+    repeated Item item              =5;
+}
+
+message SignIn {
+    required Sign sign              =1;
+    repeated Card card              =2;
+    repeated Equip equip            =3;
+    required Currency currency      =4;
+    repeated Item item              =5;
+}
+
+message BuyCard {
+    required Card card              =1;
+    required Currency currency      =2;
+}
+
+

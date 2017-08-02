@@ -161,6 +161,11 @@ public class BuffScriptEditor : BaseScriptEditor
         {
             BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Move, this.position);
         }
+        if (GUILayout.Button("范围持续技"))
+        {
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Remain, this.position);
+        }
+        
         GUI.color = Color.white;
         EditorGUILayout.EndVertical();
         #endregion

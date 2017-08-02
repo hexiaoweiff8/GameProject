@@ -60,7 +60,7 @@ public class TestFormulaConstruct : MonoBehaviour
             });
 
             // TODO 如何封装数据?
-            SkillManager.Single.DoFormula(formula.GetFirst());
+            //SkillManager.Single.DoFormula(formula.GetFirst());
 	    }
 	}
 }

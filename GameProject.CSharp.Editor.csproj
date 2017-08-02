@@ -141,6 +141,8 @@
     <Compile Include="Assets\Editor\BaseTriggerScriptEditor.cs" />
     <Compile Include="Assets\Editor\BuffScriptEditor.cs" />
     <Compile Include="Assets\Editor\BuffTriggerScriptEditor.cs" />
+    <Compile Include="Assets\Editor\RemainScriptEditor.cs" />
+    <Compile Include="Assets\Editor\RemainTriggerScriptEditor.cs" />
     <Compile Include="Assets\Editor\SkillScriptEditor.cs" />
     <Compile Include="Assets\Editor\SkillTriggerScriptEditor.cs" />
     <Compile Include="Assets\QKLibs\Asset_EasyTouch\EasyTouchBundle\EasyTouch\Plugins\Editor\EasyTouchInspector.cs" />
@@ -438,6 +440,7 @@
     <None Include="Assets\StreamingAssets\BuffScript1007.txt" />
     <None Include="Assets\StreamingAssets\BuffScript1008.txt" />
     <None Include="Assets\StreamingAssets\BuffScript2222.txt" />
+    <None Include="Assets\StreamingAssets\RemainScript10000.txt" />
     <None Include="Assets\StreamingAssets\Script100001.txt" />
     <None Include="Assets\StreamingAssets\Script10011.txt" />
     <None Include="Assets\StreamingAssets\Script1009.txt" />

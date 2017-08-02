@@ -1,3 +1,4 @@
+require('uiscripts/cangku/util/table_count')
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --header
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -7,10 +8,20 @@ wnd_cangku_model = {
 	DepositoryTab_Count = 0,
 
 	local_Tabs = {},-- 本地页卡表
-
+	--[[
+		local_Items{
+			[ItemID] = {UseType = int,...},
+			[ItemID] = {...},
+		}
+	]]
 	local_Items = {},-- 本地Items表
 	-- local_Equipment = {},-- 本地Equipment表
-
+	--[[
+		serv_Items{
+			[ItemID] = {id = int,...},
+			[ItemID] = {...},
+		}
+	]]
 	serv_Items = {},-- 从服务器获取的Items数据(id,num)
 	-- serv_Equipment = {},-- 从服务器获取的Equipment数据
 	-- serv_fitEquipmentList = {},-- 从服务器获取的已穿戴装备的id列表
@@ -100,7 +111,8 @@ function wnd_cangku_model:initLocalItemsData()
 		Item["ComposeNum"] = v[sdata_item_data.mFieldName2Index['ComposeNum']]
 		Item["SelfUse"] = v[sdata_item_data.mFieldName2Index['SelfUse']]
 
-		table.insert(this.local_Items,Item)
+		-- table.insert(this.local_Items,Item)
+		this.local_Items[Item["ItemID"]] = Item
 
 		Item = {}
 	end
@@ -109,29 +121,29 @@ function wnd_cangku_model:initLocalItemsData()
 		return a["ItemID"] < b["ItemID"]
 	end)
 
-	print("read "..#this.local_Items.." Items(Local).")
-
-	-- this.local_Items = Items
+	print("read "..table.count(this.local_Items).." Items(Local).")
 end
 
 function wnd_cangku_model:getLocalItemDetailByItemID(itemID)
-	for i = 1,#this.local_Items do
-		if this.local_Items[i]["ItemID"] == itemID then
-			return table.deepcopy(this.local_Items[i])
-		end
-	end
-	Debugger.LogWarning(itemID.." not found in wnd_cangku_model:getLocalItemDetailByItemID(itemID)")
-	return nil	
+	-- for i = 1,#this.local_Items do
+	-- 	if this.local_Items[i]["ItemID"] == itemID then
+	-- 		return table.deepcopy(this.local_Items[i])
+	-- 	end
+	-- end
+	-- Debugger.LogWarning(itemID.." not found in wnd_cangku_model:getLocalItemDetailByItemID(itemID)")
+	-- return nil
+	return table.deepcopy(this.local_Items[itemID])
 end
 --@Des 获取本地Item数据(引用)
 function wnd_cangku_model:getLocalItemDataRefByItemID(itemID)
-	for i = 1,#this.local_Items do
-		if this.local_Items[i]["ItemID"] == itemID then
-			return this.local_Items[i]
-		end
-	end
-	Debugger.LogWarning(itemID.." not found in wnd_cangku_model:getLocalItemRefByItemID(itemID)")
-	return nil	
+	-- for i = 1,#this.local_Items do
+	-- 	if this.local_Items[i]["ItemID"] == itemID then
+	-- 		return this.local_Items[i]
+	-- 	end
+	-- end
+	-- Debugger.LogWarning(itemID.." not found in wnd_cangku_model:getLocalItemRefByItemID(itemID)")
+	-- return nil
+	return this.local_Items[itemID]
 end
 --@Des 获取服务器Item数量
 function wnd_cangku_model:getServItemCountByItemID(itemID)
@@ -140,8 +152,6 @@ function wnd_cangku_model:getServItemCountByItemID(itemID)
 			return this.Processed_Items[i].num
 		end
 	end
-	Debugger.LogWarning(itemID.." not found in wnd_cangku_model:getServItemCountByItemID(itemID)")
-	return 0
 end
 --@Des 获取服务器装备数量
 function wnd_cangku_model:getServEquipCountByEquipID(eid)
@@ -165,13 +175,14 @@ function wnd_cangku_model:getServCardCountByCardID(cardID)
 end
 
 function wnd_cangku_model:getUseTypeByItemID(itemID)
-	for i = 1,#this.local_Items do
-		if this.local_Items[i]["ItemID"] == itemID then
-			return this.local_Items[i]["UseType"]
-		end
-	end
-	Debugger.LogWarning(itemID.." not found in wnd_cangku_model:getUseTypeByItemID(itemID)")
-	return nil
+	-- for i = 1,#this.local_Items do
+	-- 	if this.local_Items[i]["ItemID"] == itemID then
+	-- 		return this.local_Items[i]["UseType"]
+	-- 	end
+	-- end
+	-- Debugger.LogWarning(itemID.." not found in wnd_cangku_model:getUseTypeByItemID(itemID)")
+	-- return nil
+	return this.local_Items[itemID]["UseType"]
 end
 
 --@params id:装备唯一id
@@ -191,6 +202,7 @@ end
 function wnd_cangku_model:getEquipmentDecomposeReturn(currentLV,Quality)
 	return sdata_equippower_data.mData.body[currentLV][sdata_equippower_data.mFieldName2Index['Quality'..Quality]]
 end
+--@Obsolete 由于装备表结构修改,该方法已弃用
 --@params id:装备唯一id
 --@return 该装备在装备表中的索引
 function wnd_cangku_model:getIndexByID(id)
@@ -205,16 +217,26 @@ end
 ----------------------------------------------------------------
 --★Util
 function wnd_cangku_model:itemWhetherExist(id)
-	for i = 1,#this.serv_Items do
-		if this.serv_Items[i].id == id then
+	-- for i = 1,#this.serv_Items do
+	-- 	if this.serv_Items[i].id == id then
+	-- 		return true
+	-- 	end
+	-- end
+	for _,v in pairs(this.serv_Items) do
+		if v.id == id then
 			return true
 		end
 	end
 	return false
 end
 function wnd_cangku_model:equipWhetherExist(id)
-	for i = 1,#this.serv_Equipment do
-		if this.serv_Equipment[i].id == id then
+	-- for i = 1,#this.serv_Equipment do
+	-- 	if this.serv_Equipment[i].id == id then
+	-- 		return true
+	-- 	end
+	-- end
+	for _,v in pairs(this.serv_Equipment) do
+		if v.id == id then
 			return true
 		end
 	end
@@ -231,12 +253,13 @@ function wnd_cangku_model:addOrUpdateItemData(gw2c_item)
 		local _Exist = this:itemWhetherExist(_id)
 		-- 如果本地存在Item,则更新本地数据，否则追加ItemData到本地Model中
 		if _Exist then
-			for i = 1,#this.serv_Items do
-				if this.serv_Items[i].id == _id then
-					this.serv_Items[i].num = _num
-					return
-				end
-			end
+			-- for i = 1,#this.serv_Items do
+			-- 	if this.serv_Items[i].id == _id then
+			-- 		this.serv_Items[i].num = _num
+			-- 		return
+			-- 	end
+			-- end
+			this.serv_Items[_id].num = _num
 		else
 			local item = {}
 			item = this:getLocalItemDetailByItemID(_id)
@@ -247,7 +270,8 @@ function wnd_cangku_model:addOrUpdateItemData(gw2c_item)
 					-- print("物品数量：".._num.."  堆叠限制：".._OverlapLimit)
 					item.id = _id
 					item.num = _num
-					table.insert(this.serv_Items,item)
+					-- table.insert(this.serv_Items,item)
+					this.serv_Items[_id] = item
 				else 
 					-- print("物品数量超出限制：".._num.."  堆叠限制：".._OverlapLimit)
 					for i = 1,math.ceil(_num / _OverlapLimit) do
@@ -259,17 +283,18 @@ function wnd_cangku_model:addOrUpdateItemData(gw2c_item)
 						else
 							item = table.deepcopy(item)
 					 		item.num = _num - _OverlapLimit * (math.ceil(_num / _OverlapLimit) - 1)
-							table.insert(this.serv_Items,item)
+							-- table.insert(this.serv_Items,item)
+							this.serv_Items[_id] = item
 						end
 					end
 				end
 			end
 		end
 	end
-	require('uiscripts/cangku/scrollview/wnd_cangku_ScrollView_controller'):sortItems(this.serv_Items)
+	-- require('uiscripts/cangku/scrollview/wnd_cangku_ScrollView_controller'):sortItems(this.serv_Items)
 	this.Processed_Items = {}
 	require('uiscripts/cangku/wnd_cangku_controller'):mergeServData()
-	
+	require('uiscripts/cangku/wnd_cangku_controller'):sortProcessedData()
 	Debugger.Log("addOrUpdateItemData() completed.")
 end
 

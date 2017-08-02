@@ -119,7 +119,7 @@ public class TriggerTicker : ILoopItem
                     if (tmpBuffInfo != null)
                     {
                         // 检测上次tick与上次tick的时差, 超过或相等的执行action一次, 并更新tick
-                        if (tickDiff >= tmpBuffInfo.TickTime*10000000)
+                        if (tickDiff >= tmpBuffInfo.TickTime * Utils.TicksTimeToSecond)
                         {
                             // 执行buff的Action
                             BuffManager.Single.DoBuff(tmpBuffInfo, BuffDoType.Action, FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(tmpBuffInfo.ReleaseMember, tmpBuffInfo.ReceiveMember, tmpBuffInfo, 1, tmpBuffInfo.IsNotLethal));
@@ -131,7 +131,7 @@ public class TriggerTicker : ILoopItem
                         // 检测buff是否到时见
                         // 到达极限时间buff直接Detach
                         var buffStartTimeDiff = nowTickTime - tmpBuffInfo.BuffStartTime;
-                        if (buffStartTimeDiff > tmpBuffInfo.BuffTime*10000000)
+                        if (buffStartTimeDiff > tmpBuffInfo.BuffTime * Utils.TicksTimeToSecond)
                         {
                             // buff Detach
                             delList.Add(tmpBuffInfo);
@@ -151,7 +151,7 @@ public class TriggerTicker : ILoopItem
                     var tmpSkillInfo = SkillManager.Single.GetSkillInstance(id);
                     if (tmpSkillInfo != null)
                     {
-                        if (tickDiff >= tmpSkillInfo.TickTime*10000000)
+                        if (tickDiff >= tmpSkillInfo.TickTime * Utils.TicksTimeToSecond)
                         {
                             // 执行skill
                             //SkillManager.Single.DoShillInfo(tmpSkillInfo,

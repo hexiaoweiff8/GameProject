@@ -45,6 +45,7 @@ function chatBubble_View:InitView(root)
     this.userMessage001.text = ""
     this.userMessage002.text = ""
 
+
     this.showIndex = 2
 end
 

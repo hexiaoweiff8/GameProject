@@ -46,7 +46,9 @@ function equip_model:initEquipOnBodyList()
     end
 
     for k, v in ipairs(EquipModel.serv_fitEquipmentList) do
-        self.equipOnBodyList[EquipModel:getLocalEquipmentTypeByServID(v)] = v
+        if v then
+            self.equipOnBodyList[EquipModel:getLocalEquipmentTypeByServID(v)] = v
+        end
     end
 end
 

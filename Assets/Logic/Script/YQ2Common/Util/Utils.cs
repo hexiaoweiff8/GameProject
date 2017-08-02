@@ -133,6 +133,11 @@ public class Utils
     public const int MyCamp = 1;
 
     /// <summary>
+    /// 中立阵营
+    /// </summary>
+    public const int NeutralCamp = 0;
+
+    /// <summary>
     /// 子弹类型-普通类型
     /// </summary>
     public const int BulletTypeNormal = 1;
@@ -308,9 +313,26 @@ public class Utils
     public const float PiToAngle = 57.2957795130823f;
 
     /// <summary>
+    /// DateTime的Ticks时间转换为秒
+    /// </summary>
+    public const long TicksTimeToSecond = 10000000;
+
+    /// <summary>
     /// 特效显示层
     /// </summary>
     public const int EffectLayer = 12;
+
+    /// <summary>
+    /// 选择目标点已选择X
+    /// </summary>
+    public const string TargetPointSelectorXKey = "SelectedX";
+
+    /// <summary>
+    /// 选择目标点已选择Y
+    /// </summary>
+    public const string TargetPointSelectorYKey = "SelectedY";
+
+
 
 
     /// <summary>
@@ -908,6 +930,16 @@ public class Utils
     public static Vector3 WithOutY(Vector3 vec3)
     {
         return new Vector3(vec3.x, 0, vec3.z);
+    }
+
+    /// <summary>
+    /// 3转2排除Y
+    /// </summary>
+    /// <param name="vec3"></param>
+    /// <returns></returns>
+    public static Vector2 V3ToV2WithouY(Vector3 vec3)
+    {
+        return new Vector2(vec3.x, vec3.z);
     }
 
     /// <summary>

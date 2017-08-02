@@ -88,7 +88,7 @@ function wnd_cardyc_controller:refresh_leftCard_Data()
         end
     end
     UIEventListener.Get(view.btn_right).onClick = function()
-        if cardIndex < data:getCardNum() then
+        if cardIndex < cardModel:getCardTblLength() then
             cardIndex = cardIndex + 1
             self:refresh()
         else

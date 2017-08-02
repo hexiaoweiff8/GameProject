@@ -114,7 +114,7 @@ public class ChangeDataFormulaItem : AbstractFormulaItem
         var myField = field;
         var target = ReceivePos == 0 ? paramsPacker.ReleaseMember.ClusterData.AllData.MemberData : paramsPacker.ReceiverMenber.ClusterData.AllData.MemberData;
 
-        result = new Formula((callback) =>
+        result = new Formula((callback, scope) =>
         {
             var changeData = new VOBase();
             // 给目标增加属性

@@ -2,9 +2,9 @@ syntax = "proto2";
 
 message ChatRecord{
     required int32 rId			=1;
-    repeated string userName	=2;
+    required string userName	=2;
     required string content     =3;
-    required int32 time         =4;
+    required int64 time         =4;
 };
 
 
@@ -16,7 +16,7 @@ message EnterChat{
 
 message GetChatRecord{
     required int32 type			=1;
-    required int32 time			=2;
+    required int64 time			=2;
 };
 
 
@@ -35,3 +35,12 @@ message ChatToWorldNotify{
 };
 
 
+message CheckGwSession{
+    required int32  uId         =1;
+    required string token       =2;
+};
+
+
+message CheckGwSessionResp{
+    required int32  rId         =1;
+};

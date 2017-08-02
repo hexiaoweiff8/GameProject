@@ -113,6 +113,12 @@ message Sign{
     required int32 days         =2;
 };
 
+
+message Pvp{
+    required int32 avoid        =1;
+};
+
+
 message Role{
     required int32 uId			=1;
     required int32 hostId		=2;
@@ -132,6 +138,7 @@ message Role{
     required int32 sex          =16;
     repeated ShopItem shop      =17;
     required Sign sign          =18;
+    required Pvp pvp            =19;
 };
 
 

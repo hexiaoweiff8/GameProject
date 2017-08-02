@@ -10,8 +10,6 @@ public class DP_BattlefieldWrap
 		L.RegFunction("SwapScene", SwapScene);
 		L.RegFunction("LoadBase", LoadBase);
 		L.RegFunction("CameraFocusFID", CameraFocusFID);
-		L.RegFunction("CameraFocusActorID", CameraFocusActorID);
-		L.RegFunction("SetFightSpeed", SetFightSpeed);
 		L.RegFunction("Reset", Reset);
 		L.RegFunction("New", _CreateDP_Battlefield);
 		L.RegFunction("__tostring", ToLua.op_ToString);
@@ -101,42 +99,6 @@ public class DP_BattlefieldWrap
 			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
 			int arg1 = (int)LuaDLL.luaL_checknumber(L, 3);
 			obj.CameraFocusFID(arg0, arg1);
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int CameraFocusActorID(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 4);
-			DP_Battlefield obj = (DP_Battlefield)ToLua.CheckObject(L, 1, typeof(DP_Battlefield));
-			DPActorType arg0 = (DPActorType)ToLua.CheckObject(L, 2, typeof(DPActorType));
-			int arg1 = (int)LuaDLL.luaL_checknumber(L, 3);
-			bool arg2 = LuaDLL.luaL_checkboolean(L, 4);
-			obj.CameraFocusActorID(arg0, arg1, arg2);
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int SetFightSpeed(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 2);
-			DP_Battlefield obj = (DP_Battlefield)ToLua.CheckObject(L, 1, typeof(DP_Battlefield));
-			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
-			obj.SetFightSpeed(arg0);
 			return 0;
 		}
 		catch(Exception e)

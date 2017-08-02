@@ -5,18 +5,6 @@ using UnityEngine;
  
 public class AI_Battlefield //: MonoEX.Singleton<AI_Battlefield>
 {
-    const float delayEndTime = 5;//延迟结束战斗时间
-
-    /// <summary>
-    /// 是否战斗中
-    /// </summary>
-    public Boolean ISInBattle = false;
-    public void AddToFindEnemyCache(AI_FightUnit unit)
-    {
-        if (unit.IsInFindEnemyQueue) return;
-        FindEnemyCache.Add(unit);
-        unit.IsInFindEnemyQueue = true;
-    }
  
 
     int mDPID_Seed = 0;
@@ -25,201 +13,13 @@ public class AI_Battlefield //: MonoEX.Singleton<AI_Battlefield>
 
     public const float OneFrameTime = 0.2f;
 
-    public void IterationNext()
-    {
-        m_totalLostTime += OneFrameTime; //时间逝去
-
-
-        if (FightST < FightST.FightEnd) //战斗尚未结束
-        {
-            AddTime(OneFrameTime); //AI对象获得可行动时间
-            DoAI(); //迭代AI
-        }
-
-
-        SkillBoxManage.AddTime(OneFrameTime);
-        SkillBoxManage.Update();
-
-        EffectTrackManage.Update(OneFrameTime
-            // , FightST >= FightST.FightEnd
-            ); //迭代技能特效 
-
-        AI_FightUtils.DoFindEnemyCache(FindEnemyCache); //执行寻敌缓存
-        AI_FightUtils.DoDieUnitCache(DieUnitCache, m_UnitLeaveGridCache); //执行单位死亡缓存
-
-        if (m_UnitLeaveGridCache.Count > 0)
-        {
-            m_NeedRemoveUnitLeave.Clear();
-
-            foreach (var curr in m_UnitLeaveGridCache)
-            {
-                curr.t--;
-                if (curr.t <= 0)
-                {
-                    m_NeedRemoveUnitLeave.Add(curr);
-                    curr.unit.SetGridObj(null, true); //.ownerGrid.Obj = null; 
-                }
-            }
-
-            if (m_NeedRemoveUnitLeave.Count > 0)
-            {
-                foreach (var curr in m_NeedRemoveUnitLeave)
-                    m_UnitLeaveGridCache.Remove(curr);
-            }
-        }
-
-        //同步士兵总数
-        foreach (var square in m_ArmySquareList)
-        {
-            var currSoldiersCount = square.SoldiersCount;
-            if (square.LastSyncSoldiersCount != currSoldiersCount)
-            {
-                square.LastSyncSoldiersCount = currSoldiersCount;
-                //增加兵数量变化关键帧
-                if (square.OverheadPanel != null)
-                    square.OverheadPanel.AddKey_SoldiersCountChange(TotalLostTime, currSoldiersCount);
-            }
-        }
-
-
-    }
 
     //已经开战的时间,从冲锋开始算
     public float FightLostTime {  get { return m_totalLostTime - m_FightStartTime; }  }
 
-    void CheckFightResultSetFightST(FightST st)
-    {
-        m_FightST = st;//判攻击方胜利
-          WaitDie = true;
-        //delayEndTime
-        FightEndTimer.Start(0.5f);//定时结束战斗
-        WorldActor.AddKey_FightAIEnd(TotalLostTime);
-    }
-
-    List<UnitLeaveGridT> m_NeedRemoveUnitLeave = new List<UnitLeaveGridT>();
-    HashSet<UnitLeaveGridT> m_UnitLeaveGridCache = new  HashSet<UnitLeaveGridT>();
-
-    public void OnUnityDie(AI_FightUnit unit)
-    { 
-        DieUnitCache.Add(unit);  
-        
-    }
-
-    public void Reset()
-    {
-
-        _Event = new AI_FightEvent();
-         TexingTrigger = new AI_TexingSkillTrigger(this);
-
-         if (SkillBoxManage == null)
-             SkillBoxManage = new AI_SkillBoxManage(this);
-         else
-             SkillBoxManage.Reset();
-
-         m_QixiEntered = false;
-        m_FightStartTime = 0 ;
-        m_CountdownST = CountdownST.Hide;
-       // lastDoTestGongTime = 0;
-        const int randomSeed = 1;
-        m_LeftPreList.Clear();
-        m_RightPreList.Clear();
-        m_ArmySquareList.Clear();
-        m_totalLostTime = 0;
-        AudioFXCache.Reset(this);
-
-        m_BehindInfo.Reset();
-     
-
-        FindEnemyCache.Clear();
-        DieUnitCache.Clear();
-        m_NeedRemoveUnitLeave.Clear();
-        m_UnitLeaveGridCache.Clear();
-        mDPID_Seed = 0;
-        DPTimeLine.Reset();
-        m_LastCmd.Clear();
-        FightEndTimer = new AI_Timer();
-        FightEndTimer.OnComplete += OnFightEnd;
-        m_FightParameter = null;
-         m_FightST = FightST.None; 
-        m_Random = new QKRandom(randomSeed);
-
-        EffectTrackManage = new AI_EffectTrackManage(this);
-
-        if (GridMap == null)
-        {
-            GridMap = new DiamondGridMap();
-            var mapData = SData_mapdata.Single.GetDataOfID(1);
-            GridMap.Resize((byte)(mapData.MapMaxColumn + DiamondGridMap.SideSize * 2), (byte)(mapData.MapMaxRow + DiamondGridMap.SideSize * 2));
-         } else
-            GridMap.ClearItems();//清空格子地图中的对象
-        EffectTrackManage.Reset();
-    }
-
-    public void PushAICmd(AICmd cmd)
-    {
-        if (FightST > FightST.FightEnd) return;//战斗已经结束了，不能再执行命令
-
-        switch(cmd.CmdType)
-        {
-            case AICmdType.SDSkill:
-                {
-                   var sdskill = cmd as AICmd_SDSkill;
-
-                   var fid=sdskill.fid;
-                   foreach (var currSquare in m_ArmySquareList)
-                    {
-                       if(!currSquare.hero.IsDie&&currSquare.BaseAttr.fid==fid)
-                       {
-                           //释放技能
-                           currSquare.hero.UserReleaseShoudong = true;//ReleaseShouDong(TotalLostTime); 
-
-                           //留下命令记录
-                           sdskill.CurrTime = TotalLostTime;
-                           m_LastCmd.Add(sdskill);
-
-                           break;
-                       }
-                    }
-
-                  
-                }
-                break;
-            case AICmdType.SetResult:
-                {
-                    if (m_FightST>=FightST.Charge && m_FightST < FightST.FightEnd)//只有战斗尚未分出胜负的时候允许执行
-                    {
-                        var hcmd = cmd as AICmd_SetResult;
-                         
-                        CheckFightResultSetFightST(hcmd.IsWin ? FightST.FightWin : FightST.FightLost);
-
-                        //留下命令记录
-                        hcmd.CurrTime = TotalLostTime;
-                        m_LastCmd.Add(hcmd);
-                    }
-                }
-                break;
-            
-        }
-    }
-
-    public int RandomInt(int min, int max)
-    {
-        return m_Random.RangeI(min, max);
-    }
-
-    public FightST FightST
-    {
-        get
-        {
-            return m_FightST;
-        }
-    }
 
     //预备区加入一支军队
 
-    AI_ArmySquare QixiSquare;
-    ZhenfaInfo m_LeftZhenfa;
-    ZhenfaInfo m_RightZhenfa;
     bool m_QixiEntered = false;
 
     /// <summary>
@@ -230,11 +30,6 @@ public class AI_Battlefield //: MonoEX.Singleton<AI_Battlefield>
     {
         
         HashSet<string> packList = new HashSet<string>();
-
-        _GeneratePack_SquareList(m_LeftPreList, packList);
-        _GeneratePack_SquareList(m_RightPreList, packList);
-
-        
 
         //战斗手动聚光灯依赖纹理
         packList.Add("ani_ll_003");
@@ -252,212 +47,20 @@ public class AI_Battlefield //: MonoEX.Singleton<AI_Battlefield>
         //脚下烟尘
         packList.Add("yanwu_zl_006");
         packList.Add("yanwu_tuowei");
-
-        _GeneratePack_Fx(SData_FightKeyValue.Single.LianzhanAudioFxObj, packList); 
-        _GeneratePack_Fx(SData_FightKeyValue.Single.ShadiAudioFxObj, packList);
-        _GeneratePack_Fx(SData_FightKeyValue.Single.ZhanhouAudioFxObj, packList);
-        _GeneratePack_Fx(SData_FightKeyValue.Single.ZhanqianAllAudioFxObj, packList);
-        _GeneratePack_Fx(SData_FightKeyValue.Single.ZhanqianRoleAudioFxObj, packList);
-        //_GeneratePack_Fx(SData_FightKeyValue.Single.HeroSelfAudioFxObj, packList);
-        //_GeneratePack_Fx(SData_FightKeyValue.Single.HeroOtherAudioFxObj, packList);
         
         return packList.ToList();
     }
 
-    void _GeneratePack_SquareList(List<AI_ArmySquare> fightUnits, HashSet<string> outPackList)
-    {
-        foreach (var vo in fightUnits)
-        { 
-            var heroInfo = vo.hero.Data;
-            outPackList.Add(heroInfo.ZiyuanBaoming);//武将模型资源包
 
 
-            
-
-            //武将
-            {
-                //坐骑模型资源包
-                if (!string.IsNullOrEmpty(heroInfo.ZiyuanBaomingZuoqi))
-                    outPackList.Add(heroInfo.ZiyuanBaomingZuoqi);
-
-                //吟唱特效
-                _GeneratePack_Fx(heroInfo.YinchangAudioFxObj, outPackList);
-
-                //英雄的技能
-                foreach (var skill in heroInfo.SkillObjs) _GeneratePack_Skill(skill, outPackList);
-
-                //死亡效果
-                _GeneratePack_Fx(heroInfo.HeroDeadAudioFxObj, outPackList);
-            }
-
-
-            {
-                var armyInfo = vo.ArmyData;
-                outPackList.Add(armyInfo.ZiyuanBaoming);//士兵模型资源包
-
-                //士兵坐骑模型资源包
-                if (!string.IsNullOrEmpty(armyInfo.ZiyuanBaomingZuoqi))
-                    outPackList.Add(armyInfo.ZiyuanBaomingZuoqi);
-
-                //士兵的技能
-                foreach (var skill in armyInfo.SkillObjs) _GeneratePack_Skill(skill, outPackList);
-
-                //死亡效果
-                _GeneratePack_Fx(armyInfo.DeadAudioFxObj, outPackList);
-
-                //近身技
-                _GeneratePack_Skill(armyInfo.JinshenSkillObj, outPackList);
-
-                //弓兵技
-                //_GeneratePack_Skill(armyInfo.GongbingSkillObj, outPackList);
-            } 
-        }
-    }
-
-    void _GeneratePack_Skill(Skill skill, HashSet<string> outPackList) 
-    {
-        if (skill == null) return;
-
-        _GeneratePack_Fx(skill.ShifaAudioFxObj, outPackList);
-        _GeneratePack_Fx(skill.ChufaAudioFxObj, outPackList);
-
-        foreach (var ef in skill.AddTakeEffects) _GeneratePack_SkillEffect(ef, outPackList);
-        foreach (var ef in skill.TakeEffects) _GeneratePack_SkillEffect(ef, outPackList);
-        foreach (var box in skill.TakeBoxObjs) _GeneratePack_SkillBox(box, outPackList);
-    }
-
-    void _GeneratePack_SkillEffect(SkillEffect skillEffect, HashSet<string> outPackList)
-    {
-        if (skillEffect == null) return;
-        _GeneratePack_Fx(skillEffect.ShengcunAudioFxObj, outPackList);
-
-        if (skillEffect.SkillArriveObj!=null)
-            _GeneratePack_Fx(skillEffect.SkillArriveObj.FeixingwuAudioFxObj, outPackList);
-
-        _GeneratePack_Fx(skillEffect.BeijiAudioFxObj, outPackList);
-    }
-
-    void _GeneratePack_SkillBox(SkillBoxInfo skillBox, HashSet<string> outPackList)
-    {
-        if (skillBox == null) return;
-        _GeneratePack_Fx(skillBox.ShengcunAudioFxObj, outPackList);
-        _GeneratePack_Fx(skillBox.DiaoyongAudioFxObj, outPackList);
-        _GeneratePack_Fx(skillBox.SiwangAudioFxObj, outPackList);
-
-        if (skillBox.SkillArriveObj != null)
-            _GeneratePack_Fx(skillBox.SkillArriveObj.FeixingwuAudioFxObj, outPackList); 
-    }
-
-    void _GeneratePack_Fx(AudioFxInfo[] fxArray, HashSet<string> outPackList)
-    {
-        int len = fxArray.Length;
-        for (int i = 0; i < len; i++) _GeneratePack_Fx(fxArray[i], outPackList);
-    }
-
-    void _GeneratePack_Fx(AudioFxInfo fx, HashSet<string> outPackList)
-    {
-        if (fx == null) return;
-
-        foreach(var ad in fx.Audios) 
-        {
-            if(ad._2Dor3D==2) continue;//2D音效常驻内存，无需加载
-            outPackList.Add(ad.Sound);
-        }
-
-        foreach(var tx in fx.Texiaos)
-        {
-            if (tx.ZiyuanType == ZiyuanTypeEnum.Jianyu) 
-                outPackList.Add("gongjian");
-            else if (tx.ZiyuanType == ZiyuanTypeEnum.Lizi)
-            {
-                var len = tx.TexiaoName.Length;
-                for (int i = 0; i < len;i++ )
-                    outPackList.Add(tx.TexiaoName[i]);
-            }
-        }
-    }
-
-
-    void DoAI()
-    {
-        if (!m_QixiEntered && FightLostTime >= SData_FightKeyValue.Single.QixiTime && FightST >= FightST.Charge)
-        {
-            m_QixiEntered = true;
-        }
-
-        foreach (var currSquare in m_ArmySquareList)
-        { 
-            currSquare.DoCharge1();//冲锋武将AI和一些影响解体的逻辑
-        }
-
-        foreach (var currSquare in m_ArmySquareList)
-        { 
-            currSquare.DoAI();
-        }
-         
-    }
-
-    void AddTime(float lostTime)
-    {
-        foreach (var currSquare in m_ArmySquareList)
-            currSquare.AddTime(lostTime);
-    }
-
-    
-    //战斗结束 
-    private void OnFightEnd()
-    {
-        if (WaitDie)
-        {
-            WaitDie = false;
-            FightEndTimer.Start(delayEndTime); //定时结束战斗
-            FightEndAdjust.FightEnd(TotalLostTime, m_ArmySquareList, DPTimeLine, m_FightST);
-        }
-        else
-            WorldActor.AddKey_FightEnd(m_totalLostTime,
-                FightEndAdjust.CreateFightResult(m_FightST, m_totalLostTime - m_FightStartTime, m_ArmySquareList));
-                //战斗结果关键帧
-    }
-
-
-    public DPActor_World WorldActor = null;//世界演员，一个虚拟演员，用于承载一些世界公共的关键帧
-    public DiamondGridMap GridMap = null;
    // public YQ2QuadTree<AI_Object> QuadTreeMap = null;
-    public List<AI_ArmySquare>.Enumerator ArmySquareListEnumerator { get { return m_ArmySquareList.GetEnumerator(); } }
-
-    public float TotalLostTime { get { return m_totalLostTime; } }
-    public List<AI_ArmySquare> m_LeftPreList = new List<AI_ArmySquare>();//左军预备队伍，按动态英雄ID索引
-    public List<AI_ArmySquare> m_RightPreList = new List<AI_ArmySquare>();//右军预备队伍，按动态英雄ID索引
-
-    public List<AICmd> m_LastCmd = new List<AICmd>();
-
-    public BehindInfo m_BehindInfo = new BehindInfo();
-    
-    
-    public AI_FightEvent Event { get { return _Event; } }
-    public AI_EffectTrackManage EffectTrackManage ;
-    public AI_SkillBoxManage SkillBoxManage = null;
-    public readonly DP_TimeLine DPTimeLine = new DP_TimeLine();
-
-    AI_FightEvent _Event = new AI_FightEvent();
-    AI_TexingSkillTrigger TexingTrigger;
-
     float m_totalLostTime = 0;//离战斗开始逝去的时间 
-    List<AI_FightUnit> FindEnemyCache = new List<AI_FightUnit>();
-    List<AI_FightUnit> DieUnitCache = new List<AI_FightUnit>();
 
-    AI_Timer FightEndTimer = new AI_Timer();
     FightParameter m_FightParameter;
-    FightST m_FightST = FightST.None;//战斗状态
-    //Formation m_LeftFormation = new Formation();
     QKRandom m_Random;
-    //Formation m_RightFormation = new Formation();
-    List<AI_ArmySquare> m_ArmySquareList = new List<AI_ArmySquare>();//活动的军队方阵
-    public AI_AudioFXCache AudioFXCache = new AI_AudioFXCache();
     float m_FightStartTime;//记录战斗开始的时间
 
     
-    CountdownST m_CountdownST;//倒计时当前是否处于显示状态
     bool WaitDie = false;
     //delayEndTime
 }

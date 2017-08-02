@@ -37,6 +37,13 @@ function ModelControl:InitMyModels(cardlist)
         end
     end
 end
+function ModelControl:RefreshMyModels(card,cardIndex)
+    if card and cardIndex then
+        handCardsList[cardIndex] = card.id
+        myModelList[cardIndex] = self:createModel(handCardsList[cardIndex],cardIndex)
+        myModelList[cardIndex].gameObject:SetActive(false)
+    end
+end
 
 ---
 ---获取我我的手牌额模型的
@@ -44,7 +51,6 @@ end
 function ModelControl:getMyModel(index)
     if myModelList[index] then
         myModelList[index].gameObject:SetActive(true)
-
         return myModelList[index]
     end
 end

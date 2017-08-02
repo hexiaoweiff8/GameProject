@@ -50,16 +50,6 @@ public class ResourceRefManage : SingletonAuto<ResourceRefManage>
         m_ResidentPacks.Add(packName);
     }
 
-    public void DumpInfo()
-    {
-        foreach(var curr in m_RefInfo)
-        { 
-            Debug.Logout(
-                    MonoEX.LOG_TYPE.LT_DEBUG,
-                   string.Format("包名:{0} 引用数:{1} 是否常驻:{2}", curr.Key, curr.Value, m_ResidentPacks.Contains(curr.Key))
-                );
-        }
-    }
 
     //引用信息 包名，引用数
     Dictionary<string, int> m_RefInfo = new Dictionary<string, int>();

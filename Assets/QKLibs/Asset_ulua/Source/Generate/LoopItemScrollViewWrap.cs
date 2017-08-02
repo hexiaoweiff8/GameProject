@@ -10,6 +10,9 @@ public class LoopItemScrollViewWrap
 		L.RegFunction("Init", Init);
 		L.RegFunction("InitScrollView", InitScrollView);
 		L.RegFunction("UpdateInBack", UpdateInBack);
+		L.RegFunction("UpdateInFront", UpdateInFront);
+		L.RegFunction("InitScollerView", InitScollerView);
+		L.RegFunction("isSendOldData", isSendOldData);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("arrangeDirection", get_arrangeDirection, set_arrangeDirection);
@@ -88,6 +91,60 @@ public class LoopItemScrollViewWrap
 			int arg4 = (int)LuaDLL.luaL_checknumber(L, 6);
 			obj.UpdateInBack(arg0, arg1, arg2, arg3, arg4);
 			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int UpdateInFront(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 6);
+			LoopItemScrollView obj = (LoopItemScrollView)ToLua.CheckObject(L, 1, typeof(LoopItemScrollView));
+			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+			string arg1 = ToLua.CheckString(L, 3);
+			string arg2 = ToLua.CheckString(L, 4);
+			string arg3 = ToLua.CheckString(L, 5);
+			int arg4 = (int)LuaDLL.luaL_checknumber(L, 6);
+			obj.UpdateInFront(arg0, arg1, arg2, arg3, arg4);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int InitScollerView(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			LoopItemScrollView obj = (LoopItemScrollView)ToLua.CheckObject(L, 1, typeof(LoopItemScrollView));
+			obj.InitScollerView();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int isSendOldData(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			LoopItemScrollView obj = (LoopItemScrollView)ToLua.CheckObject(L, 1, typeof(LoopItemScrollView));
+			bool o = obj.isSendOldData();
+			LuaDLL.lua_pushboolean(L, o);
+			return 1;
 		}
 		catch(Exception e)
 		{

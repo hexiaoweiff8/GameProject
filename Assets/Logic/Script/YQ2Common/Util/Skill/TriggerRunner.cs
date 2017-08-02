@@ -22,40 +22,6 @@ public class TriggerRunner : MonoBehaviour
     /// </summary>
     private Action<TriggerLevel1, TriggerLevel2, TriggerData, AllData> settlementDamageOrCure;
 
-    ///// <summary>
-    ///// 技能释放包装类字典
-    ///// ObjectId.ID, SkillReleasePacker
-    ///// </summary>
-    //private static Dictionary<int, SkillReleasePacker> skillReleasePackerDic = new Dictionary<int, SkillReleasePacker>();
-
-    ///// <summary>
-    ///// 被释放技能列表
-    ///// </summary>
-    //private List<SkillReleasePacker> skillReleasePackerList = new List<SkillReleasePacker>();
-
-
-    ///// <summary>
-    ///// 添加技能被释放
-    ///// </summary>
-    ///// <param name="objId">释放者Id</param>
-    ///// <param name="packer">释放技能详情</param>
-    //public static void AddSkillReleasePacker(ObjectID objId, SkillReleasePacker packer)
-    //{
-    //    if (objId == null || packer == null)
-    //    {
-    //        return;
-    //    }
-    //    skillReleasePackerDic.Add(objId.ID, packer);
-    //}
-
-    ///// <summary>
-    ///// 清空被释放技能
-    ///// </summary>
-    //public static void ClearSkillReleasePacker()
-    //{
-    //    skillReleasePackerDic.Clear();
-    //}
-
 
     private void Awake()
     {
@@ -115,10 +81,8 @@ public class TriggerRunner : MonoBehaviour
 
     private void Update()
     {
-        //// 检测并执行技能释放
-        //CheckReleaseSkills();
         // 检查光环
-        CheckHalo(Display);
+        CheckRemain(Display);
         // 处理事件
         CheckTrigger(Display);
     }
@@ -161,18 +125,33 @@ public class TriggerRunner : MonoBehaviour
     }
 
     /// <summary>
-    /// 检查光环
+    /// 检查范围技能
     /// </summary>
     /// <param name="display">被检查单位</param>
-    private void CheckHalo(DisplayOwner display)
+    private void CheckRemain(DisplayOwner display)
     {
-        // 执行光环
+        // 执行范围技能
         var allData = display.ClusterData.AllData;
-        if (allData.MemberData == null) return;
-        // 检查光环
-        foreach (var halo in allData.HaloInfoList)
+        if (allData.MemberData == null || allData.RemainInfoList.Count == 0) return;
+        //var memberPos = new Vector2(display.ClusterData.X, display.ClusterData.Y);
+        // 检查范围技能
+        for (var i = 0; i < allData.RemainInfoList.Count; i++)
         {
-            
+            try
+            {
+                var remain = allData.RemainInfoList[i];
+                if (remain.CheckRange())
+                {
+                    // 如果范围技能已结束, 则删除
+                    allData.RemainInfoList.RemoveAt(i);
+                    i--;
+                    RemainManager.Single.DelRemainInstance(remain.AddtionId);
+                }
+            }
+            catch
+            {
+                int w = 0;
+            }
         }
     }
 
@@ -189,48 +168,11 @@ public class TriggerRunner : MonoBehaviour
         tmpList.Clear();
     }
 
-    ///// <summary>
-    ///// 检查释放技能
-    ///// </summary>
-    //private void CheckReleaseSkills()
-    //{
-    //    lock (skillReleasePackerList)
-    //    {
-    //        foreach (var skillReleasePacker in skillReleasePackerList)
-    //        {
-    //            // 技能释放者
-    //            // 技能接收者
-    //            // 技能
-    //            // fsm 中带技能
-    //            if (skillReleasePacker.SkillReceiveMember.ClusterData != null
-    //                && skillReleasePacker.SkillReceiveMember.GameObj != null)
-    //            {
-    //                SkillManager.Single.DoShillInfo(skillReleasePacker.Skill,
-    //                    FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(skillReleasePacker.Skill,
-    //                        skillReleasePacker.SkillReleaseMember,
-    //                        skillReleasePacker.SkillReceiveMember));
-    //            }
-    //        }
-    //        // 将释放完毕的技能删除, 如果未释放完毕则等待
-    //        for (var i = 0; i < skillReleasePackerList.Count; i++)
-    //        {
-    //            var skillReleasePacker = skillReleasePackerList[i];
-    //            if (skillReleasePacker.Skill.IsDone)
-    //            {
-    //                skillReleasePackerList.RemoveAt(i);
-    //                i--;
-    //            }
-    //        }
-    //    }
-    //}
-
 
     private void OnDestroy()
     {
         // TODO 释放
         // TODO 死亡时将未释放技能进行释放
-        // 清空事件
-        //ClearSkillReleasePacker();
     }
 }
 

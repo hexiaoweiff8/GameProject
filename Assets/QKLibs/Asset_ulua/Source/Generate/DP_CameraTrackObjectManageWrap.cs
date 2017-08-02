@@ -7,7 +7,6 @@ public class DP_CameraTrackObjectManageWrap
 	public static void Register(LuaState L)
 	{
 		L.BeginClass(typeof(DP_CameraTrackObjectManage), typeof(MonoEX.Singleton<DP_CameraTrackObjectManage>));
-		L.RegFunction("SetTrackActor", SetTrackActor);
 		L.RegFunction("CancelTrackActor", CancelTrackActor);
 		L.RegFunction("LookAround", LookAround);
 		L.RegFunction("OnInterruptLookAround", OnInterruptLookAround);
@@ -36,25 +35,6 @@ public class DP_CameraTrackObjectManageWrap
 			{
 				return LuaDLL.luaL_throw(L, "invalid arguments to ctor method: DP_CameraTrackObjectManage.New");
 			}
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int SetTrackActor(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 4);
-			DP_CameraTrackObjectManage obj = (DP_CameraTrackObjectManage)ToLua.CheckObject(L, 1, typeof(DP_CameraTrackObjectManage));
-			DPActorType arg0 = (DPActorType)ToLua.CheckObject(L, 2, typeof(DPActorType));
-			int arg1 = (int)LuaDLL.luaL_checknumber(L, 3);
-			bool arg2 = LuaDLL.luaL_checkboolean(L, 4);
-			obj.SetTrackActor(arg0, arg1, arg2);
-			return 0;
 		}
 		catch(Exception e)
 		{

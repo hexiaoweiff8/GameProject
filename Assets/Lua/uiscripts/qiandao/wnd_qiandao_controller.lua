@@ -190,7 +190,7 @@ function wnd_qiandao_controller:updatalocaldata(SignIn) --将签到奖励添加�
     end
 
     if(SignIn.item~=nil) then
-        itemModel:addItem(SignIn.item)
+        itemModel:addItems(SignIn.item)
     end
 
 end

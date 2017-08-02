@@ -105,7 +105,20 @@ public class RanderControl : MonoBehaviour
         if (!isSetShader)
         {
             isSetShader = true;
-            GetComponent<Renderer>().material.shader = PacketManage.Single.GetPacket("core").Load("Avatar_N.shader") as Shader;
+            var rander = GetComponent<Renderer>();
+            if (rander != null)
+            {
+                var core = PacketManage.Single.GetPacket("core");
+                if (core != null)
+                {
+                    var shader = core.Load("Avatar_N.shader") as Shader;
+                    if (shader != null)
+                    {
+                        rander.material.shader = shader;
+                    }
+                }
+
+            }
         }
     }
 

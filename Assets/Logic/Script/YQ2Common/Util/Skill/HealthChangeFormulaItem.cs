@@ -111,7 +111,7 @@ public class HealthChangeFormulaItem : AbstractFormulaItem
         var myIsNotLethal = paramsPacker.IsNotLethal;
 
         // 创建行为节点
-        result = new Formula((callback) =>
+        result = new Formula((callback, scope) =>
         {
             // 验证数据
             if (targetDisPlayOwner.ClusterData == null)

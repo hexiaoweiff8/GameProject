@@ -36,7 +36,6 @@ public static class LuaBinder
 		UIEventListenerWrap.Register(L);
 		UIDragObjectEXWrap.Register(L);
 		DP_FightPrefabManageWrap.Register(L);
-		AvatarCMWrap.Register(L);
 		EasyTouchWrap.Register(L);
 		BaseFingerWrap.Register(L);
 		MFAModelRenderWrap.Register(L);

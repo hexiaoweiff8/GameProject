@@ -143,6 +143,7 @@ public enum TriggerType
     Skill = 12,
     If = 13,
     ResistDemage = 14,
+    Remain = 15,        // 挂载光环
 }
 
 /// <summary>
@@ -172,5 +173,14 @@ public enum DataType
     DetachQualified,
     IsDeadDisappear,
     IsNotLethal,
+
+    // ------------Remain特有----------
+    Range,              // 作用范围
+    DuringTime,         // 作用总时间
+    IsFollow,           // 是否跟随释放者
+    ActionCamp,         // 作用阵营
+    CouldActionOnAir,   // 是否可以作用到空中单位
+    CouldActionOnSurface,   // 是否可以作用到地面单位
+    CouldActionOnBuilding   // 是否可以作用到建筑单位
 
 }

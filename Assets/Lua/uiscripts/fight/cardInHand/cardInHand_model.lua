@@ -22,8 +22,11 @@ function cardInHand_model:initDatas(view)
     self.power_rightX = _view.power.transform.localPosition.x + _view.power:GetComponent("UIWidget").width / 2
 
 
-    ---
+    ---卡牌替换时，卡牌移动的起始位置
     self.flyStartPosition = _view.leftCard.transform.localPosition
+
+    -- 卡牌选中状态
+    self.isCardSelected = {false, false, false, false}
 end
 
 
@@ -46,7 +49,7 @@ end
 cardInHand_model.AREA_TODO={
     NOTHING = 0,    --什么都不做
     DROP = 1,       --放下模型
-    RECOVERY = 2    --卡牌回收
+    RECYCLE = 2    --卡牌回收
 }
 ---根据触摸点所在的位置判断当前位置的功能
 function cardInHand_model:getArea(Vec3, cardIndex)

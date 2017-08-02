@@ -7,15 +7,21 @@ chatWindow_controller = class("chatWindow_controller",wnd_base)
 local this = chatWindow_controller
 local view = require("uiscripts/chat/chatWindow_view")
 local model = require("uiscripts/chat/chat_model")
+local socket = require "socket"
 
-local chatBubble_controller = require("uiscripts/chat/chatBubble/chatBubble_controller")
+local loopSV
+chatWindow_controller.lookingForOldData = false --是否正在接收更久之前的数据
+
+--local chatBubble_controller = require("uiscripts/chat/chatBubble/chatBubble_controller")
 
 chatBubble_controller.chatType = 0 --聊天频道默认是0世界 1军团
+--chatBubble_controller.heartbeat_chat_timer = 0 --聊天心跳每隔5分钟请求一次
 
 function chatWindow_controller:OnShowDone()
     this.gameObject = self.transform.gameObject
     --初始化view
     view:InitView(self)
+    loopSV = view.worldscrollView.gameObject:GetComponent("LoopItemScrollView")
     ----初始化数据
     --model:initmodel()
     --初始化按钮
@@ -34,6 +40,7 @@ function chatWindow_controller:OnShowDone()
 
     this.gameObject:SetActive(false)
 
+    --Message_Manager:SendPB_30001("token")
     --this.testUdp()
 end
 
@@ -51,10 +58,10 @@ function chatWindow_controller:RefreshWordWindow()
     --end
 
     for key,value in pairs(model.newWorldRecordList) do
-            local uid = value.uid
+            local rid = value.rid
             --local isSelf = (value.uid == userModel:getUserRoleTbl().uid)
             local content = value.content
-            this:create_chatItem(uid,content,0)
+            this:create_chatItem(rid,content,0)
             table.insert(model.chatRecordList,value)
     end
     model.newWorldRecordList = {}
@@ -67,6 +74,8 @@ end
 function chatWindow_controller:InitBtn()
 
     UIEventListener.Get(view.btn_chatBack).onClick = this.btn_chatBack_call
+    UIEventListener.Get(view.backzezhao).onClick = this.btn_chatBack_call
+
     UIEventListener.Get(view.btn_shijie).onClick = this.btn_shijie_call
     UIEventListener.Get(view.btn_juntuan).onClick = this.btn_juntuan_call
 
@@ -89,7 +98,7 @@ function chatWindow_controller:Enter_shijie()
     --显示世界按钮光标
     this.chatType = 0
     view:ShowOneBtnSprite(this.chatType)
-    --请求服务器，进入世界频道
+    --Message_Manager:SendPB_30001("token")
 
     --更改Grid,刷新世界面板数据
     --this:RefreshWordWindow()
@@ -100,10 +109,9 @@ function chatWindow_controller:Enter_juntuan()
     --显示军团按钮光标
     this.chatType = 1
     view:ShowOneBtnSprite(this.chatType)
-    --请求服务器，进入世界频道
 
     --更改Grid,刷新世界面板数据
-    --this:RefreshWordWindow()
+
 
 end
 
@@ -124,21 +132,28 @@ function chatWindow_controller:btn_send_call()
     --敏感字符的检查和替换
 
 
-    --往服务器发送数据 如果是屏蔽的玩家就不往服务器发送数据但是只在自己的画板显示
-    print(os.time())
-    model:inserDate(userModel:getUserRoleTbl().uid,userModel:getUserRoleTbl().userName,str,os.time())
+
 
     --创建文本Item
     --this:create_chatItem(userModel:getUserRoleTbl().uid,str)
     --创建新的数据
     local td = {}
-    td.uid = userModel:getUserRoleTbl().uid
+    td.rid = userModel:getUserRoleTbl().rId
     td.username = userModel:getUserRoleTbl().userName
     td.content = str
-    td.time = os.time()
+    td.time = math.floor(socket.gettime()*1000)
     td.type = 1
-    model:inserDate(td.uid,td.username,td.content,td.time)
-    this:pushDataToScrollViewFormTd(td)
+
+    --数据往服务器发送 先检验玩家是否被屏蔽和禁言
+    if true then
+        Message_Manager:SendPB_30003(td.content)
+    else -- 仅本地显示
+        model:inserDate(td.rid,td.username,td.content,td.time)
+        this:pushDataToScrollViewFormTd(td)
+
+    end
+
+    model.lastTime = td.time
     model.isNoPeopleChat = true
     --Table表从新排版
     --view.worldTable:GetComponent("UITable"):Reposition()
@@ -168,15 +183,15 @@ function chatWindow_controller:chaekSensitive(str)
     return fitStr
 end
 
-function chatWindow_controller:create_chatItem(uid,str)
+function chatWindow_controller:create_chatItem(rid,str)
 
     local chatItem
-    if userModel:getUserRoleTbl().uid == uid then
+    if userModel:getUserRoleTbl().rId == rid then
         chatItem = GameObjectExtension.InstantiateFromPreobj(view.item_perfab.selfChatItem,view.worldTable)
     else
         chatItem = GameObjectExtension.InstantiateFromPreobj(view.item_perfab.otherChatItem,view.worldTable)
-        chatItem.transform:FindChild("headImgBg/headImg").name = "headImg"..uid
-        UIEventListener.Get(chatItem.transform:FindChild("headImgBg/headImg"..uid).gameObject).onClick = this.otherPlayerHead_call
+        chatItem.transform:FindChild("headImgBg/headImg").name = "headImg"..rid
+        UIEventListener.Get(chatItem.transform:FindChild("headImgBg/headImg"..rid).gameObject).onClick = this.otherPlayerHead_call
 
     end
     local messageLabel = chatItem.transform:FindChild("messageBg/messageLabel"):GetComponent("UILabel")
@@ -198,9 +213,8 @@ function chatWindow_controller:btn_chatBack_call()
     --print("btn_chatBack_call")
     --print(this.gameObject.transform.parent.gameObject)
     chatBubble_View.panel:SetActive(true)
-    chatBubble_controller:RefreshNewContent()
-    --Object.Destroy(this.gameObject.transform.parent.gameObject)
-    --ui_manager:DestroyWB(WNDTYPE.chatWindow)
+    --chatBubble_controller:RefreshNewContent()
+
     --print(this.gameObject.name)
     this.gameObject:SetActive(false)
 
@@ -212,6 +226,9 @@ end
 this.isNoPeopleChat = false --没人聊天，则开始计时，当有人一旦发言(从服务器那接受到任一新信息包括自己)则设置为ture
 function chatWindow_controller:Update()
 
+    if model.newWorldRecordList ~= nil and #model.newWorldRecordList >0 then
+        this.pushDataToScrollViewFormNewRecrdList()
+    end
     --if  not this.testUDPGet and this.gameObject.activeSelf then
     --    this.timer001 = this.timer001 + Time.deltaTime
     --    if this.timer001 >= 5 then
@@ -222,14 +239,19 @@ function chatWindow_controller:Update()
 
     if model.isNoPeopleChat then
         --upTime_timer = upTime_timer + Time.deltaTime
-        if os.time() - model.lastTime >= 10 then
+        if os.time() - (model.lastTime/1000) >= 10 then --最新消息大于2分钟没人创建时间Item
             this:create_timeItem(model.lastTime)
             --upTime_timer = 0
             --model.isNoPeopleChat = false
         end
     end
 
+    --聊天请求心跳
+    --print("聊天室的心跳")
+    chatBubble_controller:Heartbeat_chat()
 
+    --请求更久以前的数据
+    this.sendOldData()
 
 end
 
@@ -246,10 +268,10 @@ function chatWindow_controller:create_timeItem(lastTime)
     --获取本地时间
     local NowTime = os.time()--os.date("%X")--测试时间
     local OneDayTime = os.date("%H")*3600+os.date("%M")*60+os.date("%S") --一天以前的时间戳和现在相差的时间
-    local timeDifference = NowTime - lastTime
+    local timeDifference = NowTime - math.floor((lastTime/1000))
     local timeText
     if timeDifference < OneDayTime then
-        timeText = os.date("%X",lastTime)
+        timeText = os.date("%X",math.floor((lastTime/1000)))
     else if timeDifference > OneDayTime and timeDifference < OneDayTime+86400 then
         timeText = "一天前"
         --print(timeDifference)
@@ -267,7 +289,7 @@ function chatWindow_controller:create_timeItem(lastTime)
     td.content = timeText
     td.type = 3
     --model:inserDate(td.time,td.type)
-    model:inserTimeDate(td.time,td.content,td.type)
+    model:inserTimeDate(lastTime+1,td.content,td.type)
 
     --要把数据往C#前端推
     this:pushDataToScrollViewFormTd(td)
@@ -283,33 +305,67 @@ function chatWindow_controller:create_timeItem(lastTime)
 end
 
 function chatWindow_controller:pushDataToScrollViewFirst()
-    local loopSV = view.worldscrollView.gameObject:GetComponent("LoopItemScrollView")
-    --print(loopSV.gameObject.name)
+    -- loopSV = view.worldscrollView.gameObject:GetComponent("LoopItemScrollView")
+    print("chatWindow_controller:pushDataToScrollViewFirst()")
 
     if loopSV ~= nil then
-        for key,value in ipairs(model.chatRecordList) do
+        for key,value in ipairs(model.newWorldRecordList) do
+            --print("排序后的newWorldRecordList的Key："..key.."----time:"..value.time.."----content:"..value.content)
             if value.type == 3 then
                 --print(value.type .. "  "..value.time)
                 loopSV:UpdateInBack(99999,"xxxxxxx",value.content,value.time,value.type)
             else
                 --print(value.type .. "  "..value.content)
-                loopSV:UpdateInBack(value.uid,value.username,value.content,value.time,value.type)
+                loopSV:UpdateInBack(value.rid,value.username,value.content,value.time,value.type)
             end
         end
+    end
+
+    if #model.newWorldRecordList ~= 0 then--第一次得吧新的数据给释放了 防止再一次往C#端推送
+        model.newWorldRecordList = {}
     end
 end
 
 function chatWindow_controller:pushDataToScrollViewFormTd(td)
-    local loopSV = view.worldscrollView.gameObject:GetComponent("LoopItemScrollView")
+    --local loopSV = view.worldscrollView.gameObject:GetComponent("LoopItemScrollView")
     if td.type == 3 then
         --print(value.type .. "  "..value.time)
         loopSV:UpdateInBack(99999,"xxxxxxx",td.content,td.time,td.type)
     else
         --print(value.type .. "  "..value.content)
-        loopSV:UpdateInBack(td.uid,td.username,td.content,td.time,td.type)
+        loopSV:UpdateInBack(td.rid,td.username,td.content,td.time,td.type)
     end
     ----Void LoopItemScrollView:UpdateInBack(Int32 uid,String username,String content,String time,Int32 type)
 
+end
+
+function chatWindow_controller:pushDataToScrollViewFormNewRecrdList()
+    --local loopSV = view.worldscrollView.gameObject:GetComponent("LoopItemScrollView")
+
+    if loopSV ~= nil then
+        for key,value in ipairs(model.newWorldRecordList) do
+            --print("排序后的newWorldRecordList的Key："..key.."----time:"..value.time.."----content:"..value.content)
+            if value.type == 3 then
+                --print(value.type .. "  "..value.time)
+                loopSV:UpdateInBack(99999,"xxxxxxx",value.content,value.time,value.type)
+            else
+                --print(value.type .. "  "..value.content)
+                loopSV:UpdateInBack(value.rid,value.username,value.content,value.time,value.type)
+            end
+        end
+    end
+    model.newWorldRecordList = {}
+end
+
+function chatWindow_controller:pushDataToScrollViewFormOldRecrdList()
+    --local loopSV = view.worldscrollView.gameObject:GetComponent("LoopItemScrollView")
+
+    if loopSV ~= nil and #model.oldWorldRecordList ~= 0  then
+        for key,value in ipairs(model.oldWorldRecordList) do
+                loopSV:UpdateInFront(value.rid,value.username,value.content,value.time,value.type)
+        end
+    end
+    model.oldWorldRecordList = {}
 end
 
 function chatWindow_controller:testUdp()
@@ -356,6 +412,22 @@ function chatWindow_controller:testUdp()
     print("tank you")
 end
 
+function chatWindow_controller:Heartbeat_chat()--聊天心跳 当用户在聊天室界面每隔5分钟请求一次
+    chatBubble_controller.heartbeat_chat_timer = chatBubble_controller.heartbeat_chat_timer + Time.deltaTime
+    if chatBubble_controller.heartbeat_chat_timer >=300 then
+        Message_Manager:SendPB_30001("token")
+        chatBubble_controller.heartbeat_chat_timer = 0
+    end
+end
 
+function chatWindow_controller:sendOldData()
+    --local loopSV = view.worldscrollView.gameObject:GetComponent("LoopItemScrollView")
+    if loopSV ~= nil and not this.lookingForOldData and loopSV:isSendOldData() and model.isHaveOldData then
+        print("开始请求更早的数据")
+        this.lookingForOldData = true
+        Message_Manager:SendPB_30002(0,model.oldLastDataTime-1)
+    end
+
+end
 
 return chatWindow_controller

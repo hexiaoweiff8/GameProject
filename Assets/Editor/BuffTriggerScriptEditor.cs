@@ -30,6 +30,7 @@ public class BuffTriggerScriptEditor : BaseTriggerScriptEditor
             new List<string>() {"是否等待执行完(0否,1是):", "Skill ID:"},
             new List<string>() {"是否等待执行完(0否,1是):", "是否停止后面(0/1):", "条件:","条件内容:"},
             new List<string>() {"是否等待执行完(0否,1是):", "吸收量:", "每次百分比(0-1):","是否吸收过量伤害(true/false):"},
+            new List<string>() {"是否等待执行完(0否,1是):", "目标(0自己/1对方):", "Remain编号:","是否跟随:"},
         };
         DataParamTitles = new[]
         {
@@ -165,6 +166,9 @@ public class BuffTriggerScriptEditor : BaseTriggerScriptEditor
                     break;
                 case TriggerType.Move:
                     ret += "Move";
+                    break;
+                case TriggerType.Remain:
+                    ret += "Remain";
                     break;
                 default:
                     return String.Empty;

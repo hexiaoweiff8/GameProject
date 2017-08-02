@@ -180,7 +180,7 @@ public class TestTargetSelecter : MonoBehaviour
         Utils.DrawGraphics(itemRect, Color.red);
 
         // 根据策略筛选目标
-        var targetList = TargetSelecter.Single.TargetFilter(item, MemberList.QuadTree);
+        var targetList = TargetSelecter.TargetFilter(item, MemberList.QuadTree);
 
         // 连线
         foreach (var targetItem in targetList)

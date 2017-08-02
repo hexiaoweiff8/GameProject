@@ -12,5 +12,4 @@ class AI_Single : MonoEX.Singleton<AI_Single>
     }
 
     public readonly AI_Battlefield Battlefield;
-   // public readonly AI_EffectTrackManage EffectTrackManage;
 }

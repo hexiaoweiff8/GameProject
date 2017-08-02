@@ -134,7 +134,7 @@ function equipDetail:refresh(equipToShow)
     self._view.lab_nextLevel:GetComponent("UILabel").text = self._data.LevelUpOffset
 
     if not self._suitProp then
-        self._suitProp = SuitProps(self._view.lab_suitEffect, Const.SUIT_PROP_PIVOT.TOP_CENTER)
+        self._suitProp = SuitProps(self._view.lab_suitEffect, SuitProps.SUIT_PROP_PIVOT.TOP_CENTER)
     end
     self._suitProp:Refresh(equip["SuitID"])
 

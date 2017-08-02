@@ -7,6 +7,8 @@ chatWindow_view = {
 
     btn_send,
     btn_chatBack,
+
+    backzezhao,
     --精灵
     btn_shijie_sprite,
     btn_juntuan_sprite,
@@ -47,6 +49,7 @@ function chatWindow_view:InitView(root)
 
     this.btn_btn_shijie_sprite = this.panel.transform:FindChild("Window/left_bg/btn_shijie/Sprite").gameObject
     this.btn_juntuan_sprite = this.panel.transform:FindChild("Window/left_bg/btn_juntuan/Sprite").gameObject
+    this.backzezhao = this.panel.transform:FindChild("Window/backzezhao").gameObject
 
     this.input_label = this.panel.transform:FindChild("Window/botton_bg/input/Label"):GetComponent("UILabel")
     this.input_com = this.panel.transform:FindChild("Window/botton_bg/input"):GetComponent("UIInput")

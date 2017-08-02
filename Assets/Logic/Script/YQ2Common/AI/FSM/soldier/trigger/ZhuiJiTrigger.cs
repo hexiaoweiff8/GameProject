@@ -45,7 +45,7 @@ public class ZhuiJiTrigger : SoldierFSMTrigger
                 var scopeMemberList = ClusterManager.Single.CheckRange(pos, clusterData.AllData.MemberData.SightRange,
                     clusterData.AllData.MemberData.Camp, true);
                 // 按照权重与是否可攻击单位选择
-                var filtedlist = TargetSelecter.Single.TargetFilter(clusterData, scopeMemberList);
+                var filtedlist = TargetSelecter.TargetFilter(clusterData, scopeMemberList);
                 Utils.DrawGraphics(new CircleGraphics(pos, clusterData.AllData.MemberData.SightRange), Color.yellow);
                 //fsm.Display.ClusterData.MemberData.SightRange
                 if (filtedlist != null && filtedlist.Count > 0)

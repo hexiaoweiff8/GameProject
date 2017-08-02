@@ -219,7 +219,7 @@ function comPropty_controller:refreshSuit()
             _suitPanel[i].transform:Find("title/name"):GetComponent("UILabel").text = equipSuitUtil:getEquipSuitName(suitID)
 
             if not _suitProp[i] then
-                _suitProp[i] = SuitProps(_suitPanel[i].transform:Find("prop").gameObject, Const.SUIT_PROP_PIVOT.TOP_LEFT)
+                _suitProp[i] = SuitProps(_suitPanel[i].transform:Find("prop").gameObject, SuitProps.SUIT_PROP_PIVOT.TOP_LEFT)
             end
             _suitProp[i]:Refresh(suitID)
 

@@ -7,6 +7,10 @@
 local class = require("common/middleclass")
 local SuitProps = class("SuitProps")
 
+SuitProps.SUIT_PROP_PIVOT ={
+    TOP_CENTER = 0,
+    TOP_LEFT = 1
+}
 
 ---构造函数
 function SuitProps:initialize(parent,pivot)
@@ -21,9 +25,9 @@ end
 ---添加控件
 function SuitProps:addSuitAttrObj(index)
     if index > #self.suitAttr_lab then
-        if self.pivot == Const.SUIT_PROP_PIVOT.TOP_CENTER then
+        if self.pivot == self.SUIT_PROP_PIVOT.TOP_CENTER then
             self.suitAttr_lab[index] = GameObjectExtension.InstantiateFromPacket("commonU", "suitAttr_TopCenter", self.parent).gameObject
-        elseif self.pivot == Const.SUIT_PROP_PIVOT.TOP_LEFT then
+        elseif self.pivot == self.SUIT_PROP_PIVOT.TOP_LEFT then
             self.suitAttr_lab[index] = GameObjectExtension.InstantiateFromPacket("commonU", "suitAttr_TopLeft", self.parent).gameObject
         end
 

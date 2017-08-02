@@ -42,7 +42,8 @@ public class PointToPositionScopeGeneralAttack : IGeneralAttack
     {
         if (attacker == null)
         {
-            throw new Exception("攻击者集群数据为空");
+            //throw new Exception("攻击者集群数据为空");
+            return;
         }
         var key1 = effectKey[0];
         var key2 = effectKey[1];

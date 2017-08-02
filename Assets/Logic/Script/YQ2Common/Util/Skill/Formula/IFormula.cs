@@ -35,7 +35,7 @@ public interface IFormula
     /// <summary>
     /// 具体执行lambda表达式
     /// </summary>
-    Action<Action> Do { get; }
+    Action<Action, DataScope> Do { get; }
 
     /// <summary>
     /// 添加下一节点
@@ -62,5 +62,9 @@ public interface IFormula
     /// </summary>
     /// <returns>链头单位</returns>
     IFormula GetFirst();
-}
 
+    /// <summary>
+    /// 数据域
+    /// </summary>
+    DataScope DataScope { get; set; }
+}

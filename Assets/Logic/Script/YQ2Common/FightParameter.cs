@@ -46,7 +46,6 @@ public class ArmySquareInfo
     public Equip[] Equips;//道具队列
 
     public bool zs;//是否已转身
-    public ArmyFlag flag;//方阵阵营
     public byte fid;//和战场阵位对应的id
 
     public float cd = -1;//手动蓄力 lua层可选属性,如果值>=0有效

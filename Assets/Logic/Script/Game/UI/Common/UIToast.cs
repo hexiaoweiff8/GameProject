@@ -15,7 +15,7 @@ public class UIToast {
     /// <param name="messageToShow">要显示的信息</param>
     /// <param name="callback">当前信息显示完成后的回调</param>
     /// <param name="showType">显示类型</param>
-    public static void Show(string messageToShow, TweenCallback callback, ShowType showType)
+    public static void ShowWithCallback(string messageToShow, TweenCallback callback, ShowType showType)
     {
         if ( ToastManager._ins == null)
         {

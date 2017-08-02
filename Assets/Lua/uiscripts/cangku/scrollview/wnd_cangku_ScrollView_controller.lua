@@ -9,6 +9,7 @@ wnd_cangku_ScrollView_controller = {
 	Items_filterByUseType_3_4_5 = nil,
 	Items_filterByUseType_6_7 = nil,
 	Items_filterByUseType_8 = nil,
+	serv_Equipment_array = nil, -- 装备列表数组
 
 	_selectedIndex,
 	_selectedItem, -- 记录当前处于选择状态的Item
@@ -97,7 +98,7 @@ function wnd_cangku_ScrollView_controller:getItemType(ItemID)
 	else return '装备碎片'
 	end
 end
-
+--@Des 为cangkuItem设置品质框
 function wnd_cangku_ScrollView_controller:setQualityMark(cangkuItem,Quality)
 	if Quality == 1 then
 		cangkuItem:setIconFrame(cstr.QUALITY_WHITE)
@@ -216,7 +217,6 @@ function wnd_cangku_ScrollView_controller:HandleOnItemLoadedHandler(item)
 		-- cangkuItem.cItem:SetActive(false)
 		-- cangkuItem.cEquipment:SetActive(false)
 	end
-	
 end
 
 function wnd_cangku_ScrollView_controller:HandleOnItemClickedHandler(cangkuItem)
@@ -289,7 +289,10 @@ function wnd_cangku_ScrollView_controller:HandleOnItemClickedInDecompositionPane
 end
 
 function wnd_cangku_ScrollView_controller:HandleOnItemSelectedHandler(cangkuItem)
-	
+
+	if not (cangkuItem.Index + 1 <= #this.currentItems) then
+		return
+	end
 	if this._selectedItem ~= nil and
 		this._selectedItem ~= cangkuItem then
 		this._selectedItem:setIconSelectFrame(nil)
@@ -311,7 +314,7 @@ function wnd_cangku_ScrollView_controller:refreshList()
 	else
 		_scrollView:Reload(#this.currentItems) end
 end
-
+--@Des 筛选列表显示项
 function wnd_cangku_ScrollView_controller:filterBy(Goods,Maintype)
 	if Goods == nil or Maintype == nil then
 		error('筛选数据异常')
@@ -325,7 +328,16 @@ function wnd_cangku_ScrollView_controller:filterBy(Goods,Maintype)
 
 	if Goods == 'Equip' then --  显示所有装备
 		if Maintype ~= 'Decomposition' then
-			this.currentItems = model.serv_Equipment
+			-- this.currentItems = model.serv_Equipment
+			if this.serv_Equipment_array == nil then
+				this.serv_Equipment_array = {}
+				for _,v in pairs(model.serv_Equipment) do
+					table.insert(this.serv_Equipment_array,v)
+				end
+				this:sortEquipment(this.serv_Equipment_array)
+				print("serv_Equipment_array初始化长度:"..tostring(#this.serv_Equipment_array))
+			end
+			this.currentItems = this.serv_Equipment_array
 		else
 			-- Maintype == Decomposition时为内部调用，显示装备分解临时表
 			this.currentItems = model.decomposition_Equipment
@@ -338,9 +350,14 @@ function wnd_cangku_ScrollView_controller:filterBy(Goods,Maintype)
 			this.currentItems = this.Items_filterByUseType_1_2
 		else
 			this.Items_filterByUseType_1_2 = {}
-			for i = 1,#model.serv_Items do
-				if model.serv_Items[i]["UseType"] == 1 or model.serv_Items[i]["UseType"] == 2 then
-					table.insert(this.Items_filterByUseType_1_2,model.serv_Items[i])
+			-- for i = 1,#model.serv_Items do
+			-- 	if model.serv_Items[i]["UseType"] == 1 or model.serv_Items[i]["UseType"] == 2 then
+			-- 		table.insert(this.Items_filterByUseType_1_2,model.serv_Items[i])
+			-- 	end
+			-- end
+			for _,v in pairs(model.serv_Items) do
+				if v["UseType"] == 1 or v["UseType"] == 2 then
+					table.insert(this.Items_filterByUseType_1_2,v)
 				end
 			end
 			this:sortItems(this.Items_filterByUseType_1_2)
@@ -353,9 +370,14 @@ function wnd_cangku_ScrollView_controller:filterBy(Goods,Maintype)
 			this.currentItems = this.Items_filterByUseType_6_7
 		else
 			this.Items_filterByUseType_6_7 = {}
-			for i = 1,#model.serv_Items do
-				if model.serv_Items[i]["UseType"] == 6 or model.serv_Items[i]["UseType"] == 7 then
-					table.insert(this.Items_filterByUseType_6_7,model.serv_Items[i])
+			-- for i = 1,#model.serv_Items do
+			-- 	if model.serv_Items[i]["UseType"] == 6 or model.serv_Items[i]["UseType"] == 7 then
+			-- 		table.insert(this.Items_filterByUseType_6_7,model.serv_Items[i])
+			-- 	end
+			-- end
+			for _,v in pairs(model.serv_Items) do
+				if v["UseType"] == 6 or v["UseType"] == 7 then
+					table.insert(this.Items_filterByUseType_6_7,v)
 				end
 			end
 			this:sortItems(this.Items_filterByUseType_6_7)
@@ -368,11 +390,16 @@ function wnd_cangku_ScrollView_controller:filterBy(Goods,Maintype)
 			this.currentItems = this.Items_filterByUseType_3_4_5
 		else
 			this.Items_filterByUseType_3_4_5 = {}
-			for i = 1,#model.serv_Items do
-				if model.serv_Items[i]["UseType"] == 3 or
-					 model.serv_Items[i]["UseType"] == 4 or
-					  model.serv_Items[i]["UseType"] == 5 then
-					table.insert(this.Items_filterByUseType_3_4_5,model.serv_Items[i])
+			-- for i = 1,#model.serv_Items do
+			-- 	if model.serv_Items[i]["UseType"] == 3 or
+			-- 		 model.serv_Items[i]["UseType"] == 4 or
+			-- 		  model.serv_Items[i]["UseType"] == 5 then
+			-- 		table.insert(this.Items_filterByUseType_3_4_5,model.serv_Items[i])
+			-- 	end
+			-- end
+			for _,v in pairs(model.serv_Items) do
+				if v["UseType"] == 3 or v["UseType"] == 4 or v["UseType"] == 5 then
+					table.insert(this.Items_filterByUseType_3_4_5,v)
 				end
 			end
 			this:sortItems(this.Items_filterByUseType_3_4_5)
@@ -385,9 +412,14 @@ function wnd_cangku_ScrollView_controller:filterBy(Goods,Maintype)
 			this.currentItems = this.Items_filterByUseType_8
 		else
 			this.Items_filterByUseType_8 = {}
-			for i = 1,#model.serv_Items do
-				if model.serv_Items[i]["UseType"] == 8 then
-					table.insert(this.Items_filterByUseType_8,model.serv_Items[i])
+			-- for i = 1,#model.serv_Items do
+			-- 	if model.serv_Items[i]["UseType"] == 8 then
+			-- 		table.insert(this.Items_filterByUseType_8,model.serv_Items[i])
+			-- 	end
+			-- end
+			for _,v in pairs(model.serv_Items) do
+				if v["UseType"] == 8 then
+					table.insert(this.Items_filterByUseType_8,v)
 				end
 			end
 			this:sortItems(this.Items_filterByUseType_8)
@@ -461,9 +493,14 @@ function wnd_cangku_ScrollView_controller:addEquipmentShowByQuality(rarity)
 	if this.currentItems ~= model.decomposition_Equipment or (this.currentItems == nil and #this.currentItems == 0) then
 		return
 	end
-	for i = 1,#model.serv_Equipment do
-		if model.serv_Equipment[i].rarity == rarity then
-			table.insert(this.currentItems,model.serv_Equipment[i])
+	-- for i = 1,#model.serv_Equipment do
+	-- 	if model.serv_Equipment[i].rarity == rarity then
+	-- 		table.insert(this.currentItems,model.serv_Equipment[i])
+	-- 	end
+	-- end
+	for _,v in pairs(model.serv_Equipment) do
+		if v.rarity == rarity then
+			table.insert(this.currentItems,v)
 		end
 	end
 	-- 清除已选择状态

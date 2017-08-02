@@ -37,7 +37,8 @@ public class NormalGeneralAttack : IGeneralAttack
     {
         if (attacker == null || beAttackMember == null)
         {
-            throw new Exception("被攻击者或攻击者数据为空");
+            //throw new Exception("被攻击者或攻击者数据为空");
+            return;
         }
         Action demage = () =>
         {

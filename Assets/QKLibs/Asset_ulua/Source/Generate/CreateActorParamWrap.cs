@@ -47,20 +47,6 @@ public class CreateActorParamWrap
 				ToLua.PushObject(L, obj);
 				return 1;
 			}
-			else if (count == 8 && TypeChecker.CheckTypes(L, 1, typeof(AvatarCM), typeof(bool), typeof(int), typeof(string), typeof(string), typeof(bool), typeof(int), typeof(int)))
-			{
-				AvatarCM arg0 = (AvatarCM)ToLua.CheckObject(L, 1, typeof(AvatarCM));
-				bool arg1 = LuaDLL.luaL_checkboolean(L, 2);
-				int arg2 = (int)LuaDLL.luaL_checknumber(L, 3);
-				string arg3 = ToLua.CheckString(L, 4);
-				string arg4 = ToLua.CheckString(L, 5);
-				bool arg5 = LuaDLL.luaL_checkboolean(L, 6);
-				int arg6 = (int)LuaDLL.luaL_checknumber(L, 7);
-				int arg7 = (int)LuaDLL.luaL_checknumber(L, 8);
-				CreateActorParam obj = new CreateActorParam(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				ToLua.PushObject(L, obj);
-				return 1;
-			}
 			else if (count == 8 && TypeChecker.CheckTypes(L, 1, typeof(int), typeof(bool), typeof(int), typeof(string), typeof(string), typeof(bool), typeof(int), typeof(int)))
 			{
 				int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
@@ -95,8 +81,8 @@ public class CreateActorParamWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			CreateActorParam obj = (CreateActorParam)o;
-			AvatarCM ret = obj.CmType;
-			ToLua.Push(L, ret);
+			int ret = obj.CmType;
+			LuaDLL.lua_pushinteger(L, ret);
 			return 1;
 		}
 		catch(Exception e)
@@ -304,7 +290,7 @@ public class CreateActorParamWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			CreateActorParam obj = (CreateActorParam)o;
-			AvatarCM arg0 = (AvatarCM)ToLua.CheckObject(L, 2, typeof(AvatarCM));
+			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
 			obj.CmType = arg0;
 			return 0;
 		}

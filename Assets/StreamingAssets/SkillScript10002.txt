@@ -1,6 +1,7 @@
 SkillNum(10002)
+Action
 {
-	PointToObj(1, test/TrailPrj, 20, 1, 1,1,1);
+	Remain(1, 1, 1000, true);
 }
 [
 ]

@@ -245,7 +245,7 @@ public class TestSkillEditor : MonoBehaviour
         }
 
         // 触发被选中技能
-        SkillManager.Single.DoShillInfo(
+        SkillManager.Single.DoSkillInfo(
             skill, 
             FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(
                 new DisplayOwner(workingObj.gameObject, workingObj),

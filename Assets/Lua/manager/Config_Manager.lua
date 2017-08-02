@@ -93,6 +93,11 @@ function Config_Manager:LoadConfig()
     sdata_systemconstant_data = luacsv.new(require("pk_tabs/systemconstant_c"))
     --聊天敏感词表
     sdata_subtlecode_data = luacsv.new(require("pk_tabs/subtlecode_c"))
+    --免战卡表
+    sdata_avoidwar_data = luacsv.new(require("pk_tabs/avoidwar_c"))
+
+    --战斗界面卡牌测试表
+    sdata_testcardplan_data = luacsv.new(require("pk_tabs/testcardplan_c"))
 
     -----------------------------------C#需要调用的配置表在以下位置添加---------------------------------------
     SDataUtils.setData("mapData", sdata_mapData_data.mData.head, sdata_mapData_data.mData.body)

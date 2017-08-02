@@ -149,7 +149,7 @@ public class PointFormulaItem : AbstractFormulaItem
         var scaleX = ScaleX;
         var scaleY = ScaleY;
         var scaleZ = ScaleZ;
-        IFormula result = new Formula((callback) =>
+        IFormula result = new Formula((callback, scope) =>
         {
             var pos = myTargetPos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
             // 判断发射与接收位置

@@ -5,7 +5,7 @@ using System.Collections;
 /// </summary>
 public class CreateActorParam
 {
-    public AvatarCM CmType;
+    public int CmType;
     //ModleMaskColor maskColor,
     public bool ColorMat;
     public int FlagColorIdx;
@@ -31,7 +31,7 @@ public class CreateActorParam
     /// </summary>
     public float Y;
 
-    public CreateActorParam(AvatarCM cmType,
+    public CreateActorParam(int cmType,
         //ModleMaskColor maskColor,
         bool colorMat,
         int flagColorIdx,
@@ -49,25 +49,6 @@ public class CreateActorParam
         this.TexturePackName = texturePackName;
         this.IsHero = isHero;
         this.SoldierID = soldierID;
-        this.CardID = cardID;
-    }
-    public CreateActorParam(int cmType,
-        //ModleMaskColor maskColor,
-    bool colorMat,
-    int flagColorIdx,
-    string meshPackName,
-    string texturePackName,
-    bool isHero,
-    int soldierID,
-    int cardID = 0)
-    {
-        this.CmType = (AvatarCM)cmType;
-        this.ColorMat = colorMat;
-        this.SoldierID = soldierID;
-        this.FlagColorIdx = flagColorIdx;
-        this.MeshPackName = meshPackName;
-        this.TexturePackName = texturePackName;
-        this.IsHero = isHero;
         this.CardID = cardID;
     }
 

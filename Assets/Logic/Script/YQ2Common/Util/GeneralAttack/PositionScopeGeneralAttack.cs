@@ -59,7 +59,8 @@ public class PositionScopeGeneralAttack : IGeneralAttack
     {
         if (attacker == null)
         {
-            throw new Exception("攻击者数据为null");
+            //throw new Exception("攻击者数据为null");
+            return;
         }
         this.attacker = attacker;
         this.effectKey = effectKey;
@@ -87,7 +88,8 @@ public class PositionScopeGeneralAttack : IGeneralAttack
     {
         if (attacker == null)
         {
-            throw new Exception("攻击者数据为null");
+            //throw new Exception("攻击者数据为null");
+            return;
         }
         this.attacker = attacker;
         this.effectKey = effectKey;

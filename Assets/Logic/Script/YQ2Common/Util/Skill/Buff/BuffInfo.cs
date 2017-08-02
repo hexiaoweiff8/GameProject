@@ -137,22 +137,22 @@ public class BuffInfo : SkillBase
             if (value.IndexOf("f", StringComparison.Ordinal) > 0)
             {
                 // float
-                result = Utils.GetCompare<float>(op)(SkillDataScope.GetFloat(key).Value, Convert.ToSingle(value.Replace("f","")));
+                result = Utils.GetCompare<float>(op)(DataScope.GetFloat(key).Value, Convert.ToSingle(value.Replace("f","")));
             }
             else if (value.EndsWith("L"))
             {
                 // long
-                result = Utils.GetCompare<long>(op)(SkillDataScope.GetLong(key).Value, Convert.ToInt64(value));
+                result = Utils.GetCompare<long>(op)(DataScope.GetLong(key).Value, Convert.ToInt64(value));
             }
             else if (value.Equals("true") && value.Equals("false"))
             {
                 // bool
-                result = Utils.GetCompare<bool>(op)(SkillDataScope.GetBool(key).Value, Convert.ToBoolean(value));
+                result = Utils.GetCompare<bool>(op)(DataScope.GetBool(key).Value, Convert.ToBoolean(value));
             }
             else
             {
                 // int
-                result = Utils.GetCompare<int>(op)(SkillDataScope.GetInt(key).Value, Convert.ToInt32(value));
+                result = Utils.GetCompare<int>(op)(DataScope.GetInt(key).Value, Convert.ToInt32(value));
             }
         }
 

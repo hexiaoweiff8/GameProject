@@ -117,7 +117,7 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
         List<FormulaParamsPacker> prvPackerList = new List<FormulaParamsPacker>();
         IList<FormulaParamsPacker> tmpPackerList = null;
 
-        IFormula result = new Formula((callback) =>
+        IFormula result = new Formula((callback, scope) =>
         {
 
             // 当前长度
@@ -160,7 +160,7 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
                         for (var i = 0; i < tmpPackerList.Count; i++)
                         {
                             var nowPacker = tmpPackerList[i];
-                            if (!TargetSelecter.CouldSelectTarget(nowPacker.ReceiverMenber.ClusterData, clusterData))
+                            if (!TargetSelecter.CouldSelectTarget(clusterData, nowPacker.ReceiverMenber.ClusterData))
                             {
                                 tmpPackerList.RemoveAt(i);
                                 i--;
@@ -205,7 +205,7 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
                             subSkill.DataList = paramsPacker.DataList;
                             subSkill.AddActionFormulaItem(SubFormulaItem);
                             //subSkill.GetFormula(packer);
-                            SkillManager.Single.DoShillInfo(subSkill, packer, true);
+                            SkillManager.Single.DoSkillInfo(subSkill, packer, true);
                         }
                     }
                 }

@@ -31,7 +31,7 @@ public class DP_Battlefield : MonoEX.SingletonAuto<DP_Battlefield>
 
         if (m_CurrScene > 0) //存在场景
         {
-            string sceneName = SData_SenceDefine.SceneID2LevelName(m_CurrScene);
+            string sceneName = string.Format("tzbd_{0:D2}", m_CurrScene); ;
             SceneManage.Single.Unload(sceneName);//卸载掉之前的场景
             m_CurrScene = -1;
         }
@@ -42,7 +42,7 @@ public class DP_Battlefield : MonoEX.SingletonAuto<DP_Battlefield>
         // 验证sceneID有效性
         if (sceneID > 0)
         {
-            string sceneName = SData_SenceDefine.SceneID2LevelName(sceneID);
+            string sceneName = string.Format("tzbd_{0:D2}", sceneID);
             SceneManage.Single.Load(sceneName, dyDependPacks, LoadSceneMode.Additive,
                 () =>
                 {
@@ -100,70 +100,18 @@ public class DP_Battlefield : MonoEX.SingletonAuto<DP_Battlefield>
     /// </summary>
     public void CameraFocusFID(bool isLeft, int fid)
     {
-        if (!YQ2CameraCtrl.Single.EnabledTouch) return;//相机当前已禁操
-
-        int actorID;
-        //界面控制
-        if (isLeft)
-        {
-            actorID = wnd_fight.Single.LeftHeroPanel.SetCurrHeroFID(fid);
-            wnd_fight.Single.RightHeroPanel.SetCurrHeroFID(-1);
-        }
-        else
-        {
-            wnd_fight.Single.LeftHeroPanel.SetCurrHeroFID(-1);
-            actorID = wnd_fight.Single.RightHeroPanel.SetCurrHeroFID(fid);
-        }
-
-        //相机控制器聚焦该英雄
-        DP_CameraTrackObjectManage.Single.SetTrackActor(DPActorType.Avatar, actorID, false);
     }
 
-    /// <summary>
-    /// 相机关注某对象
-    /// </summary>
-    public void CameraFocusActorID(DPActorType actorType, int actorID, bool lockOP)
-    {
-        if (actorType == DPActorType.Avatar)
-        {
-            //界面控制
-            if (wnd_fight.Single.LeftHeroPanel.SetCurrHeroActorID(actorID))
-                wnd_fight.Single.RightHeroPanel.SetCurrHeroFID(-1);
-            else if (wnd_fight.Single.RightHeroPanel.SetCurrHeroActorID(actorID))
-                wnd_fight.Single.LeftHeroPanel.SetCurrHeroFID(-1);
-        }
-
-        //相机控制器聚焦该英雄
-        DP_CameraTrackObjectManage.Single.SetTrackActor(actorType, actorID, lockOP);
-    }
-
-
-    /// <summary>
-    /// 设置战斗速度
-    /// </summary>
-    /// <param name="scale">倍率 0暂停 1正常</param>
-    public void SetFightSpeed(float scale)
-    {
-        Time.timeScale = scale;
-
-    }
 
     /// <summary>
     /// 清理战斗资源
     /// </summary>
     public void Reset()
     {
-        //lock (AI_Thread.Single.MutexLock)
-        //{
             DP_CameraTrackObjectManage.Single.Reset();
-//            AI_Thread.Single.T_Reset();//ai线程清理
-            //wnd_fight.Single.Reset();
-            DP_BattlefieldDraw.Single.Reset();
-            AI_Single.Single.Battlefield.Reset();
             MFAModelManage.Single.Clean();//清缓存的模型和材质
             ClusterManager.Single.ClearAll();
             m_CameraTouchCount = 0;
-        //}
 
         if (!m_BindCameraCtrlOK)
         {

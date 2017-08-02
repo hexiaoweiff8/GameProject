@@ -5,6 +5,7 @@ require "proto/role_pb"
 require "proto/gw2c_pb"
 require "proto/c2gw_pb"
 require "proto/header_pb"
+require "proto/chat_pb"
 
 -- 测试发送PBLUA--
 function Message_Manager:SendPB_10001()
@@ -735,12 +736,27 @@ function Message_Manager:SendPB_10031(cardId,CallBack)
         Event.AddListener("10031",CallBack)
     end
 end
+--================================================================
+--@Des 购买免战时间
+--@params id 免战唯一id
+--================================================================
+function Message_Manager:SendPB_10032(id,CallBack)
+    local c2gw = c2gw_pb:BuyAvoidTime()
 
+    c2gw.id = id
+
+    local msg = c2gw:SerializeToString()
+
+    Message_Manager:createSendPBHeader(10032,msg)
+    if CallBack then
+        Event.AddListener("10032",CallBack)
+    end
+end
 function Message_Manager:createSendPBHeader(msgId, body)
     local header = header_pb.Header()
     header.ID = 1
     header.msgId = msgId
-    header.userId = 8001--8001
+    header.userId = 8002--8001
     header.version = '1.0.0'
     header.errno = 0
     header.ext = 0
@@ -753,6 +769,24 @@ function Message_Manager:createSendPBHeader(msgId, body)
     networkMgr:SendMessage(buffer)
 end
 
+function Message_Manager:createSendPBHeaderByUdp(msgId, body)
+    local header = header_pb.Header()
+    header.ID = 1
+    header.msgId = msgId
+    header.userId = 8002--8001
+    header.version = '1.0.0'
+    header.errno = 0
+    header.ext = 0
+    if body then
+        header.body = body
+    end
+    local msg2 = header:SerializeToString()
+    local buffer = ByteBuffer()
+    buffer:WriteBuffer(msg2)
+    --networkMgr:SendMessage(buffer)
+    networkMgr:SendMessageByUDP(buffer:ToBytes())
+end
+
 function Message_Manager:getAllData(gw2c)
     --保存角色信息
     userModel:initUserRoleTbl(gw2c.user)
@@ -762,7 +796,6 @@ function Message_Manager:getAllData(gw2c)
     cardModel:initCardTbl(gw2c.user.card)
     --保存物品信息
     itemModel:initItemTbl(gw2c.user.item)
-
     --保存服务器数据到公用装备model
     EquipModel:initModel()
     EquipModel.serv_fitEquipmentList = gw2c.user.fitEquip
@@ -773,15 +806,126 @@ function Message_Manager:getAllData(gw2c)
     --引用仓库Controller处理服务器Item数据并保存
     wnd_cangku_controller = require("uiscripts/cangku/wnd_cangku_controller")
     wnd_cangku_controller:processServData(gw2c.user.item)
-    wnd_cangku_controller:sortServData()
     wnd_cangku_controller:mergeServData()
+    wnd_cangku_controller:sortProcessedData()
     --初始化商店model
     wnd_shop_model = require("uiscripts/shop/wnd_shop_model")
     wnd_shop_model:initModel()
     --初始化tips model
     ui_tips_model = require("uiscripts/tips/ui_tips_model")
     ui_tips_model:initModel()
+    --初始化PVE model
+    -- wnd_pve_model = require("uiscripts/PVE/wnd_PVE_model")
+    -- wnd_pve_model.AvoidWarCardTimestamp = gw2c.user.pvp.avoid
 end
+--================================================================
+--30001 进入聊天室（聊天心跳）
+--请求包：chat.EnterChat
+--token string 密令
+--================================================================
+function Message_Manager:SendPB_30001(token)
+
+    local chat = chat_pb:EnterChat()
+    chat.token = token
+
+    local msg1 = chat:SerializeToString()
+    Message_Manager:createSendPBHeaderByUdp(30001,msg1)
+
+    Event.AddListener("30001",MSGID_30001)
+end
+
+function MSGID_30001(body)
+    --local chat = chat_pb.GetChatRecordResp()
+    --chat:ParseFromString(body);
+
+    print("监听到30001")
+
+    Event.RemoveListener("30001", MSGID_30001)
+end
+
+--================================================================
+--@Des 定时拉聊天记录
+--请求包：chat.GetChatRecord
+--@params
+--type int32 频道类型（0：世界 1：工会）
+--time int32 拉取某个时间点之前的若干条记录
+--返回包：chat.GetChatRecordResp
+--rec ChatRecord repeated聊天记录
+--================================================================
+local isFirstSend30002 = true --是不是第一次请求30002，第一次的话数据正常插入，但后续要把数据往前叉
+function Message_Manager:SendPB_30002(type,time)
+    local chat = chat_pb:GetChatRecord()
+    --print("timed-------------------------------------------------------"..time)
+    chat.type = type
+    --local timenun = time
+    chat.time = time
+    --print("数据初始化完成准备传输30002")
+    local msg1 = chat:SerializeToString()
+    Message_Manager:createSendPBHeaderByUdp(30002,msg1)
+
+    Event.AddListener("30002",MSGID_30002)
+    print("发送30002请求等待接受")
+end
+
+function MSGID_30002(body)
+    local chat = chat_pb.GetChatRecordResp()
+    chat:ParseFromString(body);
+    --把数据放入chat的model层里面
+    local datalist = chat.rec
+    --print(datalist[1].userName)
+    print("监听到30002-------".."接受到的消息长度为："..#datalist)
+    if isFirstSend30002 then
+        chat_model:insertDate(datalist)
+        isFirstSend30002 =false
+    else
+        chat_model:insertDateOnBack(datalist)
+        --压入数据到C#
+        chatWindow_controller:pushDataToScrollViewFormOldRecrdList()
+    end
+
+
+    Event.RemoveListener("30002", MSGID_30002)
+end
+
+--================================================================
+--30003 发送世界聊天
+--请求包：chat.ChatToWorld
+--content String 内容
+--================================================================
+function Message_Manager:SendPB_30003(content)
+    local chat = chat_pb:ChatToWorld()
+    chat.content = content
+    local msg1 = chat:SerializeToString()
+    Message_Manager:createSendPBHeaderByUdp(30003,msg1)
+
+    Event.AddListener("30003",MSGID_30003)
+end
+
+function MSGID_30003(body)
+    print("监听到30003")
+    Event.RemoveListener("30003", MSGID_30003)
+end
+
+--================================================================
+--35001 世界聊天消息通知
+--返回包：chat.ChatToWorldNotify
+--rec ChatRecord 聊天记录
+--================================================================
+function MSGID_35001(body)
+    local chat = chat_pb.ChatToWorldNotify()
+    chat:ParseFromString(body)
+    --
+    --print(chat.rec.content)
+    print("监听到35001")
+    --print(chat.rec.content)
+    local rid = chat.rec.rId
+    local username = chat.rec.userName
+    local content = chat.rec.content
+    local time = chat.rec.time
+    --print(rid..username..content ..time)
+    chat_model:inserDate(rid, username, content, time)
+end
+
 
 --==============================--
 --desc:在事件管理类里注册消息监听
@@ -805,7 +949,7 @@ function Message_Manager:OnAddHandler()
     --Event.AddListener("10014", MSGID_10014)
     --Event.AddListener("10015", MSGID_10015)
     --Event.AddListener("10018", MSGID_10018)
-
+    Event.AddListener("35001",MSGID_35001)
     -- Event.AddListener("errno10001", ERRNO_10001)
 end
 

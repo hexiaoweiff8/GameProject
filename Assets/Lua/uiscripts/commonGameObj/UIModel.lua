@@ -5,6 +5,18 @@
 local class = require("common/middleclass")
 local UIModel = class("UIModel")
 
+---临时动画表
+local AniNameList = {
+    "Gongji",
+    "Shengli",
+    "Shibai",
+    "Yidong"
+}
+---正在播放的动画index
+local aniIndex = 0
+---模型的默认动画
+local defaultAni = "Daiji"
+
 function UIModel:initialize(parent)
     self.UIModel = GameObjectExtension.InstantiateFromPacket("ui_equip", "UIModel", parent).gameObject
     self.playerModelTexture = self.UIModel.transform:Find("playerModelTexture").gameObject
@@ -27,12 +39,27 @@ function UIModel:show3DModel()
     tempMod.localPosition = Vector3(0, -7, 500);
     tempMod.gameObject:SetActive(true)
     tempMod.gameObject.layer = UnityEngine.LayerMask.NameToLayer("3DUI")
-
+    for i = 0, tempMod.childCount - 1 do
+        tempMod:GetChild(i).gameObject.layer = UnityEngine.LayerMask.NameToLayer("3DUI")
+    end
+    local ani = tempMod:GetComponent("Animation")
+    ani.wrapMode = UnityEngine.WrapMode.Loop
+    ani:Play(defaultAni)
+    local aniTimer
     self.playerModelTexture:GetComponent(typeof(SpinWithMouse)).target = tempMod
-    UIEventListener.Get(self.playerModelTexture.gameObject).onPress = function(go, args)
-        if args then
-            --self:dianjikongbai()
+    UIEventListener.Get(self.playerModelTexture.gameObject).onClick = function(go)
+        aniIndex = aniIndex + 1
+        if aniIndex > #AniNameList then
+            aniIndex = 1
         end
+        ani:Play(AniNameList[aniIndex])
+        if aniTimer then
+            aniTimer:Kill()
+        end
+        aniTimer = TimeUtil:CreateTimer(3, function ()
+            ani:Play(defaultAni)
+            aniTimer:Kill()
+        end)
     end
 end
 

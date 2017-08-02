@@ -147,7 +147,7 @@ public class PointToObjFormulaItem : AbstractFormulaItem
         var scaleY = ScaleY;
         var scaleZ = ScaleZ;
 
-        IFormula result = new Formula((callback) =>
+        IFormula result = new Formula((callback, scope) =>
         {
             // 判断发射与接收位置
             // TODO 父级暂时没有
