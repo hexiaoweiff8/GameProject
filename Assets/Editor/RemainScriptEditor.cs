@@ -103,108 +103,112 @@ public class RemainScriptEditor : BaseScriptEditor
         GUI.color = Color.yellow;
 
         // 获取的实例
-        BuffTriggerScriptEditor.GetIns();
+        RemainTriggerScriptEditor.GetIns();
 
         if (GUILayout.Button("子级左括号"))
         {
-            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.LeftBracket, this.position);
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.LeftBracket, this.position);
         }
         if (GUILayout.Button("子级右括号"))
         {
-            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.RightBracket, this.position);
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.RightBracket, this.position);
         }
         if (GUILayout.Button("点对点特效"))
         {
-            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.PointToPoint, this.position);
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.PointToPoint, this.position);
         }
         if (GUILayout.Button("点对对象特效(跟踪)"))
         {
-            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.PointToObj, this.position);
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.PointToObj, this.position);
         }
         if (GUILayout.Button("点特效"))
         {
-            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Point, this.position);
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Point, this.position);
         }
         if (GUILayout.Button("范围碰撞检测"))
         {
-            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.CollisionDetection, this.position);
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.CollisionDetection, this.position);
         }
         if (GUILayout.Button("滑动碰撞检测"))
         {
-            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.SlideCollisionDetection, this.position);
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.SlideCollisionDetection, this.position);
         }
         if (GUILayout.Button("音效"))
         {
-            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Audio, this.position);
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Audio, this.position);
         }
         if (GUILayout.Button("Buff"))
         {
-            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Buff, this.position);
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Buff, this.position);
         }
         if (GUILayout.Button("Skill"))
         {
-            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Skill, this.position);
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Skill, this.position);
         }
         if (GUILayout.Button("If"))
         {
-            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.If, this.position);
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.If, this.position);
         }
         if (GUILayout.Button("伤害/治疗结算"))
         {
-            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.HealthChange, this.position);
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.HealthChange, this.position);
         }
         if (GUILayout.Button("伤害吸收"))
         {
-            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.ResistDemage, this.position);
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.ResistDemage, this.position);
         }
         if (GUILayout.Button("移动"))
         {
-            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Move, this.position);
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Move, this.position);
+        }
+        if (GUILayout.Button("目标点选择"))
+        {
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.TargetPointSelector, this.position);
         }
         GUI.color = Color.white;
         EditorGUILayout.EndVertical();
         #endregion
 
         #region Data
-        // Buff
+
         EditorGUILayout.BeginVertical("box");
         GUI.color = Color.green;
 
         if (GUILayout.Button("Remain等级数据"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.LevelData, this.position);
+            RemainTriggerScriptEditor.ShowDataScriptWindow(this, DataType.LevelData, this.position);
         }
         if (GUILayout.Button("作用范围"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.Range, this.position);
+            RemainTriggerScriptEditor.ShowDataScriptWindow(this, DataType.Range, this.position);
         }
         if (GUILayout.Button("作用总时间"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.DuringTime, this.position);
+            RemainTriggerScriptEditor.ShowDataScriptWindow(this, DataType.DuringTime, this.position);
         }
         if (GUILayout.Button("Action时间间隔"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.TickTime, this.position);
+            RemainTriggerScriptEditor.ShowDataScriptWindow(this, DataType.TickTime, this.position);
         }
         if (GUILayout.Button("是否跟随释放者"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.IsFollow, this.position);
+            RemainTriggerScriptEditor.ShowDataScriptWindow(this, DataType.IsFollow, this.position);
         }
         if (GUILayout.Button("作用阵营"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.ActionCamp, this.position);
+            RemainTriggerScriptEditor.ShowDataScriptWindow(this, DataType.ActionCamp, this.position);
         }
         if (GUILayout.Button("是否可以作用到空中单位"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.CouldActionOnAir, this.position);
+            RemainTriggerScriptEditor.ShowDataScriptWindow(this, DataType.CouldActionOnAir, this.position);
         }
         if (GUILayout.Button("是否可以作用到地面单位"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.CouldActionOnSurface, this.position);
+            RemainTriggerScriptEditor.ShowDataScriptWindow(this, DataType.CouldActionOnSurface, this.position);
         }
         if (GUILayout.Button("是否可以作用到建筑单位"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.CouldActionOnBuilding, this.position);
+            RemainTriggerScriptEditor.ShowDataScriptWindow(this, DataType.CouldActionOnBuilding, this.position);
         }
 
         EditorGUILayout.EndVertical();

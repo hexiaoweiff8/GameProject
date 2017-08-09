@@ -199,6 +199,7 @@ public class BuffManager
             IsBeneficial = buffInfo.IsBeneficial,
             IsDeadDisappear = buffInfo.IsDeadDisappear,
             IsNotLethal = buffInfo.IsNotLethal,
+            IsCouldNotClear =  buffInfo.IsCouldNotClear,
             ReceiveMember = buffInfo.ReceiveMember,
             ReleaseMember = buffInfo.ReleaseMember,
             TickTime = buffInfo.TickTime,
@@ -209,7 +210,11 @@ public class BuffManager
             DetachQualifiedKeyList = buffInfo.DetachQualifiedKeyList,
             DetachQualifiedOptionList = buffInfo.DetachQualifiedOptionList,
             DetachQualifiedValueList = buffInfo.DetachQualifiedValueList,
-            BuffRank =  buffInfo.BuffRank
+            BuffRank = buffInfo.BuffRank,
+            DemageChange = buffInfo.DemageChange,
+            DemageChangeProbability = buffInfo.DemageChangeProbability,
+            DemageChangeTargetType = buffInfo.DemageChangeTargetType,
+            DemageChangeType = buffInfo.DemageChangeType
         };
         result.AddActionFormulaItem(buffInfo.GetActionFormulaItem());
         result.AddAttachFormulaItem(buffInfo.GetAttachFormulaItem());
@@ -321,7 +326,7 @@ public class BuffManager
                     {
                         TriggerTicker.Single.Add(buffInfo);
                     }
-
+                    //buffInfo.ReceiveMember.ClusterData.AllData.BuffInfoList.Add(buffInfo);
                     // 如果buff增加属性, 则将属性加入对象中
                     SkillBase.AdditionAttribute(buffInfo.ReceiveMember.ClusterData.AllData.MemberData, buffInfo);
                 }

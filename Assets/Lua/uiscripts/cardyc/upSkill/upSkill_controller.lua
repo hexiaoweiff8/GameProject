@@ -107,7 +107,7 @@ end
 function upSkill_controller:skillItem_Up_CallBack(index)
     local isCan_UpSkill = data:isCan_UpSkill(index)
     if isCan_UpSkill ~= 0 then
-        UIToast.Show(isCan_UpSkill, nil, UIToast.ShowType.Upwards)
+        UIToast.Show(isCan_UpSkill)
         return
     end
     UpSkillIndex = index

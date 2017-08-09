@@ -21,6 +21,9 @@ function restCard_view:initView(arg)
     self.nextCardSpr = view.transform:Find("nextCard_bg/nextCard/cardSprite"):GetComponent(typeof(UISprite))
     -- 下一张卡牌的UILabel
     self.nextCardLabel = view.transform:Find("nextCard_bg/nextCard/feiBg/costLabel"):GetComponent(typeof(UILabel))
+    self.nextCardLv = self.nextCardBg.transform:Find("nextCard/LVLab").gameObject
+    self.nextCardStarLv = self.nextCardBg.transform:Find("nextCard/feiBg/star/Lab").gameObject
+
 
     self.leftCardItem = {}
     for i = 1, 9 do

@@ -60,10 +60,15 @@ function equip_model:initEquipListByType()
     for i = 1, Const.EQUIP_TYPE_NUM do
         self.equipListByType[i] = {}
     end
-    for i = 1, #self.allEquipmentTbl do
-        local equipType = self.allEquipmentTbl[i].EquipType
-        table.insert(self.equipListByType[equipType], self.allEquipmentTbl[i])
+    for k,v in pairs(self.allEquipmentTbl) do
+        local equipType = v.EquipType
+        table.insert(self.equipListByType[equipType], v)
     end
+
+    --for i = 1, #self.allEquipmentTbl do
+    --    local equipType = self.allEquipmentTbl[i].EquipType
+    --    table.insert(self.equipListByType[equipType], self.allEquipmentTbl[i])
+    --end
     for i = 1, #self.equipListByType do
         if #self.equipListByType[i] ~= 0 then
             EquipUtil:sortEquipment(self.equipListByType[i])
@@ -76,11 +81,8 @@ end
 ---equipID  装备ID
 ---
 function equip_model:getEquipByOnlyID(equipOnlyID)
-
-    for k, v in ipairs(self.allEquipmentTbl) do
-        if v.id == equipOnlyID then
-            return v
-        end
+    if self.allEquipmentTbl[equipOnlyID] then
+        return self.allEquipmentTbl[equipOnlyID]
     end
     return nil
 end

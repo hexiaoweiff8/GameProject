@@ -184,21 +184,19 @@ end
 
 ---
 ---根据装备的ID获取装备对象
----equipID  装备ID
+---equipID  装备唯一ID
 ---
-function EquipModel:getEquipByOnlyID(equipOnlyID)
-	-- for k, v in ipairs(EquipModel.serv_Equipment) do
-	-- 	if v.id == equipOnlyID then
-	-- 		return v
-	-- 	end
-	-- end
-	-- return nil
-	-- NOTE: 2017-07-31 修改查询方法
-	return EquipModel.serv_Equipment[equipOnlyID]
+function EquipModel:getEquipByOnlyID(equipID)
+	if EquipModel.serv_Equipment[equipID] then
+		return EquipModel.serv_Equipment[equipID]
+	end
+	Debugger.LogWarning("装备不存在！！！")
+	return nil
 end
 
 ---
 ---获取穿戴中的套装装备的数量
+---SuitID 	套装ID
 ---
 function EquipModel:getSuitEquipNum(SuitID)
 	local suitCount = 0
@@ -209,5 +207,18 @@ function EquipModel:getSuitEquipNum(SuitID)
 		end
 	end
 	return suitCount
+end
+
+---
+---判断装备是否已装备
+---equipId 		装备唯一id
+---
+function EquipModel:isEquipped(equipId)
+	for i = 1,#EquipModel.serv_fitEquipmentList do
+		if EquipModel.serv_fitEquipmentList[i] == equipId then
+			return true
+		end
+	end
+	return false
 end
 return EquipModel

@@ -53,7 +53,6 @@ public class SoldierFSMSystem {
     /// </summary>
     public SkillInfo Skill = null;
 
-
     /// <summary>
     /// 当前状态ID
     /// 不要直接修改这个变量，之所以让他公有是因为得让其他脚本调用这个变量。
@@ -108,6 +107,7 @@ public class SoldierFSMSystem {
         if (s == null)
         {
             Debug.LogError("SoldierFSM ERROR: Null reference is not allowed");
+            return;
         }
 
         if (_states.Count == 0)

@@ -61,6 +61,12 @@ public class TriggerData
     public bool IsAbsorption { get; set; }
 
     /// <summary>
+    /// 伤害类型
+    /// 只有是伤害才有效
+    /// </summary>
+    public DemageType DemageType { get; set; }
+
+    /// <summary>
     /// 生命值变动量
     /// </summary>
     private float healthChangeValue = 0f;

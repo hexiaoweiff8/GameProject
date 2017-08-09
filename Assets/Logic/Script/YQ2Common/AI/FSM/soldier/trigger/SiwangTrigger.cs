@@ -8,8 +8,8 @@ public class SiwangTrigger : SoldierFSMTrigger
     {
         triggerId = SoldierTriggerID.SiWang;
     }
-    public override bool CheckTrigger(SoldierFSMSystem fsm)
-    {
-        return fsm.Display.ClusterData.AllData.MemberData.CurrentHP <= 0;
-    }
+    //public override bool CheckTrigger(SoldierFSMSystem fsm)
+    //{
+    //    return fsm.Display.ClusterData.AllData.MemberData.CurrentHP <= 0;
+    //}
 }

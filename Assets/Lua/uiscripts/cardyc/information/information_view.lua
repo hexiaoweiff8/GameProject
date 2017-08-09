@@ -3,20 +3,14 @@ local view
 function information_view:init_view(arg)
     view = arg
 
-    self.informationBody_Panel = view.transform:Find("right/information").gameObject
+    self.information_Panel = view.transform:Find("right/information").gameObject
 
-     --卡牌信息部分
+    --卡牌信息部分
     -- refresh information body
-    self.information_Panel = self.informationBody_Panel.transform:Find("information_panel").gameObject
-    self.propertyTbl={} --注意顺序
-    table.insert( self.propertyTbl, self.information_Panel.transform:Find("property/health/value").gameObject )--生命
-    table.insert( self.propertyTbl, self.information_Panel.transform:Find("property/damagePSecond/value").gameObject )--秒伤
-    table.insert( self.propertyTbl, self.information_Panel.transform:Find("property/attack/value").gameObject )--火力
-    table.insert( self.propertyTbl, self.information_Panel.transform:Find("property/team/value").gameObject )--队伍
-    table.insert( self.propertyTbl, self.information_Panel.transform:Find("property/defence/value").gameObject )--防御
-    table.insert( self.propertyTbl, self.information_Panel.transform:Find("property/aimGeneralType/value").gameObject )--目标
-    table.insert( self.propertyTbl, self.information_Panel.transform:Find("property/shotDistance/value").gameObject )--射程
-    table.insert( self.propertyTbl, self.information_Panel.transform:Find("property/attackType/value").gameObject )--范围
+    self.infoP_propP = self.information_Panel.transform:Find("property").gameObject
+    ---卡牌信息界面的属性
+    self.InfoP_propItem = {}
+    ---属性提示
     self.infoP_propTip = self.information_Panel.transform:Find("property/propTip").gameObject
     self.infoP_propTipLab = self.information_Panel.transform:Find("property/propTip/lab").gameObject
 
@@ -32,7 +26,7 @@ function information_view:init_view(arg)
 
 
     --进阶部分
-    self.upQuality_Panel = self.informationBody_Panel.transform:Find("upQuality_panel").gameObject
+    self.upQuality_Panel = self.information_Panel.transform:Find("upQuality_panel").gameObject
     self.upQualityP_btnUpQ = self.upQuality_Panel.transform:Find("upQuality_Sp").gameObject
     self.upQualityP_btnUpQ_Lab = self.upQuality_Panel.transform:Find("upQuality_Sp/upQuality_Lab").gameObject
     self.upQualityP_btnUpQ_redDot = self.upQuality_Panel.transform:Find("upQuality_Sp/redDot").gameObject
@@ -42,10 +36,30 @@ function information_view:init_view(arg)
     self.upQualityP_Cost = self.upQuality_Panel.transform:Find("upQuality_Cost").gameObject
     self.upQualityP_Cost_Sp = self.upQuality_Panel.transform:Find("upQuality_Cost/cost_Sp").gameObject
     self.upQualityP_Cost_Lab = self.upQuality_Panel.transform:Find("upQuality_Cost/cost_Lab").gameObject
-    self.maxUpQuality_Panel = self.informationBody_Panel.transform:Find("maxQuality_panel").gameObject
+    self.maxUpQuality_Panel = self.information_Panel.transform:Find("maxQuality_panel").gameObject
     self.maxUpQualityP_Lab = self.maxUpQuality_Panel.transform:Find("maxQuality_label").gameObject
 end
 
+
+---
+---创建信息界面的属性
+---
+function information_view:createPropItem(parent)
+    print(information_view.infoP_propP.name)
+    print(parent.name)
+    local prop = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "cardProp", parent).gameObject
+    local propItem = {}
+    propItem.Self = prop
+    propItem.Sprite = prop:GetComponent("UISprite")
+    propItem.NameLab = prop.transform:Find("name"):GetComponent("UILabel")
+    propItem.ValueLab = prop.transform:Find("value"):GetComponent("UILabel")
+    return propItem
+end
+
+
+---
+---初始化卡牌详细属性界面
+---
 function information_view:init_cardDetailView()
     self.cardDetail = view.transform:Find("right/cardDetail").gameObject
     self.scrollView = self.cardDetail.transform:Find("property").gameObject
@@ -53,11 +67,12 @@ function information_view:init_cardDetailView()
     self.cardDetail_TipLab = self.cardDetail.transform:Find("property/propTip/lab").gameObject
     self.cardDetailTbl={}
     self.cardDetail_maskPanel = self.cardDetail.transform:Find("MaskPanle").gameObject
-
 end
 
 
-
+---
+---初始化品质升级成功界面
+---
 function information_view:init_UpQuality_SuccessPanel()
     self.upQuality_SuccessP = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "adSuccess",  self.gameObject)
     self.upQualitySP_clickPanel = self.upQuality_SuccessP.transform:Find("clickPanel").gameObject
@@ -68,13 +83,16 @@ function information_view:init_UpQuality_SuccessPanel()
         self["upQualitySP_propBeValue_"..i] = self.upQuality_SuccessP.transform:Find("Label_a"..i).gameObject
         self["upQualitySP_propAfValue_"..i] = self.upQuality_SuccessP.transform:Find("Label_b"..i).gameObject
     end
-    
+
 end
 
+---
+---初始化物品信息界面
+---
 function information_view:init_itemInfoPanel()
     self.itemInfoPanel = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "medalItemPanel", self.gameObject)
     self.itemInfoP_itemImg = self.itemInfoPanel.transform:Find("ItemBk/itemImg_Sp").gameObject--物品图
-    self.itemInfoP_itemNameLab =self.itemInfoPanel.transform:Find("itemName_Lab").gameObject --物品名
+    self.itemInfoP_itemNameLab = self.itemInfoPanel.transform:Find("itemName_Lab").gameObject --物品名
     self.itemInfoP_addDesLab = self.itemInfoPanel.transform:Find("addDes_Lab").gameObject --属性加成
     self.itemInfoP_needLab = self.itemInfoPanel.transform:Find("Sprite/need_Lab").gameObject --需要
     self.itemInfoP_haveLab = self.itemInfoPanel.transform:Find("Sprite/xy_Lab").gameObject--现有
@@ -85,9 +103,14 @@ function information_view:init_itemInfoPanel()
     self.itemInfoP_needPanel = self.itemInfoPanel.transform:Find("Sprite").gameObject
 end
 
+
+
+---
+---初始化获取方式界面
+---
 function information_view:init_gainWayPanel()
     self.gainWayPanel = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "gainLayer",  self.gameObject)
-    self.gainWayP_btn_back = self.gainWayPanel.transform:Find("Btn_backSp").gameObject 
+    self.gainWayP_btn_back = self.gainWayPanel.transform:Find("Btn_backSp").gameObject
 
 end
 

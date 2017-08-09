@@ -200,16 +200,17 @@ public class DataManager : MonoEX.Singleton<DataManager>
         cluster.AllData.MemberData = jidiVo;
         cluster.X = otherParam.X;
         cluster.Y = otherParam.Y;
-        cluster.Stop();
-        ClusterManager.Single.Add(cluster);
+        cluster.StopMove();
+        cluster.Diameter *= ClusterManager.Single.UnitWidth;
+        // ClusterManager.Single.Add(cluster);
 
         // 创建外层持有类
-        var displayOwner = new DisplayOwner(baseObj, cluster);
-        DisplayerManager.Single.AddElement(jidiVo.ObjID, displayOwner);
+        result = new DisplayOwner(baseObj, cluster);
+        DisplayerManager.Single.AddElement(jidiVo.ObjID, result);
 
         // 创建RanderControl
         var randerControl = baseObj.AddComponent<RanderControl>();
-        displayOwner.RanderControl = randerControl;
+        result.RanderControl = randerControl;
         randerControl.Begin();
         //// 创建MFAModelRander
         //var mfaModelRander = myBase.GetComponent<MFAModelRender>();
@@ -219,7 +220,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
 
         // 创建事件检查器
         var triggerRunner = baseObj.AddComponent<TriggerRunner>();
-        triggerRunner.Display = displayOwner;
+        triggerRunner.Display = result;
 
         return result;
     }
@@ -289,24 +290,25 @@ public class DataManager : MonoEX.Singleton<DataManager>
         cluster.AllData.MemberData = turretVo;
         cluster.X = otherParam.X;
         cluster.Y = otherParam.Y;
-        cluster.Stop();
+        cluster.Diameter *= ClusterManager.Single.UnitWidth;
+        cluster.StopMove();
 
         // 添加至ClusterManager中
-        ClusterManager.Single.Add(cluster);
+        // ClusterManager.Single.Add(cluster);
 
         // 创建外层持有类
-        var displayOwner = new DisplayOwner(turretObj, cluster);
-        DisplayerManager.Single.AddElement(turretVo.ObjID, displayOwner);
+        result = new DisplayOwner(turretObj, cluster);
+        DisplayerManager.Single.AddElement(turretVo.ObjID, result);
 
         // 创建RanderControl
         var randerControl = turretObj.AddComponent<RanderControl>();
-        displayOwner.RanderControl = randerControl;
+        result.RanderControl = randerControl;
         // 启动RanderControl
         randerControl.Begin();
 
         // 创建事件检查器
         var triggerRunner = turretObj.AddComponent<TriggerRunner>();
-        triggerRunner.Display = displayOwner;
+        triggerRunner.Display = result;
         
         return result;
     }
@@ -400,6 +402,10 @@ public class DataManager : MonoEX.Singleton<DataManager>
                 break;
         }
         Debug.Log("类型: " + soldier.GeneralType + "高度: " + mfa.Cluster.Height);
+        // 添加至ClusterManager中
+        mfa.Cluster.Diameter *= ClusterManager.Single.UnitWidth;
+        mfa.Cluster.StopMove();
+        // ClusterManager.Single.Add(mfa.Cluster);
 
 
         // 创建外层持有类
@@ -462,7 +468,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
                 _enemySoldiersDict.Remove(obj.ID);
                 break;
         }
-        DisplayerManager.Single.DeleteElement(obj);
+        //DisplayerManager.Single.DeleteElement(obj);
     }
 
     public FightVO GetEnemySoldier(int id)
@@ -593,7 +599,8 @@ public class DataManager : MonoEX.Singleton<DataManager>
 
         var result = new DisplayOwner(fixItem, fix);
 
-        ClusterManager.Single.Add(fix);
+        // 添加至ClusterManager中
+        //ClusterManager.Single.Add(fix);
 
         DisplayerManager.Single.AddElement(vo.ObjID, result);
 
@@ -638,33 +645,37 @@ public class DataManager : MonoEX.Singleton<DataManager>
         return (T) value;
     }
 
-    public void Delete<T>(ObjectID ObjID)
+    /// <summary>
+    /// 删除单位
+    /// </summary>
+    /// <param name="objId"></param>
+    public void Delete(ObjectID objId)
     {
-        switch (ObjID.ObjType)
+        switch (objId.ObjType)
         {
             case ObjectID.ObjectType.MyJiDi:
-                DeleteMyJidi(ObjID.ID);
+                DeleteMyJidi(objId.ID);
                 break;
             case ObjectID.ObjectType.EnemyJiDi:
-                DeleteEnemyJidi(ObjID.ID);
+                DeleteEnemyJidi(objId.ID);
                 break;
             case ObjectID.ObjectType.MySoldier:
-                DeleteSoldier(ObjID);
+                DeleteSoldier(objId);
                 break;
             case ObjectID.ObjectType.EnemySoldier:
-                DeleteSoldier(ObjID);
+                DeleteSoldier(objId);
                 break;
             case ObjectID.ObjectType.MyTank:
-                DeleteMyTank(ObjID.ID);
+                DeleteMyTank(objId.ID);
                 break;
             case ObjectID.ObjectType.EnemyTank:
-                DeleteEnemyTank(ObjID.ID);
+                DeleteEnemyTank(objId.ID);
                 break;
             case ObjectID.ObjectType.MyObstacle:
-                DeleteMyObstacle(ObjID.ID);
+                DeleteMyObstacle(objId.ID);
                 break;
             case ObjectID.ObjectType.EnemyObstacle:
-                DeleteEnemyObstacle(ObjID.ID);
+                DeleteEnemyObstacle(objId.ID);
                 break;
         }
     }

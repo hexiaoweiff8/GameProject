@@ -126,9 +126,9 @@ end
 --@params equip*:装备Data(混合数据)
 --@return (string)装备副属性字符串
 function EquipUtil:getEquipmentSubAttributeStr(equip)
-	local _AttributeID 
+	local _AttributeID
 	local _lv = equip.lv
-	local _UniqueID 
+	local _UniqueID
 
 	local str = ""
 
@@ -148,9 +148,12 @@ function EquipUtil:getEquipmentSubAttributeStr(equip)
 	-- end
 	for i = 1,math.floor(EquipUtil:getEquipmentPlusMAXLevel(equip.rarity) / cint.SUBATTR_NEED) do
 
+		---换行
+		if i > 1 then
+			str = str.."\n "
+		end
 		if equip.sndAttr[i] ~= nil then
 			_AttributeID = equip.sndAttr[i].id
-
 			local AttributeName = sdata_attribute_data.mData.body[_AttributeID][sdata_attribute_data.mFieldName2Index['AttributeName']]
 			local Symbol = sdata_attribute_data.mData.body[_AttributeID][sdata_attribute_data.mFieldName2Index['Symbol']]
 
@@ -159,15 +162,14 @@ function EquipUtil:getEquipmentSubAttributeStr(equip)
 				return
 			end
 
-			str = str..AttributeName.."+"..equip.sndAttr[i].val..Symbol.."\n"
+			str = str..AttributeName.."+"..equip.sndAttr[i].val..Symbol
 		else
-			str = str.."[s][707070]  强化等级+"..(i * cint.SUBATTR_NEED).."解锁  [-][/s]".."\n"
+			str = str.."[s][707070]  强化等级+"..(i * cint.SUBATTR_NEED).."解锁  [-][/s]"
 		end
 	end
 	for i = 1,(cint.EQUIPMENT_MAXLEVEL / cint.SUBATTR_NEED) - math.floor(EquipUtil:getEquipmentPlusMAXLevel(equip.rarity) / cint.SUBATTR_NEED) do
-		str = str.."[s][707070]    无法激活    [-][/s]".."\n"
-	end
-
+		str = str.."\n ".."[s][707070]    无法激活    [-][/s]"
+	end 
 	return str
 end
 

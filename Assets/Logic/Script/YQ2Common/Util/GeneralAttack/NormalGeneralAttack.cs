@@ -69,10 +69,13 @@ public class NormalGeneralAttack : IGeneralAttack
                 // 命中时检测技能
                 SkillManager.Single.SetTriggerData(new TriggerData()
                 {
+                    // 将造成的伤害带回
+                    HealthChangeValue = hurt,
                     ReceiveMember = beAttackerDisplayOwner,
                     ReleaseMember = attackerDisplayOwner,
                     TypeLevel1 = TriggerLevel1.Fight,
-                    TypeLevel2 = TriggerLevel2.Hit
+                    TypeLevel2 = TriggerLevel2.Hit,
+                    DemageType = DemageType.NormalAttackDemage
                 });
             }
             else

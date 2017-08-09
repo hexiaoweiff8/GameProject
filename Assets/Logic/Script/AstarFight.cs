@@ -42,7 +42,7 @@ public class AstarFight : MonoBehaviour
     /// <summary>
     /// 单位宽度
     /// </summary>
-    public int UnitWidth = 1;
+    public static int UnitWidth = 1;
 
     /// <summary>
     /// 其实x
@@ -123,12 +123,12 @@ public class AstarFight : MonoBehaviour
     /// <summary>
     /// 当前关卡所有换算了宽高的阵型字典
     /// </summary>
-    private readonly Dictionary<int, int[]> allZhenxingList = new Dictionary<int, int[]>();
+    private static readonly Dictionary<int, int[]> allZhenxingList = new Dictionary<int, int[]>();
 
     /// <summary>
     /// 向中点偏移距离;
     /// </summary>
-    private readonly Dictionary<int, Vector3> allCenternOffset = new Dictionary<int, Vector3>();
+    private static readonly Dictionary<int, Vector3> allCenternOffset = new Dictionary<int, Vector3>();
 
     /// <summary>
     /// 向中点偏移距离
@@ -188,10 +188,6 @@ public class AstarFight : MonoBehaviour
             spani++;
         }
 
-
-        // 初始化集群管理
-        var loadMapPos = LoadMap.GetLeftBottom();
-        ClusterManager.Single.Init(loadMapPos.x, loadMapPos.z, MapWidth, MapHeight, UnitWidth, mapInfoData);
         // 加载TriggerTicker
         TriggerTicker.Single.StopAndClear();
         TriggerTicker.Single.Start();
@@ -232,7 +228,12 @@ public class AstarFight : MonoBehaviour
         {
             TargetY = MapHeight - 1;
         }
+        // 初始化地图宽度
+        UnitWidth = (int)SData_Constant.Single.GetDataOfID(Utils.UnitWidthId).Value;
         LoadMap.Init(mapInfoData, UnitWidth);
+        // 初始化集群管理
+        var loadMapPos = LoadMap.GetLeftBottom();
+        ClusterManager.Single.Init(loadMapPos.x, loadMapPos.z, MapWidth, MapHeight, UnitWidth, mapInfoData);
         // 解析地图障碍层
         MapManager.Instance().AnalysisMap(mapInfoData);
         // 创建建筑层, 并传入基地等级
@@ -444,7 +445,7 @@ public class AstarFight : MonoBehaviour
     /// <param name="cardID">该局所有卡牌ID</param>
     /// <param name="level">该局所有卡牌等级</param>
     /// <returns></returns>
-    public Dictionary<int, int[]> setAllZhenxingList(int[] cardID, int[] level)
+    public static Dictionary<int, int[]> setAllZhenxingList(int[] cardID, int[] level)
     {
         for (int starti = 0; starti < cardID.Length; starti++)
         {
@@ -678,39 +679,39 @@ public class AstarFight : MonoBehaviour
         maxX = (int)((X - LoadMap.MapPlane.transform.position.x) / UnitWidth + MapWidth / 2f);
     }
 
-    /// <summary>
-    /// 物体寻路
-    /// </summary>
-    /// <param name="data"></param>
-    /// <param name="isEnemy">是否为地方阵营</param>
-    /// <param name="displayOwner"></param>
-    internal void toXunLu(ClusterData data, bool isEnemy, DisplayOwner displayOwner)
-    {
-        var go = displayOwner.GameObj;
-        if (go == null)
-        {
-            throw new Exception("显示对象的GameObj引用为空. 请检查创建过程.");
-        }
-        //把物体当前世界坐标转换为格子坐标
-        int[] a = Utils.PositionToNum(LoadMap.MapPlane.transform.position, go.transform.position, UnitWidth, MapWidth, MapHeight);
-        var path = AStarPathFinding.SearchRoad(mapInfoData, a[0], a[1], !isEnemy ? TargetX : 1, a[1], (int)data.Diameter, (int)data.Diameter, IsJumpPoint);
+    ///// <summary>
+    ///// 物体寻路
+    ///// </summary>
+    ///// <param name="data"></param>
+    ///// <param name="isEnemy">是否为地方阵营</param>
+    ///// <param name="displayOwner"></param>
+    //internal void toXunLu(ClusterData data, bool isEnemy, DisplayOwner displayOwner)
+    //{
+    //    var go = displayOwner.GameObj;
+    //    if (go == null)
+    //    {
+    //        throw new Exception("显示对象的GameObj引用为空. 请检查创建过程.");
+    //    }
+    //    //把物体当前世界坐标转换为格子坐标
+    //    int[] a = Utils.PositionToNum(LoadMap.MapPlane.transform.position, go.transform.position, UnitWidth, MapWidth, MapHeight);
+    //    var path = AStarPathFinding.SearchRoad(mapInfoData, a[0], a[1], !isEnemy ? TargetX : 1, a[1], (int)data.Diameter, (int)data.Diameter, IsJumpPoint);
 
 
-        ClusterData clusterData = data;
-        clusterData.RotateSpeed = 10;
-        clusterData.RotateWeight = 1;
-        //clusterData.MaxSpeed = clusterData.AllData.MemberData.MoveSpeed;
-        clusterData.Diameter *= ClusterManager.Single.UnitWidth;
-        if (path != null && path.Count > 0)
-        {
-            clusterData.PushTargetList(Utils.NumToPostionByList(LoadMap.MapPlane.transform.position, path, UnitWidth, MapWidth, MapHeight));
-        }
-        // 默认出事状态不行进
-        clusterData.Stop();
-        ClusterManager.Single.Add(clusterData);
-        // 外层对象持有ClusterData引用
-        displayOwner.ClusterData = clusterData;
-    }
+    //    ClusterData clusterData = data;
+    //    //clusterData.RotateSpeed = 10;
+    //    //clusterData.RotateWeight = 1;
+    //    //clusterData.MaxSpeed = clusterData.AllData.MemberData.MoveSpeed;
+    //    //clusterData.Diameter *= ClusterManager.Single.UnitWidth;
+    //    if (path != null && path.Count > 0)
+    //    {
+    //        clusterData.PushTargetList(Utils.NumToPostionByList(LoadMap.MapPlane.transform.position, path, UnitWidth, MapWidth, MapHeight));
+    //    }
+    //    // 默认出事状态不行进
+    //    clusterData.Stop();
+    //    //ClusterManager.Single.Add(clusterData);
+    //    // 外层对象持有ClusterData引用
+    //    //displayOwner.ClusterData = clusterData;
+    //}
 
 
     public void OnDestroy()

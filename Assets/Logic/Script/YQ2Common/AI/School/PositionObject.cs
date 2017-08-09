@@ -50,9 +50,9 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
             // TODO 变大变小
             if (collisionGraphics == null)
             {
-                collisionGraphics = new CircleGraphics(new Vector2(x, y), allData.MemberData.SpaceSet * 0.5f);
+                collisionGraphics = new CircleGraphics(new Vector2(transform.position.x, transform.position.z), allData.MemberData.SpaceSet * 0.5f);
             }
-            collisionGraphics.Postion = new Vector2(x, y);
+            collisionGraphics.Postion = new Vector2(transform.position.x, transform.position.z);
             return collisionGraphics;
         }
         set { collisionGraphics = value; }
@@ -120,14 +120,9 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
     /// </summary>
     public Vector3 Position
     {
-        get { return this.transform.position; }
+        get { return transform.position; }
         set
-        {
-            this.transform.position = value;
-            // 更新memberData中的数据
-            x = this.transform.position.x;
-            y = this.transform.position.z;
-        }
+        { transform.position = value; }
     }
 
     /// <summary>
@@ -135,15 +130,9 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
     /// </summary>
     public float X
     {
-        get { return x; }
+        get { return transform.position.x; }
         set
-        {
-            x = value;
-            //if (CollisionGraphics != null)
-            //{
-            //    CollisionGraphics.Postion = new Vector2(x, y);
-            //}
-        }
+        { transform.position = new Vector3(value, transform.position.y, transform.position.z); }
     }
 
     /// <summary>
@@ -151,15 +140,9 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
     /// </summary>
     public float Y
     {
-        get { return y; }
+        get { return transform.position.z; }
         set
-        {
-            y = value;
-            //if (CollisionGraphics != null)
-            //{
-            //    CollisionGraphics.Postion = new Vector2(x, y);
-            //}
-        }
+        { transform.position = new Vector3(transform.position.x, transform.position.y, value); }
     }
 
     /// <summary>
@@ -255,6 +238,11 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
     }
 
     /// <summary>
+    /// 是否可被选择
+    /// </summary>
+    public bool CouldSelect { get; set; }
+
+    /// <summary>
     /// 所有数据持有
     /// </summary>
     private AllData allData = new AllData();
@@ -277,12 +265,12 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
     /// <summary>
     /// 当前位置x
     /// </summary>
-    private float x = 0f;
+    //private float x = 0f;
 
     /// <summary>
     /// 当前位置y
     /// </summary>
-    private float y = 0f;
+    //private float y = 0f;
 
     /// <summary>
     /// 当前高度
@@ -324,10 +312,20 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
     /// </summary>
     private bool isMoving = true;
 
+
+
+    /// <summary>
+    /// 开始运行
+    /// </summary>
+    public void Begin()
+    {
+        ClusterManager.Single.Add(this);
+    }
+
     /// <summary>
     /// 停止移动
     /// </summary>
-    public void Stop()
+    public void StopMove()
     {
         isMoving = false;
     }
@@ -364,10 +362,10 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
         
     }
 
-    /// <summary>
-    /// 返回位置图形
-    /// </summary>
-    /// <returns>方形图形</returns>
+    ///// <summary>
+    ///// 返回位置图形
+    ///// </summary>
+    ///// <returns>方形图形</returns>
     //public Rectangle GetGraphical()
     //{
     //    //值有变更时重新创建Rect

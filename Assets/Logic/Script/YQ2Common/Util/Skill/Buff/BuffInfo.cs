@@ -73,6 +73,11 @@ public class BuffInfo : SkillBase
     public bool IsNotLethal { get; set; }
 
     /// <summary>
+    /// 是否不可被清除
+    /// </summary>
+    public bool IsCouldNotClear { get; set; }
+
+    /// <summary>
     /// 卡牌Icon地址
     /// </summary>
     public string Icon { get; set; }

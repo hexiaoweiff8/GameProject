@@ -17,11 +17,15 @@ public class HurtResult
         var zhanqianBaifenbiAdd = 0.0f;
         var zhandouBaifenbiAdd = 0.0f;
 
+        // 伤害能力
         var huoli = (zhanqianJueduizhi + zhandouJueduizhiAdd)*(1 + zhanqianBaifenbiAdd + zhandouBaifenbiAdd);
+        // 暴击
         var baojixishu = AdjustIsBaoji(active, target);
         var hurtAdd = 0.0f;
         var antiHurtAdd = 0.0f;
+        // 减伤
         var jianshanglv = AdjustJianshang(active, target);
+        // 克制关系
         var kezhixishu = AdjustKezhi(active, target);
 
         var shanghaijiacheng = 0.0f;
@@ -33,11 +37,55 @@ public class HurtResult
          * （IF（满足克制关系，1+克制伤害加成，1））*
          * （1+Max（-40%，（进攻方伤害加成-防守方免伤加成）））+
          * 攻守双方技能绝对值加成和
-         * */
+         **/
+        // 计算伤害加成与概率
+        if (active.ClusterData.AllData.SkillInfoList != null && active.ClusterData.AllData.SkillInfoList.Count > 0)
+        {
+            foreach (var skill in active.ClusterData.AllData.SkillInfoList)
+            {
+                if (skill.IsActive || skill.DemageChangeType != 0)
+                {
+                    continue;
+                }
+                shanghaijiacheng += GetDemageChange(skill, target);
+            }
+        }
+        if (active.ClusterData.AllData.BuffInfoList != null && active.ClusterData.AllData.BuffInfoList.Count > 0)
+        {
+            foreach (var buff in active.ClusterData.AllData.BuffInfoList)
+            {
+                shanghaijiacheng += GetDemageChange(buff, target);
+            }
+        }
+
+        // 计算减免加成与概率
+        if (target.ClusterData.AllData.SkillInfoList != null && target.ClusterData.AllData.SkillInfoList.Count > 0)
+        {
+            foreach (var skill in target.ClusterData.AllData.SkillInfoList)
+            {
+                if (skill.IsActive)
+                {
+                    continue;
+                }
+                mianyijiacheng += GetDemageChange(skill, target);
+            }
+        }
+        if (target.ClusterData.AllData.BuffInfoList != null && target.ClusterData.AllData.BuffInfoList.Count > 0)
+        {
+            foreach (var buff in target.ClusterData.AllData.BuffInfoList)
+            {
+                mianyijiacheng += GetDemageChange(buff, target);
+            }
+        }
+
+        // 遍历技能(附加伤害类型)(百分比类型)
+
+        // 根据两方类型, 判断是否有伤害增强/减免
+
+
         var hurt = huoli*(1 - jianshanglv)*baojixishu*kezhixishu*
                    (1 + Mathf.Max(-0.4f,(shanghaijiacheng - mianyijiacheng))) + jinengjiacheng;
         return hurt;
-
     }
 
     /// <summary>
@@ -198,11 +246,116 @@ public class HurtResult
     /// <returns></returns>
     public static float AdjustKezhi(DisplayOwner active, DisplayOwner target)
     {
+        // TODO 本地缓存数据
         var config = SData_kezhi_c.Single.GetDataOfID(active.ClusterData.AllData.MemberData.ArmyType);
         if (config.KezhiType == target.ClusterData.AllData.MemberData.ArmyType)
         {
             return 1 + config.KezhiAdd;
         }
         return 1.0f;
+    }
+
+
+
+    /// <summary>
+    /// 伤害增强/减免计算
+    /// </summary>
+    /// <param name="skill">被计算技能</param>
+    /// <param name="target">被计算目标</param>
+    /// <returns></returns>
+    private static float GetDemageChange(SkillBase skill, DisplayOwner target)
+    {
+        var result = 0f;
+        if (skill.DemageChangeProbability > 0 && skill.DemageChange > 0)
+        {
+            if (skill.DemageChangeProbability >= 1 ||
+                RandomPacker.Single.GetRangeI(0, 100) <= skill.DemageChangeProbability * 100)
+            {
+                if (Check(skill, target.ClusterData.AllData.MemberData))
+                {
+                    result += skill.DemageChange;
+                }
+            }
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// 检查是否符合技能的伤害附加/减免条件
+    /// </summary>
+    /// <param name="skill">被检测技能</param>
+    /// <param name="data">被检测单位</param>
+    /// <returns>是否符合</returns>
+    private static bool Check(SkillBase skill, VOBase data)
+    {
+        var result = false;
+        // 计算伤害附加
+        switch (skill.DemageChangeTargetType)
+        {
+            case DemageAdditionOrReductionTargetType.All:
+                result = true;
+                break;
+            case DemageAdditionOrReductionTargetType.Air:
+                if (data.GeneralType == Utils.GeneralTypeAir)
+                {
+                    result = true;
+                }
+                break;
+            case DemageAdditionOrReductionTargetType.Surface:
+                if (data.GeneralType == Utils.GeneralTypeSurface)
+                {
+                    result = true;
+                }
+                break;
+            case DemageAdditionOrReductionTargetType.Building:
+                if (data.GeneralType == Utils.GeneralTypeBuilding)
+                {
+                    result = true;
+                }
+                break;
+            case DemageAdditionOrReductionTargetType.Hide:
+                if (data.IsHide)
+                {
+                    result = true;
+                }
+                break;
+            case DemageAdditionOrReductionTargetType.RaceHuman:
+                if (data.ArmyType == Utils.HumanArmyType)
+                {
+                    result = true;
+                }
+                break;
+            case DemageAdditionOrReductionTargetType.RaceOrc:
+                if (data.ArmyType == Utils.OrcArmyType)
+                {
+                    result = true;
+                }
+                break;
+            case DemageAdditionOrReductionTargetType.RaceMechanics:
+                if (data.ArmyType == Utils.MechanicArmyType)
+                {
+                    result = true;
+                }
+                break;
+            case DemageAdditionOrReductionTargetType.Mechanics:
+                if (data.IsMechanic)
+                {
+                    result = true;
+                }
+                break;
+            case DemageAdditionOrReductionTargetType.Melee:
+                if (data.IsMelee)
+                {
+                    result = true;
+                }
+                break;
+            case DemageAdditionOrReductionTargetType.Summoned:
+                if (data.IsSummon)
+                {
+                    result = true;
+                }
+                break;
+        }
+        return result;
     }
 }

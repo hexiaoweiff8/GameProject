@@ -24,13 +24,16 @@ function network_manager.on_socket_data(key, data)
     if key == Protocal.Message then
         local header = header_pb.Header();
         header:ParseFromString(data);
-        lgyPrint('ID==>' .. header.ID);
-        lgyPrint('msgId==>' .. header.msgId);
-        lgyPrint('userId==>' .. header.userId);
-        lgyPrint('version==>' .. header.version);
+        --printe('ID==>' .. header.ID);
+        --printw('msgId==>' .. header.msgId);
+        --printf('userId==>' .. header.userId);
+        --printw('version==>' .. header.version);
         lgyPrint('errno==>' .. header.errno);
         lgyPrint('ext==>' .. header.ext);
         if header.errno == 0 then --错误码为0
+            -- 2017-08-04 加入记录接收请求回执时间
+            NetworkDelay_Manager:RecordReceiveTime(header.ID)
+            -- add end
             Event.Brocast(tostring(header.msgId), header.body)
         else
             Event.Brocast("errno"..tostring(header.msgId),header.errno)

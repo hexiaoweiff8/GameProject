@@ -60,7 +60,6 @@ function cardInHand_model:getArea(Vec3, cardIndex)
 
 
     if move_Y < self.max_Y then
-        print(Vec3.x)
         if Vec3.x > self.power_leftX and Vec3.x < self.power_rightX then
             return 2
         elseif move_Y > 0 then

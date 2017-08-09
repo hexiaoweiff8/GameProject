@@ -68,7 +68,7 @@ function wnd_cardyc_controller:refresh_leftCard_Data()
 
     UIEventListener.Get(view.btn_detail).onClick = function()
         currentTab = tabControl:getCurrentPanelIndex()
-        information_controller:show_cardDetailPanel(tabPanel[currentTab])
+        information:show_cardDetailPanel(tabPanel[currentTab])
     end
 
 
@@ -84,7 +84,7 @@ function wnd_cardyc_controller:refresh_leftCard_Data()
             self:refresh()
         else
             --无更多卡牌
-            UIToast.Show(stringUtil:getString(20701), nil, UIToast.ShowType.Upwards)
+            UIToast.Show(stringUtil:getString(20701))
         end
     end
     UIEventListener.Get(view.btn_right).onClick = function()
@@ -93,7 +93,7 @@ function wnd_cardyc_controller:refresh_leftCard_Data()
             self:refresh()
         else
             --无更多卡牌
-            UIToast.Show(stringUtil:getString(20701), nil, UIToast.ShowType.Upwards)
+            UIToast.Show(stringUtil:getString(20701))
         end
     end
 end

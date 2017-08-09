@@ -8,6 +8,7 @@ local data ={
 		[4]={4,"AntiOverflowPara1",-0.4},
 		[5]={5,"SurfacePositionY",1},
 		[6]={6,"AirPositionY",40},
+		[7]={7,"UnitWidth",5},
 	}
 }
 return data

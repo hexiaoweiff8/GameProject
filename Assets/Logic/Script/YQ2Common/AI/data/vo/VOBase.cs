@@ -20,7 +20,9 @@ public class VOBase
     private float _dodge;
     private float _hit;
     private float _attackRange;
+    private float _skillRange;
     private float _moveSpeed;
+    private int _behaviorType;
     private int _camp;
     private string _modelPack;
     private string _modelName;
@@ -221,6 +223,14 @@ public class VOBase
         set { _moveSpeed = value; }
     }
     /// <summary>
+    /// 行为类型
+    /// </summary>
+    public int BehaviorType
+    {
+        get { return _behaviorType; }
+        set { _behaviorType = value; }
+    }
+    /// <summary>
     /// 攻击范围
     /// </summary>
     [SkillAddition]
@@ -228,6 +238,15 @@ public class VOBase
     {
         get { return _attackRange; }
         set { _attackRange = value; }
+    }
+    /// <summary>
+    /// 技能释放范围
+    /// </summary>
+    [SkillAddition]
+    public float SkillRange
+    {
+        get { return _skillRange; }
+        set { _skillRange = value; }
     }
     /// <summary>
     /// 命中
@@ -365,7 +384,10 @@ public class VOBase
         set
         {
             _currentHP = value;
-            //_currentHP = Mathf.Max(0,Mathf.Min(_currentHP, TotalHp));
+            //if (_currentHP >= _totalHP)
+            //{
+            //    _currentHP = _totalHP;
+            //}
         }
     }
 
@@ -389,6 +411,18 @@ public class VOBase
     }
     //----------------------------字段声明都在上半部分---------------------------------
 
+    /// <summary>
+    /// 设置血量
+    /// </summary>
+    /// <param name="hp"></param>
+    public void SetCurrentHP(float hp)
+    {
+        if (hp > _totalHP)
+        {
+            hp = _totalHP;
+        }
+        _currentHP = hp;
+    }
 
     /// <summary>
     /// 装填单位属性
@@ -407,7 +441,9 @@ public class VOBase
         Dodge = data.Dodge;
         Hit = data.Hit;
         AttackRange = data.AttackRange;
+        SkillRange = data.SkillRange;
         MoveSpeed = data.MoveSpeed;
+        BehaviorType = data.BehaviorType;
         UniqueID = data.UniqueID;
         ArmyLevel = data.ArmyLevel;
         AimGeneralType = data.AimGeneralType;
@@ -425,9 +461,11 @@ public class VOBase
         BulletType = data.BulletType;
         BulletSpeed = data.BulletSpeed;
         AttackType = data.AttackType;
-        //MultiAimMax = data.MultiAimMax;
         SightRange = data.SightRange;
         IsHide = data.IsHide == 1;
+        IsSummon = data.IsSummoned == 1;
+        IsMechanic = data.IsCreature == 2;
+        IsMelee = data.RangeType == 1;
         IsAntiHide = data.IsAntiHide == 1;
         LifeTime = data.LifeTime;
         Skill1 = data.Skill1;

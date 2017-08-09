@@ -10,10 +10,16 @@ using System.Text;
 /// </summary>
 public class SkillInfo : SkillBase
 {
+
     /// <summary>
     /// 是否主动技能
     /// </summary>
     public bool IsActive { get; set; }
+
+    /// <summary>
+    /// 目标选择权重数据
+    /// </summary>
+    public SelectWeightData WeightData { get; set; }
 
     /// <summary>
     /// 技能CD时间

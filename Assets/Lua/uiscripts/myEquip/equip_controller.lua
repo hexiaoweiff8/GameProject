@@ -80,7 +80,7 @@ function equip_controller:getRemakePanel()
 end
 function equip_controller:showRemakePanel(equip)
 
-    remakePanel:show(equip, view.remakeP, 18)
+    remakePanel:show(equip, view.remakeP, 21)
     remakePanel:setExchangeRefreshFunc(equip_controller.remakeExchangeRefresh)
 end
 ---

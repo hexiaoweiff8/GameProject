@@ -23,6 +23,7 @@ function equipDetail_view:init()
 
     self.lab_mainAttribute = self.equipDetail.transform:Find("Widget_DetailContainer/Label_MainAttribute").gameObject
     self.lab_subAttribute = self.equipDetail.transform:Find("Widget_DetailContainer/Label_ViceAttribute").gameObject
+    self.lab_AttrLine = self.equipDetail.transform:Find("Widget_DetailContainer/Sprite_dividingline").gameObject
     self.lab_suitEffect = self.equipDetail.transform:Find("Widget_DetailContainer/Label_SuitEffect").gameObject
     self.suitAttr_lab = {}
     self.suitAttr_actNum = {}

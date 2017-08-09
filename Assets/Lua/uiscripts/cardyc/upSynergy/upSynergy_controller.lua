@@ -157,7 +157,7 @@ function upSynergy_controller:upSynergyP_btnOk_onClicked(index)
     --判断当前是否可以协同升级
     local isCan_UpSynergy = data:isCan_UpSynergy(index)
     if isCan_UpSynergy ~= 0 then
-        UIToast.Show(isCan_UpSynergy, nil, UIToast.ShowType.Upwards)
+        UIToast.Show(isCan_UpSynergy)
         return
     end
     UpSynergyIndex = index

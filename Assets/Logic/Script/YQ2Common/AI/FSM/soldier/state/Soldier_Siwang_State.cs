@@ -59,7 +59,8 @@ public class Soldier_Siwang_State : SoldierFSMState
             });
         }
         // 删除单位
-        DisplayerManager.Single.DelDisplay(fsm.Display);
+        //DisplayerManager.Single.DelDisplay(fsm.Display);
+        FightUnitFactory.DeleteUnit(fsm.Display.ClusterData.AllData.MemberData);
     }
 
     public override void Action(SoldierFSMSystem fsm)

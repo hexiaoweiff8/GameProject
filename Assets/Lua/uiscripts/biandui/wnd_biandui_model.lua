@@ -4,6 +4,9 @@ wnd_biandui_model =
     local_armycardbase = {}, --本地军队卡牌基础数据表
     local_armycarduselimit = {},--本地军队卡牌使用上限数据表
     local_armybase = {},--本地军队基础表
+    CardItemList  = {},
+    DayingItemList = {},
+    QianfengItemList = {},
 }
 
 local this = wnd_biandui_model
@@ -12,7 +15,68 @@ function wnd_biandui_model:initModel()
     this:initLocalArmyCardBase()
     this:initLocalArmyCardUseLimit()
     this:intiLocalArmyBase()
+    this:initCardItemList()
 end
+
+function wnd_biandui_model:SetArmyData(battle)
+
+    --TODO: 解析服务器读来的大营及前锋数据
+    print("SetArmyData-----------------")
+
+    print("数据数量..."..tostring(#battle))
+    print("数据数量..."..tostring(#battle.gf))
+    print("数据数量..."..tostring(#battle.pf))
+
+    this.DayingItemList = {}
+
+    local GfItem = {}
+    GfItem["cardId"] = 101001
+    GfItem["num"] = 1
+
+    local GfItem2 = {}
+    GfItem2["cardId"] = 101002
+    GfItem2["num"] = 2
+
+    table.insert(this.DayingItemList,GfItem)
+    table.insert(this.DayingItemList,GfItem2)
+
+
+
+
+    this.QianfengItemList = {}
+    local PfItem = {}
+    PfItem["cardId"] = 101001
+    PfItem["pos"] = 1
+
+    local PfItem2 = {}
+    PfItem2["cardId"] = 101002
+    PfItem2["pos"] = 2
+
+    table.insert(this.QianfengItemList,PfItem)
+    table.insert(this.QianfengItemList,PfItem2)
+
+
+end
+
+--@Des 读取卡库中卡牌信息
+function wnd_biandui_model:initCardItemList()
+    for k,v in pairs(cardModel:getCardTbl()) do
+        local Item = {}
+        Item["Quality"] = v.rlv
+        Item["Star"] = v.star
+        Item["Level"] = v.lv
+        Item["ArmyCardID"] = v.id
+
+        print("卡牌ID为,,,,"..tostring(v.id))
+        Item["ArmyType"] = this:FindArmyTypeByArmyID(v.id) --卡牌类型（人，妖，械）
+        Item["useLimit"] = this:FindUseLimitByIDandLevel(v.id,v.slv) --卡牌使用上限
+        Item["TrainCost"] = this:FindTrainCostbYArmyCardID(v.id) --卡牌训练费用（兵力）
+        Item["Num"] = Item["useLimit"]
+        table.insert(this.CardItemList,Item)
+    end
+end
+
+
 
 function wnd_biandui_model:initLocalArmyCardBase()
     if sdata_armycardbase_data == nil then
@@ -40,7 +104,7 @@ function wnd_biandui_model:initLocalArmyCardBase()
     end)
 end
 
---@Des 利用ArmyCardID查找对应卡牌的图标ID
+--@Des 查找卡牌图标ID
 --@params ArmyCardID(number)：卡牌ID
 --@return IconID:卡牌图标ID
 function wnd_biandui_model:FindIconIDByArmyCardID(ArmyCardID)
@@ -52,7 +116,7 @@ function wnd_biandui_model:FindIconIDByArmyCardID(ArmyCardID)
     return nil
 end
 
---@Des 利用ArmyCardID查找对应卡牌的使用费用
+--@Des 查找卡牌使用费用
 --@params ArmyCardID(number)：卡牌ID
 --@return TrainCost:卡牌使用费用
 function wnd_biandui_model:FindTrainCostbYArmyCardID(ArmyCardID)
@@ -83,7 +147,7 @@ function wnd_biandui_model:initLocalArmyCardUseLimit()
     end)
 end
 
---@Des 利用ArmyCardID查找对应卡牌的使用上限
+--@Des 查找卡牌使用上限
 --@params ArmyCardID(number):卡牌ID
 --        UseLimitLevel(number):使用上限等级
 --@return UseLimit:卡牌使用上限
@@ -116,7 +180,7 @@ function wnd_biandui_model:intiLocalArmyBase()
     end)
 end
 
---@Des 利用ArmyCardID查找对应卡牌的卡牌类型
+--@Des 查找卡牌卡牌类型
 --@params ArmyCardID(number):卡牌ID
 --@return ArmyType:卡牌类型
 function wnd_biandui_model:FindArmyTypeByArmyID(ArmyCardID)
@@ -127,5 +191,16 @@ function wnd_biandui_model:FindArmyTypeByArmyID(ArmyCardID)
     end
     return nil
 end
+
+
+function wnd_biandui_model:GetDayingData()
+    return this.DayingItemList
+end
+
+function wnd_biandui_model:GetQianfengData()
+    return this.QianfengItemList
+end
+
+
 
 return wnd_biandui_model

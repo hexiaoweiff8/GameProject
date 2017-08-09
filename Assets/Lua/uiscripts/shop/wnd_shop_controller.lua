@@ -64,7 +64,7 @@ function wnd_shop_controller:showDebugTimer()
 			end
 			-- 刷新当前商店列表界面
 			this:refreshShopListByCurrentShopID()
-			UIToast.Show("倒计时结束，刷新商店",nil,UIToast.ShowType.Upwards)
+			UIToast.Show(sdata_UILiteral:GetFieldV("Literal", 0xFD03))
 			this.ShopRefreshTimer = TimeUtil:CreateLoopTimer(1,onTick,onKill)
 		end
 	this.ShopRefreshTimer = TimeUtil:CreateLoopTimer(1,onTick,onKill)
@@ -97,7 +97,7 @@ function wnd_shop_controller:initListener()
 			-- DONE: 商店界面：刷新按钮的实现/优化
 			-- 刷新卡id:470009
 			if require('uiscripts/cangku/wnd_cangku_model'):getServItemCountByItemID(470009) == 0 then
-				UIToast.Show("刷新卡不足",nil,UIToast.ShowType.Upwards)
+				UIToast.Show(sdata_UILiteral:GetFieldV("Literal", 0xFD04))
 			else
 				this:refreshShopListByCurrentShopID()
 			end
@@ -235,7 +235,7 @@ function wnd_shop_controller:showShoppingListByShopID(shopId)
 
 	if this.model.serv_ShopCacheData[shopId] == nil or 
 		(this.model.serv_ShopCacheData[shopId] ~= nil and this.model.serv_ShopCacheData[shopId].UpdateTime ~= TimeUtil:getNextShopRefreshTimeStr()) then
-		UIToast.Show("Conect...",nil,UIToast.ShowType.Upwards)
+		UIToast.Show("Conect...")
 		Message_Manager:SendPB_10027(shopId,on_10027_rec)
 	else
 		this:loadShopCacheData(shopId)
@@ -332,7 +332,7 @@ function wnd_shop_controller:showPurchaseDetails(goodsSlot,goodsID)
 	    	this:refreshCurrency(this:getCurrentShopType())
 	    	 -- DONE: 验证服务器数据
 	    	 this:saveServData(this:getCurrentShopID(),gw2c.shop)
-	    	 UIToast.Show("商品已追加",nil,UIToast.ShowType.Upwards)
+	    	 UIToast.Show(sdata_UILiteral:GetFieldV("Literal", 0xFD05))
 
 	    	 this.view.Panel_PurchaseDetails.panel:SetActive(false)
 	    	 Event.RemoveListener("10029",on_10029_rec)
@@ -356,7 +356,7 @@ function wnd_shop_controller:showPurchaseDetails(goodsSlot,goodsID)
 		end
 		if _enough then
 			Message_Manager:SendPB_10029(ShopID,goodsSlot,this.model:getCommIDBySlotIndex(ShopID,goodsSlot),on_10029_rec)
-		else UIToast.Show(_info.."不足",nil,UIToast.ShowType.Upwards) end
+		else UIToast.Show(_info..sdata_UILiteral:GetFieldV("Literal", 0xFD06)) end
 	end
 	UIEventListener.Get(this.view.Panel_PurchaseDetails.Mask).onClick = function()
 		this.view.Panel_PurchaseDetails.panel:SetActive(false)
@@ -487,7 +487,7 @@ function wnd_shop_controller:HandleOnItemPress(gItem,isPressed)
 			local _isSold = this.model:whether_The_Goods_have_been_sold(this:getCurrentShopID(),this.goodsSlot)
 			if not _isSold then
 				this:showPurchaseDetails(this.goodsSlot,this.goodsID)
-			else UIToast.Show("该商品已售出",nil,UIToast.ShowType.Upwards) end
+			else UIToast.Show(sdata_UILiteral:GetFieldV("Literal", 0xFD07)) end
 		end
 	end
 end

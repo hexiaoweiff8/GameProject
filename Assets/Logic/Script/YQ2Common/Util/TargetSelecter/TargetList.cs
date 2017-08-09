@@ -80,6 +80,11 @@ public class TargetList<T> where T : IGraphicsHolder//IGraphical<Rectangle>
         {
             return;
         }
+        if (list.Contains(t))
+        {
+            Debug.LogError("单位在列表中已存在");
+            return;
+        }
         // 加入全局列表
         list.Add(t);
         // 加入四叉树

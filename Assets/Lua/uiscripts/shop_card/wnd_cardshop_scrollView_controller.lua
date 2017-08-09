@@ -104,10 +104,10 @@ function wnd_cardshop_ScrollView_controller:HandleOnItemLoadedHandler(item)
 				if ctrl:HaveEnoughMoney2Buy(price,this.currentList[item.Index + 1]['Type']) then
 					ctrl:BuyCard(this.currentList[item.Index + 1]['ArmyCardID'],item)
 				else
-					UIToast.Show("点数不足,无法购买",nil,UIToast.ShowType.Upwards)
+					UIToast.Show(sdata_UILiteral:GetFieldV("Literal", 0xFB01))
 				end
 			else
-				UIToast.Show("卡牌未激活,无法购买",nil,UIToast.ShowType.Upwards)
+				UIToast.Show(sdata_UILiteral:GetFieldV("Literal", 0xFB02))
 			end
 		end
 		-- TODO: info按钮功能未定义
@@ -247,7 +247,7 @@ end
 
 function wnd_cardshop_ScrollView_controller:KillAllToggleAnime()
 	for _,v in ipairs(this.tweeningList) do
-		v:Kill()
+		v:Kill(false)
 	end
 end
 

@@ -20,12 +20,9 @@ public class ClusterManagerWrap
 		L.RegFunction("CheckRange", CheckRange);
 		L.RegFunction("New", _CreateClusterManager);
 		L.RegFunction("__tostring", ToLua.op_ToString);
-        //L.RegVar("MovementPlanePosition", get_MovementPlanePosition, set_MovementPlanePosition);
 		L.RegVar("MapWidth", get_MapWidth, set_MapWidth);
 		L.RegVar("MapHeight", get_MapHeight, set_MapHeight);
-        //L.RegVar("ForwardAngle", get_ForwardAngle, set_ForwardAngle);
 		L.RegVar("CollisionWeight", get_CollisionWeight, set_CollisionWeight);
-        //L.RegVar("Friction", get_Friction, set_Friction);
 		L.RegVar("UnitWidth", get_UnitWidth, set_UnitWidth);
 		L.RegVar("Single", get_Single, null);
 		L.EndClass();
@@ -265,25 +262,6 @@ public class ClusterManagerWrap
 		}
 	}
 
-    //[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-    //static int get_MovementPlanePosition(IntPtr L)
-    //{
-    //    object o = null;
-
-    //    try
-    //    {
-    //        o = ToLua.ToObject(L, 1);
-    //        ClusterManager obj = (ClusterManager)o;
-    //        UnityEngine.Vector3 ret = obj.MovementPlanePosition;
-    //        ToLua.Push(L, ret);
-    //        return 1;
-    //    }
-    //    catch(Exception e)
-    //    {
-    //        return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MovementPlanePosition on a nil value" : e.Message);
-    //    }
-    //}
-
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_MapWidth(IntPtr L)
 	{
@@ -322,25 +300,6 @@ public class ClusterManagerWrap
 		}
 	}
 
-    //[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-    //static int get_ForwardAngle(IntPtr L)
-    //{
-    //    object o = null;
-
-    //    try
-    //    {
-    //        o = ToLua.ToObject(L, 1);
-    //        ClusterManager obj = (ClusterManager)o;
-    //        float ret = obj.ForwardAngle;
-    //        LuaDLL.lua_pushnumber(L, ret);
-    //        return 1;
-    //    }
-    //    catch(Exception e)
-    //    {
-    //        return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index ForwardAngle on a nil value" : e.Message);
-    //    }
-    //}
-
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_CollisionWeight(IntPtr L)
 	{
@@ -359,25 +318,6 @@ public class ClusterManagerWrap
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index CollisionWeight on a nil value" : e.Message);
 		}
 	}
-
-    //[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-    //static int get_Friction(IntPtr L)
-    //{
-    //    object o = null;
-
-    //    try
-    //    {
-    //        o = ToLua.ToObject(L, 1);
-    //        ClusterManager obj = (ClusterManager)o;
-    //        float ret = obj.Friction;
-    //        LuaDLL.lua_pushnumber(L, ret);
-    //        return 1;
-    //    }
-    //    catch(Exception e)
-    //    {
-    //        return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index Friction on a nil value" : e.Message);
-    //    }
-    //}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_UnitWidth(IntPtr L)
@@ -411,25 +351,6 @@ public class ClusterManagerWrap
 			return LuaDLL.toluaL_exception(L, e);
 		}
 	}
-
-    //[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-    //static int set_MovementPlanePosition(IntPtr L)
-    //{
-    //    object o = null;
-
-    //    try
-    //    {
-    //        o = ToLua.ToObject(L, 1);
-    //        ClusterManager obj = (ClusterManager)o;
-    //        UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 2);
-    //        obj.MovementPlanePosition = arg0;
-    //        return 0;
-    //    }
-    //    catch(Exception e)
-    //    {
-    //        return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MovementPlanePosition on a nil value" : e.Message);
-    //    }
-    //}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_MapWidth(IntPtr L)
@@ -469,25 +390,6 @@ public class ClusterManagerWrap
 		}
 	}
 
-    //[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-    //static int set_ForwardAngle(IntPtr L)
-    //{
-    //    object o = null;
-
-    //    try
-    //    {
-    //        o = ToLua.ToObject(L, 1);
-    //        ClusterManager obj = (ClusterManager)o;
-    //        float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
-    //        obj.ForwardAngle = arg0;
-    //        return 0;
-    //    }
-    //    catch(Exception e)
-    //    {
-    //        return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index ForwardAngle on a nil value" : e.Message);
-    //    }
-    //}
-
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_CollisionWeight(IntPtr L)
 	{
@@ -506,25 +408,6 @@ public class ClusterManagerWrap
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index CollisionWeight on a nil value" : e.Message);
 		}
 	}
-
-    //[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-    //static int set_Friction(IntPtr L)
-    //{
-    //    object o = null;
-
-    //    try
-    //    {
-    //        o = ToLua.ToObject(L, 1);
-    //        ClusterManager obj = (ClusterManager)o;
-    //        float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
-    //        obj.Friction = arg0;
-    //        return 0;
-    //    }
-    //    catch(Exception e)
-    //    {
-    //        return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index Friction on a nil value" : e.Message);
-    //    }
-    //}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_UnitWidth(IntPtr L)

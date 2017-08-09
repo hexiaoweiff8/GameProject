@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using UnityEngine.Assertions.Comparers;
 using Util;
 
 public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
@@ -13,6 +12,22 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
     /// 检查时间间隔
     /// </summary>
     public float CheckTime = 0.1f;
+
+    /// <summary>
+    /// 特效目标位置
+    /// 0: 释放者位置
+    /// 1: 被释放者位置
+    /// 2: 目标点选择的位置
+    /// </summary>
+    public int TargetPos { get; private set; }
+
+    /// <summary>
+    /// 特效起始位置
+    /// 0: 释放者位置
+    /// 1: 被释放者位置
+    /// 2: 目标点选择的位置
+    /// </summary>
+    public int StartPos { get; private set; }
 
     /// <summary>
     /// 速度
@@ -35,22 +50,22 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
     public TargetCampsType TargetCamps { get; private set; }
 
 
-    /// <summary>
-    /// 初始化
-    /// </summary>
-    /// <param name="formulaType">行为单元类型</param>
-    /// <param name="speed">扫描速度(单位扫描次数的长度)</param>
-    /// <param name="width">扫描宽度</param>
-    /// <param name="length">扫描总长度</param>
-    /// <param name="targetCamps">目标阵营类型</param>
-    public SlideCollisionDetectionFormulaItem(int formulaType, float speed, float width, float length, TargetCampsType targetCamps)
-    {
-        FormulaType = formulaType;
-        Speed = speed;
-        Width = width;
-        Length = length;
-        TargetCamps = targetCamps;
-    }
+    ///// <summary>
+    ///// 初始化
+    ///// </summary>
+    ///// <param name="formulaType">行为单元类型</param>
+    ///// <param name="speed">扫描速度(单位扫描次数的长度)</param>
+    ///// <param name="width">扫描宽度</param>
+    ///// <param name="length">扫描总长度</param>
+    ///// <param name="targetCamps">目标阵营类型</param>
+    //public SlideCollisionDetectionFormulaItem(int formulaType, float speed, float width, float length, TargetCampsType targetCamps)
+    //{
+    //    FormulaType = formulaType;
+    //    Speed = speed;
+    //    Width = width;
+    //    Length = length;
+    //    TargetCamps = targetCamps;
+    //}
 
     /// <summary>
     /// 初始化
@@ -67,7 +82,7 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
         {
             throw new Exception("数据列表为空");
         }
-        var argsCount = 5;
+        var argsCount = 7;
         // 解析参数
         if (array.Length < argsCount)
         {
@@ -76,17 +91,20 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
 
         // 如果该项值是以%开头的则作为替换数据
         var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        var speed = GetDataOrReplace<float>("Speed", array, 1, ReplaceDic);
-        var width = GetDataOrReplace<float>("Width", array, 2, ReplaceDic);
-        var length = GetDataOrReplace<float>("Length", array, 3, ReplaceDic);
-        var targetCamps = GetDataOrReplace<TargetCampsType>("TargetCamps", array, 4, ReplaceDic);
-
+        var targetPos = GetDataOrReplace<int>("TargetPos", array, 1, ReplaceDic);
+        var startPos = GetDataOrReplace<int>("StartPos", array, 2, ReplaceDic);
+        var speed = GetDataOrReplace<float>("Speed", array, 3, ReplaceDic);
+        var width = GetDataOrReplace<float>("Width", array, 4, ReplaceDic);
+        var length = GetDataOrReplace<float>("Length", array, 5, ReplaceDic);
+        var targetCamps = GetDataOrReplace<TargetCampsType>("TargetCamps", array, 6, ReplaceDic);
 
         FormulaType = formulaType;
         Speed = speed;
         Width = width;
         Length = length;
         TargetCamps = targetCamps;
+        TargetPos = targetPos;
+        StartPos = startPos;
     }
 
     /// <summary>
@@ -110,6 +128,8 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
         var myLength = Length;
         var myTargetCamps = TargetCamps;
         var myFormulaType = FormulaType;
+        var myTargetPos = TargetPos;
+        var myStartPos = StartPos;
 
         var clusterData = paramsPacker.ReleaseMember.ClusterData;
 
@@ -119,9 +139,13 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
 
         IFormula result = new Formula((callback, scope) =>
         {
-
             // 当前长度
             var nowLength = 0f;
+
+            // 目标点
+            var targetPos = GetPosByType(myTargetPos, paramsPacker, scope);
+            // 起始点
+            var startPos = GetPosByType(myStartPos, paramsPacker, scope);
 
             // 计时器
             var timer = new Timer(myCheckTime, true);
@@ -135,8 +159,8 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
                     nowLength += mySpeed;
                     // 从发射位置向目标位置一节一节搜索目标
                     // 速度影响单次搜索的长度
-                    var diffPos = paramsPacker.TargetPos - paramsPacker.StartPos;
-                    var pos = (diffPos) * nowLength / myLength + paramsPacker.StartPos;
+                    var diffPos = targetPos - startPos;
+                    var pos = (diffPos) * nowLength / myLength + startPos;
                     // 创建图形
                     var diffPosNoY = new Vector3(diffPos.x, 0, diffPos.z);
                     // 求旋转角度
@@ -147,8 +171,8 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
                     var graphics = new RectGraphics(new Vector2(pos.x, pos.z), Width, mySpeed, rotation * dir);
                     Utils.DrawGraphics(graphics, Color.white);
                     // 搜索当前节范围内的单位
-                    tmpPackerList = FormulaParamsPackerFactroy.Single.GetFormulaParamsPackerList(graphics, 
-                        paramsPacker.StartPos, 
+                    tmpPackerList = FormulaParamsPackerFactroy.Single.GetFormulaParamsPackerList(graphics,
+                        startPos, 
                         myTargetCamps,
                         paramsPacker.Skill,
                         paramsPacker.TargetMaxCount);

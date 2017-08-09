@@ -25,11 +25,15 @@ public class SData_armycardbase_c : MonoEX.Singleton<SData_armycardbase_c>
 					case "TrainCost": dif.TrainCost = (short)(double)o22; break;
 					case "IconID": dif.IconID = (string)o22; break;
 					case "ModelID": dif.ModelID = (string)o22; break;
-					case "UseLimit": dif.UseLimit = (short)(double)o22; break;
 					case "ArrayID": dif.ArrayID = (int)(double)o22; break;
 					case "AreaLimit": dif.AreaLimit = (short)(double)o22; break;
 					case "ArmyID": dif.ArmyID = (int)(double)o22; break;
 					case "ArmyUnit": dif.ArmyUnit = (short)(double)o22; break;
+					case "IsExchange": dif.IsExchange = (short)(double)o22; break;
+					case "ShopType": dif.ShopType = (string)o22; break;
+					case "Type": dif.Type = (string)o22; break;
+					case "BasePrice": dif.BasePrice = (int)(double)o22; break;
+					case "UpPrice": dif.UpPrice = (int)(double)o22; break;
                 }
             });
             if (Data.ContainsKey(dif.ArmyCardID))
@@ -79,10 +83,6 @@ public struct armycardbase_cInfo
 	 /// </summary>
 	public string ModelID;
 	 /// <summary>
-	 ///卡牌基础兵员
-	 /// </summary>
-	public short UseLimit;
-	 /// <summary>
 	 ///阵型ID
 	 /// </summary>
 	public int ArrayID;
@@ -98,4 +98,24 @@ public struct armycardbase_cInfo
 	 ///兵种数量
 	 /// </summary>
 	public short ArmyUnit;
+	 /// <summary>
+	 ///是否可以兑换
+	 /// </summary>
+	public short IsExchange;
+	 /// <summary>
+	 ///商店类型
+	 /// </summary>
+	public string ShopType;
+	 /// <summary>
+	 ///货币类型
+	 /// </summary>
+	public string Type;
+	 /// <summary>
+	 ///基础价格
+	 /// </summary>
+	public int BasePrice;
+	 /// <summary>
+	 ///成长系数
+	 /// </summary>
+	public int UpPrice;
 }

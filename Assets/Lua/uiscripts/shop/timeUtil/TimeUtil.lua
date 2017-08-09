@@ -1,9 +1,15 @@
 TimeUtil = {}
-
+--@Des 创建一个带Tick回调的计时器,Tick频率可指定
+--@Params sec 计时器时间
+--		  OnTickFunc OnTick回调
+--		  OnKillFunc 计时器结束后回调
 function TimeUtil:CreateLoopTimer(sec,OnTickFunc,OnKillFunc)
 	local timer = Util.Timer.New(sec, true)
 	return timer:OnCompleteCallback(OnTickFunc):OnKill(OnKillFunc):Start()
 end
+--@Des 创建一个无Tick回调的计时器
+--@Params sec 计时器时间
+--		  OnCompleteFunc 计时器完成后回调
 function TimeUtil:CreateTimer(sec,OnCompleteFunc)
 	local timer = Util.Timer.New(sec, false)
 	return timer:OnCompleteCallback(OnCompleteFunc):Start()
@@ -29,8 +35,11 @@ function TimeUtil:getRemainTime(remainTime)
         local _remainHour = math.floor(remainTime / 3600);
         remainTime = remainTime - _remainHour * 3600
         local _remianMin = math.floor(remainTime / 60);
+        remainTime = remainTime - _remianMin * 60
+        local _remainSec = math.floor(remainTime);
         
         return tostring(_remainDay) .. "d " .. string.format("%02d", _remainHour) .. ":" .. string.format("%02d", _remianMin)
+        -- return tostring(_remainDay) .. "d " .. string.format("%02d", _remainHour) .. ":" .. string.format("%02d", _remianMin) .. ':' .. string.format("%02d", _remainSec)
     end
 end
 --@Dec 从 秒 转到 天时分秒

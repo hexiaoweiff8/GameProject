@@ -144,6 +144,7 @@ public enum TriggerType
     If = 13,
     ResistDemage = 14,
     Remain = 15,        // 挂载光环
+    TargetPointSelector = 16, // 目标点选择
 }
 
 /// <summary>
@@ -162,25 +163,29 @@ public enum DataType
     TickTime = 8,
     ChangeData = 9,
 
+
     // -----------buff特有---------
-    BuffTime,
-    BuffType,
-    DetachTriggerLevel1,
-    DetachTriggerLevel2,
-    BuffLevel,
-    BuffGroup,
-    IsBeneficial,
-    DetachQualified,
-    IsDeadDisappear,
-    IsNotLethal,
+    BuffTime = 10,
+    BuffType = 11,
+    DetachTriggerLevel1 = 12,
+    DetachTriggerLevel2 = 13,
+    BuffLevel = 14,
+    BuffGroup = 15,
+    IsBeneficial = 16,
+    DetachQualified = 17,
+    IsDeadDisappear = 18,
+    IsNotLethal = 19,
 
     // ------------Remain特有----------
-    Range,              // 作用范围
-    DuringTime,         // 作用总时间
-    IsFollow,           // 是否跟随释放者
-    ActionCamp,         // 作用阵营
-    CouldActionOnAir,   // 是否可以作用到空中单位
-    CouldActionOnSurface,   // 是否可以作用到地面单位
-    CouldActionOnBuilding   // 是否可以作用到建筑单位
+    Range = 10,              // 作用范围
+    DuringTime = 11,         // 作用总时间
+    IsFollow = 12,           // 是否跟随释放者
+    ActionCamp = 13,         // 作用阵营
+    CouldActionOnAir = 14,   // 是否可以作用到空中单位
+    CouldActionOnSurface = 15,   // 是否可以作用到地面单位
+    CouldActionOnBuilding = 16,   // 是否可以作用到建筑单位
 
+
+    // -----------Skill特有------------
+    IsActive = 10,           // 是否为主动技能
 }

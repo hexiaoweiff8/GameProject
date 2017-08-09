@@ -6,18 +6,17 @@ local class = require("common/middleclass")
 local equipDetail_model = class("equipDetail_model")
 
 
-function equipDetail_model:getDatas(equip)
+function equipDetail_model:initDatas(equip)
+
+
+    ---设置要显示的装备
+    self.equipToShow = equip
     ---
     ---获取要显示的字符串
     ---
-    self.EquipName = equip["EquipName"]
-    self.EquipIcon = equip["EquipIcon"]
-    self.EquipFrame = EquipUtil:getQualitySpriteStr(equip.rarity)
-    self.EquipLV = equip.lv
-    self.EquipisBad = (equip.isBad == 0 and {false} or {true})[1]
+    self.EquipisEquipped = EquipModel:isEquipped(equip.id)
     self.MainAttributeStr = EquipUtil:getEquipmentMainAttributeStr(equip["EquipID"],equip.fst_attr,equip.lv)
     self.SubAttributeStr = EquipUtil:getEquipmentSubAttributeStr(equip)
-
 
     self.EquipPlusCost = EquipUtil:getEquipmentPlusCost(equip.lv,equip.rarity)
     self.EquipFixCost = EquipUtil:getEquipmentFixCost(equip.lv,equip.rarity)
@@ -35,7 +34,9 @@ end
 
 
 
-
+---
+---点击穿戴按钮，获取全部穿戴的装备列表
+---
 function equipDetail_model:getList_equipLoad(equip)
     for i = #EquipModel.serv_fitEquipmentList,1,-1 do
         if EquipModel:getLocalEquipmentTypeByServID(EquipModel.serv_fitEquipmentList[i]) == equip.EquipType then
@@ -46,6 +47,9 @@ function equipDetail_model:getList_equipLoad(equip)
     table.insert(EquipModel.serv_fitEquipmentList,equip.id)
     return EquipModel.serv_fitEquipmentList
 end
+---
+---点击卸下按钮，获取全部穿戴的装备列表
+---
 function equipDetail_model:getList_equipDrop(equip)
     for i = #EquipModel.serv_fitEquipmentList,1,-1 do
         if EquipModel.serv_fitEquipmentList[i] == equip.id then

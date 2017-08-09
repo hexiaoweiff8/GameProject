@@ -15,6 +15,9 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
 
     /// <summary>
     /// 接收技能位置
+    /// 0: 自己的位置
+    /// 1: 目标的位置
+    /// 2: 目标点选择的位置
     /// </summary>
     public int ReceivePos { get; private set; }
 
@@ -158,54 +161,31 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
         var myRepeatTime = RepeatTime;
         // 目标权重筛选数据
 
-        var targetSelectData = new SelectWeightData();
-        // 选择目标数据
-        targetSelectData.AirWeight = -1;
-        targetSelectData.BuildWeight = 100;
-        targetSelectData.SurfaceWeight = 100;
+        //var targetSelectData = new SelectWeightData();
+        //// 选择目标测试数据
+        //targetSelectData.AirWeight = -1;
+        //targetSelectData.BuildWeight = 100;
+        //targetSelectData.SurfaceWeight = 100;
 
-        targetSelectData.HumanWeight = 10;
-        targetSelectData.OrcWeight = 10;
-        targetSelectData.OmnicWeight = 10;
+        //targetSelectData.HumanWeight = 10;
+        //targetSelectData.OrcWeight = 10;
+        //targetSelectData.OmnicWeight = 10;
 
-        targetSelectData.HideWeight = -1;
-        targetSelectData.TauntWeight = 1000;
+        //targetSelectData.HideWeight = -1;
+        //targetSelectData.TauntWeight = 1000;
 
-        targetSelectData.HealthMaxWeight = 0;
-        targetSelectData.HealthMinWeight = 10;
-        targetSelectData.DistanceMaxWeight = 0;
-        targetSelectData.DistanceMinWeight = 10;
-        //var targetSelectData = TargetSelectDataId > 0 ? new SelectWeightData(SData_armyaim_c.Single.GetDataOfID(TargetSelectDataId)) : null;
+        //targetSelectData.HealthMaxWeight = 0;
+        //targetSelectData.HealthMinWeight = 10;
+        //targetSelectData.DistanceMaxWeight = 0;
+        //targetSelectData.DistanceMinWeight = 10;
+        var targetSelectData = TargetSelectDataId > 0 ? new SelectWeightData(SData_armyaim_c.Single.GetDataOfID(TargetSelectDataId)) : null;
 
         result = new Formula((callback, scope) =>
         {
             // 检测范围
             ICollisionGraphics graphics = null;
-            // 获取目标位置
-            var posX = 0f;
-            var posY = 0f;
-            switch (myReceivePos)
-            {
-                case 0:
-                    {
-                        posX = paramsPacker.ReleaseMember.ClusterData.X;
-                        posY = paramsPacker.ReleaseMember.ClusterData.Y;
-                    }
-                    break;
-                case 1:
-                    {
-                        posX = paramsPacker.ReceiverMenber.ClusterData.X;
-                        posY = paramsPacker.ReceiverMenber.ClusterData.Y;
-                    }
-                    break;
-                case 2:
-                    {
-                        posX = scope.GetFloat(Utils.TargetPointSelectorXKey) ?? 0f;
-                        posY = scope.GetFloat(Utils.TargetPointSelectorYKey) ?? 0f;
-                    }
-                    break;
-            }
-            var pos = new Vector2(posX, posY);//Utils.V3ToV2WithouY(myReceivePos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos);
+
+            var pos = Utils.V3ToV2WithouY(GetPosByType(myReceivePos, paramsPacker, scope));;//Utils.V3ToV2WithouY(myReceivePos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos);
             // 获取图形对象
             switch (myScopeType)
             {

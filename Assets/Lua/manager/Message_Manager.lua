@@ -275,7 +275,7 @@ function MSGID_EquipRemake(body)
     local gw2c = gw2c_pb.EquipRemake()
     gw2c:ParseFromString(body)
     EquipModel:updateEquipData(gw2c.equip)
-    itemModel:setItem(gw2c.item)
+    itemModel:setItems(gw2c.item)
     RemakePanel:remakeRefresh()
     Event.RemoveListener("10007", MSGID_EquipRemake)
 end
@@ -415,7 +415,7 @@ function MSGID_EquipSlot(body)
     local gw2c = gw2c_pb.CardTakeMedal()
     gw2c:ParseFromString(body)
     cardModel:setCardInfo(gw2c.card)
-    itemModel:setItem(gw2c.item)
+    itemModel:setItems(gw2c.item)
     wnd_cardyc_controller:equipSlot_Refresh()
     Event.RemoveListener("10013", MSGID_EquipSlot)
 
@@ -441,7 +441,7 @@ function MSGID_EquipAllSlot(body)
     local gw2c = gw2c_pb.CardTakeMedal()
     gw2c:ParseFromString(body)
     cardModel:setCardInfo(gw2c.card)
-    itemModel:setItem(gw2c.item)
+    itemModel:setItems(gw2c.item)
     Event.RemoveListener("10013", MSGID_EquipAllSlot)
 
     if slotList and #slotList > 1 then
@@ -560,7 +560,6 @@ function Message_Manager:SendPB_loadOrNot(idList)
     end
     local msg = c2gw:SerializeToString()
     Message_Manager:createSendPBHeader(10021, msg)
-
 end
 function MSGID_loadOrNot(body)
     local gw2c = gw2c_pb.EquipFit()
@@ -752,11 +751,50 @@ function Message_Manager:SendPB_10032(id,CallBack)
         Event.AddListener("10032",CallBack)
     end
 end
+--================================================================
+--@Des 设置卡牌大营
+--@params 大营卡牌信息列表
+--================================================================
+function Message_Manager:SendPB_10035(GfItemlst,CallBack)
+    local c2gw = c2gw_pb:SetCardGf()
+
+    for i=1,#GfItemlst do
+        table.insert(c2gw.lst,GfItemlst[i])
+    end
+
+    local msg = c2gw:SerializeToString()
+    Message_Manager:createSendPBHeader(10035,msg)
+
+    if CallBack then
+        Event.AddListener("10035",CallBack)
+    end
+end
+--================================================================
+--@Des 设置卡牌前锋
+--@params 前锋卡牌信息列表
+--================================================================
+function Message_Manager:SendPB_10036(PfItemlst,CallBack)
+    local c2gw = c2gw_pb:SetCardPf()
+
+    for i=1,#PfItemlst do
+        table.insert(c2gw.lst,PfItemlst[i])
+    end
+
+    local msg = c2gw:SerializeToString()
+    Message_Manager:createSendPBHeader(10036,msg)
+
+    if CallBack then
+        Event.AddListener("10036",CallBack)
+    end
+end
+
+local _headerIDCounter = 0
+
 function Message_Manager:createSendPBHeader(msgId, body)
     local header = header_pb.Header()
-    header.ID = 1
+    header.ID = _headerIDCounter
     header.msgId = msgId
-    header.userId = 8002--8001
+    header.userId = 8005--8001
     header.version = '1.0.0'
     header.errno = 0
     header.ext = 0
@@ -767,6 +805,9 @@ function Message_Manager:createSendPBHeader(msgId, body)
     local buffer = ByteBuffer()
     buffer:WriteBuffer(msg2)
     networkMgr:SendMessage(buffer)
+    -- 2017-08-04 加入记录请求时间
+    NetworkDelay_Manager:RecordSendTime(header.ID)
+    _headerIDCounter = _headerIDCounter + 1
 end
 
 function Message_Manager:createSendPBHeaderByUdp(msgId, body)
@@ -817,6 +858,13 @@ function Message_Manager:getAllData(gw2c)
     --初始化PVE model
     -- wnd_pve_model = require("uiscripts/PVE/wnd_PVE_model")
     -- wnd_pve_model.AvoidWarCardTimestamp = gw2c.user.pvp.avoid
+    --初始化主界面model
+    ui_main_model = require("uiscripts/main/ui_main_model")
+    ui_main_model.AvoidWarCardTimestamp = gw2c.user.pvp.avoid
+
+    wnd_biandui_model = require("uiscripts/biandui/wnd_biandui_model")
+    wnd_biandui_model:SetArmyData(gw2c.user.battle)
+
 end
 --================================================================
 --30001 进入聊天室（聊天心跳）
@@ -852,7 +900,7 @@ end
 --返回包：chat.GetChatRecordResp
 --rec ChatRecord repeated聊天记录
 --================================================================
-local isFirstSend30002 = true --是不是第一次请求30002，第一次的话数据正常插入，但后续要把数据往前叉
+local isFirstSend30002 = true --是不是第一次请求30002，第一次的话数据正常插入，但后续要把数据往前插
 function Message_Manager:SendPB_30002(type,time)
     local chat = chat_pb:GetChatRecord()
     --print("timed-------------------------------------------------------"..time)
@@ -925,6 +973,100 @@ function MSGID_35001(body)
     --print(rid..username..content ..time)
     chat_model:inserDate(rid, username, content, time)
 end
+--================================================================
+--10019 拉取邮件列表
+--请求包：
+--返回包：gw2c.CardUnionLvlup
+--mails Mail repeat 邮件信息
+--================================================================
+function Message_Manager:SendPB_10019()
+
+    Message_Manager:createSendPBHeader(10019)
+    Event.AddListener("10019",MSGID_10019)
+end
+
+function MSGID_10019(body)
+    print("监听到10019")
+    local gw2c = gw2c_pb.GetMailList()
+    gw2c:ParseFromString(body)
+    print("邮件列表大小:"..#gw2c.mails)
+    mail_model:insertData(gw2c.mails)
+    Event.RemoveListener("10019", MSGID_10019)
+end
+
+--================================================================
+--10025 读取邮件
+--请求包：c2gw.ReadMail
+--id string 邮件ID
+--返回包：gw2c.ReadMail
+--mail Mail 邮件信息
+--card Card  repeated 卡牌信息
+--equip Equip repeated装备信息
+--currency Currency 货币信息
+--item Item 碎片信息
+--================================================================
+function Message_Manager:SendPB_10025(mailID)
+    local c2gw = c2gw_pb:ReadMail()
+    c2gw.id = mailID
+    print(c2gw.id)
+    local msg1 = c2gw:SerializeToString()
+    Message_Manager:createSendPBHeader(10025,msg1)
+    Event.AddListener("10025",MSGID_10025)
+end
+
+function MSGID_10025(body)
+    print("监听到10025")
+    print("成功读取邮件")
+    Event.RemoveListener("10025", MSGID_10025)
+end
+
+--================================================================
+--10026 删除邮件
+--请求包：c2gw.DelMail
+--id string 邮件ID
+--返回包：
+--================================================================
+function Message_Manager:SendPB_10026(mailID)
+    local c2gw = c2gw_pb:DelMail()
+    c2gw.id = mailID
+    local msg1 = c2gw:SerializeToString()
+    Message_Manager:createSendPBHeader(10026,msg1)
+    Event.AddListener("10026",MSGID_10026)
+end
+
+function MSGID_10026(body)
+    print("监听到10026")
+    print("删除邮件成功")
+    Event.RemoveListener("10026", MSGID_10026)
+end
+--================================================================
+--10020 领取邮件奖励
+--请求包：c2gw.GetMailReward
+--id string 邮件ID
+--返回包：gw2c.GetMailReward
+--card Card  repeated 卡牌信息
+--equip Equip repeated装备信息
+--currency Currency 货币信息
+--item Item 碎片信息
+--================================================================
+function Message_Manager:SendPB_10020(mailID)
+    local c2gw = c2gw_pb:GetMailReward()
+    c2gw.id = mailID
+    local msg1 = c2gw:SerializeToString()
+    Message_Manager:createSendPBHeader(10020,msg1)
+    Event.AddListener("10020",MSGID_10020)
+end
+
+function MSGID_10020(body)
+    print("监听到10020")
+    local gw2c = gw2c_pb.GetMailReward()
+    gw2c:ParseFromString(body)
+
+
+
+    Event.RemoveListener("10020", MSGID_10020)
+end
+
 
 
 --==============================--

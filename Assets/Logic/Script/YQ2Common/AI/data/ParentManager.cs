@@ -30,6 +30,11 @@ public class ParentManager : Singleton<ParentManager>
     public const string BallisticParent = "BallisticParent";
 
     /// <summary>
+    /// 缓存父级
+    /// </summary>
+    public const string PoolParent = "PoolParent";
+
+    /// <summary>
     /// 父级dic
     /// </summary>
     private Dictionary<string, GameObject> parentDic = new Dictionary<string, GameObject>();

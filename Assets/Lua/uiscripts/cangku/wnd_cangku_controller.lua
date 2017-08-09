@@ -26,6 +26,7 @@ local class = require("common/middleclass")
 wnd_cangku_controller = class("wnd_cangku_controller",wnd_base)
 
 local this = wnd_cangku_controller
+local instance = nil
 
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --function def
@@ -34,6 +35,8 @@ function wnd_cangku_controller:OnShowDone()
 	this.view = require("uiscripts/cangku/wnd_cangku_view")
 	this.model = require("uiscripts/cangku/wnd_cangku_model")
 	this.scrollViewController = require("uiscripts/cangku/scrollview/wnd_cangku_ScrollView_controller")
+
+    instance = self
 
 	this.view:initView(self)
 	-- this.model:initModel()
@@ -62,7 +65,9 @@ function wnd_cangku_controller:initListener()
 
 	UIEventListener.Get(this.view.Button_back).onClick = function()
 			-- TODO: 仓库界面：返回按钮的实现
-			UIToast.Show("返回上一界面",nil,UIToast.ShowType.Upwards)
+			-- UIToast.Show("返回上一界面")
+			-- ui_manager:DestroyWB(WNDTYPE.Cangku)
+			instance:Hide(0)
 		end
 	-- 页卡
 	for i = 1,this.model.DepositoryTab_Count do
@@ -117,7 +122,7 @@ function wnd_cangku_controller:initListener()
 		if (_sellType == 1 and {currencyModel:getCurrentTbl().diamond} or {currencyModel:getCurrentTbl().gold})[1] < _Cost then
 			print("当前钻石："..currencyModel:getCurrentTbl().diamond)
 			print("当前金币："..currencyModel:getCurrentTbl().gold)
-			UIToast.Show("货币不足，无法分解",nil,UIToast.ShowType.Upwards)
+			UIToast.Show(sdata_UILiteral:GetFieldV("Literal", 0xFFF9))
 			return
 		end
 
@@ -128,7 +133,7 @@ function wnd_cangku_controller:initListener()
 		end
 		local on_10023_rec = function(body)
 			Event.RemoveListener("10023", on_10023_rec)
-			UIToast.Show("所选装备已分解.",nil,UIToast.ShowType.Queue)
+			UIToast.Show(sdata_UILiteral:GetFieldV("Literal", 0xFFF8))
 			local gw2c = gw2c_pb.SellEquip()
 		    gw2c:ParseFromString(body)
 		    currencyModel:initCurrencyTbl(gw2c.currency)
@@ -152,7 +157,7 @@ function wnd_cangku_controller:initListener()
 	local OnPerfectClick = function()
 
 		if #this.scrollViewController._selectedItems == 0 then
-			UIToast.Show("还没有选中任何要分解的装备")
+			UIToast.Show(sdata_UILiteral:GetFieldV("Literal", 0xFFF7))
 			return
 		end
 		
@@ -193,7 +198,7 @@ function wnd_cangku_controller:initListener()
 	UIEventListener.Get(this.view.Panel_Detail_decomposition.Button_decomposition_normal).onClick = function()
 
 		if #this.scrollViewController._selectedItems == 0 then
-			UIToast.Show("还没有选中任何要分解的装备")
+			UIToast.Show(sdata_UILiteral:GetFieldV("Literal", 0xFFF7))
 			return
 		end
 		
@@ -377,7 +382,7 @@ function wnd_cangku_controller:showPanelByItemData(ItemData)
 					    local items = gw2c.item
 					    for k,v in ipairs(items) do
 					    	this:updateServData(nil,v)
-					    	UIToast.Show("碎片剩余："..v.num)
+					    	UIToast.Show(sdata_UILiteral:GetFieldV("Literal", 0xFFF6)..v.num)
 					    end
 					    this:insertServData(equip)
 					    Event.RemoveListener("10024",on_10024_rec)	
@@ -576,11 +581,11 @@ function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 			    gw2c:ParseFromString(body)
 			    local serv_equip = gw2c.equip
 			    if serv_equip.isLock == 0 then
-			    	UIToast.Show("装备已解锁",nil,UIToast.ShowType.Upwards)
+			    	UIToast.Show(sdata_UILiteral:GetFieldV("Literal", 0xFFF5))
 			    	cangkuItem:setEquipmentLock(false)
 			    	this.view.Panel_Detail_equipment.Button_lock:GetComponent(typeof(UISprite)).spriteName = cstr.EQUIPMENT_UNLOCKED
 			    else
-			    	UIToast.Show("装备已锁定",nil,UIToast.ShowType.Upwards)
+			    	UIToast.Show(sdata_UILiteral:GetFieldV("Literal", 0xFFF4))
 			    	cangkuItem:setEquipmentLock(true)
 			    	this.view.Panel_Detail_equipment.Button_lock:GetComponent(typeof(UISprite)).spriteName = cstr.EQUIPMENT_LOCKED
 			    end
@@ -606,7 +611,7 @@ function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 				if _repeat then
 					this:unloadEquipmentByID(this.model.serv_fitEquipmentList[_repeatIndex])
 					table.remove(this.model.serv_fitEquipmentList,_repeatIndex)
-					UIToast.Show("存在相同部位装备,将卸下之前装备")
+					UIToast.Show(sdata_UILiteral:GetFieldV("Literal", 0xFFF3))
 				end
 				table.insert(this.model.serv_fitEquipmentList,equip.id)
 			end
@@ -648,7 +653,7 @@ function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 
 				local equipDetail_data = equipDetail:get_Data()
 				if currencyModel:getCurrentTbl().power < equipDetail_data.EquipPlusCost then
-					UIToast.Show("能量点不足")
+					UIToast.Show(sdata_UILiteral:GetFieldV("Literal", 0xFFF2))
 					return
 				end
 				local on_10004_rec = function(body)
@@ -663,7 +668,7 @@ function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 					this:updateServData(gw2c.equip,nil)
 					cangkuItem:setEquipmentLevel(gw2c.equip.lv)
 					this:showEquipmentDetailsPanel(equip,cangkuItem)
-					UIToast.Show("已强化到+"..serv_equip.lv)
+					UIToast.Show(sdata_UILiteral:GetFieldV("Literal", 0xFFF1)..serv_equip.lv)
 				end
 				Message_Manager:SendPB_10004(equip.id,on_10004_rec)
 			else
@@ -671,7 +676,7 @@ function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 					-- TODO:装备重铸
 
 				else
-					UIToast.Show("该装备无法重铸")
+					UIToast.Show(sdata_UILiteral:GetFieldV("Literal", 0xFFF0))
 				end
 			end
 		end

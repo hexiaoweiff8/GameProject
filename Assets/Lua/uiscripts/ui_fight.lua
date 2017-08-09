@@ -2,9 +2,9 @@ local class = require("common/middleclass")
 local ui_fight = class("ui_fight", wnd_base)
 local whiteColor = Color(1, 1, 1, 1)
 local grayColor = Color(169 / 255, 169 / 255, 169 / 255, 1)
-function Onfs()
-    ui_manager:ShowWB(WNDTYPE.ui_fight)
-end
+--function Onfs()
+--    ui_manager:ShowWB(WNDTYPE.ui_fight)
+--end
 
 --local isPress = false
 local selectedCardItem = nil

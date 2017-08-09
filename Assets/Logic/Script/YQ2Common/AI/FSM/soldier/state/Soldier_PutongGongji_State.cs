@@ -34,7 +34,7 @@ public class Soldier_PutongGongji_State : SoldierFSMState
 
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
-        Debug.Log("普通攻击:" + fsm.Display.GameObj.name);
+        //Debug.Log("普通攻击:" + fsm.Display.GameObj.name);
         _fireTick = fsm.Display.ClusterData.AllData.MemberData.AttackRate1;
         _fireTimer = new Timer(_fireTick,true);
         _fireTimer.OnCompleteCallback(() => { fire(fsm); }).Start();
@@ -77,6 +77,13 @@ public class Soldier_PutongGongji_State : SoldierFSMState
             return;
         }
 
+        // 单位转向目标
+        var clusterData = fsm.Display.ClusterData as ClusterData;
+        if (clusterData != null)
+        {
+            clusterData.RotateToWithoutYAxis(fsm.EnemyTarget.ClusterData.transform.position);
+        }
+
         //var fightVO = fsm.Display.ClusterData.MemberData as FightVO;
         // 攻击时检测技能
         SkillManager.Single.SetTriggerData(new TriggerData()
@@ -90,85 +97,86 @@ public class Soldier_PutongGongji_State : SoldierFSMState
 
         // 如果攻击方的攻击方式不为普通攻击的读取攻击表, 获取对应攻击方式
         IGeneralAttack normalGeneralAttack = null;
-        if (fsm.Display.ClusterData.AllData.MemberData.AttackType == Utils.BulletTypeNormal)
+        switch (myClusterData.AllData.MemberData.AttackType)
         {
-            normalGeneralAttack = GeneralAttackManager.Instance()
-                .GetNormalGeneralAttack(myClusterData, enemyClusterData, "test/TrailPrj",
-                    myClusterData.transform.position + new Vector3(0, 10, 0),
-                    enemyClusterData.gameObject,
-                    200,
-                    TrajectoryAlgorithmType.Line,
-                    () =>
-                    {
-                        //Debug.Log("普通攻击");
-                        
-                    });
-        }
-        else if (myClusterData.AllData.MemberData.AttackType == Utils.BulletTypeScope)
-        {
-            // 获取
-            //Debug.Log("AOE");
-            var armyAOE = myClusterData.AllData.AOEData;
-            // 根据不同攻击类型获取不同数据
-            switch (armyAOE.AOEAim)
-            {
-                case Utils.AOEObjScope:
-                    normalGeneralAttack = GeneralAttackManager.Instance().GetPointToObjScopeGeneralAttack(myClusterData,
-                        new[] { armyAOE.BulletModel, armyAOE.DamageEffect },
-                        myClusterData.transform.position,
+            case Utils.BulletTypeNormal:
+                normalGeneralAttack = GeneralAttackManager.Instance()
+                    .GetNormalGeneralAttack(myClusterData, enemyClusterData, "test/TrailPrj",
+                        myClusterData.transform.position + new Vector3(0, 10, 0),
                         enemyClusterData.gameObject,
-                        armyAOE.AOERadius,
                         200,
-                        armyAOE.EffectTime,
-                        (TrajectoryAlgorithmType)armyAOE.BulletPath,
+                        TrajectoryAlgorithmType.Line,
                         () =>
                         {
-                            //Debug.Log("AOE Attack1");
+                            //Debug.Log("普通攻击");
+                        
                         });
-                    break;
-                case Utils.AOEPointScope:
-                    normalGeneralAttack =
-                        GeneralAttackManager.Instance().GetPointToPositionScopeGeneralAttack(myClusterData,
+                break;
+            case Utils.BulletTypeScope:
+                // 获取
+                //Debug.Log("AOE");
+                var armyAOE = myClusterData.AllData.AOEData;
+                // 根据不同攻击类型获取不同数据
+                switch (armyAOE.AOEAim)
+                {
+                    case Utils.AOEObjScope:
+                        normalGeneralAttack = GeneralAttackManager.Instance().GetPointToObjScopeGeneralAttack(myClusterData,
                             new[] { armyAOE.BulletModel, armyAOE.DamageEffect },
                             myClusterData.transform.position,
-                            enemyClusterData.transform.position,
+                            enemyClusterData.gameObject,
                             armyAOE.AOERadius,
                             200,
                             armyAOE.EffectTime,
-                            (TrajectoryAlgorithmType) armyAOE.BulletPath,
+                            (TrajectoryAlgorithmType)armyAOE.BulletPath,
                             () =>
                             {
-                            //Debug.Log("AOE Attack2");
+                                //Debug.Log("AOE Attack1");
                             });
-                    break;
-                case Utils.AOEScope:
-                    normalGeneralAttack = GeneralAttackManager.Instance().GetPositionScopeGeneralAttack(myClusterData,
-                        armyAOE.DamageEffect,
-                        myClusterData.transform.position,
-                        new CircleGraphics(new Vector2(myClusterData.X, myClusterData.Y), armyAOE.AOERadius), 
-                        armyAOE.EffectTime,
-                        () =>
-                        {
-                            //Debug.Log("AOE Attack3");
-                        });
-                    break;
-                case Utils.AOEForwardScope:
-                    normalGeneralAttack =
-                        GeneralAttackManager.Instance().GetPositionRectScopeGeneralAttack(myClusterData,
+                        break;
+                    case Utils.AOEPointScope:
+                        normalGeneralAttack =
+                            GeneralAttackManager.Instance().GetPointToPositionScopeGeneralAttack(myClusterData,
+                                new[] { armyAOE.BulletModel, armyAOE.DamageEffect },
+                                myClusterData.transform.position,
+                                enemyClusterData.transform.position,
+                                armyAOE.AOERadius,
+                                200,
+                                armyAOE.EffectTime,
+                                (TrajectoryAlgorithmType) armyAOE.BulletPath,
+                                () =>
+                                {
+                                    //Debug.Log("AOE Attack2");
+                                });
+                        break;
+                    case Utils.AOEScope:
+                        normalGeneralAttack = GeneralAttackManager.Instance().GetPositionScopeGeneralAttack(myClusterData,
                             armyAOE.DamageEffect,
                             myClusterData.transform.position,
-                            armyAOE.AOEWidth,
-                            armyAOE.AOEHeight,
-                            Vector2.Angle(Vector2.up, new Vector2(myClusterData.transform.forward.x, myClusterData.transform.forward.z)),
+                            new CircleGraphics(new Vector2(myClusterData.X, myClusterData.Y), armyAOE.AOERadius), 
                             armyAOE.EffectTime,
                             () =>
                             {
-                                //Debug.Log("AOE Attack4");
+                                //Debug.Log("AOE Attack3");
                             });
-                    break;
-            }
-            SwitchAnim(fsm, SoldierAnimConst.GONGJI,WrapMode.Loop);
+                        break;
+                    case Utils.AOEForwardScope:
+                        normalGeneralAttack =
+                            GeneralAttackManager.Instance().GetPositionRectScopeGeneralAttack(myClusterData,
+                                armyAOE.DamageEffect,
+                                myClusterData.transform.position,
+                                armyAOE.AOEWidth,
+                                armyAOE.AOEHeight,
+                                Vector2.Angle(Vector2.up, new Vector2(myClusterData.transform.forward.x, myClusterData.transform.forward.z)),
+                                armyAOE.EffectTime,
+                                () =>
+                                {
+                                    //Debug.Log("AOE Attack4");
+                                });
+                        break;
+                }
+                break;
         }
+        SwitchAnim(fsm, SoldierAnimConst.GONGJI, WrapMode.Once);
 
         if (normalGeneralAttack != null)
         {

@@ -4,7 +4,7 @@
   &lt;Assembly Path="D:\project\Project1\GameProject\Assets\Plugins\MonoEX.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
 	<s:Boolean x:Key="/Default/Housekeeping/Bookmarks/NumberedBookmarks/=Bookmark9/@KeyIndexDefined">True</s:Boolean>
-	<s:String x:Key="/Default/Housekeeping/Bookmarks/NumberedBookmarks/=Bookmark9/Coords/@EntryValue">(Doc Ln 319 Col 44)</s:String>
+	<s:String x:Key="/Default/Housekeeping/Bookmarks/NumberedBookmarks/=Bookmark9/Coords/@EntryValue">(Doc Ln 324 Col 44)</s:String>
 	<s:String x:Key="/Default/Housekeeping/Bookmarks/NumberedBookmarks/=Bookmark9/FileId/@EntryValue">7438DA2E-8AFF-A4A0-BA4C-8E2CD0610083/d:Assets/d:Logic/d:Script/d:YQ2Common/d:Util/d:Skill/d:Buff/f:BuffManager.cs</s:String>
 	<s:String x:Key="/Default/Housekeeping/Bookmarks/NumberedBookmarks/=Bookmark9/Owner/@EntryValue">NumberedBookmarkManager</s:String>
 	<s:Boolean x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestSessionPersistentData/=419BA96B46614ED195EF9A4733EC10D7/@KeyIndexDefined">True</s:Boolean>

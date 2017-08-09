@@ -7,10 +7,10 @@ using System.Collections;
 public class RuChangTrigger : SoldierFSMTrigger
 {
     private bool _startRuchang;
-    public override bool CheckTrigger(SoldierFSMSystem fsm)
-    {
-        return false;
-    }
+    //public override bool CheckTrigger(SoldierFSMSystem fsm)
+    //{
+    //    return false;
+    //}
 
     public override void Init()
     {

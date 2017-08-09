@@ -61,7 +61,9 @@ end
 ---装备选项被选中时回调
 ---
 function equipItemControl:HandleOnItemSelectedHandler(item_Component)
-
+    if #_ItemsToShow == 0 then
+        return
+    end
     if _selectItem and _selectItem.Index ~= item_Component.Index then
         _selectItem:setIconSelectFrame(nil)
     end
@@ -82,15 +84,16 @@ end
 function equipItemControl:HandleOnItemLoadedHandler(item)
 
     local item_Component = item.gameObject:GetComponent(typeof(UI_Equip_Item))
-    if item_Component.Index + 1 > #_ItemsToShow then
-        item_Component:setEmpty()
-        return
-    end
     item_Component.gameObject.name = "Index_"..item_Component.Index
     if item_Component.cEquipment == nil then
         item_Component.cEquipment = item_Component.transform:Find("Equipment").gameObject
     end
 
+    ---如果超出要显示的装备的范围则显示为空
+    if item_Component.Index + 1 > #_ItemsToShow then
+        item_Component:setEmpty()
+        return
+    end
 
     item_Component._EquipID = _ItemsToShow[item_Component.Index+1]["EquipID"]
     item_Component.cEquipment:SetActive(true)
@@ -100,7 +103,7 @@ function equipItemControl:HandleOnItemLoadedHandler(item)
     ---
     local _lv = _ItemsToShow[item_Component.Index + 1].lv
     local _rarity = _ItemsToShow[item_Component.Index + 1].rarity
-    local _equipped = _ItemsToShow[item_Component.Index + 1].equipped
+    local _equipped = EquipModel:isEquipped(_ItemsToShow[item_Component.Index + 1].id)
     local _isBad = _ItemsToShow[item_Component.Index + 1].isBad
     local _isLock
     if _ItemsToShow[item_Component.Index + 1].isLock == 0 then
@@ -211,9 +214,11 @@ end
 ---
 function equipItemControl:refreshList()
     -- ListView重新加载方法
-    local _itemsVisible_row = _scrollViewAdapter._itemsVisible_row
-    local _itemsVisible_line = _scrollViewAdapter._itemsVisible_line
-    _scrollViewAdapter:Reload(#_ItemsToShow)
+    if #_ItemsToShow < 15  then
+        _scrollViewAdapter:Reload(15)
+    else
+        _scrollViewAdapter:Reload(#_ItemsToShow)
+    end
 end
 
 return equipItemControl

@@ -81,7 +81,7 @@ function upSoldier_controller:soldier_Up_CallBack()
     --判断是否可以刷新界面
     local isCan_UpSoldier = data:isCan_UpSoldier()
     if isCan_UpSoldier ~= 0 then
-        UIToast.Show(isCan_UpSoldier, nil, UIToast.ShowType.Upwards)
+        UIToast.Show(isCan_UpSoldier)
         return
     end
     --发消息,提升等级,刷新界面

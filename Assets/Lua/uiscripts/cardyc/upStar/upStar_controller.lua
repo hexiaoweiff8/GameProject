@@ -141,7 +141,7 @@ end
 function upStar_controller:upStarPanel_btnUpStar_CallBack()
     local isCan_UpStar = data:isCan_UpStar()
     if isCan_UpStar ~= 0 then
-        UIToast.Show(isCan_UpStar, nil, UIToast.ShowType.Upwards)
+        UIToast.Show(isCan_UpStar)
         return
     end
     --发送请求升星

@@ -25,7 +25,8 @@ public class SData_tech_c : MonoEX.Singleton<SData_tech_c>
 					case "TechDes": dif.TechDes = (string)o22; break;
 					case "TechIcon": dif.TechIcon = (string)o22; break;
 					case "FunctionDes": dif.FunctionDes = (string)o22; break;
-					case "AttributeID": dif.AttributeID = (int)(double)o22; break;
+					case "TechType": dif.TechType = (string)o22; break;
+					case "RelevanceID": dif.RelevanceID = (int)(double)o22; break;
 					case "Level": dif.Level = (short)(double)o22; break;
 					case "Point": dif.Point = (float)(double)o22; break;
 					case "UserLevel": dif.UserLevel = (short)(double)o22; break;
@@ -80,9 +81,13 @@ public struct tech_cInfo
 	 /// </summary>
 	public string FunctionDes;
 	 /// <summary>
-	 ///属性ID
+	 ///科技类型
 	 /// </summary>
-	public int AttributeID;
+	public string TechType;
+	 /// <summary>
+	 ///关联ID
+	 /// </summary>
+	public int RelevanceID;
 	 /// <summary>
 	 ///科技的等级
 	 /// </summary>

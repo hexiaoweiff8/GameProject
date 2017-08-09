@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using LuaInterface;
 using UnityEngine.UI;
 
 /// <summary>
@@ -111,6 +112,11 @@ public class TestSkillEditor : MonoBehaviour
     private string itemName = "item";
 
     /// <summary>
+    /// 地板名称
+    /// </summary>
+    private string planeName = "Plane";
+
+    /// <summary>
     /// skill按钮
     /// </summary>
     private Button skillButton;
@@ -135,12 +141,18 @@ public class TestSkillEditor : MonoBehaviour
     /// </summary>
     private int counter = 0;
 
+    /// <summary>
+    /// 目标位置
+    /// </summary>
+    private Vector3 targetPos;
+
 	void Start ()
 	{
         // 初始化集群管理器
 	    InitClusterManager();
         // 初始化列表
 	    InitList();
+	    InitLua();
 	}
 
 
@@ -200,7 +212,7 @@ public class TestSkillEditor : MonoBehaviour
         if (!string.IsNullOrEmpty(buffId))
         {
             // 加载Buff
-            var buff = BuffManager.Single.CreateBuffInfo(Convert.ToInt32(buffId), new DisplayOwner(targetObj.gameObject, targetObj), new DisplayOwner(workingObj.gameObject, workingObj));
+            var buff = BuffManager.Single.CreateBuffInfo(Convert.ToInt32(buffId), new DisplayOwner(workingObj.gameObject, workingObj), new DisplayOwner(workingObj.gameObject, workingObj));
             if (buff != null)
             {
                 // 挂载buff
@@ -284,6 +296,24 @@ public class TestSkillEditor : MonoBehaviour
 
     // -------------------------------私有方法----------------------------------
 
+
+
+    /// <summary>
+    /// 初始化lua文件
+    /// </summary>
+    private void InitLua()
+    {
+        // 读Lua文件
+        LuaState lua = new LuaState();
+
+        lua.Start();
+        var packPath = Application.dataPath + "\\Lua\\pk_tabs\\";
+        lua.DoFile(Application.dataPath + "\\Lua\\framework\\classWC.lua");
+        lua.DoFile(Application.dataPath + "\\Lua\\framework\\luacsv.lua");
+        var armyBaseData = lua.DoFile(packPath + "kezhi_c.lua");
+        SDataUtils.setData("kezhi_c", (LuaTable)((LuaTable)armyBaseData[0])["head"], (LuaTable)((LuaTable)armyBaseData[0])["body"]);
+    }
+
     /// <summary>
     /// 控制
     /// </summary>
@@ -305,18 +335,25 @@ public class TestSkillEditor : MonoBehaviour
             Physics.Raycast(ray, out hit);
             // 如果点击到测试单位
             var hitObj = hit.collider;
-            if (hitObj != null && hitObj.name.StartsWith(itemName))
+            if (hitObj != null)
             {
-                // 获取目标身上的ClusterData脚本
-                var clusterData = hitObj.GetComponent<ClusterData>();
-                if (clusterData != null)
+                if (hitObj.name.StartsWith(itemName))
                 {
-                    // 设置为活动单位
-                    workingObj = clusterData;
-                    ClearSelectedId();
-                    ShowSkillAndBuff(workingObj);
-                    Debug.Log("变更活动对象:" + workingObj.name);
-
+                    // 获取目标身上的ClusterData脚本
+                    var clusterData = hitObj.GetComponent<ClusterData>();
+                    if (clusterData != null)
+                    {
+                        // 设置为活动单位
+                        workingObj = clusterData;
+                        ClearSelectedId();
+                        ShowSkillAndBuff(workingObj);
+                        Debug.Log("变更活动对象:" + workingObj.name);
+                    }
+                }
+                if (hitObj.name.StartsWith(planeName))
+                {
+                    targetPos = hit.point;
+                    Debug.Log("变更目标点:" + targetPos);
                 }
             }
         }
@@ -358,6 +395,12 @@ public class TestSkillEditor : MonoBehaviour
             Debug.Log("初始化");
         }
 
+        if (Input.GetKey(KeyCode.A))
+        {
+            Attack();
+            Debug.Log("普通攻击");
+        }
+
 
         // --------------------------相机操作---------------------------
         // 上下左右移动
@@ -395,6 +438,100 @@ public class TestSkillEditor : MonoBehaviour
         {
             // 继续
             ClusterManager.Single.GoOn();
+        }
+    }
+
+    /// <summary>
+    /// 攻击
+    /// </summary>
+    private void Attack()
+    {
+        if (workingObj != null && targetObj != null)
+        {
+            IGeneralAttack normalGeneralAttack = null;
+            if (workingObj.AllData.MemberData.AttackType == Utils.BulletTypeNormal)
+            {
+                normalGeneralAttack = GeneralAttackManager.Instance()
+                    .GetNormalGeneralAttack(workingObj, targetObj, "test/TrailPrj",
+                        workingObj.transform.position + new Vector3(0, 10, 0),
+                        targetObj.gameObject,
+                        200,
+                        TrajectoryAlgorithmType.Line,
+                        () =>
+                        {
+                            //Debug.Log("普通攻击");
+
+                        });
+            }
+            else if (workingObj.AllData.MemberData.AttackType == Utils.BulletTypeScope)
+            {
+                // 获取
+                //Debug.Log("AOE");
+                var armyAOE = workingObj.AllData.AOEData;
+                // 根据不同攻击类型获取不同数据
+                switch (armyAOE.AOEAim)
+                {
+                    case Utils.AOEObjScope:
+                        normalGeneralAttack = GeneralAttackManager.Instance().GetPointToObjScopeGeneralAttack(workingObj,
+                            new[] { armyAOE.BulletModel, armyAOE.DamageEffect },
+                            workingObj.transform.position,
+                            targetObj.gameObject,
+                            armyAOE.AOERadius,
+                            200,
+                            armyAOE.EffectTime,
+                            (TrajectoryAlgorithmType)armyAOE.BulletPath,
+                            () =>
+                            {
+                                //Debug.Log("AOE Attack1");
+                            });
+                        break;
+                    case Utils.AOEPointScope:
+                        normalGeneralAttack =
+                            GeneralAttackManager.Instance().GetPointToPositionScopeGeneralAttack(workingObj,
+                                new[] { armyAOE.BulletModel, armyAOE.DamageEffect },
+                                workingObj.transform.position,
+                                targetObj.transform.position,
+                                armyAOE.AOERadius,
+                                200,
+                                armyAOE.EffectTime,
+                                (TrajectoryAlgorithmType)armyAOE.BulletPath,
+                                () =>
+                                {
+                                    //Debug.Log("AOE Attack2");
+                                });
+                        break;
+                    case Utils.AOEScope:
+                        normalGeneralAttack = GeneralAttackManager.Instance().GetPositionScopeGeneralAttack(workingObj,
+                            armyAOE.DamageEffect,
+                            workingObj.transform.position,
+                            new CircleGraphics(new Vector2(workingObj.X, workingObj.Y), armyAOE.AOERadius),
+                            armyAOE.EffectTime,
+                            () =>
+                            {
+                                //Debug.Log("AOE Attack3");
+                            });
+                        break;
+                    case Utils.AOEForwardScope:
+                        normalGeneralAttack =
+                            GeneralAttackManager.Instance().GetPositionRectScopeGeneralAttack(workingObj,
+                                armyAOE.DamageEffect,
+                                workingObj.transform.position,
+                                armyAOE.AOEWidth,
+                                armyAOE.AOEHeight,
+                                Vector2.Angle(Vector2.up, new Vector2(workingObj.transform.forward.x, workingObj.transform.forward.z)),
+                                armyAOE.EffectTime,
+                                () =>
+                                {
+                                    //Debug.Log("AOE Attack4");
+                                });
+                        break;
+                }
+            }
+
+            if (normalGeneralAttack != null)
+            {
+                normalGeneralAttack.Begin();
+            }
         }
     }
 
@@ -494,12 +631,18 @@ public class TestSkillEditor : MonoBehaviour
         }
     }
 
-
+    /// <summary>
+    /// 输出log
+    /// </summary>
     private void Log()
     {
-        if (workingObj != null)
+        if (workingObj != null || targetObj != null)
         {
-            Debug.Log(workingObj.AllData.MemberData.ToString());
+            var msg = (workingObj == null ? ""
+                : workingObj.AllData.MemberData.ToString()) + "--" + (targetObj == null
+                    ? ""
+                    : targetObj.AllData.MemberData.ToString());
+            Debug.Log(msg);
         }
     }
 
@@ -517,6 +660,11 @@ public class TestSkillEditor : MonoBehaviour
             SpaceSet = 3,
             ObjID = objId,
             MoveSpeed = UnitWidth,
+            CurrentHP = 99,
+            TotalHp = 100,
+            AttackType = 1,
+            Attack1 = 10,
+            ArmyType = 1,
         };
         school.RotateSpeed = 10;
         // 随机位置
@@ -549,14 +697,17 @@ public class TestSkillEditor : MonoBehaviour
         };
 
         school.AllData.SelectWeightData = fightData;
-        school.AllData.MemberData.CurrentHP = 99;
-        school.AllData.MemberData.TotalHp = 100;
 
         // 创建测试技能
         school.AllData.SkillInfoList = new List<SkillInfo>();
+        school.PushTarget(targetPos);
+        // 挂载TriggerRunner
+        var triggerRunner = schoolItem.AddComponent<TriggerRunner>();
+        triggerRunner.Display = new DisplayOwner(schoolItem, school, null, schoolItem.AddComponent<RanderControl>());
+
         // 单位放入集群管理器
         ClusterManager.Single.Add(school);
-        DisplayerManager.Single.AddElement(objId, new DisplayOwner(schoolItem, school));
+        DisplayerManager.Single.AddElement(objId, triggerRunner.Display);
         // 单位放入成员列表
         memberList.Add(school);
         // 设置活动目标为最新创建目标

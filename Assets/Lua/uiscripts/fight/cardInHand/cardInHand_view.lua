@@ -8,19 +8,23 @@ local cardInHand_view = {}
 local view
 function cardInHand_view:initView(arg)
     view = arg
-    self.handCards_bg = view.transform:Find("handCards/bg").gameObject
+    self.handCards_bg = view.transform:Find("bg/bg").gameObject
     ---出兵碰撞事件触发碰撞器
     self.handCards = {}
     self.handCards_CDSpr = {}
     self.handCards_Icon = {}
     self.handCards_costLab = {}
     self.handCards_bigCollider = {}
+    self.handCards_Lv = {}
+    self.handCards_StarLv = {}
     for i = 1, Const.FIGHT_HANDCARD_NUM do
         self.handCards[i] = view.transform:Find("handCards/currentCard" .. i).gameObject
         self.handCards_CDSpr[i] = self.handCards[i].transform:Find("CDBar").gameObject
         self.handCards_Icon[i] = self.handCards[i].transform:Find("cardSprite").gameObject
         self.handCards_costLab[i] = self.handCards[i].transform:Find("feiBg/costLabel").gameObject
         self.handCards_bigCollider[i] = self.handCards[i].gameObject:AddComponent(typeof(UnityEngine.BoxCollider))
+        self.handCards_Lv[i] = self.handCards[i].transform:Find("LVLab").gameObject
+        self.handCards_StarLv[i] = self.handCards[i].transform:Find("feiBg/star/Lab").gameObject
     end
 
     ---卡牌详细信息

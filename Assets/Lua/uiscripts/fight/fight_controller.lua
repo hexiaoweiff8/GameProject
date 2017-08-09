@@ -18,9 +18,9 @@ local enemyCard = require("uiscripts/fight/enemyCard/enemyCard_controller")
 require("uiscripts/fight/touchControl")
 require("uiscripts/fight/modelControl")
 require("uiscripts/fight/AStarControl")
-
+require("uiscripts/commonGameObj/Model")
 function Onfs()
-    ui_manager:ShowWB(WNDTYPE.ui_fight2)
+    ui_manager:ShowWB(WNDTYPE.ui_fight)
 end
 local _isPause = false
 function fight_controller:OnShowDone()
@@ -37,7 +37,7 @@ function fight_controller:OnShowDone()
             if _view.canotRect then
                 local maxPointX = _view.canotRect.transform.position.x
                 AStarControl:Init(maxPointX)
-                ModelControl:Init(_data.AllCardIDtb, _data.AllCardLeveltb)
+                Model:setZhenXingData(_data.AllCardIDtb, _data.AllCardLeveltb)
                 ---
                 ---初始化各部分显示
                 ---
@@ -188,7 +188,8 @@ function ENEMY_DROP_CARD()
 end
 ---自己下兵
 function DROP_CARD(cardIndex)
-    ModelControl:activeModel(cardIndex)
+    ModelControl:ActiveModel(cardIndex)
+
     _data.nowFei = _data.nowFei - cardUtil:getTrainCost(_data.nowHandpaiKutb[cardIndex].id)
     fight_controller:nextCard(cardIndex)
 end

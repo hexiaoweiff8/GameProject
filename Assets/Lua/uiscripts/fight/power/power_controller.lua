@@ -10,6 +10,7 @@ local _data = require("uiscripts/fight/power/power_model")
 
 function power_controller:Init(view)
     _view:initView(view)
+    _view.powerTips:SetActive(false)
 end
 
 
@@ -28,5 +29,28 @@ function power_controller:refreshMyPower()
     end
 end
 
+---控制可回收能量的加减
+local recyclePower = 0
+function power_controller:addRecyclePower(trainCost)
+    recyclePower = recyclePower + trainCost / 2
+end
+function power_controller:subRecyclePower(trainCost)
+    recyclePower = recyclePower - trainCost / 2
+end
+
+---
+---控制回收能量提示的显隐
+---
+function power_controller:showRecycleTips()
+    if _data.nowFei >= _data.allFei then
+        _view.powerTipsLab:GetComponent("UILabel").text = "能量已满不可回收！！"
+    else
+        _view.powerTipsLab:GetComponent("UILabel").text = "可回收能量为"..recyclePower
+    end
+    _view.powerTips:SetActive(true)
+end
+function power_controller:hideRecycleTips()
+    _view.powerTips:SetActive(false)
+end
 
 return power_controller

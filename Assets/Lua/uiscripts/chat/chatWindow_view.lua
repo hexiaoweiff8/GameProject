@@ -17,12 +17,7 @@ chatWindow_view = {
     input_label,
     input_com,
 
-    --Item_perfabs
-    --item_perfab={
-    --    otherChatItem,
-    --    selfChatItem,
-    --    timeItem,
-    --},
+
 
     chatItemPerfab,
 
@@ -30,10 +25,12 @@ chatWindow_view = {
     worldscrollView,
     juntuanscrollView,
 
+    ----静态字段----
+    btn_shijie_Label,
+    btn_juntuan_Label,
+    --btn_send_Label,
+    ----静态字段----
 
-    --table
-    --worldTable,
-    --juntuanTable,
 }
 
 local this = chatWindow_view
@@ -54,21 +51,30 @@ function chatWindow_view:InitView(root)
     this.input_label = this.panel.transform:FindChild("Window/botton_bg/input/Label"):GetComponent("UILabel")
     this.input_com = this.panel.transform:FindChild("Window/botton_bg/input"):GetComponent("UIInput")
 
-    --this.item_perfab.otherChatItem = this.panel.transform:FindChild("Window/otherChatItem").gameObject
-    --this.item_perfab.selfChatItem = this.panel.transform:FindChild("Window/selfChatItem").gameObject
-    --this.item_perfab.timeItem = this.panel.transform:FindChild("Window/timeItem").gameObject
+
     this.chatItemPerfab = this.panel.transform:FindChild("Window/ChatItem").gameObject
 
-    --this.worldTable = this.panel.transform:FindChild("Window/Window_bg/scrollView/worldTable").gameObject
-    --this.juntuanTable = this.panel.transform:FindChild("Window/Window_bg/scrollView/juntuanTable").gameObject
 
     this.worldscrollView = this.panel.transform:FindChild("Window/Window_bg/worldscrollView"):GetComponent("UIScrollView")
     this.juntuanscrollView = this.panel.transform:FindChild("Window/Window_bg/juntuanscrollView"):GetComponent("UIScrollView")
     --this.scrollView.
 
+    ----静态字段----
+    this.btn_shijie_Label = this.panel.transform:FindChild("Window/left_bg/btn_shijie/Label"):GetComponent("UILabel")
+    this.btn_juntuan_Label = this.panel.transform:FindChild("Window/left_bg/btn_juntuan/Label"):GetComponent("UILabel")
+    --this.btn_send_Label = this.panel.transform:FindChild("botton_bg/btn_shijie/Label"):GetComponent("UILabel")
+    this:InitStatic_String()
+    ----静态字段----
+
     this.chatItemPerfab:AddComponent(typeof(chatItem))
     this.worldscrollView.gameObject:AddComponent(typeof(LoopItemScrollView))
     this.juntuanscrollView.gameObject:AddComponent(typeof(LoopItemScrollView))
+
+end
+
+function chatWindow_view:InitStatic_String()
+    this.btn_shijie_Label.text = stringUtil:getString(31101)
+    this.btn_juntuan_Label.text = stringUtil:getString(31102)
 
 end
 

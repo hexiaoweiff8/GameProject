@@ -304,6 +304,28 @@ public class SkillBase : AbilityBase
     public float TickTime { get; set; }
 
     /// <summary>
+    /// 伤害变更类型
+    /// 0: 伤害增强
+    /// 1: 伤害减免
+    /// </summary>
+    public int DemageChangeType { get; set; }
+
+    /// <summary>
+    /// 伤害附加概率
+    /// </summary>
+    public float DemageChangeProbability { get; set; }
+
+    /// <summary>
+    /// 伤害附加目标类型
+    /// </summary>
+    public DemageAdditionOrReductionTargetType DemageChangeTargetType { get; set; }
+
+    /// <summary>
+    /// 伤害附加
+    /// </summary>
+    public float DemageChange { get; set; }
+
+    /// <summary>
     /// 修改数据
     /// 使用反射赋值
     /// </summary>
@@ -543,8 +565,6 @@ public class SkillBase : AbilityBase
     }
 
 
-
-
     /// <summary>
     /// 获取替换数据后的技能说明
     /// </summary>
@@ -575,7 +595,6 @@ public class SkillBase : AbilityBase
 
         return result;
     }
-
 }
 
 
@@ -779,84 +798,25 @@ public class DataScope
     //}
 }
 
-///// <summary>
-///// 能力数据包装类
-///// </summary>
-//public class AbilityShareData<T>
-//{
+/// <summary>
+/// 伤害附加/减免目标/来源类型
+/// </summary>
+public enum DemageAdditionOrReductionTargetType
+{
+    All = -1,               // 所有类型
+    // -----空地建筑-----
+    Air = 0,                // 空中
+    Surface = 1,            // 地面
+    Building = 2,           // 建筑
+    // -----隐形-----
+    Hide = 3,               // 隐形
+    // -----种族-----
+    RaceHuman = 4,          // 人族
+    RaceOrc = 5,            // 兽族
+    RaceMechanics = 6,      // 机械
+    // -----属性分类-----
+    Mechanics = 7,          // 机械单位
+    Melee = 8,              // 近战单位
+    Summoned = 9,           // 召唤单位
 
-//    /// <summary>
-//    /// 共享数据
-//    /// </summary>
-//    private Dictionary<string, T> shareDataDic = new Dictionary<string, T>();
-
-//    /// <summary>
-//    /// 添加数据
-//    /// </summary>
-//    /// <param name="key">数据key</param>
-//    /// <param name="val"></param>
-//    public void AddData([NotNull]string key, T val)
-//    {
-//        if (Contains(key))
-//        {
-//            shareDataDic[key] = val;
-//        }
-//        else
-//        {
-//            shareDataDic.Add(key, val);
-//        }
-//    }
-
-//    /// <summary>
-//    /// 获取数据
-//    /// </summary>
-//    /// <param name="key">数据key</param>
-//    /// <returns></returns>
-//    public T Get([NotNull] string key)
-//    {
-//        if (Contains(key))
-//        {
-//            return shareDataDic[key];
-//        }
-//        return default(T);
-//    }
-
-//    /// <summary>
-//    /// 是否包含Key数据
-//    /// </summary>
-//    /// <param name="key">数据key</param>
-//    /// <returns></returns>
-//    public bool Contains([NotNull]string key)
-//    {
-//        return shareDataDic.ContainsKey(key);
-//    }
-
-//    /// <summary>
-//    /// 删除Key
-//    /// </summary>
-//    /// <param name="key">数据key</param>
-//    public void Remove([NotNull]string key)
-//    {
-//        if (Contains(key))
-//        {
-//            shareDataDic.Remove(key);
-//        }
-//    }
-
-//    /// <summary>
-//    /// 获取数据
-//    /// </summary>
-//    /// <param name="key"></param>
-//    /// <returns></returns>
-//    public T this[[NotNull]string key]
-//    {
-//        get
-//        {
-//            if (Contains(key))
-//            {
-//                return shareDataDic[key];
-//            }
-//            return default(T);
-//        }
-//    }
-//}
+}

@@ -22,12 +22,10 @@ local currentEquip
 ---
 function equipPage_controller:init(equipController)
     view:init_view(equipController)
-
-    borderUtil:AddBorder(view.otherEquip_Scroll)
-
     view.otherEquip_DetailP:SetActive(false)
     equipItemControl:init(self, view)
     equipItemControl:setItemClickEvent(onEquipClicked)
+    borderUtil:AddBorder(view.otherEquip_Scroll)
     UIEventListener.Get(view.otherEquip_DetailMask).onClick = function()
         view.otherEquip_DetailL:SetActive(false)
         view.otherEquip_DetailR:SetActive(false)

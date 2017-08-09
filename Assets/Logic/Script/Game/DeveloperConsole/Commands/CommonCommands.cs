@@ -4,7 +4,7 @@ using UnityEditor;
 namespace DeveloperConsole.CommandFramework
 {
     [CommandEntry("System")]
-    class CommonCommands
+    sealed class CommonCommands
     {
         [CommandEntryMethod("cls", "清空屏幕")]
         public static string Clean()
@@ -61,11 +61,63 @@ namespace DeveloperConsole.CommandFramework
             return null;
         }
 
-        [CommandEntryMethod("rid", "获取用户roleid")]
+        [CommandEntryMethod("uid", "获取userid")]
         public static string GetUserID()
         {
-            return Convert.ToInt32(Tools.CallMethod("userModel", "getRID")[0]).ToString();
+            return Tools.CallMethod("userModel", "getUID")[0].ToString();          
+        }
+        [CommandEntryMethod("hid", "获取hostid")]
+        public static string GetHostID()
+        {
+            return Tools.CallMethod("userModel", "getHID")[0].ToString();
+        }
+        [CommandEntryMethod("rid", "获取roleid")]
+        public static string GetRoleID()
+        {
+            return Tools.CallMethod("userModel", "getRID")[0].ToString();
+        }
+        [CommandEntryMethod("userinfo", "获取角色详细信息")]
+        public static string GetUserInfo()
+        {
+            return Tools.CallMethod("userModel", "getUserInfo")[0].ToString();
         }
 
+        [CommandEntryMethod("smail", "给当前用户发送不带奖励的邮件")]
+        public static string SendMail()
+        {
+            /* http://106.75.36.113:2002/gm/send_mail?roleid=0&data=
+            {"title":"first mail","content":"dafadfaf","sender":"xiaoA","reward": [{"type":"currency","name":"gold","num":100}],"hId":****,"way":"GM"} */
+            string url = Const.Protocol + "://" + Const.IP + ':' + Const.Port + Const.PATH + Const.SEND_MAIL;
+            string postData = @"roleid=" + UserUtil.getUserRID() +
+                         @"&data={""title"":""控制台邮件"","+
+                         @"""content"":""邮件内容100字"","+
+                         @"""sender"":""GameConsole""," +
+                         @"""reward"":[]," +
+                         @"""hId"":101," +
+                         @"""way"":""GM""}";
+            UnityEngine.Debug.Log(url + postData);
+            return ServerUtil.Post(url, postData);
+        }
+
+        [CommandEntryMethod("smailr", "给当前用户发送带奖励的邮件(货币/装备/道具)")]
+        public static string SendRewardMail()
+        {
+            string[] rewards = new string[]
+            {
+                @"{""type"":""currency"",""name"":""gold"",""num"":100}",
+                @"{""type"":""equip"",""name"":""300110"",""num"":1,""ex"":4}",
+                @"{""type"":""item"",""name"":""470009"",""num"":3}",
+            };
+            string url = Const.Protocol + "://" + Const.IP + ':' + Const.Port + Const.PATH + Const.SEND_MAIL;
+            string postData = @"roleid=" + UserUtil.getUserRID() +
+                         @"&data={""title"":""控制台奖励邮件""," +
+                         @"""content"":""邮件内容100字""," +
+                         @"""sender"":""GameConsole""," +
+                         @"""reward"":["+ rewards[UnityEngine.Random.Range(0,3)] + "]," +
+                         @"""hId"":101," +
+                         @"""way"":""GM""}";
+            UnityEngine.Debug.Log(url + postData);
+            return ServerUtil.Post(url, postData);
+        }
     }
 }

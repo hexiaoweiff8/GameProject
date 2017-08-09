@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 
 
@@ -101,6 +100,11 @@ public class PositionScopeGeneralAttack : IGeneralAttack
 
     public void Begin()
     {
+        // 如果攻击者已死则不进行攻击
+        if (attacker == null)
+        {
+            return;
+        }
         // 范围内选择单位
         var memberList = ClusterManager.Single.CheckRange(graphics, attacker.AllData.MemberData.Camp, true);
         // 攻击者数据
@@ -123,7 +127,8 @@ public class PositionScopeGeneralAttack : IGeneralAttack
                     ReceiveMember = attackerDisplayOwner,
                     ReleaseMember = beAttackDisplayOwner,
                     TypeLevel1 = TriggerLevel1.Fight,
-                    TypeLevel2 = TriggerLevel2.BeAttack
+                    TypeLevel2 = TriggerLevel2.BeAttack,
+                    DemageType = DemageType.NormalAttackDemage
                 });
             }
         }

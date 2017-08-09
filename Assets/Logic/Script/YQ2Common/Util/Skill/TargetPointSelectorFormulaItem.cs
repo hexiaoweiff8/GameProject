@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 
 
@@ -68,15 +67,9 @@ public class TargetPointSelectorFormulaItem : AbstractFormulaItem
     public override IFormula GetFormula(FormulaParamsPacker paramsPacker)
     {
         IFormula result = null;
-        string errorMsg = null;
         if (paramsPacker == null)
         {
-            errorMsg = "调用参数 paramsPacker 为空.";
-        }
-
-        if (!string.IsNullOrEmpty(errorMsg))
-        {
-            throw new Exception(errorMsg);
+            throw new Exception("调用参数 paramsPacker 为空.");
         }
 
         // 数据替换
@@ -164,6 +157,10 @@ public class TargetPointSelectorFormulaItem : AbstractFormulaItem
                 {
                     // 计算我到目标这个方向的距离
                     var dir = targetPos - mySelfPos;
+                    if (dir == Vector2.zero)
+                    {
+                        dir = Vector2.up;
+                    }
                     var newPos = targetPos + dir.normalized * myDistance;
                     posX = newPos.x;
                     posY = newPos.y;
@@ -173,6 +170,10 @@ public class TargetPointSelectorFormulaItem : AbstractFormulaItem
                 {
                     // 计算目标到我这个方向的距离
                     var dir = mySelfPos - targetPos;
+                    if (dir == Vector2.zero)
+                    {
+                        dir = Vector2.up;
+                    }
                     var newPos = mySelfPos + dir.normalized * myDistance;
                     posX = newPos.x;
                     posY = newPos.y;

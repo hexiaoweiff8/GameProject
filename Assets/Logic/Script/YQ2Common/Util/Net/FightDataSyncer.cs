@@ -780,6 +780,7 @@ public class FightDataSyncer : ILoopItem
                 TexturePackName = texturePackname,
                 SoldierID = uniqueId,
             });
+            memberDisplay.ClusterData.Begin();
         }
         // 本地操作结束callback
         opSendCallbackDic[msgOp.OpUniqueNum]();

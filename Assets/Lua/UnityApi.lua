@@ -1699,6 +1699,100 @@ function SetSpatializerFloat() end
 ----Boolean AudioSource:GetSpatializerFloat(Int32 index,Single& value)
 function GetSpatializerFloat() end 
 
+Debug = {} 
+--*
+--[Comment]
+--consturctor for Debug overrides:
+--*
+--Debug.New()
+--*
+
+function Debug.New() end
+--*
+--[Comment]
+-- property: ILogger Debug.logger	get	
+--Get default debug logger.
+logger = nil 
+--*
+--[Comment]
+-- property: Boolean Debug.developerConsoleVisible	get	set	
+--Reports whether the development console is visible. The development console cannot be made to appear using:
+developerConsoleVisible = nil 
+--*
+--[Comment]
+-- property: Boolean Debug.isDebugBuild	get	
+--In the Build Settings dialog there is a check box called "Development Build".
+isDebugBuild = nil 
+--*
+----Void Debug.DrawLine(Vector3 start,Vector3 end,Color color,Single duration,Boolean depthTest)
+--Void Debug.DrawLine(Vector3 start,Vector3 end,Color color,Single duration)
+--Void Debug.DrawLine(Vector3 start,Vector3 end,Color color)
+--Void Debug.DrawLine(Vector3 start,Vector3 end)
+function Debug.DrawLine() end 
+
+----Void Debug.DrawRay(Vector3 start,Vector3 dir,Color color,Single duration)
+--Void Debug.DrawRay(Vector3 start,Vector3 dir,Color color)
+--Void Debug.DrawRay(Vector3 start,Vector3 dir)
+--Void Debug.DrawRay(Vector3 start,Vector3 dir,Color color,Single duration,Boolean depthTest)
+function Debug.DrawRay() end 
+
+----Void Debug.Break()
+function Debug.Break() end 
+
+----Void Debug.DebugBreak()
+function Debug.DebugBreak() end 
+
+----Void Debug.Log(Object message)
+--Void Debug.Log(Object message,Object context)
+function Debug.Log() end 
+
+----Void Debug.LogFormat(String format,Object[] args)
+--Void Debug.LogFormat(Object context,String format,Object[] args)
+function Debug.LogFormat() end 
+
+----Void Debug.LogError(Object message)
+--Void Debug.LogError(Object message,Object context)
+function Debug.LogError() end 
+
+----Void Debug.LogErrorFormat(String format,Object[] args)
+--Void Debug.LogErrorFormat(Object context,String format,Object[] args)
+function Debug.LogErrorFormat() end 
+
+----Void Debug.ClearDeveloperConsole()
+function Debug.ClearDeveloperConsole() end 
+
+----Void Debug.LogException(Exception exception)
+--Void Debug.LogException(Exception exception,Object context)
+function Debug.LogException() end 
+
+----Void Debug.LogWarning(Object message)
+--Void Debug.LogWarning(Object message,Object context)
+function Debug.LogWarning() end 
+
+----Void Debug.LogWarningFormat(String format,Object[] args)
+--Void Debug.LogWarningFormat(Object context,String format,Object[] args)
+function Debug.LogWarningFormat() end 
+
+----Void Debug.Assert(Boolean condition)
+--Void Debug.Assert(Boolean condition,Object context)
+--Void Debug.Assert(Boolean condition,Object message)
+--Void Debug.Assert(Boolean condition,String message)
+--Void Debug.Assert(Boolean condition,Object message,Object context)
+--Void Debug.Assert(Boolean condition,String message,Object context)
+function Debug.Assert() end 
+
+----Void Debug.AssertFormat(Boolean condition,String format,Object[] args)
+--Void Debug.AssertFormat(Boolean condition,Object context,String format,Object[] args)
+function Debug.AssertFormat() end 
+
+----Void Debug.LogAssertion(Object message)
+--Void Debug.LogAssertion(Object message,Object context)
+function Debug.LogAssertion() end 
+
+----Void Debug.LogAssertionFormat(String format,Object[] args)
+--Void Debug.LogAssertionFormat(Object context,String format,Object[] args)
+function Debug.LogAssertionFormat() end 
+
 Behaviour = {} 
 --*
 --[Comment]
@@ -10693,6 +10787,15 @@ function SendConnect() end
 ----Void NetworkManager:SendMessage(ByteBuffer buffer)
 function SendMessage() end 
 
+----Socket NetworkManager:getYsocket()
+function getYsocket() end 
+
+----Void NetworkManager:SendMessageByUDP(Byte[] msg)
+function SendMessageByUDP() end 
+
+----Boolean NetworkManager:ConnectUDP()
+function ConnectUDP() end 
+
 ----Void NetworkManager.AddEvent(Int32 _event,Byte[] data)
 function NetworkManager.AddEvent() end 
 
@@ -12341,6 +12444,65 @@ function SaveValue() end
 ----Void UIInput:LoadValue()
 function LoadValue() end 
 
+UIToggle = {} 
+--*
+--[Comment]
+--consturctor for UIToggle overrides:
+--*
+--UIToggle.New()
+--*
+
+function UIToggle.New() end
+--*
+--[Comment]
+-- property: Boolean UIToggle.value	get	set	
+value = nil 
+--*
+--[Comment]
+-- property: Boolean UIToggle.isColliderEnabled	get	
+isColliderEnabled = nil 
+--*
+--[Comment]
+-- property: Boolean UIToggle.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean UIToggle.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean UIToggle.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform UIToggle.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject UIToggle.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String UIToggle.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String UIToggle.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags UIToggle.hideFlags	get	set	
+hideFlags = nil 
+--*
+----UIToggle UIToggle.GetActiveToggle(Int32 group)
+function UIToggle.GetActiveToggle() end 
+
+----Void UIToggle:Start()
+function Start() end 
+
+----Void UIToggle:Set(Boolean state,Boolean notify)
+function Set() end 
+
 UITexture = {} 
 --*
 --[Comment]
@@ -13352,6 +13514,9 @@ Timer = {}
 --Timer.New(Single liveTime,Boolean isLoop)
 --*
 
+--Timer.New(Single liveTime,Single outTime)
+--*
+
 function Timer.New() end
 --*
 --[Comment]
@@ -13365,6 +13530,14 @@ IsLoop = nil
 --[Comment]
 -- property: Single Timer.LoopTime	get	set	
 LoopTime = nil 
+--*
+--[Comment]
+-- property: Single Timer.OutTime	get	set	
+OutTime = nil 
+--*
+--[Comment]
+-- property: Double Timer.StartTime	get	set	
+StartTime = nil 
 --*
 --[Comment]
 -- property: Action Timer.TimesUpDo	get	set	
@@ -13524,28 +13697,6 @@ function DP_FightPrefabManage.InstantiateAvatar() end
 
 ----Material DP_FightPrefabManage.CreateMat(Boolean colorMat)
 function DP_FightPrefabManage.CreateMat() end 
-
-AvatarCM = {} 
-
-Infantry_R = nil;
-
-InfantryHero_R = nil;
-
-Cavalry_R = nil;
-
-Cavalry_RH = nil;
-
-CavalryHero_R = nil;
-
-CavalryHero_RH = nil;
-
-Horse_H = nil;
-
-Cavalry_Fenshi = nil;
-
-Infantry_Fenshi = nil;
-
-Max = nil;
 
 RuntimePlatform = {} 
 
@@ -14420,6 +14571,9 @@ function Utils.GetTheta() end
 ----Vector3 Utils.WithOutY(Vector3 vec3)
 function Utils.WithOutY() end 
 
+----Vector2 Utils.V3ToV2WithouY(Vector3 vec3)
+function Utils.V3ToV2WithouY() end 
+
 ----Single Utils.GetRange(Single min,Single max,Single val)
 function Utils.GetRange() end 
 
@@ -14746,8 +14900,8 @@ function Clear() end
 ----Void AstarFight:isZhangAi(Vector3 mp,Int32 index)
 function isZhangAi() end 
 
-----Dictionary`2 AstarFight:setAllZhenxingList(Int32[] cardID,Int32[] level)
-function setAllZhenxingList() end 
+----Dictionary`2 AstarFight.setAllZhenxingList(Int32[] cardID,Int32[] level)
+function AstarFight.setAllZhenxingList() end 
 
 ----Void AstarFight:setZhenxingInfo(Transform go,Int32 cardID,Int32 index)
 function setZhenxingInfo() end 
@@ -14816,9 +14970,6 @@ DP_CameraTrackObjectManage = {}
 
 function DP_CameraTrackObjectManage.New() end
 --*
-----Void DP_CameraTrackObjectManage:SetTrackActor(DPActorType actorType,Int32 actorID,Boolean lockOP)
-function SetTrackActor() end 
-
 ----Void DP_CameraTrackObjectManage:CancelTrackActor(Int32 actorID)
 function CancelTrackActor() end 
 
@@ -14859,12 +15010,6 @@ function LoadBase() end
 
 ----Void DP_Battlefield:CameraFocusFID(Boolean isLeft,Int32 fid)
 function CameraFocusFID() end 
-
-----Void DP_Battlefield:CameraFocusActorID(DPActorType actorType,Int32 actorID,Boolean lockOP)
-function CameraFocusActorID() end 
-
-----Void DP_Battlefield:SetFightSpeed(Single scale)
-function SetFightSpeed() end 
 
 ----Void DP_Battlefield:Reset()
 function Reset() end 
@@ -15019,9 +15164,6 @@ CreateActorParam = {}
 --[Comment]
 --consturctor for CreateActorParam overrides:
 --*
---CreateActorParam.New(AvatarCM cmType,Boolean colorMat,Int32 flagColorIdx,String meshPackName,String texturePackName,Boolean isHero,Int32 soldierID,Int32 cardID)
---*
-
 --CreateActorParam.New(Int32 cmType,Boolean colorMat,Int32 flagColorIdx,String meshPackName,String texturePackName,Boolean isHero,Int32 soldierID,Int32 cardID)
 --*
 
@@ -15305,6 +15447,10 @@ SpeedDirection = nil
 MaxSpeed = nil 
 --*
 --[Comment]
+-- property: Boolean PositionObject.CouldSelect	get	set	
+CouldSelect = nil 
+--*
+--[Comment]
 -- property: Boolean PositionObject.useGUILayout	get	set	
 useGUILayout = nil 
 --*
@@ -15336,8 +15482,11 @@ name = nil
 -- property: HideFlags PositionObject.hideFlags	get	set	
 hideFlags = nil 
 --*
-----Void PositionObject:Stop()
-function Stop() end 
+----Void PositionObject:Begin()
+function Begin() end 
+
+----Void PositionObject:StopMove()
+function StopMove() end 
 
 ----Void PositionObject:ContinueMove()
 function ContinueMove() end 
@@ -15376,8 +15525,16 @@ ModelTexture = nil
 MoveSpeed = nil 
 --*
 --[Comment]
+-- property: Int32 VOBase.BehaviorType	get	set	
+BehaviorType = nil 
+--*
+--[Comment]
 -- property: Single VOBase.AttackRange	get	set	
 AttackRange = nil 
+--*
+--[Comment]
+-- property: Single VOBase.SkillRange	get	set	
+SkillRange = nil 
 --*
 --[Comment]
 -- property: Single VOBase.Hit	get	set	
@@ -15445,6 +15602,32 @@ function SetSoldierData() end
 ----String VOBase:ToString()
 function ToString() end 
 
+AllData = {} 
+--*
+--[Comment]
+--consturctor for AllData overrides:
+--*
+--AllData.New()
+--*
+
+function AllData.New() end
+--*
+--[Comment]
+-- property: VOBase AllData.MemberData	get	set	
+MemberData = nil 
+--*
+--[Comment]
+-- property: SelectWeightData AllData.SelectWeightData	get	set	
+SelectWeightData = nil 
+--*
+--[Comment]
+-- property: ArmyAOEData AllData.AOEData	get	set	
+AOEData = nil 
+--*
+--[Comment]
+-- property: IList`1 AllData.SkillInfoList	get	set	
+SkillInfoList = nil 
+--*
 ClusterData = {} 
 --*
 --[Comment]
@@ -15550,6 +15733,10 @@ SpeedDirection = nil
 --[Comment]
 -- property: Single ClusterData.MaxSpeed	get	set	
 MaxSpeed = nil 
+--*
+--[Comment]
+-- property: Boolean ClusterData.CouldSelect	get	set	
+CouldSelect = nil 
 --*
 --[Comment]
 -- property: Boolean ClusterData.useGUILayout	get	set	
@@ -15958,8 +16145,10 @@ UIToast = {}
 
 function UIToast.New() end
 --*
-----Void UIToast.Show(String messageToShow,TweenCallback callback,ShowType showType)
---Void UIToast.Show(String messageToShow)
+----Void UIToast.ShowWithCallback(String messageToShow,TweenCallback callback,ShowType showType)
+function UIToast.ShowWithCallback() end 
+
+----Void UIToast.Show(String messageToShow)
 function UIToast.Show() end 
 
 SceneChanger = {} 
@@ -16146,4 +16335,206 @@ function InitScrollView() end
 
 ----Void LoopItemScrollView:UpdateInBack(Int32 uid,String username,String content,String time,Int32 type)
 function UpdateInBack() end 
+
+----Void LoopItemScrollView:UpdateInFront(Int32 uid,String username,String content,String time,Int32 type)
+function UpdateInFront() end 
+
+----Void LoopItemScrollView:InitScollerView()
+function InitScollerView() end 
+
+----Boolean LoopItemScrollView:isSendOldData()
+function isSendOldData() end 
+
+MailItem = {} 
+--*
+--[Comment]
+--consturctor for MailItem overrides:
+--*
+--MailItem.New()
+--*
+
+function MailItem.New() end
+--*
+--[Comment]
+-- property: Boolean MailItem.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean MailItem.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean MailItem.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform MailItem.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject MailItem.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String MailItem.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String MailItem.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags MailItem.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void MailItem:ShowItemTypeAndzuoSP(Int32 type,Boolean isHavefujian)
+function ShowItemTypeAndzuoSP() end 
+
+----Void MailItem:ShowFujianNum(Int32 fujianNum,Int32 type)
+function ShowFujianNum() end 
+
+----String MailItem:DaoqiTime(Int32 time)
+function DaoqiTime() end 
+
+MailLoopGrid = {} 
+--*
+--[Comment]
+--consturctor for MailLoopGrid overrides:
+--*
+--MailLoopGrid.New()
+--*
+
+function MailLoopGrid.New() end
+--*
+--[Comment]
+-- property: Boolean MailLoopGrid.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean MailLoopGrid.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean MailLoopGrid.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform MailLoopGrid.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject MailLoopGrid.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String MailLoopGrid.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String MailLoopGrid.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags MailLoopGrid.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void MailLoopGrid:InsertDataBack(LuaTable dataTable)
+function InsertDataBack() end 
+
+----Void MailLoopGrid:UpOneData(String mailID,LuaTable dataTable)
+function UpOneData() end 
+
+----Void MailLoopGrid:DelYDorYLQ_Mail()
+function DelYDorYLQ_Mail() end 
+
+----Void MailLoopGrid:InitWindow()
+function InitWindow() end 
+
+----Void MailLoopGrid:OneBtnGet()
+function OneBtnGet() end 
+
+SceneManager = {} 
+--*
+--[Comment]
+--consturctor for SceneManager overrides:
+--*
+--SceneManager.New()
+--*
+
+function SceneManager.New() end
+--*
+--[Comment]
+-- property: Int32 SceneManager.sceneCount	get	
+--The total number of scenes.
+sceneCount = nil 
+--*
+--[Comment]
+-- property: Int32 SceneManager.sceneCountInBuildSettings	get	
+--Number of scenes in Build Settings.
+sceneCountInBuildSettings = nil 
+--*
+----Void SceneManager.add_sceneLoaded(UnityAction`2 value)
+function SceneManager.add_sceneLoaded() end 
+
+----Void SceneManager.remove_sceneLoaded(UnityAction`2 value)
+function SceneManager.remove_sceneLoaded() end 
+
+----Void SceneManager.add_sceneUnloaded(UnityAction`1 value)
+function SceneManager.add_sceneUnloaded() end 
+
+----Void SceneManager.remove_sceneUnloaded(UnityAction`1 value)
+function SceneManager.remove_sceneUnloaded() end 
+
+----Void SceneManager.add_activeSceneChanged(UnityAction`2 value)
+function SceneManager.add_activeSceneChanged() end 
+
+----Void SceneManager.remove_activeSceneChanged(UnityAction`2 value)
+function SceneManager.remove_activeSceneChanged() end 
+
+----Scene SceneManager.GetActiveScene()
+function SceneManager.GetActiveScene() end 
+
+----Boolean SceneManager.SetActiveScene(Scene scene)
+function SceneManager.SetActiveScene() end 
+
+----Scene SceneManager.GetSceneByPath(String scenePath)
+function SceneManager.GetSceneByPath() end 
+
+----Scene SceneManager.GetSceneByName(String name)
+function SceneManager.GetSceneByName() end 
+
+----Scene SceneManager.GetSceneAt(Int32 index)
+function SceneManager.GetSceneAt() end 
+
+----Void SceneManager.LoadScene(String sceneName)
+--Void SceneManager.LoadScene(String sceneName,LoadSceneMode mode)
+--Void SceneManager.LoadScene(Int32 sceneBuildIndex)
+--Void SceneManager.LoadScene(Int32 sceneBuildIndex,LoadSceneMode mode)
+function SceneManager.LoadScene() end 
+
+----AsyncOperation SceneManager.LoadSceneAsync(String sceneName)
+--AsyncOperation SceneManager.LoadSceneAsync(String sceneName,LoadSceneMode mode)
+--AsyncOperation SceneManager.LoadSceneAsync(Int32 sceneBuildIndex)
+--AsyncOperation SceneManager.LoadSceneAsync(Int32 sceneBuildIndex,LoadSceneMode mode)
+function SceneManager.LoadSceneAsync() end 
+
+----Scene SceneManager.CreateScene(String sceneName)
+function SceneManager.CreateScene() end 
+
+----Boolean SceneManager.UnloadScene(Int32 sceneBuildIndex)
+--Boolean SceneManager.UnloadScene(String sceneName)
+--Boolean SceneManager.UnloadScene(Scene scene)
+function SceneManager.UnloadScene() end 
+
+----Void SceneManager.MergeScenes(Scene sourceScene,Scene destinationScene)
+function SceneManager.MergeScenes() end 
+
+----Void SceneManager.MoveGameObjectToScene(GameObject go,Scene scene)
+function SceneManager.MoveGameObjectToScene() end 
+
+LoadSceneMode = {} 
+
+Single = nil;
+
+Additive = nil;
 

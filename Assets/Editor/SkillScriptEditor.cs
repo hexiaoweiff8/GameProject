@@ -161,7 +161,11 @@ public class SkillScriptEditor : BaseScriptEditor
         }
         if (GUILayout.Button("范围持续技"))
         {
-            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Remain, this.position);
+            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Remain, this.position);
+        }
+        if (GUILayout.Button("目标点选择"))
+        {
+            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.TargetPointSelector, this.position);
         }
         GUI.color = Color.white;
         EditorGUILayout.EndVertical();
@@ -199,6 +203,10 @@ public class SkillScriptEditor : BaseScriptEditor
         if (GUILayout.Button("数据修正"))
         {
             SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.ChangeData, this.position);
+        }
+        if (GUILayout.Button("技能是否为主动技能(默认否)"))
+        {
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.IsActive, this.position);
         }
         if (GUILayout.Button("技能描述"))
         {

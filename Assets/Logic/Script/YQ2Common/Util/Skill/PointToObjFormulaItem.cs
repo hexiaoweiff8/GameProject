@@ -39,27 +39,27 @@ public class PointToObjFormulaItem : AbstractFormulaItem
     /// </summary>
     public float ScaleZ { get; private set; }
 
-    /// <summary>
-    /// 初始化行为链生成器
-    /// </summary>
-    /// <param name="formulaType">行为节点类型</param>
-    /// <param name="effectKey">特效Key(或path)</param>
-    /// <param name="speed">飞行速度</param>
-    /// <param name="flyType">飞行方式(0抛物线, 1直线, 2 sin线</param>
-    /// <param name="scale">缩放</param>
-    public PointToObjFormulaItem(int formulaType, string effectKey, float speed, TrajectoryAlgorithmType flyType, float[] scale = null)
-    {
-        FormulaType = formulaType;
-        EffectKey = effectKey;
-        Speed = speed;
-        FlyType = flyType;
-        if (scale != null)
-        {
-            ScaleX = scale[0];
-            ScaleY = scale[1];
-            ScaleZ = scale[2];
-        }
-    }
+    ///// <summary>
+    ///// 初始化行为链生成器
+    ///// </summary>
+    ///// <param name="formulaType">行为节点类型</param>
+    ///// <param name="effectKey">特效Key(或path)</param>
+    ///// <param name="speed">飞行速度</param>
+    ///// <param name="flyType">飞行方式(0抛物线, 1直线, 2 sin线</param>
+    ///// <param name="scale">缩放</param>
+    //public PointToObjFormulaItem(int formulaType, string effectKey, float speed, TrajectoryAlgorithmType flyType, float[] scale = null)
+    //{
+    //    FormulaType = formulaType;
+    //    EffectKey = effectKey;
+    //    Speed = speed;
+    //    FlyType = flyType;
+    //    if (scale != null)
+    //    {
+    //        ScaleX = scale[0];
+    //        ScaleY = scale[1];
+    //        ScaleZ = scale[2];
+    //    }
+    //}
 
     /// <summary>
     /// 初始化行为链生成器

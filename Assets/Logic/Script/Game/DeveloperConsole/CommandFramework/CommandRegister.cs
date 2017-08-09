@@ -23,6 +23,7 @@ namespace DeveloperConsole.CommandFramework
         {
             RegisterMethodCommand(InAssembly);
             RegisterClassCommand(InAssembly);
+            UnityEngine.Debug.Log("Command x"+CommandsRepository._ins.repository.Count);
         }
         /// <summary>
         /// @DONE:将带有CommandEntryMethod特性的方法注册到命令仓库中

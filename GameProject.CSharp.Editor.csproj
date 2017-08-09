@@ -439,6 +439,7 @@
     <None Include="Assets\StreamingAssets\BuffScript100001.txt" />
     <None Include="Assets\StreamingAssets\BuffScript1007.txt" />
     <None Include="Assets\StreamingAssets\BuffScript1008.txt" />
+    <None Include="Assets\StreamingAssets\BuffScript1009.txt" />
     <None Include="Assets\StreamingAssets\BuffScript2222.txt" />
     <None Include="Assets\StreamingAssets\RemainScript10000.txt" />
     <None Include="Assets\StreamingAssets\Script100001.txt" />

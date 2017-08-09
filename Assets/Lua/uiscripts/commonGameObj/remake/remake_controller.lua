@@ -51,11 +51,11 @@ end
 ---
 function Remake:show(equip, parent, depth)
     if equip.rarity < 4  then
-        UIToast.Show(stringUtil:getString(30104), nil, UIToast.ShowType.Upwards)
+        UIToast.Show(stringUtil:getString(30104))
         return
     end
     if #equip.sndAttr == 0 then
-        UIToast.Show("sndAttr error!!", nil, UIToast.ShowType.Upwards)
+        UIToast.Show("sndAttr error!!")
         return
     end
 
@@ -208,7 +208,7 @@ function Remake:refreshNeedItem(itemIndex)
         if itemHaveNum >= itemNeedNum then
             Message_Manager:SendPB_EquipRemake(_data.equipToShow.id, _data.selectIndex, self)
         else
-            UIToast.Show(stringUtil:getString(30107), nil, UIToast.ShowType.Upwards)
+            UIToast.Show(stringUtil:getString(30107))
         end
     end
 

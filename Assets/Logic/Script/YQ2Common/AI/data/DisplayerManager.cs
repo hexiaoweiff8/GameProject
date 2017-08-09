@@ -31,9 +31,6 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
     private Dictionary<int, DisplayOwner> enemyBuilding;
 
 
-
-
-
     // ---------------------------公有方法-------------------------------
 
     public DisplayerManager()
@@ -60,15 +57,30 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
         return null;
     }
 
+    /// <summary>
+    /// 创建单位, 如果对象池内有引用直接使用
+    /// </summary>
+    /// <param name="soldiername"></param>
+    /// <param name="param"></param>
+    /// <returns></returns>
     public GameObject CreateAvatar(string soldiername, CreateActorParam param)
     {
         if (displayPool.ContainsKey(soldiername) && displayPool[soldiername].Count > 0)
         {
-            return displayPool[soldiername].Pop();
+            var member = displayPool[soldiername].Pop();
+            // 清空父级引用
+            member.transform.parent = null;
+            member.SetActive(true);
+            return member;
         }
         return DP_FightPrefabManage.InstantiateAvatar(param);
     }
 
+    /// <summary>
+    /// 将对象放入对象池
+    /// </summary>
+    /// <param name="objID"></param>
+    /// <param name="obj"></param>
     public void PushPool(ObjectID objID, DisplayOwner obj)
     {
         var control = obj.GameObj.GetComponent<RanderControl>();
@@ -84,9 +96,12 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
             GameObject.Destroy(control);
         }
         var soldierType = obj.ClusterData.AllData.MemberData.Name;
-        ClusterManager.Single.Remove(obj.ClusterData);
+        // 清理数据
+        ClearDisplayer(obj);
         if (!displayPool.ContainsKey(soldierType))
             displayPool.Add(soldierType, new Stack<GameObject>());
+        // 设置父级
+        obj.GameObj.transform.parent = ParentManager.Instance().GetParent(ParentManager.PoolParent).transform;
         displayPool[soldierType].Push(obj.GameObj);
     }
 
@@ -159,6 +174,35 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
                 {
                     Debug.LogError("试图从敌人士兵列表删除不存在的id------------" + objId.ID);
                 }
+                break;
+            case ObjectID.ObjectType.MyTower:
+            case ObjectID.ObjectType.MyJiDi:
+            {
+                if (_allMyDisPlayDict.ContainsKey(objId.ID))
+                {
+                    PushPool(objId, _allMyDisPlayDict[objId.ID]);
+                    _allMyDisPlayDict.Remove(objId.ID);
+                }
+                if (myBuilding.ContainsKey(objId.ID))
+                {
+                    myBuilding.Remove(objId.ID);
+                }
+            }
+                break;
+
+            case ObjectID.ObjectType.EnemyTower:
+            case ObjectID.ObjectType.EnemyJiDi:
+            {
+                if (_allEnemyDisPlayDict.ContainsKey(objId.ID))
+                {
+                    PushPool(objId, _allEnemyDisPlayDict[objId.ID]);
+                    _allEnemyDisPlayDict.Remove(objId.ID);
+                }
+                if (enemyBuilding.ContainsKey(objId.ID))
+                {
+                    enemyBuilding.Remove(objId.ID);
+                }
+            }
                 break;
         }
     }
@@ -286,29 +330,40 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
     /// <summary>
     /// 销毁单位
     /// </summary>
-    /// <param name="display"></param>
+    /// <param name="display">被删除单位包装类</param>
     public void DelDisplay(DisplayOwner display)
     {
-        display.ClusterData.Stop();
-        ClusterManager.Single.Remove(display.ClusterData);
-        FightUnitFactory.DeleteUnit(display.ClusterData.AllData.MemberData);
-        GameObject.Destroy(display.ClusterData);
+        display.ClusterData.StopMove();
+        // 从本地列表中删除
+        DeleteElement(display.ClusterData.AllData.MemberData.ObjID);
+    }
+
+    /// <summary>
+    /// 销毁单位
+    /// </summary>
+    /// <param name="objId">被删除单位ObjectId对象</param>
+    public void DelDisplay(ObjectID objId)
+    {
+        DelDisplay(GetElementById(objId));
     }
 
 
-    //public List<DisplayOwner> GetElementsByScope(ICollisionGraphics graphics)
-    //{
-    //    List<DisplayOwner> result = null;
-    //    var positionObjectInScope = ClusterManager.Single.GetPositionObjectListByGraphics(graphics);
-    //    if (positionObjectInScope != null && positionObjectInScope.Count != 0)
-    //    {
-    //        result = new List<DisplayOwner>();
-
-    //    }
-
-    //    return result;
-    //}
-
+    /// <summary>
+    /// 清空显示单位身上的脚本
+    /// </summary>
+    /// <param name="display">被清理单位包装类</param>
+    private void ClearDisplayer(DisplayOwner display)
+    {
+        if (display != null)
+        {
+            ClusterManager.Single.Remove(display.ClusterData);
+            display.GameObj.RemoveComponents(typeof(ClusterData));
+            display.ClusterData = null;
+            display.GameObj.RemoveComponents(typeof(TriggerRunner));
+            display.GameObj.RemoveComponents(typeof(RanderControl));
+            display.RanderControl = null;
+        }
+    }
 
     // ---------------------------私有方法----------------------------------
 

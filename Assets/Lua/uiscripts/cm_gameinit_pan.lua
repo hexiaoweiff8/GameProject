@@ -4,47 +4,18 @@ require "framework/luacsv"
 require 'events'
 require "common/protocal"
 require "manager/Config_Manager"
-require("uiscripts/equipP")
-require("uiscripts/kejiP")
-require("uiscripts/Const")
-require("uiscripts/commonModel/card_Model")
-require("uiscripts/commonModel/user_Model")
-require("uiscripts/commonModel/item_Model")
-require("uiscripts/commonModel/currency_Model")
-require("uiscripts/commonModel/equip_Model")
-
---引用工具类
-require("uiscripts/Util/stringUtil")
-require("uiscripts/Util/cardUtil")
-require("uiscripts/Util/colorUtil")
-require("uiscripts/Util/spriteNameUtil")
-require("uiscripts/Util/attributeUtil")
-require("uiscripts/Util/equipSuitUtil")
-require("uiscripts/Util/soldierUtil")
-require("uiscripts/Util/synergyUtil")
-require("uiscripts/Util/skillUtil")
-require("uiscripts/Util/starUtil")
-require("uiscripts/Util/itemUtil")
-require("uiscripts/Util/qualityUtil")
-require("uiscripts/Util/equipUtil")
-require("uiscripts/Util/dotweenUtil")
-require("uiscripts/Util/borderUtil")
-
-
-
 
 gameinit = classWC()
 -- 单例
 GameInit = nil
-
 
 WNDTYPE = {
     None = "None",
     Login = "ui_login",
     Healthadvice = "ui_healthadvice",
     Prefight = "ui_prefight",
+    ui_fight_before = "ui_fightU_before",
     ui_fight = "ui_fightU",
-    ui_fight2 = "ui_fightU2",
     ui_pause = "ui_pauseU",
     ui_quitGame = "ui_quitGame",
     quiteEnsure_ui = "ui_quiteensure",
@@ -60,6 +31,12 @@ WNDTYPE = {
     QianDao = "ui_qiandao",
     chatBubble = "ui_chatBubble",
     chatWindow = "ui_chatWindow",
+    PvpGz = "ui_pvpgz",
+    BianDui = "ui_biandui",
+    PVE = "ui_pve",
+    Main = "ui_main",
+    pvpList = "ui_pvpList",
+    mail = "ui_mail",
 }
 UiDefine = luacsv.new(require("pk_tabs/UiDefine"))
 -- 登录窗体组件名列表 
@@ -69,8 +46,8 @@ local lgwnds = {
 -- 窗体枚举 --对应文件名
 gameinit.wndlist = {
     {name = WNDTYPE.Login, cm = "uiscripts/wndtz_login"},
-    {name = WNDTYPE.ui_fight, cm = "uiscripts/ui_fight"},
-    {name = WNDTYPE.ui_fight2, cm = "uiscripts/fight/fight_controller"},
+    {name = WNDTYPE.ui_fight_before, cm = "uiscripts/ui_fight"},
+    {name = WNDTYPE.ui_fight, cm = "uiscripts/fight/fight_controller"},
     {name = WNDTYPE.ui_pause, cm = "uiscripts/ui_pause"},
     {name = WNDTYPE.ui_quitGame, cm = "uiscripts/ui_quitGame"},
     {name = WNDTYPE.quiteEnsure_ui, cm = "uiscripts/ui_pause"},
@@ -86,7 +63,15 @@ gameinit.wndlist = {
     {name = WNDTYPE.CardShop, cm = "uiscripts/shop_card/wnd_cardshop_controller"},
     {name = WNDTYPE.QianDao, cm = "uiscripts/qiandao/wnd_qiandao_controller"},
     {name = WNDTYPE.chatBubble, cm = "uiscripts/chat/chatBubble/chatBubble_controller"},
-    {name = WNDTYPE.chatWindow, cm = "uiscripts/chat/chatWindow_controller"},}
+	{name = WNDTYPE.chatWindow, cm = "uiscripts/chat/chatWindow_controller"},
+    --{name = WNDTYPE.PvpGz, cm = "uiscripts/pvpgz/wnd_pvpgz_controller"},
+    --{name = WNDTYPE.BianDui, cm = "uiscripts/biandui/wnd_biandui_controller"},
+    {name = WNDTYPE.PVE, cm = "uiscripts/PVE/wnd_PVE_controller"},
+    {name = WNDTYPE.Main, cm = "uiscripts/main/ui_main_controller"},
+     --{name = WNDTYPE.pvpList, cm = "uiscripts/pvp/pvpList/pvpList_controller"},
+    {name = WNDTYPE.mail, cm = "uiscripts/mail/mail_controller"},
+
+}
 _all_Reg_Wnd_list = {}
 --- <summary>
 --- 初始化窗体
@@ -95,6 +80,7 @@ function gameinit:InitWnds(initPogressManage, wnds)
     local wndcount = #wnds
     local currIndex = 1
     local eachfunc = function(_, wndInfo)
+            print(wndInfo.cm .. wndInfo.name)
             -- 设置装载进度
             require(wndInfo.cm)(wndInfo.name)
             -- 初始化窗体
@@ -206,7 +192,7 @@ function gameinit:coStartGame(parm)
     self:InitWnds(initPogressManage, lgwnds)
     require "uiscripts/ui_manager"
     ui_manager = ui_manager()
-    ui_manager:ShowWB(WNDTYPE.Healthadvice)
+    -- ui_manager:ShowWB(WNDTYPE.Healthadvice)
     self:coLoading();
 
 end
@@ -214,6 +200,7 @@ end
 function gameinit:coLoading(parm)
     self:InitCSharpLogic(initPogressManage)
     self:InitWnds(initPogressManage, self.wndlist)
+    ui_manager:ShowWB(WNDTYPE.Login)
 end
 function gameinit:OnPacketDone(isDone)
     self.mPacketLoadDone = true

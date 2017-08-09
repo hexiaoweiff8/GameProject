@@ -428,12 +428,6 @@ public class LoopItemScrollView : MonoBehaviour {
 
         }
 
-        //itemComp.otherContent.text = myData.content;
-        //itemComp.selfContent.text = myData.content;
-        //itemComp.timeLable.text = myData.content;
-        //item.gameObject.name = "Item" + item.dataIndex;
-        //item.widget.gameObject.SetActive(false);
-        //print(myData.content +"  " +item.widget.isVisible);
     }
 
     

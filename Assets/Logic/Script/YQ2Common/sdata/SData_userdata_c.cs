@@ -19,7 +19,7 @@ public class SData_userdata_c : MonoEX.Singleton<SData_userdata_c>
                 switch (head[(int)(double)o11 - 1])
 				{
 					case "UserLevel": dif.UserLevel = (short)(double)o22; break;
-					case "UserExp": dif.UserExp = (int)(double)o22; break;
+					case "Exp": dif.Exp = (int)(double)o22; break;
                 }
             });
             if (Data.ContainsKey(dif.UserLevel))
@@ -41,11 +41,11 @@ public class SData_userdata_c : MonoEX.Singleton<SData_userdata_c>
 public struct userdata_cInfo
 {
 	 /// <summary>
-	 ///玩家等级
+	 ///主角等级
 	 /// </summary>
 	public short UserLevel;
 	 /// <summary>
-	 ///角色经验
+	 ///经验值
 	 /// </summary>
-	public int UserExp;
+	public int Exp;
 }

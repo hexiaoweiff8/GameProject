@@ -4,10 +4,10 @@ using System;
 
 public class DaiJiTrigger : SoldierFSMTrigger {
 
-    public override bool CheckTrigger(SoldierFSMSystem fsm)
-    {
-        return false;
-    }
+    //public override bool CheckTrigger(SoldierFSMSystem fsm)
+    //{
+    //    return false;
+    //}
 
     public override void Init()
     {

@@ -70,7 +70,6 @@ public static class CustomSettings
         _GT(typeof (DG.Tweening.LoopType)),
         _GT(typeof (DG.Tweening.PathMode)),
         _GT(typeof (DG.Tweening.PathType)),
-
         _GT(typeof (DG.Tweening.RotateMode)),
         _GT(typeof (Component)).AddExtendType(typeof (DG.Tweening.ShortcutExtensions)),
         _GT(typeof (Transform)).AddExtendType(typeof (DG.Tweening.ShortcutExtensions)),
@@ -94,7 +93,7 @@ public static class CustomSettings
         //_GT(typeof(LineRenderer))
         //_GT(typeof(TrailRenderer))
 #endif
-      
+        _GT(typeof (Debug)),
         _GT(typeof (Behaviour)),
         _GT(typeof (MonoBehaviour)),
         _GT(typeof (GameObject)),
@@ -208,6 +207,7 @@ public static class CustomSettings
         _GT(typeof (UIGrid)),
         _GT(typeof (UITable)),
         _GT(typeof (UIInput)),
+        _GT(typeof (UIToggle)),
         _GT(typeof (UITexture)),
         _GT(typeof (UIScrollView)),
         _GT(typeof (UICamera)),
@@ -258,6 +258,7 @@ public static class CustomSettings
         _GT(typeof (DisplayOwner)),
         _GT(typeof (PositionObject)),
         _GT(typeof (VOBase)),
+        _GT(typeof (AllData)),
         _GT(typeof (ClusterData)),
         _GT(typeof (UIScrollViewAdapter)),
         _GT(typeof (UIScrollViewItemBase)),
@@ -268,9 +269,18 @@ public static class CustomSettings
         _GT(typeof (SceneChanger)),
         _GT(typeof (FightManager)),
         _GT(typeof (MapManager.MapDataParamsPacker)),
+
+        #region 姚毅添加
         _GT(typeof(ChatBubbleAni)),
         _GT(typeof(chatItem)),
         _GT(typeof(LoopItemScrollView)),
+        //_GT(typeof(PVPListItem)),
+        //_GT(typeof(PVPloopGrid)),
+        _GT(typeof(MailItem)),
+        _GT(typeof(MailLoopGrid)),
+        #endregion
+        _GT(typeof(UnityEngine.SceneManagement.SceneManager)),
+        _GT(typeof(UnityEngine.SceneManagement.LoadSceneMode)),
     };
 
 

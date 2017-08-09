@@ -16,6 +16,19 @@ public class MoveFormulaItem : AbstractFormulaItem
     public float CheckTime = 0.05f;
 
     /// <summary>
+    /// 超时时间
+    /// </summary>
+    public float OutTime = 3f;
+
+    /// <summary>
+    /// 目标点
+    /// 0: 自己的位置
+    /// 1: 目标的位置
+    /// 2: 目标点选择的位置
+    /// </summary>
+    public int TargetPos { get; private set; }
+
+    /// <summary>
     /// 移动速度
     /// </summary>
     public float Speed { get; private set; }
@@ -51,7 +64,7 @@ public class MoveFormulaItem : AbstractFormulaItem
         {
             throw new Exception("数据列表为空");
         }
-        var argsCount = 3;
+        var argsCount = 4;
         // 解析参数
         if (array.Length < argsCount)
         {
@@ -60,10 +73,12 @@ public class MoveFormulaItem : AbstractFormulaItem
 
         // 如果该项值是以%开头的则作为替换数据
         var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        var speed = GetDataOrReplace<float>("Speed", array, 1, ReplaceDic);
-        var isBlink = GetDataOrReplace<bool>("IsBlink", array, 2, ReplaceDic);
+        var targetPos = GetDataOrReplace<int>("TargetPos", array, 1, ReplaceDic);
+        var speed = GetDataOrReplace<float>("Speed", array, 2, ReplaceDic);
+        var isBlink = GetDataOrReplace<bool>("IsBlink", array, 3, ReplaceDic);
 
         FormulaType = formulaType;
+        TargetPos = targetPos;
         Speed = speed;
         IsBlink = isBlink;
     }
@@ -84,9 +99,11 @@ public class MoveFormulaItem : AbstractFormulaItem
         ReplaceData(paramsPacker);
         // 数据本地化
         var myCheckTime = CheckTime;
+        var myTargetPos = TargetPos;
         var mySpeed = Speed;
         var myIsBlink = IsBlink;
         var member = paramsPacker.ReleaseMember;
+        var target = paramsPacker.ReceiverMenber;
         var myFormulaType = FormulaType;
         // 最大移动次数(防溢出)
         var moveTime = 300;
@@ -97,25 +114,27 @@ public class MoveFormulaItem : AbstractFormulaItem
 
         IFormula result = new Formula((callback, scope) =>
         {
+            // 获取目标位置
+            var targetPos = GetPosByType(myTargetPos, paramsPacker, scope); ;
             if (myIsBlink)
             {
                 // 瞬移
                 // 数据层面移动
-                member.ClusterData.X = paramsPacker.TargetPos.x;
-                member.ClusterData.Y = paramsPacker.TargetPos.z;
+                member.ClusterData.X = targetPos.x;
+                member.ClusterData.Y = targetPos.y;
 
                 // 显示层面移动
-                member.GameObj.transform.position = paramsPacker.TargetPos;
+                member.GameObj.transform.position = targetPos;
             }
             else
             {
-                // 计时器
-                var timer = new Timer(myCheckTime);
+                // 计时器(超时停止, 防止双重移动导致一直无法到达终点)
+                var timer = new Timer(myCheckTime, OutTime);
                 // 移动
                 Action completeCallback = () =>
                 {
                     // 计算夹角
-                    var diffDir = member.GameObj.transform.position - paramsPacker.TargetPos;
+                    var diffDir = member.GameObj.transform.position - targetPos;
                     // 判断达到目标, 停止
                     if (diffDir.magnitude < mySpeed || moveTime <= 0)
                     {
@@ -131,7 +150,6 @@ public class MoveFormulaItem : AbstractFormulaItem
                     moveTime--;
                 };
 
-                timer = new Timer(myCheckTime, true);
                 timer.OnCompleteCallback(completeCallback).Start();
             }
             callback();

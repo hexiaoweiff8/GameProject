@@ -31,6 +31,9 @@ public class VOBaseWrap
 		L.RegVar("AttackType", get_AttackType, set_AttackType);
 		L.RegVar("SightRange", get_SightRange, set_SightRange);
 		L.RegVar("IsHide", get_IsHide, set_IsHide);
+		L.RegVar("IsMechanic", get_IsMechanic, set_IsMechanic);
+		L.RegVar("IsMelee", get_IsMelee, set_IsMelee);
+		L.RegVar("IsSummon", get_IsSummon, set_IsSummon);
 		L.RegVar("IsAntiHide", get_IsAntiHide, set_IsAntiHide);
 		L.RegVar("LifeTime", get_LifeTime, set_LifeTime);
 		L.RegVar("Skill1", get_Skill1, set_Skill1);
@@ -43,7 +46,9 @@ public class VOBaseWrap
 		L.RegVar("ModelName", get_ModelName, set_ModelName);
 		L.RegVar("ModelTexture", get_ModelTexture, set_ModelTexture);
 		L.RegVar("MoveSpeed", get_MoveSpeed, set_MoveSpeed);
+		L.RegVar("BehaviorType", get_BehaviorType, set_BehaviorType);
 		L.RegVar("AttackRange", get_AttackRange, set_AttackRange);
+		L.RegVar("SkillRange", get_SkillRange, set_SkillRange);
 		L.RegVar("Hit", get_Hit, set_Hit);
 		L.RegVar("Dodge", get_Dodge, set_Dodge);
 		L.RegVar("Crit", get_Crit, set_Crit);
@@ -501,6 +506,63 @@ public class VOBaseWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsMechanic(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			bool ret = obj.IsMechanic;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsMechanic on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsMelee(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			bool ret = obj.IsMelee;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsMelee on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsSummon(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			bool ret = obj.IsSummon;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsSummon on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_IsAntiHide(IntPtr L)
 	{
 		object o = null;
@@ -729,6 +791,25 @@ public class VOBaseWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_BehaviorType(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			int ret = obj.BehaviorType;
+			LuaDLL.lua_pushinteger(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index BehaviorType on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_AttackRange(IntPtr L)
 	{
 		object o = null;
@@ -744,6 +825,25 @@ public class VOBaseWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index AttackRange on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_SkillRange(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			float ret = obj.SkillRange;
+			LuaDLL.lua_pushnumber(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index SkillRange on a nil value" : e.Message);
 		}
 	}
 
@@ -1413,6 +1513,63 @@ public class VOBaseWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_IsMechanic(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
+			obj.IsMechanic = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsMechanic on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_IsMelee(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
+			obj.IsMelee = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsMelee on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_IsSummon(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
+			obj.IsSummon = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsSummon on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_IsAntiHide(IntPtr L)
 	{
 		object o = null;
@@ -1641,6 +1798,25 @@ public class VOBaseWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_BehaviorType(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+			obj.BehaviorType = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index BehaviorType on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_AttackRange(IntPtr L)
 	{
 		object o = null;
@@ -1656,6 +1832,25 @@ public class VOBaseWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index AttackRange on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_SkillRange(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
+			obj.SkillRange = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index SkillRange on a nil value" : e.Message);
 		}
 	}
 

@@ -20,7 +20,7 @@ public class TestTimer : MonoBehaviour
             {
                 stopwatch.Stop();
                 Debug.Log(stopwatch.Elapsed + ", " + timer.ToString());
-                timer.Kill();
+                //timer.Kill();
             }).OnKill(() =>
             {
                 Debug.Log("Kill");

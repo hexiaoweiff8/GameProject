@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 
 /// <summary>
 /// 抽象类，所有状态必须继承它 并在子类中实例化
@@ -15,12 +16,6 @@ public abstract class SoldierFSMState
         set { _stateId = value; }
     }
 
-    ///// <summary>
-    ///// 来源状态
-    ///// </summary>
-    //public SoldierStateID SourceStateID { get; set; }
-
-
     /// <summary>
     /// 状态ID
     /// </summary>
@@ -30,11 +25,6 @@ public abstract class SoldierFSMState
     /// 本状态是否过期
     /// </summary>
     protected bool _stateIsLose = false;
-
-    /// <summary>
-    /// state-trigger对应关系表
-    /// </summary>
-    private Dictionary<SoldierTriggerID, SoldierStateID> dict = new Dictionary<SoldierTriggerID, SoldierStateID>();
 
     /// <summary>
     /// 当前状态可切换状态的trigger检测列表
@@ -54,54 +44,39 @@ public abstract class SoldierFSMState
     /// </summary>
     public abstract void Init();
 
-    /// <summary>
-    /// 添加状态 转换和状态id必须成对存在 且唯一
-    /// </summary>
-    /// <param name="trigger"></param>
-    /// <param name="id"></param>
-    public void AddTrigger(SoldierTriggerID trigger, SoldierStateID id)//增加关联对（转换，状态ID）
-    {
-        //-----------------------------验证参数的合法性-----------------------------------
-        if (dict.ContainsKey(trigger))
-        {
-            Debug.LogError("SoldierFSMState ERROR: SoldierTriggerID" + id + " 已经存在" + trigger);
-            return;
-        }
-        dict.Add(trigger, id);
-        ////通过转换反射出对应的触发器再把触发器添加到触发器列表
-        //Type type = Type.GetType(trigger + "Trigger");
-        //SoldierFSMTrigger fsmtrigger = Activator.CreateInstance(type) as SoldierFSMTrigger;
-        //_fsmTrriggerList.Add(fsmtrigger);
-        SoldierFSMFactory.GetTrigger(trigger, _fsmTrriggerList);
-    }
+    ///// <summary>
+    ///// 添加状态 转换和状态id必须成对存在 且唯一
+    ///// </summary>
+    ///// <param name="trigger"></param>
+    ///// <param name="id"></param>
+    //public void AddTrigger(SoldierTriggerID trigger, SoldierStateID id)//增加关联对（转换，状态ID）
+    //{
+    //    //-----------------------------验证参数的合法性-----------------------------------
+    //    if (dict.ContainsKey(trigger))
+    //    {
+    //        Debug.LogError("SoldierFSMState ERROR: SoldierTriggerID" + id + " 已经存在" + trigger);
+    //        return;
+    //    }
+    //    dict.Add(trigger, id);
+    //    ////通过转换反射出对应的触发器再把触发器添加到触发器列表
+    //    //Type type = Type.GetType(trigger + "Trigger");
+    //    //SoldierFSMTrigger fsmtrigger = Activator.CreateInstance(type) as SoldierFSMTrigger;
+    //    //_fsmTrriggerList.Add(fsmtrigger);
+    //    //SoldierFSMFactory.GetTrigger(trigger, _fsmTrriggerList);
+    //}
 
     /// <summary>
-    /// 删除某个转换 
+    /// 添加映射trigger
     /// </summary>
-    /// <param name="trigger"></param>
-    public void DeleteTrigger(SoldierTriggerID trigger)
+    /// <param name="triggerId">被映射TriggerId</param>
+    /// <param name="triggerFunc">trigger具体行为</param>
+    public void AddMappingTrigger(SoldierTriggerID triggerId, Func<SoldierFSMSystem, bool> triggerFunc)
     {
-
-        if (dict.ContainsKey(trigger))
-        {
-            dict.Remove(trigger);
-            return;
-        }
-        Debug.LogError("FSMState ERROR: " + trigger + " 不存在");
-    }
-
-    /// <summary>
-    ///  根据当前转换获取对应的状态
-    /// </summary>
-    /// <param name="trigger"></param>
-    /// <returns></returns>
-    public SoldierStateID GetStateByTrigger(SoldierTriggerID trigger)
-    {
-        if (dict.ContainsKey(trigger))
-        {
-            return dict[trigger];
-        }
-        return SoldierStateID.NullState;
+        var triggerType = SoldierFSMFactory.GetTriggerTypeByTriggerId(triggerId);
+        var triggerInvoke = (SoldierFSMTrigger)triggerType.InvokeMember("", BindingFlags.Public | BindingFlags.CreateInstance,
+               null, null, null);
+        triggerInvoke.CheckTriggerFunc = triggerFunc;
+        _fsmTrriggerList.Add(triggerInvoke);
     }
 
     /// <summary>
@@ -127,11 +102,12 @@ public abstract class SoldierFSMState
     {
         for (int i = 0; i < _fsmTrriggerList.Count; i++)
         {
-            // TODO 多个Trigger同事触发会保持最后一个的状态
-            if (_fsmTrriggerList[i].CheckTrigger(fsm))
+            //if (_fsmTrriggerList[i].CheckTrigger(fsm))
+            if (_fsmTrriggerList[i].CheckTriggerFunc(fsm))
             {
-                var state = SoldierFSMFactory.GetStateIDByTrigger(_fsmTrriggerList[i].triggerId);
+                var state = SoldierFSMFactory.GetStateIdByTrigger(_fsmTrriggerList[i].triggerId);
                 fsm.ChangeState(state);
+                Debug.Log("切换状态:" + state);
                 break;
             }
         }
@@ -146,25 +122,12 @@ public abstract class SoldierFSMState
     }
 
     /// <summary>
-    /// 删除对应id的触发器 
-    /// </summary>
-    /// <param name="triggerId"></param>
-    public void RemoveTrigger(SoldierTriggerID triggerId)
-    {
-        if (dict.ContainsKey(triggerId))
-        {
-            dict.Remove(triggerId);
-            _fsmTrriggerList.Remove(_fsmTrriggerList.Find((e) => triggerId == e.triggerId));
-        }
-    }
-
-    /// <summary>
     /// 销毁
     /// </summary>
     public void Destory()
     {
         _fsmTrriggerList.Clear();
-        dict.Clear();
+        //dict.Clear();
     }
 
     /// <summary>

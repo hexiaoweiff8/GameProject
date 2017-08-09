@@ -7,8 +7,8 @@ namespace DeveloperConsole.Commands
 {
     [Command("bat", "批量添加指定类型装备/物品/卡牌\n" +
                     "Usage:bat equip (可选)(-num <Int32> -suitId <Int32> -eqType <Int32> -ex <Int32>)\n" +
-                    "Usage:bat item (可选)(-num <Int32> -count <Int32> -useType <Int32>)\n" + 
-                    "Usage:bat card \n", CommandType.Server)]
+                    "Usage:bat item (可选)(-num <Int32> -count <Int32> -useType <Int32>)\n" +
+                    "Usage:bat card (可选)(-num <Int32>)\n", CommandType.Server)]
     class Batch : CommandBase
     {
         public override string commandName
@@ -77,7 +77,8 @@ namespace DeveloperConsole.Commands
             }
             if (type == "card")
             {
-                ConsoleLog.Println("批量添加卡牌功能施工中...");
+                generateRandomCard(args);
+                //ConsoleLog.Println("批量添加卡牌功能施工中...");
             }
             else
             {
@@ -120,6 +121,7 @@ namespace DeveloperConsole.Commands
                              @",""ex"":" + (ex == -1 ? UnityEngine.Random.Range(1,7) : ex) +
                              @"}]}";
                 //UnityEngine.Debug.Log(url+postData);
+                ConsoleLog.Println(postData);
                 ConsoleLog.Println(ServerUtil.Post(url, postData));
                 Count ++;
             }
@@ -240,6 +242,35 @@ namespace DeveloperConsole.Commands
             if (itemGenerateRange.Count != 0)
                 return itemGenerateRange;
             else return Items;
-        } 
+        }
+
+        private void generateRandomCard(Dictionary<string, int> args)
+        {
+            int num = -1;
+            foreach (var arg in args)
+            {
+                switch (arg.Key)
+                {
+                    case "-num":
+                        num = arg.Value; break;
+                }
+            }
+            var Count = 0;
+            for (int i = 0; i < (num == -1 ? UnityEngine.Random.Range(0, 100) : num); i++)
+            {
+                string url = Const.Protocol + "://" + Const.IP + ':' + Const.Port + Const.PATH + Const.MSG_SINGLE_REWARD;
+                string postData = @"roleid=" + UserUtil.getUserRID() +
+                             @"&data={""rewardList"":[{" +
+                             @"""type"":""card""," +
+                             @"""name"":" + "1010" + UnityEngine.Random.Range(1, 10).ToString("00") + @"," +
+                             @"""num"":" + UnityEngine.Random.Range(1, 100) +
+                             @"}]}";
+                UnityEngine.Debug.Log(postData);
+                ConsoleLog.Println(ServerUtil.Post(url, postData));
+                Count++;
+            }
+            ConsoleLog.Println("生成了" + Count + "张卡牌.");
+
+        }
     }
 }

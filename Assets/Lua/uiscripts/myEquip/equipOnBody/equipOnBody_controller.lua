@@ -49,7 +49,7 @@ function equipOnBody_controller:addListener()
     UIEventListener.Get(view.btn_equipOnce).onClick = function()
         local bestEquips = data:getBestEquipIDList()
         if not data:isCanEquipOnce() then
-            UIToast.Show(stringUtil:getString(30101), nil, UIToast.ShowType.Upwards)
+            UIToast.Show(stringUtil:getString(30101))
             return
         end
         Message_Manager:SendPB_loadBest(bestEquips)
@@ -60,13 +60,13 @@ function equipOnBody_controller:addListener()
 
         if #fixEquips == 0 then
             ---无可修理的装备
-            UIToast.Show(stringUtil:getString(30102), nil, UIToast.ShowType.Upwards)
+            UIToast.Show(stringUtil:getString(30102))
             return
         end
 
         if not data:isCanFixOnce(fixEquips) then
             ---能量点不足
-            UIToast.Show(stringUtil:getString(30108), nil, UIToast.ShowType.Upwards)
+            UIToast.Show(stringUtil:getString(30108))
             return
         end
 

@@ -26,6 +26,10 @@ public class SData_armybase_c : MonoEX.Singleton<SData_armybase_c>
 					case "DeployTime": dif.DeployTime = (float)(double)o22; break;
 					case "GeneralType": dif.GeneralType = (short)(double)o22; break;
 					case "ArmyType": dif.ArmyType = (short)(double)o22; break;
+					case "IsCreature": dif.IsCreature = (short)(double)o22; break;
+					case "RangeType": dif.RangeType = (short)(double)o22; break;
+					case "IsSummoned": dif.IsSummoned = (short)(double)o22; break;
+					case "BehaviorType": dif.BehaviorType = (short)(double)o22; break;
 					case "Attack1": dif.Attack1 = (float)(double)o22; break;
 					case "Clipsize1": dif.Clipsize1 = (short)(double)o22; break;
 					case "AttackRate1": dif.AttackRate1 = (float)(double)o22; break;
@@ -53,6 +57,7 @@ public class SData_armybase_c : MonoEX.Singleton<SData_armybase_c>
 					case "AttackType": dif.AttackType = (short)(double)o22; break;
 					case "AttackRange": dif.AttackRange = (float)(double)o22; break;
 					case "SightRange": dif.SightRange = (float)(double)o22; break;
+					case "SkillRange": dif.SkillRange = (float)(double)o22; break;
 					case "IsHide": dif.IsHide = (short)(double)o22; break;
 					case "IsAntiHide": dif.IsAntiHide = (short)(double)o22; break;
 					case "LifeTime": dif.LifeTime = (float)(double)o22; break;
@@ -116,6 +121,22 @@ public struct armybase_cInfo
 	 ///种族类型
 	 /// </summary>
 	public short ArmyType;
+	 /// <summary>
+	 ///机械生命属性
+	 /// </summary>
+	public short IsCreature;
+	 /// <summary>
+	 ///攻击距离属性
+	 /// </summary>
+	public short RangeType;
+	 /// <summary>
+	 ///主体/召唤
+	 /// </summary>
+	public short IsSummoned;
+	 /// <summary>
+	 ///行为类型
+	 /// </summary>
+	public short BehaviorType;
 	 /// <summary>
 	 ///火力
 	 /// </summary>
@@ -224,6 +245,10 @@ public struct armybase_cInfo
 	 ///视野范围
 	 /// </summary>
 	public float SightRange;
+	 /// <summary>
+	 ///技能释放范围
+	 /// </summary>
+	public float SkillRange;
 	 /// <summary>
 	 ///是否隐形
 	 /// </summary>

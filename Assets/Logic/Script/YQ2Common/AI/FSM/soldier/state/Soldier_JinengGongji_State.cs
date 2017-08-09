@@ -22,17 +22,13 @@ public class Soldier_JinengGongji_State : SoldierFSMState
 
     public override void Action(SoldierFSMSystem fsm)
     {
+        // TODO 持续技能
         // fsm 中带技能
         if (fsm.IsCanInJinenggongji && fsm.EnemyTarget.ClusterData != null && fsm.EnemyTarget.GameObj != null)
         {
-            // TODO 改为抛出技能的释放
             SkillManager.Single.DoSkillInfo(fsm.Skill, FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(fsm.Skill,
                 fsm.Display,
                 fsm.EnemyTarget));
-            // 攻击动作
-            //var myself = fsm.Display.RanderControl;
-            // TODO 部分模型没有攻击动作, 会报错
-            //myself.ModelRander.SetClip("attack".GetHashCode());
 
             fsm.IsCanInJinenggongji = false;
             fsm.Skill = null;

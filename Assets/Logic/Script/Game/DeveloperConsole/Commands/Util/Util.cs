@@ -94,5 +94,6 @@ namespace DeveloperConsole
         public const string PATH = "/gm/";
         public const string MSG_SINGLE_REWARD = "single_reward";
         public const string MSG_DEL = "delete_";
+        public const string SEND_MAIL = "send_mail";
     }
 }

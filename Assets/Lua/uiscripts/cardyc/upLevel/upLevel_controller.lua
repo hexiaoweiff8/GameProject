@@ -61,7 +61,7 @@ end
 function upLevel_controller:upLevelOne_CallBack()
     local isCan_UpLevel = data:isCan_UpLevel()
     if isCan_UpLevel ~= 0 then
-        UIToast.Show(isCan_UpLevel, nil, UIToast.ShowType.Upwards)
+        UIToast.Show(isCan_UpLevel)
         return
     end
     Message_Manager:SendPB_CardUpLevel(data.cardId, 1)
@@ -72,7 +72,7 @@ end
 function upLevel_controller:upLevelTen_CallBack()
     local isCan_UpLevel = data:isCan_UpLevel()
     if isCan_UpLevel ~= 0 then
-        UIToast.Show(isCan_UpLevel, nil, UIToast.ShowType.Upwards)
+        UIToast.Show(isCan_UpLevel)
         return
     end
     Message_Manager:SendPB_CardUpLevel(data.cardId, 10)

@@ -3,7 +3,7 @@ local data ={
 	head={"Name","DependPacks","CacheTime","FadeMode","AnimationMode","wnd_base_type","wnd_base_baffleType","Resident"},
 	body={
 		["ui_healthadvice"]={"ui_healthadvice","ui_healthadvice",1,2,0,2,1,0},
-		["ui_fightU"]={"ui_fightU","ui_fightU;commonU;heroU;core;gongjianbing;qingzhoujun;changqiangbing;ma1;ma5;sunluban;zhangxingcai;zhenji1;lingtong;usasoldier;xiahoudun",10000,0,0,2,1,0},
+		["ui_fightU_before"]={"ui_fightU_before","ui_fightU;commonU;heroU;core;gongjianbing;qingzhoujun;changqiangbing;ma1;ma5;sunluban;zhangxingcai;zhenji1;lingtong;usasoldier;xiahoudun",10000,0,0,2,1,0},
 		["ui_pauseU"]={"ui_pauseU","ui_pauseU",10000,3,0,4,3,1},
 		["ui_quitGame"]={"ui_quitGame","ui_quitGame",10000,3,0,4,3,0},
 		["ui_quiteensure"]={"ui_quiteensure","ui_quiteensure",10000,3,0,4,2,0},
@@ -14,15 +14,20 @@ local data ={
 		["ui_kejitree"]={"ui_kejitree","ui_kejitree;heroU;ui_fightU;commonU;ui_equip",10000,2,0,2,1,0},
 		["ui_keji_jiasu"]={"ui_keji_jiasu","ui_keji_jiasu",10000,3,0,4,3,0},
 		["ui_cardyc"]={"ui_cardyc","ui_cardyc;commonU;ui_fightU;heroU;xuebaotujidui;gongjianbing;ui_toast",10000,0,0,2,1,0},
-		["ui_fightU2"]={"ui_fightU2","ui_fightU;ui_toast;commonU;heroU;core;gongjianbing;qingzhoujun;changqiangbing;ma1;ma5;sunluban;zhangxingcai;zhenji1;lingtong;usasoldier;xiahoudun",10000,2,0,2,1,0},
+		["ui_fightU"]={"ui_fightU","ui_fightU;ui_toast;commonU;heroU;core;gongjianbing;qingzhoujun;changqiangbing;ma1;ma5;sunluban;zhangxingcai;zhenji1;lingtong;usasoldier;xiahoudun",10000,2,0,2,1,0},
 		["ui_equip2"]={"ui_equip2","ui_equip;heroU;ui_fightU;commonU;gongjianbing;ui_cangku;ui_toast;xuebaotujidui;ui_tips",10000,2,0,2,2,0},
 		["ui_cangku"]={"ui_cangku","ui_cangku;ui_toast;commonU",10000,2,0,2,1,0},
-		["ui_shop"]={"ui_shop","ui_shop;ui_toast;ui_tips",10000,2,0,4,1,1},
+		["ui_shop"]={"ui_shop","ui_shop;ui_toast;ui_tips",10000,2,0,4,1,0},
+		["ui_cardshop"]={"ui_cardshop","ui_cardshop;ui_toast",10000,2,0,4,1,0},
 		["ui_qiandao"]={"ui_qiandao","ui_qiandao;ui_tips",10000,2,0,2,1,0},
 		["ui_chatBubble"]={"ui_chatBubble","ui_chatBubble",10000,2,0,2,1,0},
 		["ui_chatWindow"]={"ui_chatWindow","ui_chatWindow",10000,2,0,2,1,0},
-		["ui_cardshop"]={"ui_cardshop","ui_cardshop;ui_toast",10000,2,0,4,1,1},
-		["ui_pve"]={"ui_pve","ui_pve;ui_toast",10000,2,0,2,1,1},
+		["ui_pve"]={"ui_pve","ui_pve;ui_toast",10000,2,0,4,1,0},
+		["ui_main"]={"ui_main","ui_main;ui_toast;ui_resident",10000,2,0,2,1,1},
+		["ui_pvpList"]={"ui_pvpList","ui_pvpList;ui_equip;gongjianbing",10000,2,0,2,1,0},
+		["ui_mail"]={"ui_mail","ui_mail",10000,2,0,4,1,0},
+		["ui_pvpgz"]={"ui_pvpgz","ui_pvpgz;ui_tips",10000,2,0,4,1,0},
+		["ui_biandui"]={"ui_biandui","ui_biandui",10000,2,0,2,1,0},
 	}
 }
 return data

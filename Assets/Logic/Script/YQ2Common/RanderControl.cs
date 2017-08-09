@@ -129,7 +129,7 @@ public class RanderControl : MonoBehaviour
     {
         NowWorldCamera = GameObject.Find("/PTZCamera/SceneryCamera").GetComponent<Camera>();
         Head = transform.Find("head").gameObject.transform;
-        bloodBar = GameObjectExtension.InstantiateFromPacket("ui_fightU", "blood.prefab", GameObject.Find("ui_fightU")).transform;
+        bloodBar = GameObjectExtension.InstantiateFromPacket("ui_fightU", "blood.prefab", GameObject.Find("ui_fightU/bloodParent")).transform;
         bloodBar.localScale = Vector3.zero;
         bloodBarCom = bloodBar.gameObject.AddComponent<BloodBar>();
         ModelRander = gameObject.GetComponent<MFAModelRender>();
@@ -164,10 +164,12 @@ public class RanderControl : MonoBehaviour
     {
         _ani = transform.GetComponent<Animation>();
     }
+
     /// <summary>
     /// 播放模型身上对应名字的动作 
     /// </summary>
-    /// <param name="aniName"></param>
+    /// <param name="aniName">动画名称</param>
+    /// <param name="mode">播放方式</param>
     public void PlayAni(string aniName,WrapMode mode)
     {
         if (null == _ani)
@@ -179,8 +181,9 @@ public class RanderControl : MonoBehaviour
         {
             if (_ani.clip.name != aniName)
             {
+                _ani.Stop();
                 _ani.wrapMode = mode;
-                _ani.PlayQueued(aniName);
+                _ani.Play(aniName);
             }
         }
         catch (Exception ex)

@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// 行为链单元构造器接口
@@ -184,6 +185,47 @@ public abstract class AbstractFormulaItem : IFormulaItem
             SubFormulaItem.After(formulaItem);
         }
         return formulaItem;
+    }
+
+    /// <summary>
+    /// 获取位置
+    /// </summary>
+    /// <param name="posType">位置类型</param>
+    /// <param name="paramsPacker">数据包装类</param>
+    /// <param name="scope">数据域</param>
+    /// <returns></returns>
+    public static Vector3 GetPosByType(int posType, FormulaParamsPacker paramsPacker, DataScope scope)
+    {
+
+        // 获取目标位置
+        var posX = 0f;
+        var posY = 0f;
+        var height = paramsPacker.ReleaseMember.ClusterData.Height;
+        switch (posType)
+        {
+            case 0:
+                {
+                    posX = paramsPacker.ReleaseMember.ClusterData.X;
+                    posY = paramsPacker.ReleaseMember.ClusterData.Y;
+                }
+                break;
+            case 1:
+                {
+                    posX = paramsPacker.ReceiverMenber.ClusterData.X;
+                    posY = paramsPacker.ReceiverMenber.ClusterData.Y;
+                    height = paramsPacker.ReceiverMenber.ClusterData.Height;
+                }
+                break;
+            case 2:
+                {
+                    posX = scope.GetFloat(Utils.TargetPointSelectorXKey) ?? 0f;
+                    posY = scope.GetFloat(Utils.TargetPointSelectorYKey) ?? 0f;
+                }
+                break;
+        }
+        var pos = new Vector3(posX, height, posY);
+
+        return pos;
     }
 
 

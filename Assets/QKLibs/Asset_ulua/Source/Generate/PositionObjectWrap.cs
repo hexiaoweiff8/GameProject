@@ -7,7 +7,8 @@ public class PositionObjectWrap
 	public static void Register(LuaState L)
 	{
 		L.BeginClass(typeof(PositionObject), typeof(UnityEngine.MonoBehaviour));
-		L.RegFunction("Stop", Stop);
+		L.RegFunction("Begin", Begin);
+		L.RegFunction("StopMove", StopMove);
 		L.RegFunction("ContinueMove", ContinueMove);
 		L.RegFunction("Clear", Clear);
 		L.RegFunction("__eq", op_Equality);
@@ -30,17 +31,34 @@ public class PositionObjectWrap
 		L.RegVar("Quality", get_Quality, set_Quality);
 		L.RegVar("SpeedDirection", get_SpeedDirection, set_SpeedDirection);
 		L.RegVar("MaxSpeed", get_MaxSpeed, set_MaxSpeed);
+		L.RegVar("CouldSelect", get_CouldSelect, set_CouldSelect);
 		L.EndClass();
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int Stop(IntPtr L)
+	static int Begin(IntPtr L)
 	{
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
 			PositionObject obj = (PositionObject)ToLua.CheckObject(L, 1, typeof(PositionObject));
-			obj.Stop();
+			obj.Begin();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int StopMove(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			PositionObject obj = (PositionObject)ToLua.CheckObject(L, 1, typeof(PositionObject));
+			obj.StopMove();
 			return 0;
 		}
 		catch(Exception e)
@@ -423,6 +441,25 @@ public class PositionObjectWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_CouldSelect(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			PositionObject obj = (PositionObject)o;
+			bool ret = obj.CouldSelect;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index CouldSelect on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_AllData(IntPtr L)
 	{
 		object o = null;
@@ -666,6 +703,25 @@ public class PositionObjectWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MaxSpeed on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_CouldSelect(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			PositionObject obj = (PositionObject)o;
+			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
+			obj.CouldSelect = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index CouldSelect on a nil value" : e.Message);
 		}
 	}
 }

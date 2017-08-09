@@ -51,11 +51,28 @@ end
     cardId      卡牌id
     cardLv      卡牌等级
 ]]
-function cardUtil:getCardProperty(property, cardId, cardLv)
-    if cardId then 
-        local uid = tonumber(string.format("%d%.3d",cardId,cardLv))
-        return sdata_armybase_data:GetFieldV(property, uid)
+function cardUtil:getCardPropValue(property, cardId, cardLv)
+    local uid = tonumber(string.format("%d%.3d",cardId,cardLv))
+    if property == "ArmyUnit" then
+        local value = sdata_armycardbase_data:GetFieldV(property, cardId)
+        return value
+    elseif property == "RangeType" or
+    property == "ArmyType" or
+    property == "GeneralType" or
+    property == "IsCreature" or
+    property == "AimGeneralType" or
+    property == "AttackType" then
+        local value = sdata_armybase_data:GetFieldV(property, uid)
+        local stringID = tonumber(Const.CARD_PROP_NAME_TO_STRING_ID[property]..value)
+        return stringUtil:getString(stringID)
+    else
+        local value = math.floor(sdata_armybase_data:GetFieldV(property, uid))
+        return value
     end
+end
+
+function cardUtil:getCardPropName(property)
+    return stringUtil:getString(Const.CARD_PROP_NAME_TO_STRING_ID[property])
 end
 
 

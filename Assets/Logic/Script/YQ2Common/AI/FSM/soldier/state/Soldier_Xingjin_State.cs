@@ -13,6 +13,12 @@ public class Soldier_Xingjin_State : SoldierFSMState
     /// </summary>
     private ClusterData clusterData = null;
 
+
+    /// <summary>
+    /// 目标单位
+    /// </summary>
+    private DisplayOwner targetDisplay = null;
+
     public override void Init()
     {
         StateID = SoldierStateID.Xingjin;
@@ -23,14 +29,16 @@ public class Soldier_Xingjin_State : SoldierFSMState
     /// <param name="fsm"></param>
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
-        Debug.Log("行进:" + fsm.Display.GameObj.name);
+        //Debug.Log("行进:" + fsm.Display.GameObj.name);
         base.DoBeforeEntering(fsm);
         fsm.Display.ClusterData.ContinueMove();
         clusterData = fsm.Display.ClusterData as ClusterData;
+        clusterData.ContinueMove();
 
         // 切换动作
         SwitchAnim(fsm, SoldierAnimConst.XINGJIN, WrapMode.Loop);
 
+        // TODO 重巡路条件
         // 重新寻路
         ReFindPath();
     }
@@ -43,7 +51,12 @@ public class Soldier_Xingjin_State : SoldierFSMState
 
     public override void Action(SoldierFSMSystem fsm)
     {
-        
+        // TODO 判断当前目标是否有效, 如果无效则重新寻路
+        // 目标是否已死亡
+        if (targetDisplay == null || targetDisplay.ClusterData == null)
+        {
+            ReFindPath();
+        }
     }
 
 
@@ -83,7 +96,11 @@ public class Soldier_Xingjin_State : SoldierFSMState
         //clusterData.PushTargetList(Utils.NumToPostionByList(LoadMap.Single.MapPlane.transform.position, path, ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth, ClusterManager.Single.MapHeight));
     }
 
-
+    /// <summary>
+    /// 获取目标类型
+    /// </summary>
+    /// <param name="myType"></param>
+    /// <returns></returns>
     private ObjectID.ObjectType[] GetTypeArray(ObjectID.ObjectType myType)
     {
         ObjectID.ObjectType[] result = null;
@@ -102,7 +119,11 @@ public class Soldier_Xingjin_State : SoldierFSMState
         return result;
     }
 
-
+    /// <summary>
+    /// 获取最近对方建筑位置
+    /// </summary>
+    /// <param name="displayList"></param>
+    /// <returns></returns>
     private Vector3 GetClosestBuildingPos(IList<DisplayOwner> displayList)
     {
         var result = Vector3.zero;
@@ -117,11 +138,11 @@ public class Soldier_Xingjin_State : SoldierFSMState
                 if (distance < minDistance)
                 {
                     minDistance = distance;
+                    targetDisplay = display;
                     result = display.GameObj.transform.position;
                 }
             }
         }
-
         return result;
     }
 

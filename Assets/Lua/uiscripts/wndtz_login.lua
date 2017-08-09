@@ -26,7 +26,7 @@ function class_wnd_login:OnShowDone()
                     
 			--jyp cardyc测试
            
-	        -- Message_Manager.SendPB_10001()
+	        -- 
             -- ui_manager:ShowWB(WNDTYPE.Cardyc)
         end
     end
@@ -34,6 +34,7 @@ end
 
 
 function class_wnd_login:OnAddHandler()
+    Message_Manager.SendPB_10001()
     Message_Manager:OnAddHandler()
 end
 return class_wnd_login

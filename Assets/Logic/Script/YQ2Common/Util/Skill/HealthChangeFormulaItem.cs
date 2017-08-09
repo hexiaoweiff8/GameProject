@@ -98,7 +98,7 @@ public class HealthChangeFormulaItem : AbstractFormulaItem
         {
             throw new Exception(errorMsg);
         }
-        
+
         // 替换数据
         ReplaceData(paramsPacker);
         // 数据本地化
@@ -129,7 +129,8 @@ public class HealthChangeFormulaItem : AbstractFormulaItem
                 ReleaseMember = targetDisPlayOwner,
                 TypeLevel1 = TriggerLevel1.Fight,
                 TypeLevel2 = myDemageOrCure == DemageOrCure.Cure ? TriggerLevel2.BeCure : TriggerLevel2.BeAttack,
-                IsNotLethal = myIsNotLethal
+                IsNotLethal = myIsNotLethal,
+                DemageType = DemageType.SkillAttackDemage
             });
             callback();
         }, myFormulaType);
@@ -145,6 +146,16 @@ public enum DemageOrCure
 {
     Demage = 0,         // 伤害
     Cure = 1            // 治疗
+}
+
+/// <summary>
+/// 伤害类型
+/// </summary>
+public enum DemageType
+{
+    None = 0,
+    NormalAttackDemage = 1,
+    SkillAttackDemage = 2,
 }
 
 /// <summary>

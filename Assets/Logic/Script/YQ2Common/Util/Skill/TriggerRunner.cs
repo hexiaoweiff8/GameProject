@@ -28,22 +28,24 @@ public class TriggerRunner : MonoBehaviour
         // 初始化事件
         settlementDamageOrCure = (type1, type2, trigger, alldata) =>
         {
+            var isChange = false;
             // 治疗结算
             if (type1 == TriggerLevel1.Fight && type2 == TriggerLevel2.BeCure)
             {
                 alldata.MemberData.CurrentHP += trigger.HealthChangeValue;
+                isChange = true;
             }
             // 伤害结算
             if (type1 == TriggerLevel1.Fight && type2 == TriggerLevel2.BeAttack)
             {
-                alldata.MemberData.CurrentHP -= trigger.HealthChangeValue;
+                alldata.MemberData.SetCurrentHP(alldata.MemberData.CurrentHP - trigger.HealthChangeValue);
                 if (alldata.MemberData.CurrentHP < Utils.ApproachZero)
                 {
-                    alldata.MemberData.CurrentHP = 0;
+                    alldata.MemberData.SetCurrentHP(0);
                     // 并判断该伤害是否致死, 如果不致死则生命值设置为1
                     if (trigger.IsNotLethal)
                     {
-                        alldata.MemberData.CurrentHP = 1;
+                        alldata.MemberData.SetCurrentHP(1);
                     }
                     else
                     {
@@ -74,6 +76,19 @@ public class TriggerRunner : MonoBehaviour
                         TypeLevel2 = TriggerLevel2.Absorption
                     });
                 }
+                isChange = true;
+            }
+
+            // 如果血量有变动则抛出血量变动事件
+            if (isChange)
+            {
+                tmpList.Add(new TriggerData()
+                {
+                    ReceiveMember = trigger.ReleaseMember,
+                    ReleaseMember = trigger.ReceiveMember,
+                    TypeLevel1 = TriggerLevel1.Fight,
+                    TypeLevel2 = TriggerLevel2.HealthChange
+                });
             }
         };
     }
@@ -97,13 +112,13 @@ public class TriggerRunner : MonoBehaviour
         if (allData.MemberData != null)
         {
             // 抛出None事件用于持续技能执行
-            SkillManager.Single.SetTriggerData(new TriggerData()
-            {
-                ReceiveMember = display,
-                ReleaseMember = display,
-                TypeLevel1 = TriggerLevel1.None,
-                TypeLevel2 = TriggerLevel2.None
-            });
+            //SkillManager.Single.SetTriggerData(new TriggerData()
+            //{
+            //    ReceiveMember = display,
+            //    ReleaseMember = display,
+            //    TypeLevel1 = TriggerLevel1.None,
+            //    TypeLevel2 = TriggerLevel2.None
+            //});
             // 触发当前单位的所有事件
             SkillManager.Single.SetEachAction(allData.MemberData.ObjID, (type1, type2, trigger) =>
             {
@@ -137,20 +152,13 @@ public class TriggerRunner : MonoBehaviour
         // 检查范围技能
         for (var i = 0; i < allData.RemainInfoList.Count; i++)
         {
-            try
+            var remain = allData.RemainInfoList[i];
+            if (remain.CheckRange())
             {
-                var remain = allData.RemainInfoList[i];
-                if (remain.CheckRange())
-                {
-                    // 如果范围技能已结束, 则删除
-                    allData.RemainInfoList.RemoveAt(i);
-                    i--;
-                    RemainManager.Single.DelRemainInstance(remain.AddtionId);
-                }
-            }
-            catch
-            {
-                int w = 0;
+                // 如果范围技能已结束, 则删除
+                allData.RemainInfoList.RemoveAt(i);
+                i--;
+                RemainManager.Single.DelRemainInstance(remain.AddtionId);
             }
         }
     }

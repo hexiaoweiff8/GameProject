@@ -27,7 +27,7 @@ namespace DeveloperConsole.CommandFramework
         }
         public void RegisterCommand(string command, CommandBase commandClass)
         {
-            UnityEngine.Debug.Log("import " + command + " " + commandClass.GetType().Name);
+            //UnityEngine.Debug.Log("import " + command + " " + commandClass.GetType().Name);
             repository[command] = commandClass;
         }
         /// <summary>

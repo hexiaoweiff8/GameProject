@@ -29,6 +29,7 @@ public class UtilsWrap
 		L.RegFunction("GetMapDataByFileName", GetMapDataByFileName);
 		L.RegFunction("GetTheta", GetTheta);
 		L.RegFunction("WithOutY", WithOutY);
+		L.RegFunction("V3ToV2WithouY", V3ToV2WithouY);
 		L.RegFunction("GetRange", GetRange);
 		L.RegFunction("GetTwoPointDistance2D", GetTwoPointDistance2D);
 		L.RegFunction("CopyArray", CopyArray);
@@ -76,6 +77,8 @@ public class UtilsWrap
 		L.RegConstant("PiToAngle", 57.2957801818848);
 		L.RegConstant("TicksTimeToSecond", 10000000);
 		L.RegConstant("EffectLayer", 12);
+		L.RegVar("TargetPointSelectorXKey", get_TargetPointSelectorXKey, null);
+		L.RegVar("TargetPointSelectorYKey", get_TargetPointSelectorYKey, null);
 		L.RegVar("RadianToAngle", get_RadianToAngle, null);
 		L.RegVar("AngleToRadian", get_AngleToRadian, null);
 		L.RegVar("HalfPI", get_HalfPI, null);
@@ -538,6 +541,23 @@ public class UtilsWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int V3ToV2WithouY(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 1);
+			UnityEngine.Vector2 o = Utils.V3ToV2WithouY(arg0);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int GetRange(IntPtr L)
 	{
 		try
@@ -671,6 +691,34 @@ public class UtilsWrap
 			Utils obj = (Utils)ToLua.CheckObject(L, 1, typeof(Utils));
 			obj.StopMove();
 			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_TargetPointSelectorXKey(IntPtr L)
+	{
+		try
+		{
+			LuaDLL.lua_pushstring(L, Utils.TargetPointSelectorXKey);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_TargetPointSelectorYKey(IntPtr L)
+	{
+		try
+		{
+			LuaDLL.lua_pushstring(L, Utils.TargetPointSelectorYKey);
+			return 1;
 		}
 		catch(Exception e)
 		{

@@ -81,6 +81,7 @@ public class BuffFormulaItem : AbstractFormulaItem
         // 替换数据
         ReplaceData(paramsPacker);
         // 数据本地化
+        var myFormulaType = FormulaType;
         var myBuffTarget = BuffTarget;
         var myBuffNum = BuffNum;
         var targetDisplayOwner = myBuffTarget == 0 ? paramsPacker.ReleaseMember : paramsPacker.ReceiverMenber;
@@ -105,7 +106,7 @@ public class BuffFormulaItem : AbstractFormulaItem
             BuffManager.Single.DoBuff(buffInfo, BuffDoType.Attach, FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(buffInfo.ReleaseMember, buffInfo.ReceiveMember, buffInfo, 1, buffInfo.IsNotLethal));
             callback();
         },
-        FormulaType);
+        myFormulaType);
 
         return result;
     }

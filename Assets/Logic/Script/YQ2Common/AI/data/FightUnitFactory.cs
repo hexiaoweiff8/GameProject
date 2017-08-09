@@ -56,9 +56,13 @@ public class FightUnitFactory {
     }
 
 
-
+    /// <summary>
+    /// 删除单位
+    /// </summary>
+    /// <param name="obj">被删除单位数据</param>
     public static void DeleteUnit(VOBase obj)
     {
-        DataManager.Single.Delete<VOBase>(obj.ObjID);
+        DataManager.Single.Delete(obj.ObjID);
+        DisplayerManager.Single.DelDisplay(obj.ObjID);
     }
 }

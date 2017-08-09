@@ -1,8 +1,10 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using System.Reflection;
 
 public class SoldierFSMControl{
 
@@ -35,50 +37,8 @@ public class SoldierFSMControl{
         fsm = new SoldierFSMSystem();
         fsm.Display = obj;
 
-        ConfigureState();
-    }
-
-    /// <summary>
-    /// 配置状态 持续扩展
-    /// </summary>
-    private void ConfigureState()
-    {
-        Soldier_Ruchang_State ruchang = new Soldier_Ruchang_State();
-        ruchang.AddTrigger(SoldierTriggerID.RuChang, SoldierStateID.RuChang);
-        fsm.AddState(ruchang);
-
-        Soldier_Daiji_State daiji = new Soldier_Daiji_State();
-        daiji.AddTrigger(SoldierTriggerID.DaiJi, SoldierStateID.DaiJi);
-        fsm.AddState(daiji);
-
-        Soldier_Xingjin_State xingjin = new Soldier_Xingjin_State();
-        xingjin.AddTrigger(SoldierTriggerID.Xingjin, SoldierStateID.Xingjin);
-        fsm.AddState(xingjin);
-
-        Soldier_Zhunbeizhandou_State zhunbeizhandou = new Soldier_Zhunbeizhandou_State();
-        zhunbeizhandou.AddTrigger(SoldierTriggerID.Zhunbeizhandou, SoldierStateID.Zhunbeizhandou);
-        fsm.AddState(zhunbeizhandou);
-
-        Soldier_PutongGongji_State putong = new Soldier_PutongGongji_State();
-        putong.AddTrigger(SoldierTriggerID.PutongGongji, SoldierStateID.PutongGongji);
-        fsm.AddState(putong);
-
-        Soldier_JinengGongji_State jineng = new Soldier_JinengGongji_State();
-        jineng.AddTrigger(SoldierTriggerID.JinengGongji, SoldierStateID.JinengGongji);
-        fsm.AddState(jineng);
-
-        Soldier_Siwang_State siwang = new Soldier_Siwang_State();
-        siwang.AddTrigger(SoldierTriggerID.SiWang, SoldierStateID.SiWang);
-        fsm.AddState(siwang);
-
-        Soldier_Zhuiji_State zhuiji = new Soldier_Zhuiji_State();
-        zhuiji.AddTrigger(SoldierTriggerID.ZhuiJi, SoldierStateID.ZhuiJi);
-        fsm.AddState(zhuiji);
-    }
-
-    public void Destory()
-    {
-        fsm.Destory();
+        // 初始化行为状态机
+        InitState(obj.ClusterData.AllData.MemberData.BehaviorType);
     }
 
     public void UpdateFSM() //作为驱动源
@@ -86,6 +46,50 @@ public class SoldierFSMControl{
         if (_iSAwake) return;
         fsm.CurrentState.CheckTrigger(fsm);
         fsm.CurrentState.Action(fsm);
+    }
+
+    public void Destory()
+    {
+        fsm.Destory();
+    }
+
+    /// <summary>
+    /// 初始化行为状态机
+    /// </summary>
+    /// <param name="behaviorType"></param>
+    public void InitState(int behaviorType)
+    {
+        SetStateMappingConfig(SoldierFSMFactory.GetBehaviorMappingDicById(behaviorType), 
+            SoldierFSMFactory.GetTriggerFuncDicById(behaviorType));
+    }
+
+
+    /// <summary>
+    /// 设置切换映射关系
+    /// </summary>
+    /// <param name="mapDic">切换关系列表</param>
+    /// <param name="triggerFuncDic">节点具体行为列表</param>
+    public void SetStateMappingConfig(Dictionary<SoldierStateID, List<SoldierStateID>> mapDic, Dictionary<SoldierTriggerID, Func<SoldierFSMSystem, bool>> triggerFuncDic)
+    {
+        if (mapDic == null)
+        {
+            return;
+        }
+
+        foreach (var kv in mapDic)
+        {
+            var keyType = SoldierFSMFactory.GetStateTypeByStateId(kv.Key);
+            var keyStateInvoke = (SoldierFSMState)keyType.InvokeMember("", BindingFlags.Public | BindingFlags.CreateInstance,
+                null, null, null);
+
+            foreach (var mapStateId in kv.Value)
+            {
+                // 设置映射关系
+                keyStateInvoke.AddMappingTrigger(SoldierFSMFactory.GetTriggerByStateId(mapStateId), triggerFuncDic[SoldierFSMFactory.GetTriggerByStateId(mapStateId)]);
+            }
+            // 添加状态
+            fsm.AddState(keyStateInvoke);
+        }
     }
 
     ///// <summary>

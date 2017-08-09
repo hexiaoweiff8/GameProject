@@ -208,7 +208,11 @@ public class SkillManager
                 ReleaseTime = skillInfo.ReleaseTime,
                 TickTime = skillInfo.TickTime,
                 TriggerLevel1 = skillInfo.TriggerLevel1,
-                TriggerLevel2 = skillInfo.TriggerLevel2
+                TriggerLevel2 = skillInfo.TriggerLevel2,
+                DemageChange = skillInfo.DemageChange,
+                DemageChangeProbability = skillInfo.DemageChangeProbability,
+                DemageChangeTargetType = skillInfo.DemageChangeTargetType,
+                DemageChangeType = skillInfo.DemageChangeType
             };
             result.AddActionFormulaItem(skillInfo.GetActionFormulaItem());
         }

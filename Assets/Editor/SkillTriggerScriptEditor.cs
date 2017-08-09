@@ -150,11 +150,11 @@ public class SkillTriggerScriptEditor : BaseTriggerScriptEditor
             new List<string>(), 
             new List<string>(), 
             // 类型标识:V3,Txt,Int,Float
-            new List<string>() {"是否等待执行完(0否,1是):", "特效资源Key(或Path):", "释放位置(0放技能方, 1目标方):", "命中位置(0放技能方, 1目标方):", "速度:","飞行轨迹:","缩放(三位 1,1,1):"},
+            new List<string>() {"是否等待执行完(0否,1是):", "特效资源Key(或Path):", "释放位置(0放技能方, 1目标方,2):", "命中位置(0放技能方, 1目标方,2):", "速度:","飞行轨迹:","缩放(三位 1,1,1):"},
             new List<string>() {"是否等待执行完(0否,1是):", "特效资源Key(或Path):", "速度:","飞行轨迹:","缩放(三位 1,1,1):"},
-            new List<string>() {"是否等待执行完(0否,1是):", "特效资源Key(或Path):", "速度:","持续时间:","缩放(三位 1,1,1):"},
-            new List<string>() {"是否等待执行完(0否,1是):", "目标数量上限:", "检测位置(0放技能方, 1目标方):", "检测范围形状(0圆, 1方):", "目标阵营(-1:都触发, 1: 己方, 2: 非己方):", "范围大小(方 第一个宽, 第二个长, 第三个旋转角度, 圆的就取第一个值当半径, 扇形第一个半径, 第二个开口角度, 第三个旋转角度有更多的参数都放进来):"},
-            new List<string>() {"是否等待执行完(0否,1是):", "目标数量上限:", "滑动速度:", "检测宽度:", "检测总长度:", "目标阵营(-1:都触发, 1: 己方, 2: 非己方):"},
+            new List<string>() {"是否等待执行完(0否,1是):", "特效资源Key(或Path):", "位置(0放技能方, 1目标方,2):", "速度:","持续时间:","缩放(三位 1,1,1):"},
+            new List<string>() {"是否等待执行完(0否,1是):", "目标数量上限:", "检测位置(0放技能方, 1目标方,2):", "检测范围形状(0圆, 1方):", "目标阵营(-1:都触发, 1: 己方, 2: 非己方):", "范围大小(方 第一个宽, 第二个长, 第三个旋转角度, 圆的就取第一个值当半径, 扇形第一个半径, 第二个开口角度, 第三个旋转角度有更多的参数都放进来):"},
+            new List<string>() {"是否等待执行完(0否,1是):", "目标数量上限:", "目标位置(0放技能方, 1目标方,2):", "释放位置(0放技能方, 1目标方,2):", "滑动速度:", "检测宽度:", "检测总长度:", "目标阵营(-1:都触发, 1: 己方, 2: 非己方):"},
             new List<string>() {"是否等待执行完(0否,1是):", "音效Key(或Path):", "起始时间:", "播放时长:","是否循环(0/1):", "循环次数:"},
             new List<string>() {"是否等待执行完(0否,1是):", "Buff ID:", "Buff目标(0自己/1对方)"},
             new List<string>() {"是否等待执行完(0否,1是):", "固定/百分比(0/1)","伤害/治疗(0/1):", "目标(自己/对方)(0/1):","数值固定/百分比(0-1):"},
@@ -162,7 +162,8 @@ public class SkillTriggerScriptEditor : BaseTriggerScriptEditor
             new List<string>() {"是否等待执行完(0否,1是):", "Skill ID:"},
             new List<string>() {"是否等待执行完(0否,1是):", "是否停止后面(0/1):", "条件:","条件内容:"},
             new List<string>() {"是否等待执行完(0否,1是):", "吸收量:", "每次百分比(0-1):","是否吸收过量伤害(true/false):"},
-            new List<string>() {"是否等待执行完(0否,1是):", "目标(0自己/1对方):", "Remain编号:","是否跟随:"},
+            new List<string>() {"是否等待执行完(0否,1是):", "目标(0自己/1对方/2):", "Remain编号:","是否跟随:"},
+            new List<string>() {"是否等待执行完(0否,1是):", "相对(0自己/1对方/2选择点/3我到你方向/4你到我方向):", "距离:","角度:"},
         };
         DataParamTitles = new []
         {
@@ -176,6 +177,7 @@ public class SkillTriggerScriptEditor : BaseTriggerScriptEditor
             new List<string>(){"事件Level2:"},
             new List<string>(){"tick时间(单位秒):"},
             new List<string>(){"变更属性:", "变更值:", "变更类型(0绝对值,1百分比0-1):"},
+            new List<string>(){"是否为主动技能(true/false,目标选择数据Id):"},
         };
         
     }
@@ -192,12 +194,6 @@ public class SkillTriggerScriptEditor : BaseTriggerScriptEditor
         {
             switch (TriggerType)
             {
-                //case TriigerType.PlayAnimation:
-                //    ret += "PlayAnimation";
-                //    break;
-                //case TriigerType.SingleDamage:
-                //    ret += "SingleDamage";
-                //    break;
                 case TriggerType.LeftBracket:
                     ret += "{";
                     break;
@@ -243,6 +239,9 @@ public class SkillTriggerScriptEditor : BaseTriggerScriptEditor
                 case TriggerType.Remain:
                     ret += "Remain";
                     break;
+                case TriggerType.TargetPointSelector:
+                    ret += "TargetPointSelector";
+                    break;
                 default:
                     return String.Empty;
             }
@@ -251,12 +250,6 @@ public class SkillTriggerScriptEditor : BaseTriggerScriptEditor
         {
             switch (DataType)
             {
-                //case TriigerType.PlayAnimation:
-                //    ret += "PlayAnimation";
-                //    break;
-                //case TriigerType.SingleDamage:
-                //    ret += "SingleDamage";
-                //    break;
                 case DataType.LevelData:
                     ret += "";
                     isLevelData = true;
@@ -288,11 +281,10 @@ public class SkillTriggerScriptEditor : BaseTriggerScriptEditor
                 case DataType.ChangeData:
                     ret += "ChangeData";
                     break;
+                case DataType.IsActive:
+                    ret += "IsActive";
+                    break;
                     
-    //TriggerLevel1 = 6,
-    //TriggerLevel2 = 7,
-    //TickTime = 8,
-    //ChangeData = 9,
                 default:
                     return String.Empty;
             }

@@ -31,6 +31,9 @@ public static class FormulaConstructor
         {"ResistDemage", typeof(ResistDemageFormulaItem)},
         {"Remain", typeof(RemainFormulaItem)},
         {"TargetPointSelector", typeof(TargetPointSelectorFormulaItem)},
+        {"Death", typeof(DeathFormulaItem)},
+        {"SummonedUnit", typeof(SummonedFormulaItem)},
+        {"LifeDrain", typeof(LifeDrainFormulaItem)},
         
     };
 
@@ -207,7 +210,7 @@ public static class FormulaConstructor
      Skill 释放技能                   参数 是否等待完成,被释放技能,技能接收方(0释放者,1被释放者)
 
      -----------------位置--------------------
-     Move 位置移动                    参数 是否等待完成,移动速度,是否瞬移(0: 否, 1: 是(如果是瞬移则速度无效))
+     Move 位置移动                    参数 是否等待完成,释放位置(0放技能方, 1目标方, 2目标点选择器选的的位置),移动速度,是否瞬移(0: 否, 1: 是(如果是瞬移则速度无效))
 
      -----------------条件选择----------------
      If 条件选择                      参数 是否等待完成,是否中断后续行为,条件, 条件内容
@@ -828,6 +831,39 @@ public static class FormulaConstructor
                     skillInfo.ChangeDataTypeDic.Add(propertyName, propertyType);
                 }
                 break;
+                case "DemageChange":
+                {
+                    // 解析数据
+                    var values = line.Substring(start + 1, end - start - 1).Split(',');
+                    // 类型 (0:伤害增强/1:伤害减免)
+                    var type = Convert.ToInt32(values[0].Trim());
+                    // 伤害增强/减免值(百分比, 1为100%)
+                    var demageVal = Convert.ToSingle(values[1].Trim());
+                    // 产生伤害增强/减免概率(百分比, 1为100%)
+                    var probability = Convert.ToSingle(values[2].Trim());
+                    // 目标/来源类型
+                    var targetType = (DemageAdditionOrReductionTargetType)Enum.Parse(typeof(DemageAdditionOrReductionTargetType), values[3].Trim());
+
+                    skillInfo.DemageChangeType = type;
+                    skillInfo.DemageChange = demageVal;
+                    skillInfo.DemageChangeProbability = probability;
+                    skillInfo.DemageChangeTargetType = targetType;
+                }
+                break;
+                case "IsActive":
+                {
+                    var values = line.Substring(start + 1, length).Trim().Split(',');
+                    if (values.Length == 2)
+                    {
+                        skillInfo.IsActive = Convert.ToBoolean(values[0].Trim());
+                        skillInfo.WeightData = new SelectWeightData(SData_armyaim_c.Single.GetDataOfID(Convert.ToInt32(values[1].Trim())));
+                    }
+                    else
+                    {
+                        skillInfo.IsActive = Convert.ToBoolean(values[0].Trim());
+                    }
+                }
+                break;
                 case "ReleaseTime":
                 {
                     skillInfo.ReleaseTime = Convert.ToInt32(line.Substring(start + 1, length).Trim());
@@ -965,11 +1001,11 @@ public static class FormulaConstructor
                         // 获取值
                         var values = line.Substring(start + 1, end - start - 1).Split(',');
                         // 属性名称
-                        var propertyName = values[0];
+                        var propertyName = values[0].Trim();
                         // 属性值
-                        var propertyValue = values[1];
+                        var propertyValue = values[1].Trim();
                         // 属性值类型
-                        var propertyType = (ChangeDataType)Enum.Parse(typeof(ChangeDataType), values[2]);
+                        var propertyType = (ChangeDataType)Enum.Parse(typeof(ChangeDataType), values[2].Trim());
                         // 反射获取类中的属性
                         var property = buffInfo.ChangeData.GetType().GetProperty(propertyName);
                         if (property == null)
@@ -987,12 +1023,25 @@ public static class FormulaConstructor
                         buffInfo.ChangeDataTypeDic.Add(propertyName, propertyType);
                     }
                     break;
-                //case "ExistType":
-                //    {
-                //        // buff存在状态
-                //        buffInfo.ExistType = (BuffExistType)Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
-                //    }
-                //    break;
+                case "DemageChange":
+                    {
+                        // 解析数据
+                        var values = line.Substring(start + 1, end - start - 1).Split(',');
+                        // 类型 (0:伤害增强/1:伤害减免)
+                        var type = Convert.ToInt32(values[0].Trim());
+                        // 伤害增强/减免值(百分比, 1为100%)
+                        var demageVal = Convert.ToSingle(values[1].Trim());
+                        // 产生伤害增强/减免概率(百分比, 1为100%)
+                        var probability = Convert.ToSingle(values[2].Trim());
+                        // 目标/来源类型
+                        var targetType = (DemageAdditionOrReductionTargetType)Enum.Parse(typeof(DemageAdditionOrReductionTargetType), values[3].Trim());
+
+                        buffInfo.DemageChangeType = type;
+                        buffInfo.DemageChange = demageVal;
+                        buffInfo.DemageChangeProbability = probability;
+                        buffInfo.DemageChangeTargetType = targetType;
+                    }
+                    break;
                 case "DetachQualified":
                     {
                         // buff的Detach条件
@@ -1015,6 +1064,12 @@ public static class FormulaConstructor
                     {
                         // buff是否不致死
                         buffInfo.IsNotLethal = Convert.ToBoolean(line.Substring(start + 1, end - start - 1).Trim());
+                    }
+                    break;
+                case "IsCouldNotClear":
+                    {
+                        // buff是否不可清除
+                        buffInfo.IsCouldNotClear = Convert.ToBoolean(line.Substring(start + 1, end - start - 1).Trim());
                     }
                     break;
                 case "Description":
@@ -1202,7 +1257,7 @@ public enum TriggerLevel2
     EnemyHide = 6,              // 有敌方隐形单位
 
 
-    HealthScope = 7,            // 血量在一定范围内
+    HealthChange = 7,           // 血量变动
     Attack = 8,                 // 攻击时
     Hit = 9,                    // 命中时
     BeAttack = 10,              // 被攻击时
@@ -1217,7 +1272,4 @@ public enum TriggerLevel2
     TickTime = 18,              // 每XX秒触发一次
     SafeTime = 19,              // 安全XX时长时
     ClearScope = 20,            // 范围内XX时长无敌人时
-
-    BuffDown = 21,              // XXBuff消失时
-    TakeBuffDie = 22,           // 带XXBuff死亡时
 }

@@ -56,23 +56,60 @@ end
 
 ---初始化剩余卡牌信息
 function fight_model:initMyCards()
-    sdata_testcardplan_data:Foreach(
-    function (key, value)
+    local cardTbl = cardModel:getCardTbl()
+    sdata_cardplanmine_data:Foreach(
+        function (key, value)
             local card = {
                 id = 0,
                 num = 0,
+                lv = 0,
+                starLv = 0,
                 rarity = 0,
                 TrainCost = 0
             }
-            card.id = value[1]
-            card.num = value[2]
-            card.rarity = value[3]
-            print(card.id)
 
-            card.TrainCost = cardUtil:getTrainCost(card.id)
-            table.insert(self.enemyPaiKutb, card)
-            table.insert(self.paiKutb, card)
-    end)
+            if cardTbl[value[1]] then
+                card.id = value[1]
+                card.num = value[2]
+                card.lv = cardTbl[value[1]].lv
+                card.starLv = cardTbl[value[1]].star
+                card.rarity = cardTbl[value[1]].rlv
+                card.TrainCost = cardUtil:getTrainCost(card.id)
+                table.insert(self.paiKutb, card)
+            else
+                Debugger.LogWarning(value[1].." 卡牌不存在！！！")
+            end
+
+        end)
+    sdata_cardplanenemy_data:Foreach(
+        function (key, value)
+            local card = {
+                id = 0,
+                num = 0,
+                lv = 0,
+                starLv = 0,
+                rarity = 0,
+                TrainCost = 0
+            }
+
+            if cardTbl[value[1]] then
+                card.id = value[1]
+                card.num = value[2]
+                card.lv = cardTbl[value[1]].lv
+                card.starLv = cardTbl[value[1]].star
+                card.rarity = cardTbl[value[1]].rlv
+                card.TrainCost = cardUtil:getTrainCost(card.id)
+                table.insert(self.enemyPaiKutb, card)
+            else
+                Debugger.LogWarning(value[1].." 卡牌不存在！！！")
+            end
+
+        end)
+
+
+
+
+
     --打乱敌人牌库
     table.upset(self.enemyPaiKutb)
     --取前4张为手牌库

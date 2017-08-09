@@ -22,6 +22,7 @@ public class SData_currency_c : MonoEX.Singleton<SData_currency_c>
 					case "Field": dif.Field = (string)o22; break;
 					case "Name": dif.Name = (string)o22; break;
 					case "Quality": dif.Quality = (short)(double)o22; break;
+					case "ItemIcon": dif.ItemIcon = (string)o22; break;
 					case "Icon": dif.Icon = (string)o22; break;
 					case "FunctionDes": dif.FunctionDes = (string)o22; break;
                 }
@@ -60,6 +61,10 @@ public struct currency_cInfo
 	 ///品质
 	 /// </summary>
 	public short Quality;
+	 /// <summary>
+	 ///图标
+	 /// </summary>
+	public string ItemIcon;
 	 /// <summary>
 	 ///图标
 	 /// </summary>

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 
 public abstract class SoldierFSMTrigger {
@@ -14,5 +15,10 @@ public abstract class SoldierFSMTrigger {
 
     public abstract void Init();
 
-    public abstract bool CheckTrigger(SoldierFSMSystem fsm);
+    //public abstract bool CheckTrigger(SoldierFSMSystem fsm);
+
+    /// <summary>
+    /// 检测方法
+    /// </summary>
+    public Func<SoldierFSMSystem, bool> CheckTriggerFunc;
 }

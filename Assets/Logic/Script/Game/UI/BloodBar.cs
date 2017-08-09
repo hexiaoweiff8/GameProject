@@ -10,6 +10,7 @@ public class BloodBar : MonoBehaviour
     {
         BloodBarSprite1 = transform.Find("bg1").GetComponent<UISprite>();
         BloodBarSprite2 = transform.Find("bg2").GetComponent<UISprite>();
+        this.gameObject.SetActive(false);
     }
 
 
@@ -33,6 +34,10 @@ public class BloodBar : MonoBehaviour
     /// <param name="value"></param>
     public void SetBloodBarValue(float value)
     {
+        if (value < 1)
+        {
+            this.gameObject.SetActive(true);
+        }
         BloodBarSprite2.fillAmount = value;
     }
 

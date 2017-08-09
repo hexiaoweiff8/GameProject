@@ -19,6 +19,8 @@ public class Util_TimerWrap
 		L.RegVar("IsPause", get_IsPause, null);
 		L.RegVar("IsLoop", get_IsLoop, null);
 		L.RegVar("LoopTime", get_LoopTime, null);
+		L.RegVar("OutTime", get_OutTime, null);
+		L.RegVar("StartTime", get_StartTime, null);
 		L.RegVar("TimesUpDo", get_TimesUpDo, set_TimesUpDo);
 		L.RegVar("KillDo", get_KillDo, set_KillDo);
 		L.RegVar("IsStop", get_IsStop, null);
@@ -33,7 +35,15 @@ public class Util_TimerWrap
 		{
 			int count = LuaDLL.lua_gettop(L);
 
-			if (count == 2)
+			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(float), typeof(float)))
+			{
+				float arg0 = (float)LuaDLL.luaL_checknumber(L, 1);
+				float arg1 = (float)LuaDLL.luaL_checknumber(L, 2);
+				Util.Timer obj = new Util.Timer(arg0, arg1);
+				ToLua.PushObject(L, obj);
+				return 1;
+			}
+			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(float), typeof(bool)))
 			{
 				float arg0 = (float)LuaDLL.luaL_checknumber(L, 1);
 				bool arg1 = LuaDLL.luaL_checkboolean(L, 2);
@@ -247,6 +257,44 @@ public class Util_TimerWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index LoopTime on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_OutTime(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			Util.Timer obj = (Util.Timer)o;
+			float ret = obj.OutTime;
+			LuaDLL.lua_pushnumber(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index OutTime on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_StartTime(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			Util.Timer obj = (Util.Timer)o;
+			double ret = obj.StartTime;
+			LuaDLL.lua_pushnumber(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index StartTime on a nil value" : e.Message);
 		}
 	}
 

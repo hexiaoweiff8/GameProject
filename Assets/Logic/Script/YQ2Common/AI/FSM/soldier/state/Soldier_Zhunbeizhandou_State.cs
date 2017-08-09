@@ -16,12 +16,12 @@ public class Soldier_Zhunbeizhandou_State : SoldierFSMState
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
 
-        Debug.Log("准备战斗状态:" + fsm.Display.GameObj.name);
+        //Debug.Log("准备战斗状态:" + fsm.Display.GameObj.name);
         if (fsm.IsCanInPutonggongji || fsm.IsCanInJinenggongji)
         {
             //var myself = fsm.Display.RanderControl;
             //myself.ModelRander.SetClip("attack".GetHashCode());
-            fsm.Display.ClusterData.Stop();
+            fsm.Display.ClusterData.StopMove();
         }
 
 

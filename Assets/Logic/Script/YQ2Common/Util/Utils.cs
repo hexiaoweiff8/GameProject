@@ -208,6 +208,11 @@ public class Utils
     /// </summary>
     public const int AirTypeConstantId = 6;
 
+    /// <summary>
+    /// 单位宽度ID
+    /// </summary>
+    public const int UnitWidthId = 7;
+
 
     /// <summary>
     /// 兵种类型-人族

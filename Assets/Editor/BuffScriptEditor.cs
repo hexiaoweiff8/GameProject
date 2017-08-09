@@ -165,6 +165,10 @@ public class BuffScriptEditor : BaseScriptEditor
         {
             BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Remain, this.position);
         }
+        if (GUILayout.Button("目标点选择"))
+        {
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.TargetPointSelector, this.position);
+        }
         
         GUI.color = Color.white;
         EditorGUILayout.EndVertical();

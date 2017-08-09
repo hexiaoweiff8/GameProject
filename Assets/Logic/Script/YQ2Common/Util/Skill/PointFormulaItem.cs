@@ -17,6 +17,7 @@ public class PointFormulaItem : AbstractFormulaItem
     /// 特效出现位置
     /// 0: 释放者位置
     /// 1: 被释放者位置
+    /// 2: 目标点选择的位置
     /// </summary>
     public int TargetPos { get; private set; }
 
@@ -46,29 +47,29 @@ public class PointFormulaItem : AbstractFormulaItem
     public float ScaleZ { get; private set; }
 
 
-    /// <summary>
-    /// 初始化
-    /// </summary>
-    /// <param name="formulaType">是否等待执行完毕 0 否, 1 是</param>
-    /// <param name="effectKey">特效key(或路径)</param>
-    /// <param name="targetPos">出现位置</param>
-    /// <param name="speed">播放速度</param>
-    /// <param name="durTime">持续时间</param>
-    /// <param name="scale">缩放</param>
-    public PointFormulaItem(int formulaType, string effectKey, int targetPos, float speed, float durTime, float[] scale = null)
-    {
-        FormulaType = formulaType;
-        EffectKey = effectKey;
-        TargetPos = targetPos;
-        Speed = speed;
-        DurTime = durTime;
-        if (scale != null && scale.Length == 3)
-        {
-            ScaleX = scale[0];
-            ScaleY = scale[1];
-            ScaleZ = scale[2];
-        }
-    }
+    ///// <summary>
+    ///// 初始化
+    ///// </summary>
+    ///// <param name="formulaType">是否等待执行完毕 0 否, 1 是</param>
+    ///// <param name="effectKey">特效key(或路径)</param>
+    ///// <param name="targetPos">出现位置</param>
+    ///// <param name="speed">播放速度</param>
+    ///// <param name="durTime">持续时间</param>
+    ///// <param name="scale">缩放</param>
+    //public PointFormulaItem(int formulaType, string effectKey, int targetPos, float speed, float durTime, float[] scale = null)
+    //{
+    //    FormulaType = formulaType;
+    //    EffectKey = effectKey;
+    //    TargetPos = targetPos;
+    //    Speed = speed;
+    //    DurTime = durTime;
+    //    if (scale != null && scale.Length == 3)
+    //    {
+    //        ScaleX = scale[0];
+    //        ScaleY = scale[1];
+    //        ScaleZ = scale[2];
+    //    }
+    //}
 
     /// <summary>
     /// 初始化
@@ -151,7 +152,7 @@ public class PointFormulaItem : AbstractFormulaItem
         var scaleZ = ScaleZ;
         IFormula result = new Formula((callback, scope) =>
         {
-            var pos = myTargetPos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
+            var pos = GetPosByType(myTargetPos, paramsPacker, scope);
             // 判断发射与接收位置
             EffectsFactory.Single.CreatePointEffect(myEffectKey, null, pos, new Vector3(scaleX, scaleY, scaleZ), myDurTime, mySpeed, callback, Utils.EffectLayer).Begin();
         }, myFormulaType);

@@ -86,19 +86,19 @@ public class MapManager : Singleton<MapManager>
                         break;
                     case Utils.Obstacle:
                     {
-                            // 障碍物
+                        // 障碍物
                         var paramObj = new CreateActorParam(col, row);
-                        FightUnitFactory.CreateUnit((int) ObjectID.ObjectType.NPCObstacle, paramObj);
+                        FightUnitFactory.CreateUnit((int) ObjectID.ObjectType.NPCObstacle, paramObj).ClusterData.Begin();
                     }
                         break;
                     case Utils.MyBaseId:
-                        {
-                            // 我方基地
+                    {
+                        // 我方基地
                         var pos = Utils.NumToPosition(LoadMap.Single.transform.position, new Vector2(col, row),
                             ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth,
                             ClusterManager.Single.MapHeight);
                         var paramObj = new CreateActorParam(pos.x, pos.z, packer.BaseLevel);
-                        FightUnitFactory.CreateUnit((int) ObjectID.ObjectType.MyJiDi, paramObj);
+                        FightUnitFactory.CreateUnit((int)ObjectID.ObjectType.MyJiDi, paramObj).ClusterData.Begin();
                     }
                         break;
                     case Utils.MyTurretId:
@@ -108,28 +108,28 @@ public class MapManager : Singleton<MapManager>
                             ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth,
                             ClusterManager.Single.MapHeight);
                         var paramObj = new CreateActorParam(pos.x, pos.z, packer.TurretLevel);
-                        FightUnitFactory.CreateUnit((int)ObjectID.ObjectType.MyTower, paramObj);
+                        FightUnitFactory.CreateUnit((int)ObjectID.ObjectType.MyTower, paramObj).ClusterData.Begin();
                     }
                         break;
                     case Utils.EnemyBaseId:
-                        {
-                            // 敌方基地
+                    {
+                        // 敌方基地
                         var pos = Utils.NumToPosition(LoadMap.Single.transform.position, new Vector2(col, row),
                             ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth,
                             ClusterManager.Single.MapHeight);
                         var paramObj = new CreateActorParam(pos.x, pos.z, packer.EnemyBaseLevel);
-                        FightUnitFactory.CreateUnit((int) ObjectID.ObjectType.EnemyJiDi, paramObj);
+                        FightUnitFactory.CreateUnit((int)ObjectID.ObjectType.EnemyJiDi, paramObj).ClusterData.Begin();
                     }
                         break;
                     case Utils.EnemyTurretId:
                     {
                         // 敌方防御塔
-
                         var pos = Utils.NumToPosition(LoadMap.Single.transform.position, new Vector2(col, row),
                             ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth,
                             ClusterManager.Single.MapHeight);
                         var paramObj = new CreateActorParam(pos.x, pos.z, packer.TurretLevel);
-                        FightUnitFactory.CreateUnit((int)ObjectID.ObjectType.EnemyTower, paramObj);
+                        var turret = FightUnitFactory.CreateUnit((int)ObjectID.ObjectType.EnemyTower, paramObj);
+                        turret.ClusterData.Begin();
                     }
                         break;
                 }

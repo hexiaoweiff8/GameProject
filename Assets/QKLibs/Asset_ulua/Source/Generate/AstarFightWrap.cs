@@ -92,11 +92,10 @@ public class AstarFightWrap
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 3);
-			AstarFight obj = (AstarFight)ToLua.CheckObject(L, 1, typeof(AstarFight));
-			int[] arg0 = ToLua.CheckNumberArray<int>(L, 2);
-			int[] arg1 = ToLua.CheckNumberArray<int>(L, 3);
-			System.Collections.Generic.Dictionary<int,int[]> o = obj.setAllZhenxingList(arg0, arg1);
+			ToLua.CheckArgsCount(L, 2);
+			int[] arg0 = ToLua.CheckNumberArray<int>(L, 1);
+			int[] arg1 = ToLua.CheckNumberArray<int>(L, 2);
+			System.Collections.Generic.Dictionary<int,int[]> o = AstarFight.setAllZhenxingList(arg0, arg1);
 			ToLua.PushObject(L, o);
 			return 1;
 		}
@@ -273,19 +272,14 @@ public class AstarFightWrap
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_UnitWidth(IntPtr L)
 	{
-		object o = null;
-
 		try
 		{
-			o = ToLua.ToObject(L, 1);
-			AstarFight obj = (AstarFight)o;
-			int ret = obj.UnitWidth;
-			LuaDLL.lua_pushinteger(L, ret);
+			LuaDLL.lua_pushinteger(L, AstarFight.UnitWidth);
 			return 1;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index UnitWidth on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e);
 		}
 	}
 
@@ -553,19 +547,15 @@ public class AstarFightWrap
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_UnitWidth(IntPtr L)
 	{
-		object o = null;
-
 		try
 		{
-			o = ToLua.ToObject(L, 1);
-			AstarFight obj = (AstarFight)o;
 			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
-			obj.UnitWidth = arg0;
+			AstarFight.UnitWidth = arg0;
 			return 0;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index UnitWidth on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e);
 		}
 	}
 

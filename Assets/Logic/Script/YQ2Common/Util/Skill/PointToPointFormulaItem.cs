@@ -27,15 +27,17 @@ public class PointToPointFormulaItem : AbstractFormulaItem
     /// 释放特效位置
     /// 0: 释放特效单位(默认)
     /// 1: 接受单位位置
+    /// 2: 目标点选择的位置
     /// </summary>
-    private int releasePos = 0;
+    public int ReleasePos = 0;
 
     /// <summary>
     /// 接受特效位置
     /// 0: 释放特效单位
     /// 1: 接受单位位置(默认)
+    /// 2: 目标点选择的位置
     /// </summary>
-    private int receivePos = 1;
+    public int ReceivePos = 1;
 
     /// <summary>
     /// X轴缩放
@@ -52,31 +54,31 @@ public class PointToPointFormulaItem : AbstractFormulaItem
     /// </summary>
     public float ScaleZ { get; private set; }
 
-    /// <summary>
-    /// 初始化
-    /// </summary>
-    /// <param name="formulaType">行为节点类型</param>
-    /// <param name="effectKey">特效Key(或path)</param>
-    /// <param name="speed">飞行速度</param>
-    /// <param name="releasePos">释放位置(0释放者位置,1被释放者位置)</param>
-    /// <param name="receivePos">接收位置(0释放者位置,1被释放者位置)</param>
-    /// <param name="flyType">飞行方式(0抛物线, 1直线, 2 sin线</param>
-    /// <param name="scale">缩放</param>
-    public PointToPointFormulaItem(int formulaType, string effectKey, float speed, int releasePos, int receivePos, TrajectoryAlgorithmType flyType, float[] scale = null)
-    {
-        FormulaType = formulaType;
-        EffectKey = effectKey;
-        Speed = speed;
-        this.releasePos = releasePos;
-        this.receivePos = receivePos;
-        FlyType = flyType;
-        if (scale != null)
-        {
-            ScaleX = scale[0];
-            ScaleY = scale[1];
-            ScaleZ = scale[2];
-        }
-    }
+    ///// <summary>
+    ///// 初始化
+    ///// </summary>
+    ///// <param name="formulaType">行为节点类型</param>
+    ///// <param name="effectKey">特效Key(或path)</param>
+    ///// <param name="speed">飞行速度</param>
+    ///// <param name="releasePos">释放位置(0释放者位置,1被释放者位置)</param>
+    ///// <param name="receivePos">接收位置(0释放者位置,1被释放者位置)</param>
+    ///// <param name="flyType">飞行方式(0抛物线, 1直线, 2 sin线</param>
+    ///// <param name="scale">缩放</param>
+    //public PointToPointFormulaItem(int formulaType, string effectKey, float speed, int releasePos, int receivePos, TrajectoryAlgorithmType flyType, float[] scale = null)
+    //{
+    //    FormulaType = formulaType;
+    //    EffectKey = effectKey;
+    //    Speed = speed;
+    //    this.releasePos = releasePos;
+    //    this.receivePos = receivePos;
+    //    FlyType = flyType;
+    //    if (scale != null)
+    //    {
+    //        ScaleX = scale[0];
+    //        ScaleY = scale[1];
+    //        ScaleZ = scale[2];
+    //    }
+    //}
 
     /// <summary>
     /// 初始化
@@ -105,8 +107,8 @@ public class PointToPointFormulaItem : AbstractFormulaItem
         // 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),命中位置(0放技能方, 1目标方),速度,飞行轨迹, 缩放
         var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
         var effectKey = GetDataOrReplace<string>("EffectKey", array, 1, ReplaceDic);
-        var releasePosArg = GetDataOrReplace<int>("Speed", array, 2, ReplaceDic);
-        var receivePosArg = GetDataOrReplace<int>("Speed", array, 3, ReplaceDic);
+        var releasePosArg = GetDataOrReplace<int>("ReleasePos", array, 2, ReplaceDic);
+        var receivePosArg = GetDataOrReplace<int>("ReceivePos", array, 3, ReplaceDic);
         var speed = GetDataOrReplace<float>("Speed", array, 4, ReplaceDic);
         var flyType = GetDataOrReplace<TrajectoryAlgorithmType>("FlyType", array, 5, ReplaceDic);
 
@@ -119,8 +121,8 @@ public class PointToPointFormulaItem : AbstractFormulaItem
         FormulaType = formulaType;
         EffectKey = effectKey;
         Speed = speed;
-        this.releasePos = releasePosArg;
-        this.receivePos = receivePosArg;
+        ReleasePos = releasePosArg;
+        ReceivePos = receivePosArg;
         FlyType = flyType;
         ScaleX = scaleX;
         ScaleY = scaleY;
@@ -159,8 +161,8 @@ public class PointToPointFormulaItem : AbstractFormulaItem
 
         // 数据本地化
         var myFormulaType = FormulaType;
-        var myRelsPos = releasePos;
-        var myRecvPos = receivePos;
+        var myRelsPos = ReleasePos;
+        var myRecvPos = ReceivePos;
         var myEffectKey = EffectKey;
         var mySpeed = Speed;
         var myFlyType = FlyType;
@@ -170,9 +172,11 @@ public class PointToPointFormulaItem : AbstractFormulaItem
 
         IFormula result = new Formula((callback, scope) =>
         {
-            // 判断发射与接收位置
-            var releasePosition = myRelsPos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
-            var receivePosition = myRecvPos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos;
+            // 起始位置
+            var releasePosition = GetPosByType(myRelsPos, paramsPacker, scope); ;
+
+            // 目标位置
+            var receivePosition = GetPosByType(myRecvPos, paramsPacker, scope);
             // TODO 父级暂时没有
             EffectsFactory.Single.CreatePointToPointEffect(myEffectKey, null, releasePosition,
                                 receivePosition, new Vector3(scaleX, scaleY, scaleZ), mySpeed, myFlyType, callback, Utils.EffectLayer).Begin();

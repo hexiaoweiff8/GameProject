@@ -21,6 +21,8 @@ function power_view:initView(view)
     --能量满
     self.power_full = self.power.transform:Find("full").gameObject
 
+    self.powerTips = self.power.transform:Find("tip").gameObject
+    self.powerTipsLab = self.powerTips.transform:Find("lab").gameObject
 
 end
 

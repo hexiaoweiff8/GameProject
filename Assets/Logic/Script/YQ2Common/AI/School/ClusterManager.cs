@@ -315,14 +315,13 @@ public class ClusterManager : ILoopItem
         {
             foreach (var member in memberInSightScope)
             {
-                // 区分自己
                 // 区分空地属性
                 // 区分阵营
                 if (member.AllData.MemberData.CurrentHP > 0
                     && (myCamp == -1
                     || (isExceptMyCamp && member.AllData.MemberData.Camp != myCamp)
-                    || (!isExceptMyCamp && member.AllData.MemberData.Camp == myCamp)))
-                //&& objId.ID != member.MemberData.ObjID.ID)
+                    || (!isExceptMyCamp && member.AllData.MemberData.Camp == myCamp))
+                    && member.CouldSelect)
                 {
                     list.Add(member);
                 }
@@ -381,7 +380,7 @@ public class ClusterManager : ILoopItem
 
         // 高度控制
         var heightDiff = member.transform.position.y - member.Height;
-        if (heightDiff > Utils.ApproachZero || heightDiff < Utils.ApproachZero)
+        if (heightDiff != 0)
         {
             member.transform.position = new Vector3(member.transform.position.x, member.Height,
                 member.transform.position.z);

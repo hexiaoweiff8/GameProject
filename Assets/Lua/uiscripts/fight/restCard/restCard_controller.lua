@@ -70,6 +70,8 @@ function restCard_controller:initNextCard()
         _view.nextCardBg:GetComponent(typeof(UILabel)).text = stringUtil:getString(10032)
         _view.nextCardSpr.spriteName = cardUtil:getCardIcon(_data.nextCard.id)
         _view.nextCardLabel.text = _data.nextCard.TrainCost
+        _view.nextCardLv:GetComponent("UILabel").text = "LV.".._data.nextCard.lv
+        _view.nextCardStarLv:GetComponent("UILabel").text = "X".._data.nextCard.starLv
     else
         _view.nextCardBg:SetActive(false)
     end

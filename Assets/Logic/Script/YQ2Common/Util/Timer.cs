@@ -28,6 +28,16 @@ namespace Util
         /// </summary>
         public float LoopTime { get; private set; }
 
+        /// <summary>
+        /// 超时时间
+        /// </summary>
+        public float OutTime { get; private set; }
+
+        /// <summary>
+        /// 启动时间
+        /// </summary>
+        public double StartTime { get; private set; }
+
 
         /// <summary>
         /// 时间到执行
@@ -76,6 +86,19 @@ namespace Util
         {
             LoopTime = liveTime;
             IsLoop = isLoop;
+            OutTime = -1f;
+        }
+
+        /// <summary>
+        /// 初始化
+        /// 默认循环
+        /// </summary>
+        /// <param name="liveTime">存活时间(单位 秒) 如果isLoop为true则该值为循环间隔</param>
+        public Timer(float liveTime, float outTime)
+        {
+            LoopTime = liveTime;
+            IsLoop = true;
+            OutTime = outTime;
         }
 
 
@@ -86,6 +109,7 @@ namespace Util
                 IsStop = false;
             // 加入TimeManager中
             stopTime = TimerManager.Single.StartTimerTick + LoopTime;
+            StartTime = TimerManager.Single.StartTimerTick;
             TimerManager.Single.AddTimer(this);
             return this;
         }
@@ -273,14 +297,15 @@ namespace Util
             var itemForTimerList = activityTimerList.GetEnumerator();
             itemForTimerList.MoveNext();
             var current = itemForTimerList.Current;
-            if (current.Key > time)
+            var key = current.Key;
+            if (key > time)
             {
                 // 未到时间
                 return false;
             }
 
             // 删除列表
-            activityTimerList.Remove(current.Key);
+            activityTimerList.Remove(key);
 
             var timerList = current.Value;
             foreach (var timer in timerList)
@@ -292,8 +317,9 @@ namespace Util
                         timer.TimesUpDo();
                     }
 
-                    // 如果是循环执行则将其移至下一次执行
-                    if (timer.IsLoop || timer.IsPause)
+                    // 如果是循环执行并且未超时则将其移至下一次执行
+                    if ((timer.IsLoop && (timer.OutTime < 0 || timer.OutTime > time - timer.StartTime)) 
+                        || timer.IsPause)
                     {
                         timer.NextTick();
                         AddTimer(timer);
