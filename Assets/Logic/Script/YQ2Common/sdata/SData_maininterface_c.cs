@@ -23,6 +23,9 @@ public class SData_maininterface_c : MonoEX.Singleton<SData_maininterface_c>
 					case "Type": dif.Type = (short)(double)o22; break;
 					case "UnlockLevel": dif.UnlockLevel = (short)(double)o22; break;
 					case "UnlockEvent": dif.UnlockEvent = (string)o22; break;
+					case "Prompt": dif.Prompt = (short)(double)o22; break;
+					case "UIDefine": dif.UIDefine = (string)o22; break;
+					case "RedDotRefreshAPI": dif.RedDotRefreshAPI = (string)o22; break;
 					case "Icon": dif.Icon = (string)o22; break;
                 }
             });
@@ -64,6 +67,18 @@ public struct maininterface_cInfo
 	 ///解锁条件
 	 /// </summary>
 	public string UnlockEvent;
+	 /// <summary>
+	 ///红点提示类型(-1:始终不显示;1:根据API返回值决定是否显示;2:根据API返回值决定显示数量)
+	 /// </summary>
+	public short Prompt;
+	 /// <summary>
+	 ///UI界面
+	 /// </summary>
+	public string UIDefine;
+	 /// <summary>
+	 ///各UI界面提供的判断是否显示红点的API(如果lua文件没有被导入:则使用require方式)(注意冒号和点)
+	 /// </summary>
+	public string RedDotRefreshAPI;
 	 /// <summary>
 	 ///图标资源
 	 /// </summary>

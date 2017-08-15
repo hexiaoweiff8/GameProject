@@ -2,6 +2,8 @@ mail_model = {
     mail_data_list={},--储存邮件信息的地方
     new_mail_data={},-- 暂时存邮件信息地方
 
+
+    new_mailNum = 0,--新邮件的数量
 }
 
 
@@ -16,8 +18,18 @@ end
 function mail_model:UpdateData()
     Message_Manager:SendPB_10019()
 end
-function mail_model:insertData(datalist)
 
+function mail_model:InitMode(HCCallback)
+    this.mail_data_list = {}
+    this.new_mail_data = {}
+    this:UpdateData(HCCallback)
+end
+
+function mail_model:UpdateData(HCCallback)
+    Message_Manager:SendPB_10019(HCCallback)
+end
+
+function mail_model:insertData(datalist)
     for i=1,#datalist do
         --required string _id         =1;
         --required string title       =2;
@@ -49,9 +61,26 @@ function mail_model:insertData(datalist)
         --print(i)
         table.insert(this.new_mail_data,tb)
     end
+    --设置新邮件的数量
+    local new_num = 0
+    for i = 1, #this.new_mail_data do
+        if this.new_mail_data[i].new == 0 then
+            new_num = new_num + 1
+        end
+    end
+    this.new_mailNum = new_num
+end
 
-
-
+--设置新邮件的数量
+function mail_model:SetNewNum(num)
+    mail_model.new_mailNum = num
+end
+--获取新邮件数量
+function mail_model:GetNewNum(HCCallback)
+    --先判断邮件数据是否是0如果是两种情况1.没打开过邮件系统所以没新邮件得自己请求，2打开过但是在次请求防止邮件数据更新
+    if HCCallback~=nil then
+        mail_model:InitMode(HCCallback)
+    end
 end
 
 return mail_model

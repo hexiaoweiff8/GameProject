@@ -3848,6 +3848,164 @@ SleepTimeout = {}
 
 function SleepTimeout.New() end
 --*
+Color = {} 
+--*
+--[Comment]
+--consturctor for Color overrides:
+--*
+--Color.New(Single r,Single g,Single b,Single a)
+--Constructs a new Color with given r,g,b,a components.
+--params:
+--r:    Red component.
+--g:    Green component.
+--b:    Blue component.
+--a:    Alpha component.
+
+--*
+
+--Color.New(Single r,Single g,Single b)
+--Constructs a new Color with given r,g,b components and sets a to 1.
+--params:
+--r:    Red component.
+--g:    Green component.
+--b:    Blue component.
+
+--*
+
+function Color.New() end
+--*
+--[Comment]
+-- property: Color Color.red	get	
+--Solid red. RGBA is (1, 0, 0, 1).
+red = nil 
+--*
+--[Comment]
+-- property: Color Color.green	get	
+--Solid green. RGBA is (0, 1, 0, 1).
+green = nil 
+--*
+--[Comment]
+-- property: Color Color.blue	get	
+--Solid blue. RGBA is (0, 0, 1, 1).
+blue = nil 
+--*
+--[Comment]
+-- property: Color Color.white	get	
+--Solid white. RGBA is (1, 1, 1, 1).
+white = nil 
+--*
+--[Comment]
+-- property: Color Color.black	get	
+--Solid black. RGBA is (0, 0, 0, 1).
+black = nil 
+--*
+--[Comment]
+-- property: Color Color.yellow	get	
+--Yellow. RGBA is (1, 0.92, 0.016, 1), but the color is nice to look at!
+yellow = nil 
+--*
+--[Comment]
+-- property: Color Color.cyan	get	
+--Cyan. RGBA is (0, 1, 1, 1).
+cyan = nil 
+--*
+--[Comment]
+-- property: Color Color.magenta	get	
+--Magenta. RGBA is (1, 0, 1, 1).
+magenta = nil 
+--*
+--[Comment]
+-- property: Color Color.gray	get	
+--Gray. RGBA is (0.5, 0.5, 0.5, 1).
+gray = nil 
+--*
+--[Comment]
+-- property: Color Color.grey	get	
+--English spelling for gray. RGBA is the same (0.5, 0.5, 0.5, 1).
+grey = nil 
+--*
+--[Comment]
+-- property: Color Color.clear	get	
+--Completely transparent. RGBA is (0, 0, 0, 0).
+clear = nil 
+--*
+--[Comment]
+-- property: Single Color.grayscale	get	
+--The grayscale value of the color. (Read Only)
+grayscale = nil 
+--*
+--[Comment]
+-- property: Color Color.linear	get	
+--A linear value of an sRGB color.
+linear = nil 
+--*
+--[Comment]
+-- property: Color Color.gamma	get	
+--A version of the color that has had the gamma curve applied.
+gamma = nil 
+--*
+--[Comment]
+-- property: Single Color.maxColorComponent	get	
+--Returns the maximum color component value: Max(r,g,b).
+maxColorComponent = nil 
+--*
+--[Comment]
+-- property: Single Color.Item	get	set	
+Item = nil 
+--*
+----String Color:ToString()
+--String Color:ToString(String format)
+function ToString() end 
+
+----Int32 Color:GetHashCode()
+function GetHashCode() end 
+
+----Boolean Color:Equals(Object other)
+function Equals() end 
+
+----Color Color.Lerp(Color a,Color b,Single t)
+function Color.Lerp() end 
+
+----Color Color.LerpUnclamped(Color a,Color b,Single t)
+function Color.LerpUnclamped() end 
+
+----Single Color:get_Item(Int32 index)
+function get_Item() end 
+
+----Void Color:set_Item(Int32 index,Single value)
+function set_Item() end 
+
+----Void Color.RGBToHSV(Color rgbColor,Single& H,Single& S,Single& V)
+function Color.RGBToHSV() end 
+
+----Color Color.HSVToRGB(Single H,Single S,Single V)
+--Color Color.HSVToRGB(Single H,Single S,Single V,Boolean hdr)
+function Color.HSVToRGB() end 
+
+----Color Color.op_Addition(Color a,Color b)
+function Color.op_Addition() end 
+
+----Color Color.op_Subtraction(Color a,Color b)
+function Color.op_Subtraction() end 
+
+----Color Color.op_Multiply(Color a,Color b)
+--Color Color.op_Multiply(Color a,Single b)
+--Color Color.op_Multiply(Single b,Color a)
+function Color.op_Multiply() end 
+
+----Color Color.op_Division(Color a,Single b)
+function Color.op_Division() end 
+
+----Boolean Color.op_Equality(Color lhs,Color rhs)
+function Color.op_Equality() end 
+
+----Boolean Color.op_Inequality(Color lhs,Color rhs)
+function Color.op_Inequality() end 
+
+----Vector4 Color.op_Implicit(Color c)
+--Color Color.op_Implicit(Vector4 v)
+function Color.op_Implicit() end 
+
 DirectorPlayer = {} 
 --*
 --[Comment]
@@ -14405,7 +14563,7 @@ Name = nil
 -- property: Boolean Wnd.IsVisible	get	
 IsVisible = nil 
 --*
-----Void Wnd:_Hide(Single duration,WShowType wt)
+----Void Wnd:_Hide(Single duration,WShowType wt,Int32 depth)
 function _Hide() end 
 
 ----Void Wnd:_Show(Single duration)
@@ -14479,6 +14637,9 @@ function DestoryFSM() end
 
 ----Void RanderControl:SetBloodBarValue()
 function SetBloodBarValue() end 
+
+----Void RanderControl:CleanTarget()
+function CleanTarget() end 
 
 wndShowHideInfo = {} 
 --*
@@ -14897,14 +15058,20 @@ function InitMap() end
 ----Void AstarFight:Clear()
 function Clear() end 
 
-----Void AstarFight:isZhangAi(Vector3 mp,Int32 index)
+----Void AstarFight:isZhangAi(Vector3 mapPosition,Int32 index)
 function isZhangAi() end 
+
+----Void AstarFight:isQianFengZhangAi(Vector3 mapPosition,Int32 index)
+function isQianFengZhangAi() end 
 
 ----Dictionary`2 AstarFight.setAllZhenxingList(Int32[] cardID,Int32[] level)
 function AstarFight.setAllZhenxingList() end 
 
 ----Void AstarFight:setZhenxingInfo(Transform go,Int32 cardID,Int32 index)
 function setZhenxingInfo() end 
+
+----Void AstarFight:setQianFengInfo(Transform go,Int32 cardID,Int32 index)
+function setQianFengInfo() end 
 
 ----Vector3 AstarFight:getNum(Vector3 p)
 function getNum() end 
@@ -14924,6 +15091,10 @@ UIFollow = {}
 --*
 
 function UIFollow.New() end
+--*
+--[Comment]
+-- property: Transform UIFollow.Target	get	set	
+Target = nil 
 --*
 --[Comment]
 -- property: Boolean UIFollow.useGUILayout	get	set	
@@ -15596,6 +15767,9 @@ EntityID = nil
 -- property: Int32 VOBase.Camp	get	set	
 Camp = nil 
 --*
+----Void VOBase:SetCurrentHP(Single hp)
+function SetCurrentHP() end 
+
 ----Void VOBase:SetSoldierData(armybase_cInfo data)
 function SetSoldierData() end 
 
@@ -15623,6 +15797,14 @@ SelectWeightData = nil
 --[Comment]
 -- property: ArmyAOEData AllData.AOEData	get	set	
 AOEData = nil 
+--*
+--[Comment]
+-- property: EffectData AllData.EffectData	get	set	
+EffectData = nil 
+--*
+--[Comment]
+-- property: ArmyTypeData AllData.ArmyTypeData	get	set	
+ArmyTypeData = nil 
 --*
 --[Comment]
 -- property: IList`1 AllData.SkillInfoList	get	set	
@@ -15787,9 +15969,6 @@ function PopTarget() end
 
 ----Void ClusterData:ClearTarget()
 function ClearTarget() end 
-
-----Void ClusterData:Update()
-function Update() end 
 
 ----Void ClusterData:Destory()
 function Destory() end 
@@ -16183,7 +16362,11 @@ function StartFight() end
 function EndFight() end 
 
 ----Void FightManager:InitMap()
+--Void FightManager:InitMap(Int32[][] obMapInfo,Int32[][] buildingMapInfo)
 function InitMap() end 
+
+----Void FightManager:Clear()
+function Clear() end 
 
 MapDataParamsPacker = {} 
 --*
@@ -16452,6 +16635,22 @@ function InitWindow() end
 
 ----Void MailLoopGrid:OneBtnGet()
 function OneBtnGet() end 
+
+WordFilter = {} 
+--*
+--[Comment]
+--consturctor for WordFilter overrides:
+--*
+--WordFilter.New()
+--*
+
+function WordFilter.New() end
+--*
+----Void WordFilter.AddStirngToFilters(String s)
+function WordFilter.AddStirngToFilters() end 
+
+----String WordFilter.filter(String content,String& result_str,Int32 filter_deep,Boolean check_only,Boolean bTrim,String replace_str)
+function WordFilter.filter() end 
 
 SceneManager = {} 
 --*

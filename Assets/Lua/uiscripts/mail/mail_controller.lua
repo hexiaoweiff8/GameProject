@@ -11,7 +11,7 @@ local mail_panel
 
 
 function mail_controller:OnShowDone()
-    --print("mail_controller:OnShowDone")
+    print("mail_controller:OnShowDone")
 
     view:InitView(self)
     model:InitMode()
@@ -20,6 +20,11 @@ function mail_controller:OnShowDone()
 
     mail_panel = self
     --this.PutDataToLoop()
+end
+
+function mail_controller:OnReOpenDone()
+    print("mail_controller:OnReOpenDone")
+    model:InitMode()
 end
 
 function mail_controller:InitBtn()
@@ -36,16 +41,14 @@ function mail_controller:InitBtn()
     UIEventListener.Get(view.btn_close).onClick = function ()
         print("关闭按钮")
         view.loopSV:InitWindow()
-        ui_manager:DestroyWB(WNDTYPE.mail)
-        --mail_panel:Hide(0)
+        view:CloseWindow()
+        mail_panel:Hide(0)
 
-        --ui_manager:DestroyWB(wnd_base, duration, isPop)
-
-        --mail_panel.gameObject:SetActive(false)
     end
     UIEventListener.Get(view.closeZZ).onClick = function ()
         view.loopSV:InitWindow()
-        ui_manager:DestroyWB(WNDTYPE.mail)
+        view:CloseWindow()
+        mail_panel:Hide(0)
     end
 
 

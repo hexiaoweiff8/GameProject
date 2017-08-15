@@ -240,16 +240,16 @@ public class ClusterData: PositionObject
         targetQueue.Clear();
     }
 
-#if UNITY_EDITOR
-    public void Update()
-    {
-        // 显示所有路径点
-        foreach (var point in targetQueue)
-        {
-            Utils.DrawRect(point, ClusterManager.Single.UnitWidth, ClusterManager.Single.UnitWidth, 0, Color.green);
-        }
-    }
-#endif
+//#if UNITY_EDITOR
+//    public void Update()
+//    {
+//        // 显示所有路径点
+//        foreach (var point in targetQueue)
+//        {
+//            Utils.DrawRect(point, ClusterManager.Single.UnitWidth, ClusterManager.Single.UnitWidth, 0, Color.green);
+//        }
+//    }
+//#endif
 
     public void Destory() {
         // 销毁时从列表中消除当前队员

@@ -37,6 +37,7 @@ WNDTYPE = {
     Main = "ui_main",
     pvpList = "ui_pvpList",
     mail = "ui_mail",
+    dailyMission = "ui_dailyMission",
 }
 UiDefine = luacsv.new(require("pk_tabs/UiDefine"))
 -- 登录窗体组件名列表 
@@ -64,12 +65,13 @@ gameinit.wndlist = {
     {name = WNDTYPE.QianDao, cm = "uiscripts/qiandao/wnd_qiandao_controller"},
     {name = WNDTYPE.chatBubble, cm = "uiscripts/chat/chatBubble/chatBubble_controller"},
 	{name = WNDTYPE.chatWindow, cm = "uiscripts/chat/chatWindow_controller"},
-    --{name = WNDTYPE.PvpGz, cm = "uiscripts/pvpgz/wnd_pvpgz_controller"},
-    --{name = WNDTYPE.BianDui, cm = "uiscripts/biandui/wnd_biandui_controller"},
+    {name = WNDTYPE.PvpGz, cm = "uiscripts/pvpgz/wnd_pvpgz_controller"},
+    {name = WNDTYPE.BianDui, cm = "uiscripts/biandui/wnd_biandui_controller"},
     {name = WNDTYPE.PVE, cm = "uiscripts/PVE/wnd_PVE_controller"},
     {name = WNDTYPE.Main, cm = "uiscripts/main/ui_main_controller"},
      --{name = WNDTYPE.pvpList, cm = "uiscripts/pvp/pvpList/pvpList_controller"},
     {name = WNDTYPE.mail, cm = "uiscripts/mail/mail_controller"},
+    {name = WNDTYPE.dailyMission, cm = "uiscripts/dailyMission/dailyMission_controller"},
 
 }
 _all_Reg_Wnd_list = {}
@@ -80,7 +82,6 @@ function gameinit:InitWnds(initPogressManage, wnds)
     local wndcount = #wnds
     local currIndex = 1
     local eachfunc = function(_, wndInfo)
-            print(wndInfo.cm .. wndInfo.name)
             -- 设置装载进度
             require(wndInfo.cm)(wndInfo.name)
             -- 初始化窗体

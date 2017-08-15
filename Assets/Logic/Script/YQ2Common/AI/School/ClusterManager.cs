@@ -814,6 +814,10 @@ public class ClusterManager : ILoopItem
     /// <param name="argQuadTree"></param>
     private void DrawQuadTreeLine<T>(QuadTree<T> argQuadTree) where T : IGraphicsHolder
     {
+        if (!Debug.logger.logEnabled)
+        {
+            return;
+        }
         var colorForItem = Color.green;
         // 绘制四叉树边框
         Utils.DrawGraphics(argQuadTree.GetRectangle(), Color.white);

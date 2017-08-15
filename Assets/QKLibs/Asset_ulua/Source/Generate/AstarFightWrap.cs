@@ -10,8 +10,10 @@ public class AstarFightWrap
 		L.RegFunction("InitMap", InitMap);
 		L.RegFunction("Clear", Clear);
 		L.RegFunction("isZhangAi", isZhangAi);
+		L.RegFunction("isQianFengZhangAi", isQianFengZhangAi);
 		L.RegFunction("setAllZhenxingList", setAllZhenxingList);
 		L.RegFunction("setZhenxingInfo", setZhenxingInfo);
+		L.RegFunction("setQianFengInfo", setQianFengInfo);
 		L.RegFunction("getNum", getNum);
 		L.RegFunction("setMaxX", setMaxX);
 		L.RegFunction("OnDestroy", OnDestroy);
@@ -22,10 +24,6 @@ public class AstarFightWrap
 		L.RegVar("MapWidth", get_MapWidth, set_MapWidth);
 		L.RegVar("MapHeight", get_MapHeight, set_MapHeight);
 		L.RegVar("UnitWidth", get_UnitWidth, set_UnitWidth);
-		L.RegVar("StartX", get_StartX, set_StartX);
-		L.RegVar("StartY", get_StartY, set_StartY);
-		L.RegVar("TargetX", get_TargetX, set_TargetX);
-		L.RegVar("TargetY", get_TargetY, set_TargetY);
 		L.RegVar("IsJumpPoint", get_IsJumpPoint, set_IsJumpPoint);
 		L.RegVar("LoadMap", get_LoadMap, set_LoadMap);
 		L.RegVar("PathPoint", get_PathPoint, set_PathPoint);
@@ -88,6 +86,24 @@ public class AstarFightWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int isQianFengZhangAi(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			AstarFight obj = (AstarFight)ToLua.CheckObject(L, 1, typeof(AstarFight));
+			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 2);
+			int arg1 = (int)LuaDLL.luaL_checknumber(L, 3);
+			obj.isQianFengZhangAi(arg0, arg1);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int setAllZhenxingList(IntPtr L)
 	{
 		try
@@ -116,6 +132,25 @@ public class AstarFightWrap
 			int arg1 = (int)LuaDLL.luaL_checknumber(L, 3);
 			int arg2 = (int)LuaDLL.luaL_checknumber(L, 4);
 			obj.setZhenxingInfo(arg0, arg1, arg2);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int setQianFengInfo(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 4);
+			AstarFight obj = (AstarFight)ToLua.CheckObject(L, 1, typeof(AstarFight));
+			UnityEngine.Transform arg0 = (UnityEngine.Transform)ToLua.CheckUnityObject(L, 2, typeof(UnityEngine.Transform));
+			int arg1 = (int)LuaDLL.luaL_checknumber(L, 3);
+			int arg2 = (int)LuaDLL.luaL_checknumber(L, 4);
+			obj.setQianFengInfo(arg0, arg1, arg2);
 			return 0;
 		}
 		catch(Exception e)
@@ -280,82 +315,6 @@ public class AstarFightWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_StartX(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			AstarFight obj = (AstarFight)o;
-			int ret = obj.StartX;
-			LuaDLL.lua_pushinteger(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index StartX on a nil value" : e.Message);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_StartY(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			AstarFight obj = (AstarFight)o;
-			int ret = obj.StartY;
-			LuaDLL.lua_pushinteger(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index StartY on a nil value" : e.Message);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_TargetX(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			AstarFight obj = (AstarFight)o;
-			int ret = obj.TargetX;
-			LuaDLL.lua_pushinteger(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index TargetX on a nil value" : e.Message);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_TargetY(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			AstarFight obj = (AstarFight)o;
-			int ret = obj.TargetY;
-			LuaDLL.lua_pushinteger(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index TargetY on a nil value" : e.Message);
 		}
 	}
 
@@ -556,82 +515,6 @@ public class AstarFightWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_StartX(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			AstarFight obj = (AstarFight)o;
-			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
-			obj.StartX = arg0;
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index StartX on a nil value" : e.Message);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_StartY(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			AstarFight obj = (AstarFight)o;
-			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
-			obj.StartY = arg0;
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index StartY on a nil value" : e.Message);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_TargetX(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			AstarFight obj = (AstarFight)o;
-			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
-			obj.TargetX = arg0;
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index TargetX on a nil value" : e.Message);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_TargetY(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			AstarFight obj = (AstarFight)o;
-			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
-			obj.TargetY = arg0;
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index TargetY on a nil value" : e.Message);
 		}
 	}
 

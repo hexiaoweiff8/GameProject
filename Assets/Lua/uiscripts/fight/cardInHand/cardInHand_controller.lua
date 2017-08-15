@@ -172,6 +172,8 @@ function cardInHand_controller:AddListener()
         UIEventListener.Get(_data.nowMyCardtb[cardIndex]).onPress = function(go, args)
             if args then
                 print("onPress true")
+                ---初始化标志位
+                _isClickDrop = false
                 ---添加触控点
                 TouchControl:addTouch(cardIndex)
                 if _data.isCardSelected[cardIndex] then
@@ -203,8 +205,9 @@ function cardInHand_controller:AddListener()
                 ---点击出牌且没有拖动时
                 if _isClickDrop and not _isDrag then
                     _cardAction:doEvent(go, cardIndex)
+                    _isClickDrop = false
                 else    ---重置标志位
-                _isClickDrop = false
+                    _isClickDrop = false
                     _isDrag = false
                     --ModelControl:DestroyModel(cardIndex)
                 end

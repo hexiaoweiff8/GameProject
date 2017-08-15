@@ -172,7 +172,8 @@ public class AstarTest : MonoBehaviour
         packLoader.Start(PackType.Res, new List<string>()
             {
                 "ui_fightU",
-                "xuebaotujidui"
+                "xuebaotujidui",
+                "attackeffect"
             }, (isDone) =>
             {
                 if (isDone)
@@ -336,6 +337,15 @@ public class AstarTest : MonoBehaviour
             SummonedUnit(1,1,3,101001,1)   
         }
 ";
+        string formulaStr12 = @"SkillNum(10006)
+        Action
+        {
+
+        }
+		[
+            ChangeData(IsDambody, true, 0)
+		]
+";
         string buffStr1 = @"BuffNum(1007)
         Action
         {
@@ -405,6 +415,7 @@ public class AstarTest : MonoBehaviour
         var skillInfo9 = FormulaConstructor.SkillConstructor(formulaStr9);
         var skillInfo10 = FormulaConstructor.SkillConstructor(formulaStr10);
         var skillInfo11 = FormulaConstructor.SkillConstructor(formulaStr11);
+        var skillInfo12 = FormulaConstructor.SkillConstructor(formulaStr12);
 
         var buffInfo1 = FormulaConstructor.BuffConstructor(buffStr1);
         var buffInfo2 = FormulaConstructor.BuffConstructor(buffStr2);
@@ -421,6 +432,7 @@ public class AstarTest : MonoBehaviour
         SkillManager.Single.AddSkillInfo(skillInfo9);
         SkillManager.Single.AddSkillInfo(skillInfo10);
         SkillManager.Single.AddSkillInfo(skillInfo11);
+        SkillManager.Single.AddSkillInfo(skillInfo12);
 
 
         BuffManager.Single.AddBuffInfo(buffInfo1);
@@ -462,7 +474,7 @@ public class AstarTest : MonoBehaviour
             if (hit.collider != null && hit.collider.name.Equals(LoadMap.MapPlane.name))
             {
 
-                SkillManager.Single.DoSkillNum(1011, new FormulaParamsPacker()
+                SkillManager.Single.DoSkillNum(10006, new FormulaParamsPacker()
                 {
                     StartPos = new Vector3(hit.point.x, 0, hit.point.z),
                     TargetPos = new Vector3(hit.point.x, 0, hit.point.z),
@@ -499,6 +511,13 @@ public class AstarTest : MonoBehaviour
                 lastTimeTargetY = posOnMap[1];
 
             }
+            //var target = GameObject.Find("item0");
+            //if (target != null)
+            //{
+            //    //var testEffect = EffectsFactory.Single.CreateLinerEffect("linePrfb.prefab", null, target, 3, null, 12);
+            //    var testEffect = EffectsFactory.Single.CreateLinerEffect("linePrfb.prefab", null, new Vector3(0,0,0), new Vector3(100, 0, 100), 3, null, 12);
+            //    testEffect.Begin();
+            //}
         }
 
         if (Input.GetMouseButtonDown(2))
@@ -566,6 +585,25 @@ public class AstarTest : MonoBehaviour
             // 继续
             ClusterManager.Single.GoOn();
         }
+        //if (Input.GetKey(KeyCode.A))
+        //{
+        //    // 添加统计单位
+        //    FightDataStatistical.Single.AddCostData(new ArmyTypeData()
+        //    {
+        //        ArmyId = 1,
+        //        ArmyType = 1,
+        //        Camp = 1,
+        //        GeneralType = 1,
+        //        SingleCost = 10
+        //    });
+        //}
+        //if (Input.GetKey(KeyCode.S))
+        //{
+        //    // 打印统计数据
+        //    Debug.Log("cost:" + FightDataStatistical.Single.GetCostData(1));
+        //}
+
+
         // 绘制关闭列表
         DrawCloseMap(AStarPathFinding.closePathMap);
     }

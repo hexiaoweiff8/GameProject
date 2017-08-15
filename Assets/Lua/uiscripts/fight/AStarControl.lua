@@ -2,15 +2,22 @@
 --- Created by Administrator.
 --- DateTime: 2017/7/22 11:50
 ---
-AStarControl = {}
 
+AStarControl = {}
+local CanNotArea = require("uiscripts/fight/CanNotArea")
 function AStarControl:Init(maxPointX)
     --AstarFight
     self.AstarFight = GameObject.Find("/AstarFight"):GetComponent(typeof(AstarFight))
-    --可下兵最大X
-    self.AstarFight:setMaxX(maxPointX)
+    self:SetMaxDropX(maxPointX)
 end
 
+
+---设置最大下兵区域的X坐标
+function AStarControl:SetMaxDropX(maxPointX)
+    --可下兵最大X
+    self.AstarFight:setMaxX(maxPointX)
+    CanNotArea:ChangeArea(maxPointX)
+end
 
 ---
 ---根据世界坐标获取格子坐标
@@ -66,6 +73,27 @@ end
 function AStarControl:setZhangAi(position, index)
     if self.AstarFight then
         self.AstarFight:isZhangAi(position, index)
+        return
+    end
+    Debugger.LogWarning("设置阵型信息出错，可能是未初始化AStarFight！！！")
+
+end
+
+
+---
+---设置前锋模型阵型信息
+---
+function AStarControl:setQianFengInfo(go, id, index)
+    if self.AstarFight then
+        self.AstarFight:setQianFengInfo(go, id, index)
+        return
+    end
+    Debugger.LogWarning("设置阵型信息出错，可能是未初始化AStarFight！！！")
+end
+
+function AStarControl:setQianFengZhangAi(position, index)
+    if self.AstarFight then
+        self.AstarFight:isQianFengZhangAi(position, index)
         return
     end
     Debugger.LogWarning("设置阵型信息出错，可能是未初始化AStarFight！！！")

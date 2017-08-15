@@ -95,13 +95,14 @@ public class Soldier_PutongGongji_State : SoldierFSMState
         });
 
 
+        var effect = myClusterData.AllData.EffectData;
         // 如果攻击方的攻击方式不为普通攻击的读取攻击表, 获取对应攻击方式
         IGeneralAttack normalGeneralAttack = null;
         switch (myClusterData.AllData.MemberData.AttackType)
         {
             case Utils.BulletTypeNormal:
                 normalGeneralAttack = GeneralAttackManager.Instance()
-                    .GetNormalGeneralAttack(myClusterData, enemyClusterData, "test/TrailPrj",
+                    .GetNormalGeneralAttack(myClusterData, enemyClusterData, effect.Bullet,
                         myClusterData.transform.position + new Vector3(0, 10, 0),
                         enemyClusterData.gameObject,
                         200,
@@ -121,13 +122,13 @@ public class Soldier_PutongGongji_State : SoldierFSMState
                 {
                     case Utils.AOEObjScope:
                         normalGeneralAttack = GeneralAttackManager.Instance().GetPointToObjScopeGeneralAttack(myClusterData,
-                            new[] { armyAOE.BulletModel, armyAOE.DamageEffect },
+                            new[] { effect.Bullet, effect.MuzzleFlashEffect },
                             myClusterData.transform.position,
                             enemyClusterData.gameObject,
                             armyAOE.AOERadius,
                             200,
-                            armyAOE.EffectTime,
-                            (TrajectoryAlgorithmType)armyAOE.BulletPath,
+                            1, //effect.EffectTime,
+                            (TrajectoryAlgorithmType)Enum.Parse(typeof(TrajectoryAlgorithmType), effect.TrajectoryEffect),
                             () =>
                             {
                                 //Debug.Log("AOE Attack1");
@@ -136,13 +137,13 @@ public class Soldier_PutongGongji_State : SoldierFSMState
                     case Utils.AOEPointScope:
                         normalGeneralAttack =
                             GeneralAttackManager.Instance().GetPointToPositionScopeGeneralAttack(myClusterData,
-                                new[] { armyAOE.BulletModel, armyAOE.DamageEffect },
+                                new[] { effect.Bullet, effect.MuzzleFlashEffect },
                                 myClusterData.transform.position,
                                 enemyClusterData.transform.position,
                                 armyAOE.AOERadius,
                                 200,
-                                armyAOE.EffectTime,
-                                (TrajectoryAlgorithmType) armyAOE.BulletPath,
+                                1, //effect.EffectTime,
+                                (TrajectoryAlgorithmType)Enum.Parse(typeof(TrajectoryAlgorithmType), effect.TrajectoryEffect),
                                 () =>
                                 {
                                     //Debug.Log("AOE Attack2");
@@ -150,10 +151,10 @@ public class Soldier_PutongGongji_State : SoldierFSMState
                         break;
                     case Utils.AOEScope:
                         normalGeneralAttack = GeneralAttackManager.Instance().GetPositionScopeGeneralAttack(myClusterData,
-                            armyAOE.DamageEffect,
+                            effect.MuzzleFlashEffect,
                             myClusterData.transform.position,
-                            new CircleGraphics(new Vector2(myClusterData.X, myClusterData.Y), armyAOE.AOERadius), 
-                            armyAOE.EffectTime,
+                            new CircleGraphics(new Vector2(myClusterData.X, myClusterData.Y), armyAOE.AOERadius),
+                            1, //effect.EffectTime,
                             () =>
                             {
                                 //Debug.Log("AOE Attack3");
@@ -162,12 +163,12 @@ public class Soldier_PutongGongji_State : SoldierFSMState
                     case Utils.AOEForwardScope:
                         normalGeneralAttack =
                             GeneralAttackManager.Instance().GetPositionRectScopeGeneralAttack(myClusterData,
-                                armyAOE.DamageEffect,
+                                effect.MuzzleFlashEffect,
                                 myClusterData.transform.position,
                                 armyAOE.AOEWidth,
                                 armyAOE.AOEHeight,
                                 Vector2.Angle(Vector2.up, new Vector2(myClusterData.transform.forward.x, myClusterData.transform.forward.z)),
-                                armyAOE.EffectTime,
+                                1, //effect.EffectTime,
                                 () =>
                                 {
                                     //Debug.Log("AOE Attack4");
@@ -201,7 +202,8 @@ public class Soldier_PutongGongji_State : SoldierFSMState
 
     public override void DoBeforeLeaving(SoldierFSMSystem fsm)
     {
-        //Debug.Log("普通攻击结束:" + fsm.Display.GameObj.name);
+        fsm.IsCanInPutonggongji = false;
+        fsm.TargetIsLoseEfficacy = true;
         _fireTimer.Kill();
     }
 

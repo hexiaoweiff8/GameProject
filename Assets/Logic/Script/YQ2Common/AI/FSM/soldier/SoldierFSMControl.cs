@@ -92,6 +92,20 @@ public class SoldierFSMControl{
         }
     }
 
+    /// <summary>
+    /// 停止攻击当前目标
+    /// </summary>
+    public void CleanTarget()
+    {
+        // 终止普通攻击目标
+        if (fsm.CurrentStateID == SoldierStateID.PutongGongji)
+        {
+            fsm.CurrentState.DoBeforeLeaving(fsm);
+        }
+        // 终止技能攻击目标
+
+    }
+
     ///// <summary>
     ///// 修改该单位的当前状态
     ///// </summary>

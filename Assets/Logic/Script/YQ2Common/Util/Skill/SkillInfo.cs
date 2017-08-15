@@ -17,6 +17,11 @@ public class SkillInfo : SkillBase
     public bool IsActive { get; set; }
 
     /// <summary>
+    /// 技能是否释放完毕
+    /// </summary>
+    public bool IsDone { get; set; }
+
+    /// <summary>
     /// 目标选择权重数据
     /// </summary>
     public SelectWeightData WeightData { get; set; }
@@ -30,6 +35,11 @@ public class SkillInfo : SkillBase
     /// 技能CD组ID(不同组ID不会公用一个公共CD)
     /// </summary>
     public int CDGroup { get; set; }
+
+    /// <summary>
+    /// 执行间隔时间
+    /// </summary>
+    public float IntervalTime { get; set; }
 
     /// <summary>
     /// 技能可释放次数

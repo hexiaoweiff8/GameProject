@@ -10,8 +10,12 @@ public class FightManagerWrap
 		L.RegFunction("StartFight", StartFight);
 		L.RegFunction("EndFight", EndFight);
 		L.RegFunction("InitMap", InitMap);
+		L.RegFunction("Clear", Clear);
 		L.RegFunction("New", _CreateFightManager);
 		L.RegFunction("__tostring", ToLua.op_ToString);
+		L.RegVar("MapWidth", get_MapWidth, set_MapWidth);
+		L.RegVar("MapHeight", get_MapHeight, set_MapHeight);
+		L.RegVar("UnitWidth", get_UnitWidth, set_UnitWidth);
 		L.RegVar("Single", get_Single, null);
 		L.EndClass();
 	}
@@ -80,10 +84,94 @@ public class FightManagerWrap
 	{
 		try
 		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(FightManager)))
+			{
+				FightManager obj = (FightManager)ToLua.ToObject(L, 1);
+				obj.InitMap();
+				return 0;
+			}
+			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(FightManager), typeof(int[][]), typeof(int[][])))
+			{
+				FightManager obj = (FightManager)ToLua.ToObject(L, 1);
+				int[][] arg0 = ToLua.CheckObjectArray<int[]>(L, 2);
+				int[][] arg1 = ToLua.CheckObjectArray<int[]>(L, 3);
+				obj.InitMap(arg0, arg1);
+				return 0;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: FightManager.InitMap");
+			}
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Clear(IntPtr L)
+	{
+		try
+		{
 			ToLua.CheckArgsCount(L, 1);
 			FightManager obj = (FightManager)ToLua.CheckObject(L, 1, typeof(FightManager));
-			obj.InitMap();
+			obj.Clear();
 			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_MapWidth(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			FightManager obj = (FightManager)o;
+			int ret = obj.MapWidth;
+			LuaDLL.lua_pushinteger(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MapWidth on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_MapHeight(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			FightManager obj = (FightManager)o;
+			int ret = obj.MapHeight;
+			LuaDLL.lua_pushinteger(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MapHeight on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_UnitWidth(IntPtr L)
+	{
+		try
+		{
+			LuaDLL.lua_pushinteger(L, FightManager.UnitWidth);
+			return 1;
 		}
 		catch(Exception e)
 		{
@@ -98,6 +186,59 @@ public class FightManagerWrap
 		{
 			ToLua.PushObject(L, FightManager.Single);
 			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_MapWidth(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			FightManager obj = (FightManager)o;
+			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+			obj.MapWidth = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MapWidth on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_MapHeight(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			FightManager obj = (FightManager)o;
+			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+			obj.MapHeight = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MapHeight on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_UnitWidth(IntPtr L)
+	{
+		try
+		{
+			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+			FightManager.UnitWidth = arg0;
+			return 0;
 		}
 		catch(Exception e)
 		{

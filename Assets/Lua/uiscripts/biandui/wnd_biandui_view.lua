@@ -61,7 +61,7 @@ function wnd_biandui_view:initview(root)
     this.daying_item_panel = self.transform:Find("daying_item_panel_col/daying_item_panel").gameObject
     this.card_item_panel = self.transform:Find("card_item_panel_col/card_item_panel").gameObject
     this.qianfeng_item_panel_bg = self.transform:Find("qianfeng_item_panel").gameObject
-    --this.qianfeng_bushu = self.transform:Find("qianfeng_panel/qianfeng_bg/qianfeng_bushu").gameObject
+
 
     this.AddIcon = self.transform:Find("daying_item_panel_col/daying_item_panel/daying_item_grid/add_bg").gameObject
 
@@ -72,6 +72,7 @@ function wnd_biandui_view:initview(root)
 
     this.select_card_panel = self.transform:Find("select_card_panel").gameObject
     this.card_clone_panel = self.transform:Find("card_clone_panel").gameObject
+    this.card_clone_panel.transform.localPosition = self.transform:Find("daying_item_panel_col").gameObject.transform.localPosition
     this.card_clone_item = this.card_clone_panel.transform:Find("card_clone_item").gameObject
 
     this.TriggerBox = self.transform:Find("TriggerBOX").gameObject
@@ -114,11 +115,18 @@ function wnd_biandui_view:initview(root)
     this.CloneCamera:GetComponent(typeof(UnityEngine.Camera)).targetTexture = this.myclonetexture
     this.CloneTexture:GetComponent(typeof(UITexture)).mainTexture = this.myclonetexture
 
+
+
+
+
+
+    ---高亮位置外部碰撞体---
     this.pos_col = {}
     for i =1,6 do
         this.pos_col[i] = self.transform:Find("qianfeng_item_panel/"..tostring(i)).gameObject
     end
 
+    ---高亮位置图片---
     this.pos = {}
     for i =1,6 do
         this.pos[i] = self.transform:Find("qianfeng_item_panel/"..tostring(i).."/".."pos"..tostring(i)).gameObject

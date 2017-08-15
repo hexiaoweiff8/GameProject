@@ -1,8 +1,11 @@
 
+
+require('uiscripts/tips/ui_tips_item')
+require('uiscripts/tips/ui_tips_equip')
+
 wnd_qiandao_controller = {
     view,--视图层
     model,--数据层
-    SignInfo = {},--签到信息
     Slidingdistance,--滑动总距离
     dis,--每一次的滑动距离
     finish,--是否完成界面滑动
@@ -11,21 +14,27 @@ wnd_qiandao_controller = {
     initListener,--添加按钮事件
     updatalocaldata,--更新本地数据
     SetRefeshTime,--设置刷新时间
-    AddClickEventforRes,--为需要添加点击签到事件的图片加碰撞体
     getSlidingdistance,--获取滑动距离
     InitQiandaoResList,--初始化签到奖励信息
     ContentsInflate,--获取签到奖励信息
+    PressCtr, --玩家点击的事件处理
+    QidandaoCtr, --进行点击签到的事件处理
+
+    tipsshow = false, --tips是否已经被显示
+    resneedbesign = false --选中的物体是否需要被签到处理
 
 }
 local class = require("common/middleclass")
 wnd_qiandao_controller = class("wnd_qiandao_controller", wnd_base)
 local this = wnd_qiandao_controller
+local instance = nil
 
 function wnd_qiandao_controller:OnShowDone()
+    instance = self
     this.view = require("uiscripts/qiandao/wnd_qiandao_view")
     this.model = require("uiscripts/qiandao/wnd_qiandao_model")
     this.view:initview(self)
-   this.model:initModel()
+    this.model:initModel()
     this:initListener()
     this.qiandao_res_Ctrl()
     print("qiandao  ++++  OnShowDone")
@@ -34,20 +43,24 @@ end
 
 function wnd_qiandao_controller:initListener()
     UIEventListener.Get(this.view.CloseBtn).onClick = function()
-        this.view.MainPanel:SetActive(false)
+        instance:Hide(0)
+    end
+
+    for i = 1,#this.view.qiandao_res_list do
+        UIEventListener.Get(this.view.qiandao_res_list[i].transform:Find("qiandao_res_quality").gameObject).onPress = function (go,isPressed)
+            this:PressCtr(go,isPressed)
+        end
     end
 
 end
 
 ----签到到第几天的控制------
 function wnd_qiandao_controller:qiandao_res_Ctrl()
-
     this:SetRefeshTime()
     this.InitQiandaoResList()
     this.Slidingdistance = 0
     this.dis = 0
     this.finish = false
-
 
     print("玩家没有签到之前的签到状态是-----"..this.model.serv_qiandaoInfo["isSigned"])
     print("玩家没有签到之前的累计签到天数是-----"..this.model.serv_qiandaoInfo["days"])
@@ -59,39 +72,91 @@ function wnd_qiandao_controller:qiandao_res_Ctrl()
 
     if(this.model.serv_qiandaoInfo["isSigned"] == 0) then
         this:getSlidingdistance(this.model.serv_qiandaoInfo["days"]+1)
-        local item = this.view.qiandao_res_list[this.model.serv_qiandaoInfo["days"]+1].transform:Find("qiandao_res_quality").gameObject
-        this:AddClickEventforRes(item)
-        --TODO: 设置第N天的签到为TRUE,播放动画
-        UIEventListener.Get(item).onClick = function()
-
-            local on_10030_rec = function(body)
-                print("on_10030_rec call")
-                Event.RemoveListener("10030", on_10030_rec)
-                --   UIToast.Show("已接收到来自服务器的签到信息.",nil,UIToast.ShowType.Queue)
-                local gw2c = gw2c_pb.SignIn()
-                gw2c:ParseFromString(body)
-                ----   this:updateServData(gw2c.currency,nil)
-                print("服务器交互后的签到状态是-----"..gw2c.sign["isSigned"])
-                print("服务器交互后的累计签到天数是-----"..gw2c.sign["days"])
-                if(gw2c.sign["isSigned"]) then
-                    this.view.QiandaoData.QiandaoCishu:GetComponent("UILabel").text = (gw2c.sign["days"]).."次"
-                    local go = item.transform:Find("qiandao_res_icon/qiandao_res_blackbg").gameObject
-                    go:SetActive(true)
-                    this:updatalocaldata(gw2c)
-                end
-            end
-            print(type(on_10030_rec))
-            Message_Manager:SendPB_10030(on_10030_rec)
-            require('uiscripts/tips/ui_tips_equip').Show(require('uiscripts/cangku/wnd_cangku_model'):getLocalEquipmentRefByEquipID(300210),Vector3.zero)
-            --require('uiscripts/tips/ui_tips_equip').Hide()
-        end
     else
         this:getSlidingdistance(this.model.serv_qiandaoInfo["days"])
     end
 end
 
 
+function wnd_qiandao_controller:PressCtr(go,isPressed)
+    -- 先判断press传来的物体是不是每日签到的奖励物品
+    --print("父物体的名字是"..go.transform.parent.name)
+    --this.OnPressTimer = TimeUtil:CreateTimer(5,OnComplete)
+    --然后判断是否进行了长按，如果是长按则进行回调，回调为展示TIPS，传入相关信息。
+    self.obj = go
 
+    for index = 1,#this.view.qiandao_res_list do
+
+        if(self.obj.transform.parent.name == this.view.qiandao_res_list[index].name) then
+            print("我按到了谁-----"..this.view.qiandao_res_list[index].name)
+            print("index是多少---"..index)
+            godata = this.model.local_checkin[index]
+
+            if(this.model.serv_qiandaoInfo["isSigned"] == 0 and index == this.model.serv_qiandaoInfo["days"]+1) then
+                this.resneedbesign = true
+            else
+                this.resneedbesign = false
+            end
+
+        end
+    end
+
+    OnComplete = function()
+        this.OnPressTimer:Kill()
+        if(this.resneedbesign) then
+            return
+        end
+        if godata["AwardType"] == 'item' then
+            ui_tips_item.Show(require('uiscripts/cangku/wnd_cangku_model'):getLocalItemDataRefByItemID(tonumber(godata["ID"])),
+            Vector3.zero)
+            --this._bTipsIsShow = true
+            this.tipsshow = true
+        elseif godata["AwardType"] == 'equip' then
+            -- DONE: 显示装备Tips
+            ui_tips_equip.Show(require('uiscripts/commonModel/equip_Model'):getLocalEquipmentRefByEquipID(tonumber(godata["ID"])),
+            Vector3.zero)
+            --this._bTipsIsShow = true
+            this.tipsshow = true
+        elseif godata["AwardType"] == 'card' then
+            -- DONE: 显示卡牌Tips
+            --this._bTipsIsShow = true
+            this.tipsshow = false
+        elseif godata["AwardType"] == "currency" then
+            this.tipsshow = false
+        end
+        print("已经完成了计时!!")
+    end
+    --this.OnPressTimer:Start()
+    print("现在我按没按！"..tostring(isPressed))
+
+    if isPressed then
+        if this.OnPressTimer then
+            if this.OnPressTimer.IsStop then
+                this.OnPressTimer:Start()
+            end
+        else
+            this.OnPressTimer = TimeUtil:CreateTimer(0.5,OnComplete)
+        end
+    else
+        this.OnPressTimer:Kill()
+        if(this.resneedbesign) then
+            this:QidandaoCtr(self.obj)
+            return
+        end
+        if(this.tipsshow) then
+            if ui_tips_item.bIsShowing then
+                ui_tips_item.Hide()
+            elseif ui_tips_equip.bIsShowing then
+                ui_tips_equip.Hide()
+            end
+            -- ui_tips_equip.Hide()
+            this.tipsshow = false
+        end
+        print("我的手抬起来了！")
+    end
+    --如果不是长按，判断是否是今日需要签到的物品，
+    --如果是，判断今天签了还是没钱，如果没签就毫无响应，如果签了，则进行点击签到的逻辑代码，如果不是，则毫无响应。
+end
 
 function wnd_qiandao_controller:Update()
     if(not this.finish) then
@@ -109,15 +174,6 @@ end
 function wnd_qiandao_controller:SetRefeshTime()
     this.view.QiandaoData.Time:GetComponent("UILabel").text = "每日"..tostring(this.model:getLocalRefeshTime())..":00"
 end
-
-
-function wnd_qiandao_controller:AddClickEventforRes(item)
-    collider = item:AddComponent(typeof(UnityEngine.BoxCollider))
-    collider.isTrigger = true
-    collider.center = Vector3.zero
-    collider.size = Vector3(collider.gameObject:GetComponent(typeof(UIWidget)).localSize.x,collider.gameObject:GetComponent(typeof(UIWidget)).localSize.y,0)
-end
-
 
 
 function wnd_qiandao_controller:getSlidingdistance(days)
@@ -160,6 +216,7 @@ function wnd_qiandao_controller:ContentsInflate(qiandaoListItem,Day)
         _ItemData = nil
         _Icon = cardUtil:getCardIcon(tonumber(_AwardData["ID"]))
     end
+
     -- 处理品质值为空的情况
     _Quality = _Quality or 1
     qiandaoListItem.transform:Find("qiandao_res_quality/qiandao_res_icon").gameObject:GetComponent(typeof(UISprite)).spriteName =_Icon
@@ -168,22 +225,46 @@ function wnd_qiandao_controller:ContentsInflate(qiandaoListItem,Day)
 end
 
 
+function wnd_qiandao_controller:QidandaoCtr(item)
+
+    --local on_10030_rec = function(body)
+    --    print("on_10030_rec call")
+    --    Event.RemoveListener("10030", on_10030_rec)
+    --    --   UIToast.Show("已接收到来自服务器的签到信息.",nil,UIToast.ShowType.Queue)
+    --    local gw2c = gw2c_pb.SignIn()
+    --    gw2c:ParseFromString(body)
+    --    ----   this:updateServData(gw2c.currency,nil)
+    --    print("服务器交互后的签到状态是-----"..gw2c.sign["isSigned"])
+    --    print("服务器交互后的累计签到天数是-----"..gw2c.sign["days"])
+    --    if(gw2c.sign["isSigned"]) then
+    --        this.view.QiandaoData.QiandaoCishu:GetComponent("UILabel").text = (gw2c.sign["days"]).."次"
+    --        local go = item.transform:Find("qiandao_res_icon/qiandao_res_blackbg").gameObject
+    --        go:SetActive(true)
+    --        this:updatalocaldata(gw2c)
+    ---------需要更新本地的签到信息---------
+    --    end
+    --end
+    --Message_Manager:SendPB_10030(on_10030_rec)
+
+
+    local go = item.transform:Find("qiandao_res_icon/qiandao_res_blackbg").gameObject
+    go:SetActive(true)
+    this.model.serv_qiandaoInfo["isSigned"] = 1
+
+end
+
+
 function wnd_qiandao_controller:updatalocaldata(SignIn) --将签到奖励添加到本地数据当中（更新本地数据）
     userModel:setSign(SignIn.sign)
-
-
     if(SignIn.card~=nil) then
         cardModel:addCards(SignIn.card)
     end
 
-
     if(SignIn.equip~=nil) then
         for k,v in pairs(SignIn.equip) do
-            --v为所有equip
             require("uiscripts/commonModel/equip_Model"):addEquipData(v)
         end
     end
-    
 
     if(SignIn.currency~=nil) then
         currencyModel:addCoin(SignIn.currency)
@@ -193,13 +274,7 @@ function wnd_qiandao_controller:updatalocaldata(SignIn) --将签到奖励添加�
         itemModel:addItems(SignIn.item)
     end
 
-end
-
-
-function wnd_qiandao_controller:OnDisable()
-
-    print("12312312312")
-
+    
 end
 
 

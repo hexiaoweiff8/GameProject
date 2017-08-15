@@ -321,10 +321,14 @@ public class MailLoopGrid : LoopGrid {
         MailItem.beChoseSP = null;
         MailItem.choseMailID = "";
 
-        foreach (ItemObj obj in itemsList)
+        if (itemsList!=null)
         {
-            PutItemToLoop(obj);
+            foreach (ItemObj obj in itemsList)
+            {
+                PutItemToLoop(obj);
+            }
         }
+        
         itemsList = new List<ItemObj>();
         DelAllLoop();
 

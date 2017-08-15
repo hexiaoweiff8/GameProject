@@ -12,10 +12,10 @@ local detailPage = require("uiscripts/myEquip/detailPage/detailPage_controller")
 local equipOnBody = require("uiscripts/myEquip/equipOnBody/equipOnBody_controller")
 local comPropty = require("uiscripts/myEquip/comPropty/comPropty_controller")
 local UIModel = require("uiscripts/commonGameObj/UIModel")
-local Model
+local _UIModel
 
 local Remake = require("uiscripts/commonGameObj/remake/remake_controller")
-local remakePanel = nil   ---
+local remakePanel
 
 
 
@@ -41,18 +41,30 @@ function equip_controller:OnShowDone()
     ---初始化重铸界面
     remakePanel = Remake()
 
-
-    Model = UIModel(view.UIModelPosition)
+    ---初始化UIModel
+    _UIModel = UIModel(view.UIModelPosition)
+    _UIModel:showCardModel(101001)
     ---
     ---初始化装备界面的显示
     ---
     self:initShow()
-
-
+    UIEventListener.Get(view.btn_Back).onClick = function(go)
+        print("back")
+        self:Hide()
+    end
+end
+---
+---界面销毁回调
+---
+function equip_controller:OnDestroyDone()
 
 end
+---
+---重新打开时回调
+---
+function equip_controller:OnReOpenDone()
 
-
+end
 ---
 ---初始化界面显示
 ---
@@ -79,7 +91,6 @@ function equip_controller:getRemakePanel()
     return remakePanel
 end
 function equip_controller:showRemakePanel(equip)
-
     remakePanel:show(equip, view.remakeP, 21)
     remakePanel:setExchangeRefreshFunc(equip_controller.remakeExchangeRefresh)
 end

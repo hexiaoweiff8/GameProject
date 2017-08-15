@@ -30,6 +30,7 @@ public class SData_armybase_c : MonoEX.Singleton<SData_armybase_c>
 					case "RangeType": dif.RangeType = (short)(double)o22; break;
 					case "IsSummoned": dif.IsSummoned = (short)(double)o22; break;
 					case "BehaviorType": dif.BehaviorType = (short)(double)o22; break;
+					case "SingleCost": dif.SingleCost = (short)(double)o22; break;
 					case "Attack1": dif.Attack1 = (float)(double)o22; break;
 					case "Clipsize1": dif.Clipsize1 = (short)(double)o22; break;
 					case "AttackRate1": dif.AttackRate1 = (float)(double)o22; break;
@@ -137,6 +138,10 @@ public struct armybase_cInfo
 	 ///行为类型
 	 /// </summary>
 	public short BehaviorType;
+	 /// <summary>
+	 ///单兵费用
+	 /// </summary>
+	public short SingleCost;
 	 /// <summary>
 	 ///火力
 	 /// </summary>

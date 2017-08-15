@@ -1,0 +1,13 @@
+SkillNum(10006)
+        Action
+        {
+            ImmuneToDeath(1)
+        }
+
+        [
+            BuffTime(100)
+            TriggerLevel1(3)
+            TriggerLevel2(17)
+            BuffLevel(1)
+            BuffGroup(1)
+        ]

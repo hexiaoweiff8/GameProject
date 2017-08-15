@@ -13,11 +13,12 @@ local userInfo = require("uiscripts/fight/userInfo/userInfo_controller")
 local cardInHand = require("uiscripts/fight/cardInHand/cardInHand_controller")
 local power = require("uiscripts/fight/power/power_controller")
 local enemyCard = require("uiscripts/fight/enemyCard/enemyCard_controller")
-
+local qianFengModel = require("uiscripts/fight/QianFengModel")
 
 require("uiscripts/fight/touchControl")
 require("uiscripts/fight/modelControl")
 require("uiscripts/fight/AStarControl")
+local CanNotArea = require("uiscripts/fight/CanNotArea")
 require("uiscripts/commonGameObj/Model")
 function Onfs()
     ui_manager:ShowWB(WNDTYPE.ui_fight)
@@ -31,13 +32,15 @@ function fight_controller:OnShowDone()
     _data:getDatas()
 
     local fun = function()--开场还没加载到所以用协程
-        while _view.canotRect == nil do
+        while not CanNotArea.cannotRect do
             coroutine.wait(0.1)
-            _view.canotRect = GameObject.Find("/SceneRoot/canotRectGo")
-            if _view.canotRect then
-                local maxPointX = _view.canotRect.transform.position.x
-                AStarControl:Init(maxPointX)
+            CanNotArea:Init()
+            if CanNotArea.cannotRect then
+                local maxDropX = CanNotArea:GetMaxDropX()
+                AStarControl:Init(maxDropX)
                 Model:setZhenXingData(_data.AllCardIDtb, _data.AllCardLeveltb)
+                qianFengModel:Init(_data.QianFengCard)
+                qianFengModel:Start()
                 ---
                 ---初始化各部分显示
                 ---
@@ -47,39 +50,35 @@ function fight_controller:OnShowDone()
                 cardInHand:Init(self)
                 power:Init(self)
                 enemyCard:Init(self)
-
-
                 self:initJumpButton()
-
+                ---开始游戏倒计时
+                self:StartTimer()
             end
         end
     end
     coroutine.start(fun)
 
-
-
-    ---开始游戏倒计时
-    self:StartTimer()
-
     self:initPause()
     ui_manager:DestroyWB(WNDTYPE.Prefight)
 end
 
-
+---初始化跳转按钮
 function fight_controller:initJumpButton()
-    local myMainBuild = GameObject.Find("/BuildingParent").transform:GetChild(3)
-    local myFirstSoldier = GameObject.Find("/BuildingParent").transform:GetChild(2)
+
+    ---双方主基地
+    self.myMainBuild = GameObject.Find("/BuildingParent").transform:GetChild(3)
+    self.myFirstSoldier = GameObject.Find("/BuildingParent").transform:GetChild(2)
     UIEventListener.Get(_view.jumpToMyMain).onPress = function (go, args)
         if args then
-            if myMainBuild then
-                _view.UIFollow.target = myMainBuild
+            if self.myMainBuild then
+                _view.UIFollow.Target = self.myMainBuild
             end
         end
     end
     UIEventListener.Get(_view.jumpToFirst).onPress = function (go, args)
         if args then
-            if myFirstSoldier then
-                _view.UIFollow.target = myFirstSoldier
+            if self.myFirstSoldier then
+                _view.UIFollow.Target = self.myFirstSoldier
             end
         end
     end
@@ -109,26 +108,41 @@ function fight_controller:StartTimer()
     end)
 end
 
----出牌或回收后，下一张牌替换
-function fight_controller:nextCard(cardIndex)
-    _data:refreshMyCards(cardIndex)
-    -- 延迟1秒刷新显示
-    local t = TimeTicker()
-    t:Start(1)
-    t.OnEnd = function(go)
-        cardInHand:Refresh(cardIndex)
-        restCard:Refresh()
-    end
-end
 
----
 function fight_controller:Update()
-    if not _view.canotRect then
+    if not CanNotArea.cannotRect then
         return
     end
     if _isPause then
         return
     end
+
+    ---
+    ---刷新UI中的基地血条
+    ---
+    userInfo:refreshHP()
+
+
+    ---
+    ---控制跳转我的主基地按钮的显隐
+    ---
+    local myMainBuild_UIPosition = _data:UIWorldPosition_From_3DWorldPosition(_view.nowWorldCamera,self.myMainBuild.position)
+    if myMainBuild_UIPosition.x < -2 then
+        _view.jumpToMyMain:SetActive(true)
+    else
+        _view.jumpToMyMain:SetActive(false)
+    end
+    ---
+    ---控制跳转我的排头兵按钮的显隐
+    ---
+    local myFirstSoldier_UIPosition = _data:UIWorldPosition_From_3DWorldPosition(_view.nowWorldCamera,self.myFirstSoldier.position)
+    if myFirstSoldier_UIPosition.x > 2 then
+        _view.jumpToFirst:SetActive(true)
+    else
+        _view.jumpToFirst:SetActive(false)
+    end
+
+
     ----如果拖动卡牌到边界则同时移动相机
     local touchTable = TouchControl:getTouchTbl()
     for k,_ in pairs(touchTable) do
@@ -143,55 +157,61 @@ function fight_controller:Update()
         end
     end
 
-
-    --费每秒增长
+    ---我的费增长
     if _data.nowFei < _data.allFei then
-        _data.nowFei = _data.nowFei + 1
+        _data.nowFei = _data.nowFei + 10
     else
         _data.nowFei = _data.allFei
     end
     power:refreshMyPower()
     cardInHand:refreshCardCD()
 
-
-
-    --敌人费每秒增长
+    ---敌人费增长
     if _data.enemyNowFei < _data.enemyAllFei then
-        _data.enemyNowFei = _data.enemyNowFei + 1
+        _data.enemyNowFei = _data.enemyNowFei + 10
     else
         _data.enemyNowFei = _data.enemyAllFei
     end
     enemyCard:AIDropCard()
+
+
+
+    ---测试数据---
+    if Input.GetKeyDown(UnityEngine.KeyCode.F1) then
+        _view.TEST_ENEMYINFO:SetActive(not _view.TEST_ENEMYINFO.activeSelf)
+    end
+    if _data.enemyNextCard then
+        _view.TEST_ENEMYINFO:GetComponent("UILabel").text =
+        string.format("敌人剩余卡数：%d\n敌人总能量：%d\n等待卡ID：%d\n所需能量：%d",
+        _data.enemyCardNum,_data.enemyNowFei,_data.enemyNextCard.id,_data.enemyNextCard.TrainCost)
+    else
+        _view.TEST_ENEMYINFO:GetComponent("UILabel").text =
+        string.format("敌人剩余卡数：%d\n",_data.enemyCardNum)
+    end
+
 end
 
----添加和移除事件监听
-function fight_controller:OnAddHandler()
-    Event.AddListener(GameEventType.HUIFUZANTING, HUIFUZANTING)
-    Event.AddListener(GameEventType.ENEMY_DROP_CARD, ENEMY_DROP_CARD)
-    Event.AddListener(GameEventType.DROP_CARD, DROP_CARD)
-    Event.AddListener(GameEventType.RECOVERY_CARD, RECOVERY_CARD)
 
-end
-function fight_controller:OnRemoveHandler()
-    Event.RemoveListener(GameEventType.HUIFUZANTING, HUIFUZANTING)
-    Event.RemoveListener(GameEventType.ENEMY_DROP_CARD, ENEMY_DROP_CARD)
-    Event.RemoveListener(GameEventType.DROP_CARD, DROP_CARD)
-    Event.RemoveListener(GameEventType.RECOVERY_CARD, RECOVERY_CARD)
-end
 
 
 ---敌人下兵逻辑
 function ENEMY_DROP_CARD()
-    ModelControl:createEnemyModel(_data.enemyPaiKutb[1].id)
-    _data.enemyNowFei = _data.enemyNowFei - _data.enemyPaiKutb[1].TrainCost
-    table.remove(_data.enemyPaiKutb, 1)
+    ModelControl:createEnemyModel(_data.enemyNextCard.id)
+    _data.enemyNowFei = _data.enemyNowFei - _data.enemyNextCard.TrainCost
+    _data:refreshEnemyCard()
 end
 ---自己下兵
 function DROP_CARD(cardIndex)
     ModelControl:ActiveModel(cardIndex)
-
     _data.nowFei = _data.nowFei - cardUtil:getTrainCost(_data.nowHandpaiKutb[cardIndex].id)
-    fight_controller:nextCard(cardIndex)
+    _data:refreshMyCards(cardIndex)
+    -- 延迟1秒刷新显示
+    local t = TimeTicker()
+    t:Start(1)
+    t.OnEnd = function(go)
+        cardInHand:Refresh(cardIndex)
+        restCard:Refresh()
+    end
 end
 ---回收卡牌
 function RECOVERY_CARD(cardIndex)
@@ -222,6 +242,19 @@ function HUIFUZANTING()
     sq:SetUpdate(true)
 end
 
+---添加和移除事件监听
+function fight_controller:OnAddHandler()
+    Event.AddListener(GameEventType.HUIFUZANTING, HUIFUZANTING)
+    Event.AddListener(GameEventType.ENEMY_DROP_CARD, ENEMY_DROP_CARD)
+    Event.AddListener(GameEventType.DROP_CARD, DROP_CARD)
+    Event.AddListener(GameEventType.RECOVERY_CARD, RECOVERY_CARD)
 
+end
+function fight_controller:OnRemoveHandler()
+    Event.RemoveListener(GameEventType.HUIFUZANTING, HUIFUZANTING)
+    Event.RemoveListener(GameEventType.ENEMY_DROP_CARD, ENEMY_DROP_CARD)
+    Event.RemoveListener(GameEventType.DROP_CARD, DROP_CARD)
+    Event.RemoveListener(GameEventType.RECOVERY_CARD, RECOVERY_CARD)
+end
 
 return fight_controller

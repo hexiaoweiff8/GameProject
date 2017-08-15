@@ -165,8 +165,12 @@ message BuyAvoidTime {
 }
 
 
-message SetCardGroup {
-    repeated int32 lst          =1;
+message SetCardPf {
+    repeated int32  lst          =1;
+}
+
+message SetCardGf {
+    repeated GfItem lst          =1;
 }
 
 

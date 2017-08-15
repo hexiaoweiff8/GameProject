@@ -12,6 +12,7 @@ public class wndShowHideInfoWrap
 		L.RegVar("name", get_name, set_name);
 		L.RegVar("needVisible", get_needVisible, set_needVisible);
 		L.RegVar("duration", get_duration, set_duration);
+		L.RegVar("PlantfromDetph", get_PlantfromDetph, set_PlantfromDetph);
 		L.RegVar("isWithBg", get_isWithBg, set_isWithBg);
 		L.EndClass();
 	}
@@ -98,6 +99,25 @@ public class wndShowHideInfoWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_PlantfromDetph(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			wndShowHideInfo obj = (wndShowHideInfo)o;
+			int ret = obj.PlantfromDetph;
+			LuaDLL.lua_pushinteger(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index PlantfromDetph on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_isWithBg(IntPtr L)
 	{
 		object o = null;
@@ -170,6 +190,25 @@ public class wndShowHideInfoWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index duration on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_PlantfromDetph(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			wndShowHideInfo obj = (wndShowHideInfo)o;
+			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+			obj.PlantfromDetph = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index PlantfromDetph on a nil value" : e.Message);
 		}
 	}
 

@@ -24,6 +24,9 @@ function mailCall.SendReadMail(mailID,_new)
     --遍历邮件列表更新邮件对应那条的数据
     for k ,v in ipairs(mail_model.mail_data_list) do
         if v.id == mailID then
+            if v.new == 0 then--如果这是一封信邮件那么减少新邮件的数量
+            mailCall.UpdataNewMailNum()
+            end
             v.new = _new;
             --print("更新状态成功")
             break
@@ -114,5 +117,10 @@ function mailCall.UpdaNewDataList(id, title,sender,receiver,content,rewards,time
     tb.autoDel = autoDel
     table.insert(mail_model.mail_data_list, tb)
 end
+--更新新邮件数量
+function mailCall.UpdataNewMailNum()
+    mail_model:SetNewNum(mail_model.new_mailNum - 1)
+end
+
 
 return mailCall

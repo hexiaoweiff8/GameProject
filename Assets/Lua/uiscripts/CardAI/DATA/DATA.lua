@@ -75,12 +75,39 @@ DATA.ENEMY_POWER = {
 }
 
 
----我方卡牌数量
+---我方卡牌数量（无序）
 DATA.CARD_NUM = {
     --[cardID_1] = num_1,
     --[cardID_2] = num_2,
     --...
 }
+---类型卡牌表（各类型卡牌有序，按单费战斗力从大到小排序）
+DATA.CARD_TYPE = {
+    --[typeId1] = {cardId1,...},
+    --[typeId2] = {cardId1,...}
+}
+
+
+---卡牌单费战斗力表(无序)
+DATA.CARD_FIHGT = {
+    --[cardId1] = DANFEI,
+    --[cardId2] = DANFEI,
+}
+
+---可吞牌库（有序：按单费战斗力从小到大排序）
+DATA.CARD_EAT = {
+    --cardId1,
+    --cardId2
+}
+
+---卡牌平均单费战斗力
+DATA.AVERAGE_FIGHT = nil
+
+---最大单费战斗力卡牌
+DATA.maxFightCard = nil
+
+
+
 
 ---
 DATA.ATTRIBUTE = {
@@ -100,5 +127,8 @@ DATA.ATTRIBUTE = {
     --}
     --...
 }
+
+
+
 
 return DATA

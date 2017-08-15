@@ -40,7 +40,7 @@ public class Soldier_Zhuiji_State : SoldierFSMState
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
         // 加载当前数据
-        Debug.Log("追击状态:" + fsm.Display.GameObj.name);
+        //Debug.Log("追击状态:" + fsm.Display.GameObj.name);
         clusterData = fsm.Display.ClusterData as ClusterData;
         targetPos = fsm.EnemyTarget.ClusterData.transform.position;
 
@@ -194,7 +194,7 @@ public class Soldier_Zhuiji_State : SoldierFSMState
             if (fsm.EnemyTarget == null ||
                 !closeObj.AllData.MemberData.ObjID.Equals(fsm.EnemyTarget.ClusterData.AllData.MemberData.ObjID))
             {
-                Debug.Log("变更目标.");
+                //Debug.Log("变更目标.");
                 fsm.EnemyTarget = DisplayerManager.Single.GetElementById(closeObj.AllData.MemberData.ObjID);
             }
         }

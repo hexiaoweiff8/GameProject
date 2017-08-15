@@ -42,9 +42,6 @@ public class Soldier_Siwang_State : SoldierFSMState
             }
                 break;
         }
-        // 如果是基地
-
-        // 如果是防御塔
 
         // 死亡时检测技能
         if (allData.SkillInfoList != null)
@@ -58,6 +55,10 @@ public class Soldier_Siwang_State : SoldierFSMState
                 TypeLevel2 = TriggerLevel2.Death
             });
         }
+        // 统计死亡数量
+        FightDataStatistical.Single.AddBeKillCount("" + allData.MemberData.ObjID.ID, 1, allData.MemberData.Camp, allData.MemberData.ArmyType, allData.MemberData.GeneralType);
+        // 清除费用统计
+        FightDataStatistical.Single.DelCostData(allData.ArmyTypeData);
         // 删除单位
         //DisplayerManager.Single.DelDisplay(fsm.Display);
         FightUnitFactory.DeleteUnit(fsm.Display.ClusterData.AllData.MemberData);

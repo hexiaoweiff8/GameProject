@@ -184,7 +184,8 @@ public class DataManager : MonoEX.Singleton<DataManager>
                 _enemyJidiDict.Add(jidiVo.ObjID.ID, jidiVo);
                 // 旋转角度
                 baseObj.transform.Rotate(new Vector3(0, -90, 0));
-                texture = PacketManage.Single.GetPacket("jidi").Load("zhujidi_r_texture") as Texture;
+                var obj = PacketManage.Single.GetPacket("jidi").Load("zhujidi_r_texture");
+                texture = obj as Texture;
                 break;
         }
         mesh.material.mainTexture = texture;
@@ -382,34 +383,34 @@ public class DataManager : MonoEX.Singleton<DataManager>
         mfa.ObjId = soldier.ObjID;
 
         // 创建集群数据
-        mfa.Cluster = display.AddComponent<ClusterData>();
-        mfa.Cluster.SetDataValue(soldier);
-
+        var cluster = display.AddComponent<ClusterData>();
+        cluster.SetDataValue(soldier);
+        mfa.Cluster = cluster;
 
         // 设置空地高度
         switch (soldier.GeneralType)
         {
             // 空中单位高度
             case Utils.GeneralTypeAir:
-                mfa.Cluster.Height = SData_Constant.Single.GetDataOfID(Utils.AirTypeConstantId).Value;
-                mfa.Cluster.CollisionGroup = Utils.AirCollisionGroup;
+                cluster.Height = SData_Constant.Single.GetDataOfID(Utils.AirTypeConstantId).Value;
+                cluster.CollisionGroup = Utils.AirCollisionGroup;
                 break;
             // 地面单位高度
             case Utils.GeneralTypeBuilding:
             case Utils.GeneralTypeSurface:
-                mfa.Cluster.Height = SData_Constant.Single.GetDataOfID(Utils.SurfaceTypeConstantId).Value;
-                mfa.Cluster.CollisionGroup = Utils.SurfaceCollisionGroup;
+                cluster.Height = SData_Constant.Single.GetDataOfID(Utils.SurfaceTypeConstantId).Value;
+                cluster.CollisionGroup = Utils.SurfaceCollisionGroup;
                 break;
         }
-        Debug.Log("类型: " + soldier.GeneralType + "高度: " + mfa.Cluster.Height);
+        //Debug.Log("类型: " + soldier.GeneralType + "高度: " + mfa.Cluster.Height);
         // 添加至ClusterManager中
-        mfa.Cluster.Diameter *= ClusterManager.Single.UnitWidth;
-        mfa.Cluster.StopMove();
+        cluster.Diameter *= ClusterManager.Single.UnitWidth;
+        cluster.StopMove();
         // ClusterManager.Single.Add(mfa.Cluster);
 
 
         // 创建外层持有类
-        var displayOwner = new DisplayOwner(display, mfa.Cluster, mfa);
+        var displayOwner = new DisplayOwner(display, cluster, mfa);
         DisplayerManager.Single.AddElement(soldier.ObjID, displayOwner);
 
         // 创建RanderControl
@@ -423,14 +424,21 @@ public class DataManager : MonoEX.Singleton<DataManager>
 
         // 设置目标选择权重数据
         var aimData = SData_armyaim_c.Single.GetDataOfID(soldier.ArmyID);
-        mfa.Cluster.AllData.SelectWeightData = new SelectWeightData(aimData);
+        cluster.AllData.SelectWeightData = new SelectWeightData(aimData);
 
         if (soldier.AttackType == Utils.BulletTypeScope)
         {
             // 加载单位的AOE数据
             var aoeData = SData_armyaoe_c.Single.GetDataOfID(soldier.ArmyID);
-            mfa.Cluster.AllData.AOEData = new ArmyAOEData(aoeData);
+            cluster.AllData.AOEData = new ArmyAOEData(aoeData);
         }
+        // 加载单位Effect数据
+        var effectData = SData_effect_c.Single.GetDataOfID(soldier.ArmyID);
+        cluster.AllData.EffectData = new EffectData(effectData);
+
+        // 加载单位
+        var armyTypeData = SData_UnitFightData_c.Single.GetDataOfID(soldier.ArmyID);
+        cluster.AllData.ArmyTypeData = new ArmyTypeData(armyTypeData);
 
         // 加载并设置技能
         displayOwner.ClusterData.AllData.SkillInfoList = SkillManager.Single.CreateSkillInfoList(new List<int>()
@@ -579,7 +587,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
         var fixItem = GameObject.CreatePrimitive(PrimitiveType.Cube);
         // 设置父级
         ParentManager.Instance().SetParent(fixItem, ParentManager.ObstacleParent);
-        fixItem.layer = LayerMask.NameToLayer("Scenery");//TODODO 下边测试
+        fixItem.layer = LayerMask.NameToLayer("Scenery");
         //fixItem.name += i;
         var fix = fixItem.AddComponent<FixtureData>();
         var unitWidth = ClusterManager.Single.UnitWidth;

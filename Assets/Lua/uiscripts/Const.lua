@@ -87,4 +87,15 @@ Const = class("Const")
         ["AimGeneralType"] = "tongyong_tubiao_mubiao",
         ["AttackType"] = "tongyong_tubiao_fanwei",
     }
+
+
+    ---我的预摆放模型的位置
+    Const.MyPreModelPosition = {
+        [1] = Vector3(-300,0,0),
+        [2] = Vector3(-100,0,0),
+        [3] = Vector3(-300,0,-50),
+        [4] = Vector3(-100,0,-50),
+        [5] = Vector3(-300,0,-100),
+        [6] = Vector3(-100,0,-100),
+    }
 return Const

@@ -28,17 +28,35 @@ public class TriggerRunner : MonoBehaviour
         // 初始化事件
         settlementDamageOrCure = (type1, type2, trigger, alldata) =>
         {
+            //Debug.Log("伤害结算");
             var isChange = false;
             // 治疗结算
             if (type1 == TriggerLevel1.Fight && type2 == TriggerLevel2.BeCure)
             {
                 alldata.MemberData.CurrentHP += trigger.HealthChangeValue;
                 isChange = true;
+                // 统计受到的治疗量
+                FightDataStatistical.Single.AddHealthChange("" + alldata.MemberData.ObjID.ID, trigger.HealthChangeValue,
+                    alldata.MemberData.Camp, DemageOrCure.Cure, trigger.DemageType);
+                // 统计产生的治疗量
+                FightDataStatistical.Single.AddHealthChange(
+                    "" + trigger.ReleaseMember.ClusterData.AllData.MemberData.ObjID.ID, trigger.HealthChangeValue,
+                    trigger.ReleaseMember.ClusterData.AllData.MemberData.Camp, DemageOrCure.Cure, trigger.DemageType,
+                    AttackOrBeAttach.Attack);
             }
             // 伤害结算
             if (type1 == TriggerLevel1.Fight && type2 == TriggerLevel2.BeAttack)
             {
+                //Debug.Log("结算生命值:" + trigger.HealthChangeValue);
                 alldata.MemberData.SetCurrentHP(alldata.MemberData.CurrentHP - trigger.HealthChangeValue);
+                // 统计受到的伤害量
+                FightDataStatistical.Single.AddHealthChange("" + alldata.MemberData.ObjID.ID, trigger.HealthChangeValue,
+                    alldata.MemberData.Camp, DemageOrCure.Demage, trigger.DemageType);
+                // 统计产生的伤害量
+                FightDataStatistical.Single.AddHealthChange(
+                    "" + trigger.ReleaseMember.ClusterData.AllData.MemberData.ObjID.ID, trigger.HealthChangeValue,
+                    trigger.ReleaseMember.ClusterData.AllData.MemberData.Camp, DemageOrCure.Demage, trigger.DemageType,
+                    AttackOrBeAttach.Attack);
                 if (alldata.MemberData.CurrentHP < Utils.ApproachZero)
                 {
                     alldata.MemberData.SetCurrentHP(0);
@@ -53,11 +71,14 @@ public class TriggerRunner : MonoBehaviour
                         tmpList.Add(new TriggerData()
                         {
                             HealthChangeValue = trigger.HealthChangeValue,
-                            ReceiveMember = trigger.ReleaseMember,
-                            ReleaseMember = trigger.ReceiveMember,
+                            ReceiveMember = trigger.ReceiveMember,
+                            ReleaseMember = trigger.ReleaseMember,
                             TypeLevel1 = TriggerLevel1.Fight,
                             TypeLevel2 = TriggerLevel2.LethalHit
                         });
+
+                        // 统计杀敌数量
+                        FightDataStatistical.Single.AddKillCount("" + alldata.MemberData.ObjID.ID, 1, alldata.MemberData.Camp);
                     }
                 }
 
@@ -70,8 +91,8 @@ public class TriggerRunner : MonoBehaviour
                     tmpList.Add(new TriggerData()
                     {
                         HealthChangeValue = trigger.HealthChangeValue,
-                        ReceiveMember = trigger.ReleaseMember,
-                        ReleaseMember = trigger.ReceiveMember,
+                        ReceiveMember = trigger.ReceiveMember,
+                        ReleaseMember = trigger.ReleaseMember,
                         TypeLevel1 = TriggerLevel1.Fight,
                         TypeLevel2 = TriggerLevel2.Absorption
                     });
@@ -84,8 +105,8 @@ public class TriggerRunner : MonoBehaviour
             {
                 tmpList.Add(new TriggerData()
                 {
-                    ReceiveMember = trigger.ReleaseMember,
-                    ReleaseMember = trigger.ReceiveMember,
+                    ReceiveMember = trigger.ReceiveMember,
+                    ReleaseMember = trigger.ReleaseMember,
                     TypeLevel1 = TriggerLevel1.Fight,
                     TypeLevel2 = TriggerLevel2.HealthChange
                 });
@@ -124,11 +145,14 @@ public class TriggerRunner : MonoBehaviour
             {
                 if (allData.SkillInfoList != null)
                 {
+
+                    //Debug.Log("触发技能");
                     // 触发skill类
                     SkillManager.Single.CheckAndDoSkillInfo(allData.SkillInfoList, trigger);
                 }
                 if (allData.BuffInfoList != null)
                 {
+                    //Debug.Log("触发buff");
                     // 技能触发完毕开始触发buff类
                     BuffManager.Single.CheckAndDoBuffInfo(allData.BuffInfoList, trigger);
                 }

@@ -21,6 +21,10 @@ public class TransformMixer : MonoBehaviour
 
     public void ManualUpdate()
     {
+        if (GetComponent<UIFollow>().Target != null)
+        {
+            return;
+        }
         if (m_PositionTransformChanged)
         {
             m_PositionTransformChanged = false;

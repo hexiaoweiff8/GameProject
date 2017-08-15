@@ -119,6 +119,22 @@ message Pvp{
 };
 
 
+message GfItem {
+    required int32 cardId       =1;
+    required int32 num          =2;
+};
+
+
+message Battle {
+    //repeated PfItem pf          =1;
+    repeated int32 pf           =1;
+    repeated GfItem gf          =2;
+    required int32 avoid        =3;
+    required int32 win          =4;
+    required int32 npc          =5;
+    required int32 score        =6;
+};
+
 message Role{
     required int32 uId			=1;
     required int32 hostId		=2;
@@ -138,7 +154,8 @@ message Role{
     required int32 sex          =16;
     repeated ShopItem shop      =17;
     required Sign sign          =18;
-    required Pvp pvp            =19;
+    //required Pvp pvp            =19;
+    required Battle battle      =19;
 };
 
 

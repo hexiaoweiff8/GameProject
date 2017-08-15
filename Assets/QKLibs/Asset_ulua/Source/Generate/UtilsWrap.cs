@@ -66,6 +66,7 @@ public class UtilsWrap
 		L.RegConstant("AirCollisionGroup", 2);
 		L.RegConstant("SurfaceTypeConstantId", 5);
 		L.RegConstant("AirTypeConstantId", 6);
+		L.RegConstant("UnitWidthId", 7);
 		L.RegConstant("HumanArmyType", 1);
 		L.RegConstant("OrcArmyType", 2);
 		L.RegConstant("MechanicArmyType", 3);

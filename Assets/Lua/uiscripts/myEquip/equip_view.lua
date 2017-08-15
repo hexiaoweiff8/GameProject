@@ -20,6 +20,8 @@ function equip_view:getView()
     self.UIModelPosition =  view.transform:Find("UIModelPosition").gameObject
 
     self.remakeP = view.transform:Find("remakePosition").gameObject
+
+    self.btn_Back = view.transform:Find("btn_Back").gameObject
 end
 
 return equip_view

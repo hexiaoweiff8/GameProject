@@ -127,8 +127,8 @@ public class FormulaParamsPackerFactroy
             // TODO 技能等级, 最大目标数量
             SkillLevel = skill.Level,
             SkillNum = skill.Num,
-            ReceiverMenber = startObj,
-            ReleaseMember = targetObj,
+            ReceiverMenber = targetObj,
+            ReleaseMember = startObj,
             StartPos = startObj.ClusterData.gameObject.transform.position,
             TargetPos = targetObj.ClusterData.gameObject.transform.position,
             IsNotLethal = isNotLethal,

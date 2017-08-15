@@ -139,6 +139,12 @@ public class VOBase
     [SkillAddition]
     public bool IsMelee;
     /// <summary>
+    /// 是否霸体
+    /// </summary>
+    [SkillAddition]
+    public bool IsDambody;
+
+    /// <summary>
     /// 是否为召唤生物
     /// </summary>
     [SkillAddition]
@@ -294,6 +300,7 @@ public class VOBase
         set { _armor = value; }
     }
 
+
     /// <summary>
     /// 自身大兵种类型
     /// </summary>
@@ -409,6 +416,7 @@ public class VOBase
         get { return _camp; }
         set { _camp = value; }
     }
+
     //----------------------------字段声明都在上半部分---------------------------------
 
     /// <summary>
@@ -423,7 +431,6 @@ public class VOBase
         }
         _currentHP = hp;
     }
-
     /// <summary>
     /// 装填单位属性
     /// </summary>

@@ -41,6 +41,7 @@ function wnd_base:initialize(_wnd_base_id)
     
     --同一个预制不同界面
     local tempIndex = string.find(_wnd_base_id, "&")
+
     if tempIndex then
         self.wnd_base_sub_id = string.sub(_wnd_base_id, tempIndex + 1, string.len(_wnd_base_id))
         _wnd_base_id = string.sub(_wnd_base_id, 1, tempIndex - 1)
@@ -68,6 +69,7 @@ function wnd_base:Show(duration)
         isWithBg = false
     end
     WndManage.Single:ShowWnd(self.name, duration, isWithBg)
+
 end
 
 function wnd_base:Hide(duration)
@@ -90,17 +92,19 @@ function wnd_base:PreLoad()
 end
 
 function wnd_base:_OnShowFinish(wnd)
-    local wndGO = wnd:GetGameObject()
-    wndGO:AddComponent(typeof(LuaBehaviour)):Init(self)
-    local rootGameObject = ui_manager:get_wnd_base_root(self.wnd_base_type).transform
-    local tfp = wndGO.transform.parent
-    tfp.parent = rootGameObject
-    if self.wnd_base_baffleType == wnd_base_baffleType.NONE then
-        wnd.m_baffleObj:SetActive(false)
-    end
+    -- local wndGO = wnd:GetGameObject()
+    -- wndGO:AddComponent(typeof(LuaBehaviour)):Init(self)
+    -- local rootGameObject = ui_manager:get_wnd_base_root(self.wnd_base_type).transform
+    -- local tfp = wndGO.transform.parent
+    -- tfp.parent = rootGameObject
+    -- if self.wnd_base_baffleType == wnd_base_baffleType.NONE then
+    --     wnd.m_baffleObj:SetActive(false)
+    -- end
+  
+    -- Tools.AdjustBaseWindowDepth(rootGameObject.gameObject, tfp.gameObject, wndDepth[self.wnd_base_type])
     
-    Tools.AdjustBaseWindowDepth(rootGameObject.gameObject, tfp.gameObject, wndDepth[self.wnd_base_type])
-    
+    AdjustBaseWindowDepth(wnd,self)
+
     --显示完成通知
     if (self.OnShowDone ~= nil) then
         self:OnShowDone()
@@ -108,6 +112,13 @@ function wnd_base:_OnShowFinish(wnd)
     --注册事件监听
     if (self.OnAddHandler ~= nil) then
         self:OnAddHandler()
+    end
+end
+
+function wnd_base:_OnHideFinish(wnd)
+    --隐藏或销毁完成通知
+    if (self.OnHideDone ~= nil) then
+        self:OnHideDone()
     end
 end
 
@@ -167,6 +178,13 @@ function OnShowFinish(wnd)
     wnd_base:_OnShowFinish(wnd)
 end
 
+function OnHideFinish(wnd)
+    local wndName = wnd.Name
+    local wnd_base = _all_Reg_Wnd_list[wndName]
+    if (wnd_base == nil) then return end
+    wnd_base:_OnHideFinish(wnd)
+end
+
 
 function OnDestroyFinish(wnd)
     local wndName = wnd.Name
@@ -182,6 +200,20 @@ function OnShowFinishEnd(wnd)
     if (wnd_base == nil) then return end
     wnd_base:_OnShowFinishEnd(wnd)
 end
+function wnd_base:_OnReOpenWnd(wnd)
+    AdjustBaseWindowDepth(wnd,self)
+    if (self.OnReOpenDone ~= nil) then
+        self:OnReOpenDone()
+    end
+end
+
+function OnReOpenWnd(wnd)
+    local wndName = wnd.Name
+    local wnd_base = _all_Reg_Wnd_list[wndName]
+    if (wnd_base == nil) then return end
+    wnd_base:_OnReOpenWnd(wnd)
+end
+
 
 
 function OnDestroyFinishEnd(wnd)
@@ -196,4 +228,19 @@ function OnPreLoadFinish(wnd)
     local wnd_base = _all_Reg_Wnd_list[wndName]
     if (wnd_base == nil) then return end
     wnd_base:_OnPreLoadFinish(wnd)
+end
+
+function AdjustBaseWindowDepth(wnd,instance)
+    local wndGO = wnd:GetGameObject()
+    if wndGO:GetComponent(typeof(LuaBehaviour)) == nil then
+        wndGO:AddComponent(typeof(LuaBehaviour)):Init(instance)
+    end
+    local rootGameObject = ui_manager:get_wnd_base_root(instance.wnd_base_type).transform
+    local tfp = wndGO.transform.parent
+    tfp.parent = rootGameObject
+    if instance.wnd_base_baffleType == wnd_base_baffleType.NONE then
+        wnd.m_baffleObj:SetActive(false)
+    end
+
+    Tools.AdjustBaseWindowDepth(rootGameObject.gameObject, tfp.gameObject, wndDepth[instance.wnd_base_type])
 end

@@ -30,6 +30,11 @@ function cardInHand_view:initView(arg)
     ---卡牌详细信息
     -- 卡牌信息tf
     self.cardInfoBg = view.transform:Find("cardInfoBg")
+    self.targetType = self.cardInfoBg.transform:Find("target").gameObject
+    self.attackValue = self.cardInfoBg.transform:Find("attack/value").gameObject
+    self.defenceValue = self.cardInfoBg.transform:Find("defence/value").gameObject
+    self.HPValue= self.cardInfoBg.transform:Find("HP/value").gameObject
+
     -- 当前UI相机
     self.nowUICamera = GameObject.Find("/UIRoot/Camera_UI"):GetComponent(typeof(UnityEngine.Camera))
     -- PTZCamera相机
@@ -38,8 +43,6 @@ function cardInHand_view:initView(arg)
     self.nowWorldCamera = self.PTZCameraTf:Find("SceneryCamera"):GetComponent(typeof(UnityEngine.Camera))
 
 
-    --不可下兵区域
-    self.canotRect = GameObject.Find("/SceneRoot/canotRectGo/canotRect")
     -- 能量部分
     self.power = view.transform:Find("power").gameObject
 

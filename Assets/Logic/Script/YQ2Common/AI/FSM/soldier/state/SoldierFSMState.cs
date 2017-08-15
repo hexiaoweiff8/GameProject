@@ -107,7 +107,7 @@ public abstract class SoldierFSMState
             {
                 var state = SoldierFSMFactory.GetStateIdByTrigger(_fsmTrriggerList[i].triggerId);
                 fsm.ChangeState(state);
-                Debug.Log("切换状态:" + state);
+                //Debug.Log("切换状态:" + state);
                 break;
             }
         }

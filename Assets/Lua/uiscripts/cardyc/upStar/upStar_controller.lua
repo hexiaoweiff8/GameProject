@@ -139,7 +139,7 @@ end
 
 --点击升星界面的升星按钮
 function upStar_controller:upStarPanel_btnUpStar_CallBack()
-    local isCan_UpStar = data:isCan_UpStar()
+    local isCan_UpStar = data:isCan_UpStar(data.cardId)
     if isCan_UpStar ~= 0 then
         UIToast.Show(isCan_UpStar)
         return

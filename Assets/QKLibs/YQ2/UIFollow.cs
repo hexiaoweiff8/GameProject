@@ -3,7 +3,17 @@ using System.Collections;
 public class UIFollow : MonoBehaviour
 {
     // 需要跟随的目标对象
-    public Transform target;
+    private Transform target;
+    private bool isFollow;
+    public Transform Target
+    {
+        get { return target; }
+        set
+        {
+            target = value;
+            if (target) { isFollow = true; }
+        }
+    }
 
     // 需要锁定的坐标（可以实时生效）
     public bool freazeX, freazeY, freazeZ;
@@ -31,12 +41,17 @@ public class UIFollow : MonoBehaviour
 
     void LateUpdate()
     {
-        if (!target)
+        if (!target||!isFollow)
         {
             return;
         }
-        oldPosition = transform.position;
+        if (Mathf.Abs(target.position.x - transform.position.x) < 10)
+        {
+            isFollow = false;
+            return;
+        }
 
+        oldPosition = transform.position;
         if (!freazeX)
         {
             oldPosition.x = Mathf.SmoothDamp(transform.position.x, target.position.x + offset.x, ref xVelocity, smoothTime);
@@ -53,10 +68,10 @@ public class UIFollow : MonoBehaviour
         }
         mr.CurrentPos = oldPosition;
         transform.position = oldPosition;
-        if (Mathf.Abs(target.position.x - oldPosition.x) < 10)
-        {
-            target = null;
-        }
+//        if (Mathf.Abs(target.position.x - oldPosition.x) < 10)
+//        {
+//            target = null;
+//        }
 
     }
 
@@ -66,6 +81,8 @@ public class UIFollow : MonoBehaviour
     /// </summary>
     public void ResetPosition()
     {
+        target = null;
+        isFollow = false;
         transform.position = startPosition;
     }
 }

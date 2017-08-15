@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 /// <summary>
 /// 加载器
 /// </summary>
-public class ResourcesLoader : IResourcesLoader
+public class ResourcesLoader
 {
     /// <summary>
     /// 单例
@@ -38,9 +38,7 @@ public class ResourcesLoader : IResourcesLoader
     /// <returns>特效对象</returns>
     public GameObject Load(string key)
     {
-        GameObject result = null;
-        // TODO AB包中加载
-        result = (GameObject)Resources.Load(key);
+        var result = (GameObject)Resources.Load(key);
         if (result != null)
         {
             result = Object.Instantiate(result);
@@ -50,5 +48,16 @@ public class ResourcesLoader : IResourcesLoader
             Debug.Log("Resource not exist:" + key);
         }
         return result;
+    }
+
+    /// <summary>
+    /// 加载Ab包资源
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="package"></param>
+    /// <returns></returns>
+    public GameObject Load(string key, string package)
+    {
+        return GameObjectExtension.InstantiateFromPacket(package, key, null);
     }
 }

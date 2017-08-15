@@ -22,40 +22,30 @@ function wnd_biandui_model:SetArmyData(battle)
 
     --TODO: 解析服务器读来的大营及前锋数据
     print("SetArmyData-----------------")
-
     print("数据数量..."..tostring(#battle))
     print("数据数量..."..tostring(#battle.gf))
     print("数据数量..."..tostring(#battle.pf))
 
     this.DayingItemList = {}
 
-    local GfItem = {}
-    GfItem["cardId"] = 101001
-    GfItem["num"] = 1
-
-    local GfItem2 = {}
-    GfItem2["cardId"] = 101002
-    GfItem2["num"] = 2
-
-    table.insert(this.DayingItemList,GfItem)
-    table.insert(this.DayingItemList,GfItem2)
-
-
+    if(#battle.gf>0) then
+        for i=1,#battle.gf do
+            local GfItem = {}
+            GfItem["cardId"] = battle.gf[i]["cardId"]
+            GfItem["num"] = battle.gf[i]["num"]
+            table.insert(this.DayingItemList,GfItem)
+        end
+    end
 
 
     this.QianfengItemList = {}
-    local PfItem = {}
-    PfItem["cardId"] = 101001
-    PfItem["pos"] = 1
-
-    local PfItem2 = {}
-    PfItem2["cardId"] = 101002
-    PfItem2["pos"] = 2
-
-    table.insert(this.QianfengItemList,PfItem)
-    table.insert(this.QianfengItemList,PfItem2)
-
-
+    for i =1,6 do
+        if(battle.pf[i] == 0) then
+            this.QianfengItemList[i] = 0
+        else
+            this.QianfengItemList[i] = battle.pf[i]
+        end
+    end
 end
 
 --@Des 读取卡库中卡牌信息
@@ -130,10 +120,12 @@ function wnd_biandui_model:FindTrainCostbYArmyCardID(ArmyCardID)
 end
 
 function wnd_biandui_model:initLocalArmyCardUseLimit()
+
     if sdata_armycarduselimit_data == nil then
         print("没获取到以下数据：sdata_armycarduselimit_data")
         return
     end
+
     for k,v in pairs(sdata_armycarduselimit_data.mData.body) do
         local Tab = {}
         Tab["UniqueID"] = v[sdata_armycarduselimit_data.mFieldName2Index['UniqueID']]
@@ -142,9 +134,11 @@ function wnd_biandui_model:initLocalArmyCardUseLimit()
         Tab["UseLimit"] = v[sdata_armycarduselimit_data.mFieldName2Index['UseLimit']]
         table.insert(this.local_armycarduselimit,Tab)
     end
+
     table.sort(this.local_armycarduselimit,function(a,b)
         return a["UniqueID"] < b["UniqueID"]
     end)
+
 end
 
 --@Des 查找卡牌使用上限

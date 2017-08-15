@@ -18,9 +18,10 @@ function wnd_cardyc_view:getView()
     self.btn_upLevel_redDot = self.leftPanel.transform:Find("Btn_upLevel/redDot").gameObject
     self.btn_left = self.leftPanel.transform:Find("Btn_left").gameObject
     self.btn_right = self.leftPanel.transform:Find("Btn_right").gameObject
+    --UImodel
+    self.UIModelPosition = self.leftPanel.transform:Find("UIModelPosition").gameObject--卡牌图
     --cardPanel
     self.cardPanel = self.leftPanel.transform:Find("card").gameObject
-    self.cardImgSp = self.cardPanel.transform:Find("cardImg_Sp").gameObject--卡牌图
     self.cardNameLab = self.cardPanel.transform:Find("cardName_Lab").gameObject --卡牌名+品质
     self.cardLevelLab = self.cardPanel.transform:Find("cardLevel_Lab").gameObject--卡牌等级
     self.cardNum_Lab = self.cardPanel.transform:Find("cardNum_lab").gameObject --卡牌数量
@@ -43,6 +44,8 @@ function wnd_cardyc_view:getView()
     self.synergyPanel = view.transform:Find("right/synergy").gameObject
     self.informationBody_Panel = view.transform:Find("right/information").gameObject
     self.skillPanel = view.transform:Find("right/skill").gameObject
+
+    self.btn_Back = view.transform:Find("bgframe/Btn_back").gameObject
 end
 
 

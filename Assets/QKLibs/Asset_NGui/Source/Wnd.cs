@@ -1,38 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using DG.Tweening;
 using LuaInterface;
 
 
-//渐显渐隐模式
-public enum WndFadeMode
-{
-    None = 0,//没有渐显效果
-    ScaleAlpha = 1,//一边缩放，一边半透
-    Alpha = 2,//半透
-    Scale = 3, //缩放
-}
-
-//窗体动画模式
-public enum WndAnimationMode
-{
-    situ = 0,//原地不动的
-    down = 1,//从上方掉下来
-    up = 2,//从下方升起
-    left = 3,//从左边拉出
-    right = 4,//从右边拉出
-}
-
 public class Wnd : IDisposable
 {
+    /// <summary>
+    /// show destroy hide preload（预加载） 分别对应wndmanager 最重要的四个对外接口的枚举
+    /// </summary>
     public static LuaFunction OnShowFinish = LuaClient.GetMainState().GetFunction("OnShowFinish");
     public static LuaFunction OnDestroyFinish = LuaClient.GetMainState().GetFunction("OnDestroyFinish");
+    public static LuaFunction OnHideFinish = LuaClient.GetMainState().GetFunction("OnHideFinish");
+    public static LuaFunction OnPreLoadFinish = LuaClient.GetMainState().GetFunction("OnPreLoadFinish");
+    /// <summary>
+    /// 在wnd未被释放之前调用show 会触发此方法
+    /// </summary>
+    public static LuaFunction OnReOpenWnd = LuaClient.GetMainState().GetFunction("OnReOpenWnd");
+
+    /// <summary>
+    /// 对应缓动结束后的回调 主要处理一些界面动画播放完之后的刷新等操作
+    /// </summary>
     public static LuaFunction OnShowFinishEnd = LuaClient.GetMainState().GetFunction("OnShowFinishEnd");
     public static LuaFunction OnDestroyFinishEnd = LuaClient.GetMainState().GetFunction("OnDestroyFinishEnd");
-    public static LuaFunction OnPreLoadFinish = LuaClient.GetMainState().GetFunction("OnPreLoadFinish");
     public const float DefaultDuration = 0.5f;
     public Wnd(GameObject panelObj, GameObject baffleObj, wndInfo wInfo)
     {
@@ -43,9 +34,9 @@ public class Wnd : IDisposable
         m_wndObj = panelObj.transform.GetChild(0).gameObject;
     }
 
-    public void _Hide(float duration, WShowType wt)
+    public void _Hide(float duration, WShowType wt, int depth)
     {
-        _ShowHide(false, duration, wt);
+        _ShowHide(false, duration, wt, depth);
     }
 
     public void _Show(float duration)
@@ -138,7 +129,7 @@ public class Wnd : IDisposable
     Vector3 m_TweenStartPos;
     float m_TweenStartAlpha;
 
-    void _ShowHide(bool isShow, float duration, WShowType wt)
+    void _ShowHide(bool isShow, float duration, WShowType wt,int depth = 0)
     {
         //移除所有现有的显示效果
         StopAllTweener();
@@ -176,7 +167,7 @@ public class Wnd : IDisposable
                         }
                         else
                         {
-                            _DoHide(wt);
+                            _DoHide(wt,depth);
                         }
                     }
                 );
@@ -192,7 +183,7 @@ public class Wnd : IDisposable
                 OnShowFinishEnd.Call(this);
             }
             else
-                _DoHide(wt);
+                _DoHide(wt,depth);
         }
     }
 
@@ -211,7 +202,7 @@ public class Wnd : IDisposable
     }
 
 
-    void _DoHide(WShowType wt)
+    void _DoHide(WShowType wt,int depth)
     {
         if (m_panelObj == null) return;
         if (wt == WShowType.hide)
@@ -220,7 +211,7 @@ public class Wnd : IDisposable
             UIPanel[] panels = m_panelObj.transform.GetComponentsInChildren<UIPanel>(true);
             for (int i = 0; i < panels.Length; i++)
             {
-                panels[i].depth = 0;
+                panels[i].depth -= depth;
             }
             m_Visible = false;
             WndManage.Single._OnWndHide(m_wInfo.name);//通知界面隐藏
@@ -228,8 +219,9 @@ public class Wnd : IDisposable
         else
         {
             WndManage.Single.DestroyWnd(WndManage.Single._GetWnd(m_wInfo.name));
+            OnDestroyFinishEnd.Call(this);
         }
-        OnDestroyFinishEnd.Call(this);
+        
     }
 
 
@@ -263,6 +255,59 @@ public class Wnd : IDisposable
     public GameObject m_baffleObj = null;
     wndInfo m_wInfo = null;
     Tweener m_Tween = null;
-    //bool m_isShowing = false;
-    //int m_TweenCount = 0;
+
 }
+
+public class wndShowHideInfo
+{
+    public string name;
+    //逻辑当前是希望它显示还是隐藏,还是预加载
+    public WShowType needVisible = WShowType.hide;
+    public float duration;//延迟
+    //基础深度
+    public int PlantfromDetph;
+    public bool isWithBg;
+}
+public enum WShowType
+{
+    hide,
+    show,
+    preLoad,
+    destroy,
+}
+
+
+public class wndInfo : ICloneable
+{
+    public string name;
+    public List<string> dependPackets = null;
+    public WndFadeMode fade;
+    public WndAnimationMode animaMode;
+    public bool isVisible = false;//当前是否处于显示状态
+    public int cacheTime;
+    public object Clone()
+    {
+        return this.MemberwiseClone();
+    }
+}
+
+
+//渐显渐隐模式
+public enum WndFadeMode
+{
+    None = 0,//没有渐显效果
+    ScaleAlpha = 1,//一边缩放，一边半透
+    Alpha = 2,//半透
+    Scale = 3, //缩放
+}
+
+//窗体动画模式
+public enum WndAnimationMode
+{
+    situ = 0,//原地不动的
+    down = 1,//从上方掉下来
+    up = 2,//从下方升起
+    left = 3,//从左边拉出
+    right = 4,//从右边拉出
+}
+

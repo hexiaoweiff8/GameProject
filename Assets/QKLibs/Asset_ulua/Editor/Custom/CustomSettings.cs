@@ -106,6 +106,7 @@ public static class CustomSettings
         _GT(typeof (Texture2D)),
         _GT(typeof (Shader)),
         _GT(typeof (Renderer)),
+
         _GT(typeof (WWW)),
         _GT(typeof (Screen)),
         _GT(typeof (CameraClearFlags)),
@@ -115,6 +116,7 @@ public static class CustomSettings
         _GT(typeof (AsyncOperation)).SetBaseType(typeof (System.Object)),
         _GT(typeof (LightType)),
         _GT(typeof (SleepTimeout)),
+        _GT(typeof (Color)),
 #if UNITY_5_3_OR_NEWER && !UNITY_5_6_OR_NEWER
         _GT(typeof (UnityEngine.Experimental.Director.DirectorPlayer)),
 #endif
@@ -278,6 +280,7 @@ public static class CustomSettings
         //_GT(typeof(PVPloopGrid)),
         _GT(typeof(MailItem)),
         _GT(typeof(MailLoopGrid)),
+        _GT(typeof(WordFilter)),//敏感词过滤工具
         #endregion
         _GT(typeof(UnityEngine.SceneManagement.SceneManager)),
         _GT(typeof(UnityEngine.SceneManagement.LoadSceneMode)),

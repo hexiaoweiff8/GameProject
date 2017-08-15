@@ -25,7 +25,7 @@ public class Soldier_Ruchang_State : SoldierFSMState
         //at.toXunLu(fsm.Display.ClusterData as ClusterData, soldier.isEnemy, fsm.Display);
         // 设置单位可被选择
         fsm.Display.ClusterData.CouldSelect = true;
-        Debug.Log("士兵入场, armyID:" + fsm.Display.ClusterData.AllData.MemberData.ArmyID);
+        //Debug.Log("士兵入场, armyID:" + fsm.Display.ClusterData.AllData.MemberData.ArmyID);
         float deployTime = 0f;
 
         var objId = fsm.Display.ClusterData.AllData.MemberData.ObjID;
@@ -55,6 +55,8 @@ public class Soldier_Ruchang_State : SoldierFSMState
         CoroutineManage.Single.StartCoroutine(_waitFor(deployTime, () =>
         {
             fsm.IsCanRun = true;
+            // 统计战斗数据
+            FightDataStatistical.Single.AddCostData(fsm.Display.ClusterData.AllData.ArmyTypeData);
 
             // 抛出入场结束事件
             SkillManager.Single.SetTriggerData(new TriggerData()

@@ -5,7 +5,6 @@
 			_scrollView
 			_scrollViewItem
 			currentList -- table* scrollview内容表指针
-
 		function:
 			init() 初始化scrollview界面
 			HandleOnItemLoadedHandler() 回调，加载列表项时被执行
@@ -15,6 +14,7 @@ wnd_cardshop_ScrollView_controller = {}
 
 local this = wnd_cardshop_ScrollView_controller
 local ctrl,model,view
+local _scrollView,_scrollViewItem
 
 this.currentList = {}
 this.tweeningList = {}

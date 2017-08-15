@@ -18,6 +18,7 @@ require('uiscripts/tips/ui_tips_equip')
 wnd_shop_controller = require("common/middleclass")("wnd_shop_controller",wnd_base)
 
 local this = wnd_shop_controller
+local instance = nil
 
 this._bTipsIsShow = false -- 当前界面是否有tips处于显示状态
 
@@ -25,6 +26,8 @@ function wnd_shop_controller:OnShowDone()
 	this.view = require('uiscripts/shop/wnd_shop_view')
 	this.model = require('uiscripts/shop/wnd_shop_model')
 	this.view:initView(self)
+
+	instance = self
 
 	this:initTabButton()
 	this.view:initCollider()
@@ -74,7 +77,7 @@ end
 function wnd_shop_controller:initListener()
 	UIEventListener.Get(this.view.Button_back).onClick = function()
 			-- TODO: 商店界面：返回按钮的实现
-			ui_manager:DestroyWB(self)
+			instance:Hide(0)
 		end
 	-- 页卡
 	for i = 1,#this.model.local_Tabs do
@@ -163,15 +166,15 @@ function wnd_shop_controller:SelectYekaButton(selectedButton)
 		return
 	end
 
-	if mAtlas == nil then
-		mAtlas = this.view.Button_back:GetComponent(typeof(UISprite)).atlas
+	if this.mAtlas == nil then
+		this.mAtlas = this.view.Button_back:GetComponent(typeof(UISprite)).atlas
 	end
 
 	if this._selectedYekaButton ~= nil then
 		this._selectedYekaButton:GetComponent(typeof(UISprite)).atlas = nil
 	end
 
-	selectedButton:GetComponent(typeof(UISprite)).atlas = mAtlas
+	selectedButton:GetComponent(typeof(UISprite)).atlas = this.mAtlas
 	selectedButton:GetComponent(typeof(UISprite)).spriteName = cstr.SELECTED_YEKA
 	-- this.view.Panel_Tab.sTabTop.transform.localPosition = Vector3(selectedButton.transform.localPosition.x,
 	-- 	selectedButton.transform.localPosition.y + selectedButton:GetComponent(typeof(UIWidget)).height / 2 + this.view.Panel_Tab.sTabTop:GetComponent(typeof(UIWidget)).height / 2,

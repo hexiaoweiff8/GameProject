@@ -1,6 +1,13 @@
 require("common/init")
 require("framework/init")
 require("gameEventType")
+--[[
+	导入inspect全局调试工具类
+	Usage:
+		local str = inspect(<table>)
+		print(str)
+]]
+inspect = require 'common/inspect'
 
 --高亮打印
 function lgyPrint(log)
@@ -52,7 +59,6 @@ local network_manager = require "manager/network_manager"
 networkMgr:SetLuaTable(network_manager())
 networkMgr:SendConnect()
 
-
 require("uiscripts/wnd_base")
 require("uiscripts/cm_gameinit_pan")
 require("uiscripts/main/NetworkDelay_Manager")
@@ -84,5 +90,8 @@ require("uiscripts/Util/qualityUtil")
 require("uiscripts/Util/equipUtil")
 require("uiscripts/Util/dotweenUtil")
 require("uiscripts/Util/borderUtil")
+require("uiscripts.Util.dayilymissionUtil")
+require("uiscripts.Util.subtlecodeUtil")
+
 
 -- require('uiscripts/Util/consoleUtil')

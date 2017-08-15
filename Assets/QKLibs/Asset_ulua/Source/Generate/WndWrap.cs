@@ -17,9 +17,11 @@ public class WndWrap
 		L.RegConstant("DefaultDuration", 0.5);
 		L.RegVar("OnShowFinish", get_OnShowFinish, set_OnShowFinish);
 		L.RegVar("OnDestroyFinish", get_OnDestroyFinish, set_OnDestroyFinish);
+		L.RegVar("OnHideFinish", get_OnHideFinish, set_OnHideFinish);
+		L.RegVar("OnPreLoadFinish", get_OnPreLoadFinish, set_OnPreLoadFinish);
+		L.RegVar("OnReOpenWnd", get_OnReOpenWnd, set_OnReOpenWnd);
 		L.RegVar("OnShowFinishEnd", get_OnShowFinishEnd, set_OnShowFinishEnd);
 		L.RegVar("OnDestroyFinishEnd", get_OnDestroyFinishEnd, set_OnDestroyFinishEnd);
-		L.RegVar("OnPreLoadFinish", get_OnPreLoadFinish, set_OnPreLoadFinish);
 		L.RegVar("m_wndObj", get_m_wndObj, set_m_wndObj);
 		L.RegVar("m_panelObj", get_m_panelObj, set_m_panelObj);
 		L.RegVar("m_baffleObj", get_m_baffleObj, set_m_baffleObj);
@@ -60,11 +62,12 @@ public class WndWrap
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 3);
+			ToLua.CheckArgsCount(L, 4);
 			Wnd obj = (Wnd)ToLua.CheckObject(L, 1, typeof(Wnd));
 			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
 			WShowType arg1 = (WShowType)ToLua.CheckObject(L, 3, typeof(WShowType));
-			obj._Hide(arg0, arg1);
+			int arg2 = (int)LuaDLL.luaL_checknumber(L, 4);
+			obj._Hide(arg0, arg1, arg2);
 			return 0;
 		}
 		catch(Exception e)
@@ -170,6 +173,48 @@ public class WndWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_OnHideFinish(IntPtr L)
+	{
+		try
+		{
+			ToLua.Push(L, Wnd.OnHideFinish);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_OnPreLoadFinish(IntPtr L)
+	{
+		try
+		{
+			ToLua.Push(L, Wnd.OnPreLoadFinish);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_OnReOpenWnd(IntPtr L)
+	{
+		try
+		{
+			ToLua.Push(L, Wnd.OnReOpenWnd);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_OnShowFinishEnd(IntPtr L)
 	{
 		try
@@ -189,20 +234,6 @@ public class WndWrap
 		try
 		{
 			ToLua.Push(L, Wnd.OnDestroyFinishEnd);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_OnPreLoadFinish(IntPtr L)
-	{
-		try
-		{
-			ToLua.Push(L, Wnd.OnPreLoadFinish);
 			return 1;
 		}
 		catch(Exception e)
@@ -337,6 +368,51 @@ public class WndWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_OnHideFinish(IntPtr L)
+	{
+		try
+		{
+			LuaFunction arg0 = ToLua.CheckLuaFunction(L, 2);
+			Wnd.OnHideFinish = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_OnPreLoadFinish(IntPtr L)
+	{
+		try
+		{
+			LuaFunction arg0 = ToLua.CheckLuaFunction(L, 2);
+			Wnd.OnPreLoadFinish = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_OnReOpenWnd(IntPtr L)
+	{
+		try
+		{
+			LuaFunction arg0 = ToLua.CheckLuaFunction(L, 2);
+			Wnd.OnReOpenWnd = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_OnShowFinishEnd(IntPtr L)
 	{
 		try
@@ -358,21 +434,6 @@ public class WndWrap
 		{
 			LuaFunction arg0 = ToLua.CheckLuaFunction(L, 2);
 			Wnd.OnDestroyFinishEnd = arg0;
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_OnPreLoadFinish(IntPtr L)
-	{
-		try
-		{
-			LuaFunction arg0 = ToLua.CheckLuaFunction(L, 2);
-			Wnd.OnPreLoadFinish = arg0;
 			return 0;
 		}
 		catch(Exception e)

@@ -11,9 +11,6 @@ function fight_view:init(arg)
     self.time_txt = view.transform:Find("basic/time_bg/txt"):GetComponent("UILabel")
     --self.myBloodBar = view.transform:Find("defence_widget1/bg/hp_fg"):GetComponent("UISprite")
 
-    ---不可下兵区域的父物体
-    self.canotRectP = GameObject.Find("/SceneRoot/canotRectGo")
-
     ---已准备好的卡牌
     -- 装载ui卡牌的panel
     self.currentCards_bg = view.transform:Find("handCards")
@@ -62,10 +59,10 @@ function fight_view:init(arg)
     self.jumpToMyMain = view.transform:Find("btn_main").gameObject
     self.jumpToFirst = view.transform:Find("btn_first").gameObject
 
-end
 
-function fight_view:getView()
-
+    ---测试UI
+    self.TEST_ENEMYINFO = view.transform:Find("TEST_ENEMYINFO").gameObject
+    self.TEST_ENEMYINFO:SetActive(false)
 end
 
 return fight_view

@@ -15,7 +15,6 @@ function upSkill_model:init_skillIDTable()
 end
 --判断技能是否可以升级
 function upSkill_model:isCan_UpSkill(index)
-    print(index,self.skill_Lv_Table[index])
     local lv = self.skill_Lv_Table[index]
 
     if lv >= Const.MAX_SKILL_LV then

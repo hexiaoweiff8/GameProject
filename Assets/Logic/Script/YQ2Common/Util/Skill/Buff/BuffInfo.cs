@@ -98,6 +98,16 @@ public class BuffInfo : SkillBase
     public TriggerLevel2 DetachTriggerLevel2 { get; set; }
 
     /// <summary>
+    /// Detach生命区间下限
+    /// </summary>
+    public int DetachHpScopeMin = -1;
+
+    /// <summary>
+    /// Detach生命区间上限
+    /// </summary>
+    public int DetachHpScopeMax = -1;
+
+    /// <summary>
     /// detach-键
     /// </summary>
     public IList<string> DetachQualifiedKeyList = new List<string>();

@@ -37,7 +37,7 @@ function ui_mainSystemBar.initView()
 	for index,button in pairs(colliders) do
 		collider = button:AddComponent(typeof(UnityEngine.BoxCollider))
 		collider.isTrigger = true
-		collider.center = Vector3.zero
+		collider.center = Vector3(0,12,0)
 		if collider.gameObject == m.pItem then
 			collider.size = Vector3(78,78,0)
 		else
@@ -58,7 +58,10 @@ function ui_mainSystemBar.initData()
 			Item["Type"] = v[sdata_maininterface_data.mFieldName2Index['Type']]
 			Item["UnlockLevel"] = v[sdata_maininterface_data.mFieldName2Index['UnlockLevel']]
 			Item["UnlockEvent"] = v[sdata_maininterface_data.mFieldName2Index['UnlockEvent']]
+			Item["Prompt"] = v[sdata_maininterface_data.mFieldName2Index['Prompt']]
 			Item["Icon"] = v[sdata_maininterface_data.mFieldName2Index['Icon']]
+			Item["UIDefine"] = v[sdata_maininterface_data.mFieldName2Index['UIDefine']]
+			Item["RedDotRefreshAPI"] = v[sdata_maininterface_data.mFieldName2Index['RedDotRefreshAPI']]
 			table.insert(m.local_MainSystemBarData,Item)
 		end
 	end
@@ -98,30 +101,29 @@ function ui_mainSystemBar.initItem()
 	m.bIsInitialed = true
 end
 function ui_mainSystemBar.attachListener(ID,pItem)
-	if ID == 101 then -- 显示equip2界面
-		UIEventListener.Get(pItem).onClick = function()
-			ui_manager:ShowWB(WNDTYPE.ui_equip2)
+
+	local function showWND(WNDTYPE_WndName)
+		local WND_instance = ui_manager:GetWB(WNDTYPE_WndName)
+		if WND_instance == nil then
+			ui_manager:ShowWB(WNDTYPE_WndName)
+		else
+			WND_instance:Show()
 		end
-	elseif ID == 102 then -- 显示编队界面
-		UIEventListener.Get(pItem).onClick = function()
-			ui_manager:ShowWB(WNDTYPE.BianDui)
-		end
-	elseif ID == 104 then -- 显示仓库界面
-		UIEventListener.Get(pItem).onClick = function()
-			ui_manager:ShowWB(WNDTYPE.Cangku)
-		end
-	elseif ID == 106 then
-		UIEventListener.Get(pItem).onClick = function()
-			ui_manager:ShowWB(WNDTYPE.Shop)
-		end
-	elseif ID == 107 then
-		UIEventListener.Get(pItem).onClick = function()
-			if ui_manager._shown_wnd_bases[WNDTYPE.CardShop] == nil then
-				ui_manager:ShowWB(WNDTYPE.CardShop)
-			else
-				ui_manager._shown_wnd_bases[WNDTYPE.CardShop]:Show()
+	end
+
+	UIEventListener.Get(pItem).onClick = function()
+		local function getEntrance(ID)
+			for i = 1,#m.local_MainSystemBarData do
+				if m.local_MainSystemBarData[i]["ID"] == ID then
+					if m.local_MainSystemBarData[i]["UIDefine"] ~= '' then
+						return m.local_MainSystemBarData[i]["UIDefine"]
+					else
+						error("未定义ui入口")
+					end
+				end
 			end
 		end
+		showWND(getEntrance(ID))
 	end
 end
 ----------------------------------------------------------------
@@ -138,27 +140,107 @@ function ui_mainSystemBar.toggleBar()
 		m.switch:GetComponent(typeof(UISprite)).spriteName = "tongyong_jiantou_you"
 	end
 end
+--@Des 刷新所有图标红点
+function ui_mainSystemBar.refreshRedDot()
+	local function find_Prompt_and_UIDefine_By_ID(ID)
+		for _,v in ipairs(m.local_MainSystemBarData) do
+			if v["ID"] == ID then
+				return v["Prompt"],v["UIDefine"]
+			end
+		end
+	end
+
+	for _,v in ipairs(m.MainSystemBarItems) do
+		local _prompt,_uiDefine = find_Prompt_and_UIDefine_By_ID(tonumber(v.name))
+		local redDotWidget = v.transform:Find("RedDot").gameObject
+		print(_prompt,_uiDefine)
+		if _prompt == 1 then -- 显示正常红点
+			local refreshFunc = m.Get_RefreshFunction_By_WND_base_id(_uiDefine)
+			local returnValue = refreshFunc ~= nil and refreshFunc() or -1
+			if returnValue > 0 then
+				redDotWidget:SetActive(true)
+			else
+				redDotWidget:SetActive(false)
+			end
+		elseif _prompt == 2 then --TODO: 显示数字
+			
+		else -- 什么都不显示
+			if redDotWidget.activeInHierarchy then
+				redDotWidget:SetActive(false)
+			end
+		end
+	end
+end
+--@Des 通过baseId刷新指定图标的红点
+--@Params wnd_base_id (UIDefine)
+function ui_mainSystemBar.refreshRedDotBy_WND_base_id(wnd_base_id)
+	local function getIDByUIDefine()
+		for _,v in ipairs(m.local_MainSystemBarData) do
+			if v["UIDefine"] == wnd_base_id then
+				return v["ID"]
+			end
+		end
+	end
+
+	local ID = getIDByUIDefine(wnd_base_id)
+	for _,v in ipairs(m.MainSystemBarItems) do
+		if v.name == tostring(ID) then
+			local refreshFunc = m.Get_RefreshFunction_By_WND_base_id(wnd_base_id)
+			local returnValue = refreshFunc ~= nil and refreshFunc() or -1
+			printw("returnValue = "..returnValue)
+			if returnValue > 0 then
+				v.transform:Find("RedDot").gameObject:SetActive(true)
+			else
+				v.transform:Find("RedDot").gameObject:SetActive(false)
+			end
+		end
+	end
+end
 function ui_mainSystemBar.playOpenAnime()
 	local skipCount = 0
 	-- local currentLV = userModel:getUserRoleTbl().lv
 	local currentLV = 5
 
-	for i = 1,#m.MainSystemBarItems do
-		local ID = tonumber(m.MainSystemBarItems[i].name)
+	-- for i = 1,#m.MainSystemBarItems do
+	-- 	local ID = tonumber(m.MainSystemBarItems[i].name)
+
+	-- 	if currentLV < sdata_maininterface_data:GetFieldV("UnlockLevel",ID) then
+	-- 		skipCount = skipCount + 1
+	-- 	else
+	-- 		m.MainSystemBarItems[i]:GetComponent(typeof(UnityEngine.BoxCollider)).enabled = true
+	-- 		m.MainSystemBarItems[i].transform:DOLocalMove(
+	-- 		Vector3(
+	-- 			m.cItemLocalPosition.x + (i - skipCount - 1) * (m.cSpacing + m.pItem:GetComponent(typeof(UIWidget)).localSize.x),
+	-- 			m.cItemLocalPosition.y,
+	-- 			m.cItemLocalPosition.z
+	-- 		)
+	-- 		,0.5,true)
+	-- 	end
+	-- end
+
+	local function DoLocalMove(index)
+		local ID = tonumber(m.MainSystemBarItems[index].name)
 
 		if currentLV < sdata_maininterface_data:GetFieldV("UnlockLevel",ID) then
 			skipCount = skipCount + 1
 		else
-			m.MainSystemBarItems[i]:GetComponent(typeof(UnityEngine.BoxCollider)).enabled = true
-			m.MainSystemBarItems[i].transform:DOLocalMove(
+			m.MainSystemBarItems[index]:GetComponent(typeof(UnityEngine.BoxCollider)).enabled = true
+			m.MainSystemBarItems[index].transform:DOLocalMove(
 			Vector3(
-				m.cItemLocalPosition.x + (i - skipCount - 1) * (m.cSpacing + m.pItem:GetComponent(typeof(UIWidget)).localSize.x),
+				m.cItemLocalPosition.x + (index - skipCount - 1) * (m.cSpacing + m.pItem:GetComponent(typeof(UIWidget)).localSize.x),
 				m.cItemLocalPosition.y,
 				m.cItemLocalPosition.z
 			)
-			,0.5,true)
+			,0.035,true):OnComplete(
+				function()
+					if index < #m.MainSystemBarItems then
+						DoLocalMove(index + 1)
+					end
+				end)
 		end
 	end
+
+	DoLocalMove(1)
 end
 function ui_mainSystemBar.playCloseAnime()
 	for i = 1,#m.MainSystemBarItems do
@@ -168,6 +250,15 @@ function ui_mainSystemBar.playCloseAnime()
 			m.MainSystemBarItems[i].transform:DOLocalMove(m.cOutPosition,0.5,true)
 		end
 	end
+end
+function ui_mainSystemBar.DOLocalJump(go)
+	local basePoint = go.transform.localPosition
+	local sq = go.transform:DOLocalJump(
+            Vector3(go.transform.localPosition.x,
+                go.transform.localPosition.y + 20,
+                go.transform.localPosition.z),
+            40.0,1,0.8,true);
+    sq:Append(go.transform:DOLocalMove(basePoint, 0.1,true));
 end
 ----------------------------------------------------------------
 --★Show/Hide Control
@@ -180,6 +271,7 @@ function ui_mainSystemBar.show()
 		m.initItem()
 		m.root:SetActive(true)
 		m.toggleBar()
+		m.refreshRedDot()
 	end
 end
 function ui_mainSystemBar.hide()
@@ -189,6 +281,25 @@ end
 function ui_mainSystemBar.destroy()
 	UnityEngine.GameObject.Destroy(m.root)
 	ui_mainSystemBar = nil
+end
+----------------------------------------------------------------
+--★Util
+function ui_mainSystemBar.Get_RefreshFunction_By_WND_base_id(wnd_base_id)
+
+	local function addReturnValue(funcStr)
+		local RETURN = 'return'
+		return RETURN..' '..funcStr
+	end
+
+	for _,v in ipairs(m.local_MainSystemBarData) do
+		if v['UIDefine'] == wnd_base_id then
+			if v['RedDotRefreshAPI'] ~= '' then
+				return loadstring(addReturnValue(v['RedDotRefreshAPI']))
+			end
+		end
+	end
+	printw(wnd_base_id..'对应刷新红点API未定义')
+	return nil
 end
 
 return ui_mainSystemBar

@@ -209,6 +209,7 @@ public class SkillManager
                 TickTime = skillInfo.TickTime,
                 TriggerLevel1 = skillInfo.TriggerLevel1,
                 TriggerLevel2 = skillInfo.TriggerLevel2,
+                TriggerProbability = skillInfo.TriggerProbability,
                 DemageChange = skillInfo.DemageChange,
                 DemageChangeProbability = skillInfo.DemageChangeProbability,
                 DemageChangeTargetType = skillInfo.DemageChangeTargetType,
@@ -234,7 +235,9 @@ public class SkillManager
     {
         if (formula == null)
         {
-            throw new Exception("方程式对象为空.");
+            Debug.Log("方程式对象为空.");
+            return;
+            //throw new Exception("方程式对象为空.");
         }
 
         CoroutineManage.AutoInstance();
@@ -301,6 +304,9 @@ public class SkillManager
             {
                 SetSkillInCD(skillBase as SkillInfo);
                 DoFormula(skillBase.GetActionFormula(packer), callback);
+                // 统计释放技能次数
+                FightDataStatistical.Single.AddSkillCount("" + skillBase.ReleaseMember.ClusterData.AllData.MemberData.ObjID.ID,
+                    1, skillBase.ReleaseMember.ClusterData.AllData.MemberData.Camp);
             }
             else
             {
@@ -421,14 +427,31 @@ public class SkillManager
         }
         // 如果攻击时触发
         foreach (var skill in skillsList.Where(
-                skill => skill != null && skill.TriggerLevel1 == triggerData.TypeLevel1 &&  skill.TriggerLevel2 == triggerData.TypeLevel2).ToArray())
+                skill => skill != null ).ToArray())
         {
-            var paramsPacker = FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(skill, triggerData.ReleaseMember,
-                triggerData.ReceiveMember);
-            // 将触发数据传入
-            paramsPacker.TriggerData = triggerData;
-            // 触发技能
-            DoSkillInfo(skill, paramsPacker);
+
+            int r =  RandomPacker.Single.GetRangeI(0, 100);
+
+            Debug.Log("技能触发概率为  " + skill.TriggerProbability * 100);
+            // 生命值百分比
+            var hpPercent = skill.ReleaseMember.ClusterData.AllData.MemberData.CurrentHP*100/
+                            skill.ReleaseMember.ClusterData.AllData.MemberData.TotalHp;
+
+            // 判断是否符合生命值
+            if (skill.HpScopeMin >= 0 && skill.HpScopeMax >= 0 &&
+                (!(hpPercent > skill.HpScopeMin) || !(hpPercent < skill.HpScopeMax))) continue;
+            if (skill.TriggerLevel1 == triggerData.TypeLevel1 &&
+                skill.TriggerLevel2 == triggerData.TypeLevel2 &&  r<=(skill.TriggerProbability*100) )
+            {
+                Debug.Log("技能随机数为  " + r);
+                var paramsPacker = FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(skill,
+                    triggerData.ReleaseMember,
+                    triggerData.ReceiveMember);
+                // 将触发数据传入
+                paramsPacker.TriggerData = triggerData;
+                // 触发技能
+                DoSkillInfo(skill, paramsPacker);
+            }
         }
     }
 
@@ -508,47 +531,7 @@ public class SkillManager
         }
 
         // 放入缓存
-        //tmpList.Add(triggerData);
-        var objId = triggerData.ReleaseMember.ClusterData.AllData.MemberData.ObjID;
-        if (!triggerList.ContainsKey(objId))
-        {
-            triggerList.Add(objId,
-                new Dictionary<TriggerLevel1, IDictionary<TriggerLevel2, List<TriggerData>>>()
-                {
-                    {
-                        triggerData.TypeLevel1, new Dictionary<TriggerLevel2, List<TriggerData>>()
-                        {
-                            {triggerData.TypeLevel2, new List<TriggerData>() {triggerData}}
-                        }
-                    }
-                });
-        }
-        else
-        {
-            var dicLevel1 = triggerList[objId];
-            if (!dicLevel1.ContainsKey(triggerData.TypeLevel1))
-            {
-                dicLevel1.Add(triggerData.TypeLevel1,
-                    new Dictionary<TriggerLevel2, List<TriggerData>>()
-                    {
-                        {
-                            triggerData.TypeLevel2, new List<TriggerData>() {triggerData}
-                        }
-                    });
-            }
-            else
-            {
-                var dicLevel2 = dicLevel1[triggerData.TypeLevel1];
-                if (!dicLevel2.ContainsKey(triggerData.TypeLevel2))
-                {
-                    dicLevel2.Add(triggerData.TypeLevel2, new List<TriggerData>() { triggerData });
-                }
-                else
-                {
-                    dicLevel2[triggerData.TypeLevel2].Add(triggerData);
-                }
-            }
-        }
+        tmpList.Add(triggerData);
     }
 
     /// <summary>
@@ -646,15 +629,13 @@ public class SkillManager
     /// <param name="objId">单位ObjId</param>
     /// <param name="each">被执行单位处理</param>
     /// <param name="isDelBeforeEnd">是否执行完毕后删除</param>
-    public void SetEachAction(ObjectID objId, Action<TriggerLevel1, TriggerLevel2, TriggerData> each, bool isDelBeforeEnd)
+    public void SetEachAction(ObjectID objId, Action<TriggerLevel1, TriggerLevel2, TriggerData> each,
+        bool isDelBeforeEnd)
     {
-        if (each == null || !triggerList.ContainsKey(objId))
+        PushListToTrigger();
+        if (each != null && triggerList.ContainsKey(objId))
         {
-            return;
-        }
-        // 保证线程数据安全
-        lock (triggerList)
-        {
+            // 保证线程数据安全
             var objKV = triggerList[objId];
             foreach (var typeLevel1Dic in objKV)
             {
@@ -662,9 +643,9 @@ public class SkillManager
                 foreach (var typeLevel2Dic in typeLevel1Dic.Value)
                 {
                     var typeLevel2 = typeLevel2Dic.Key;
-                    foreach (var triggerDic in typeLevel2Dic.Value)
+                    foreach (var trigger in typeLevel2Dic.Value)
                     {
-                        each(typeLevel1, typeLevel2, triggerDic);
+                        each(typeLevel1, typeLevel2, trigger);
 
                     }
                     // 如果需要执行完毕后删除
@@ -674,7 +655,6 @@ public class SkillManager
                     }
                 }
             }
-            //PushListToTrigger();
         }
     }
 
@@ -689,19 +669,24 @@ public class SkillManager
         {
             foreach (var triggerData in tmpList)
             {
+                // 排除死亡单位
+                if (triggerData.ReleaseMember == null || triggerData.ReleaseMember.ClusterData == null)
+                {
+                    continue;
+                }
                 var objId = triggerData.ReleaseMember.ClusterData.AllData.MemberData.ObjID;
                 if (!triggerList.ContainsKey(objId))
                 {
                     triggerList.Add(objId,
                         new Dictionary<TriggerLevel1, IDictionary<TriggerLevel2, List<TriggerData>>>()
-                {
-                    {
-                        triggerData.TypeLevel1, new Dictionary<TriggerLevel2, List<TriggerData>>()
                         {
-                            {triggerData.TypeLevel2, new List<TriggerData>() {triggerData}}
-                        }
-                    }
-                });
+                            {
+                                triggerData.TypeLevel1, new Dictionary<TriggerLevel2, List<TriggerData>>()
+                                {
+                                    {triggerData.TypeLevel2, new List<TriggerData>() {triggerData}}
+                                }
+                            }
+                        });
                 }
                 else
                 {
@@ -710,18 +695,18 @@ public class SkillManager
                     {
                         dicLevel1.Add(triggerData.TypeLevel1,
                             new Dictionary<TriggerLevel2, List<TriggerData>>()
-                    {
-                        {
-                            triggerData.TypeLevel2, new List<TriggerData>() {triggerData}
-                        }
-                    });
+                            {
+                                {
+                                    triggerData.TypeLevel2, new List<TriggerData>() {triggerData}
+                                }
+                            });
                     }
                     else
                     {
                         var dicLevel2 = dicLevel1[triggerData.TypeLevel1];
                         if (!dicLevel2.ContainsKey(triggerData.TypeLevel2))
                         {
-                            dicLevel2.Add(triggerData.TypeLevel2, new List<TriggerData>() { triggerData });
+                            dicLevel2.Add(triggerData.TypeLevel2, new List<TriggerData>() {triggerData});
                         }
                         else
                         {
@@ -736,4 +721,16 @@ public class SkillManager
     }
 
     // ------------------------------------技能事件检测-----------------------------------
+}
+
+public class SkillDataBuffer
+{
+    public static Dictionary<string, List<DisplayOwner>> SkillDataCache = new Dictionary<string, List<DisplayOwner>>();
+
+
+    public static void ClearData()
+    {
+        SkillDataCache.Clear();
+    }
+
 }

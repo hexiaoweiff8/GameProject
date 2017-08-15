@@ -53,6 +53,12 @@ public class ParentManager : Singleton<ParentManager>
             parent.name = key;
             parentDic.Add(key, parent);
         }
+        else if (parentDic[key] == null)
+        {
+            var parent = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            parent.name = key;
+            parentDic[key] = parent;
+        }
         return parentDic[key];
     }
 

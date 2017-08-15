@@ -13,7 +13,6 @@ public class ClusterDataWrap
 		L.RegFunction("PushTargetList", PushTargetList);
 		L.RegFunction("PopTarget", PopTarget);
 		L.RegFunction("ClearTarget", ClearTarget);
-		L.RegFunction("Update", Update);
 		L.RegFunction("Destory", Destory);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
@@ -120,22 +119,6 @@ public class ClusterDataWrap
 			ToLua.CheckArgsCount(L, 1);
 			ClusterData obj = (ClusterData)ToLua.CheckObject(L, 1, typeof(ClusterData));
 			obj.ClearTarget();
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int Update(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 1);
-			ClusterData obj = (ClusterData)ToLua.CheckObject(L, 1, typeof(ClusterData));
-			obj.Update();
 			return 0;
 		}
 		catch(Exception e)

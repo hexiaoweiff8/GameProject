@@ -205,6 +205,7 @@ public class BuffManager
             TickTime = buffInfo.TickTime,
             TriggerLevel1 = buffInfo.TriggerLevel1,
             TriggerLevel2 = buffInfo.TriggerLevel2,
+            TriggerProbability = buffInfo.TriggerProbability,
             DetachTriggerLevel1 = buffInfo.DetachTriggerLevel1,
             DetachTriggerLevel2 = buffInfo.DetachTriggerLevel2,
             DetachQualifiedKeyList = buffInfo.DetachQualifiedKeyList,
@@ -266,29 +267,51 @@ public class BuffManager
             Debug.Log("空事件");
             return;
         }
-        var list = buffList.Where(buff => buff != null
-                                                    && ((buff.TriggerLevel1 == triggerData.TypeLevel1
-                                                         && buff.TriggerLevel2 == triggerData.TypeLevel2)
-                                                        || buff.DetachTriggerLevel1 == triggerData.TypeLevel1
-                                                        && buff.DetachTriggerLevel2 == triggerData.TypeLevel2)).ToList();
+
         // 如果攻击时触发
-        for (var i = 0; i < list.Count(); i++)
+        for (var i = 0; i < buffList.Count(); i++)
         {
-            var buff = list[i];
+            var buff = buffList[i];
+            if (buff == null)
+            {
+                continue;
+            }
+
+            // 生命值百分比
+            var hpPercent = buff.ReleaseMember.ClusterData.AllData.MemberData.CurrentHP * 100 /
+                            buff.ReleaseMember.ClusterData.AllData.MemberData.TotalHp;
+
+            // 构建数据packer
             var paramsPacker = FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(buff.ReleaseMember,
                 buff.ReceiveMember, buff, 1, buff.IsNotLethal);
             paramsPacker.TriggerData = triggerData;
 
+
+            // 判断是否符合生命值
             // 触发技能
-            // 触发action
-            if (buff.TriggerLevel1 == triggerData.TypeLevel1 && buff.TriggerLevel2 == triggerData.TypeLevel2)
+            if (buff.HpScopeMin < 0 || buff.HpScopeMax < 0 ||
+                ((hpPercent > buff.HpScopeMin) && (hpPercent < buff.HpScopeMax)))
             {
-                DoBuff(buff, BuffDoType.Action, paramsPacker);
+
+                int r = RandomPacker.Single.GetRangeI(0, 100);
+                Debug.Log("buff触发几率为   " + buff.TriggerProbability);
+                // 触发action
+                if (buff.TriggerLevel1 == triggerData.TypeLevel1 && buff.TriggerLevel2 == triggerData.TypeLevel2 && r<=buff.TriggerProbability*100)
+                {
+                    Debug.Log("ROLL出概率为   " + r);
+                    DoBuff(buff, BuffDoType.Action, paramsPacker);
+                }
             }
-            // 检测Detach条件如果符合触发detach
-            if (buff.DetachTriggerLevel1 == triggerData.TypeLevel1 && buff.DetachTriggerLevel2 == triggerData.TypeLevel2 && buff.CheckDetach())
+
+            if (buff.DetachHpScopeMin < 0 || buff.DetachHpScopeMax < 0 ||
+                ((hpPercent > buff.DetachHpScopeMin) && (hpPercent < buff.DetachHpScopeMax)))
             {
-                DoBuff(buff, BuffDoType.Detach, paramsPacker);
+                // 检测Detach条件如果符合触发detach
+                if (buff.DetachTriggerLevel1 == triggerData.TypeLevel1 &&
+                    buff.DetachTriggerLevel2 == triggerData.TypeLevel2 && buff.CheckDetach())
+                {
+                    DoBuff(buff, BuffDoType.Detach, paramsPacker);
+                }
             }
         }
     }

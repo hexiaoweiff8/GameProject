@@ -81,7 +81,7 @@ public class ResistDemageFormulaItem : AbstractFormulaItem
 
         result = new Formula((callback, scope) =>
         {
-
+            callback();
         },
         myFormulaType);
 

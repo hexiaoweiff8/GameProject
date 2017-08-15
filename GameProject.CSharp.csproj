@@ -209,6 +209,7 @@
     <Compile Include="Assets\Logic\Script\Game\UI\mail\MailItem.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\mail\MailLoopGrid.cs" />
     <Compile Include="Assets\Logic\Script\Game\UIPanelEX.cs" />
+    <Compile Include="Assets\Logic\Script\Game\WordFilter.cs" />
     <Compile Include="Assets\Logic\Script\LogicInit.cs" />
     <Compile Include="Assets\Logic\Script\VirtualServer\AssetsManage.cs" />
     <Compile Include="Assets\Logic\Script\VirtualServer\Node.cs" />
@@ -253,9 +254,12 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\School\ClusterManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\School\FixtureData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\School\PositionObject.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\ArmyAOEData.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\ArmyTypeData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\DataManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\DisplayOwner.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\DisplayerManager.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\EffectData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\FightUnitFactory.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\IFight.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\data\ILife.cs" />
@@ -285,8 +289,8 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Collision\ICollisionGraphics.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Collision\RectGraphics.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Collision\SectorGraphics.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\Util\EffectsFactory.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\Util\GeneralAttack\ArmyAOEData.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Effect\EffectsFactory.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Effect\LineRandererControl.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\GeneralAttack\GeneralAttackManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\GeneralAttack\NormalGeneralAttack.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\GeneralAttack\PointToObjScopeGeneralAttack.cs" />
@@ -312,6 +316,8 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\Buff\BuffManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\BuffFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\ChangeDataFormulaItem.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\CleanBuffFormulaItem.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\CleanTargetFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\CollisionDetectionFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\DeathFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\Formula\Formula.cs" />
@@ -323,7 +329,10 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\HealthScopeFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\IFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\IfFormulaItem.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\ImmuneDemageFormulaItem.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\ImmuneToDeathFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\LifeDrainFormulaItem.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\LinerFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\MoveFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\PauseFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\PointFormulaItem.cs" />
@@ -333,6 +342,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\Remain\RemainManager.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\RemainFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\ResistDemageFormulaItem.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\ShareDamageFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillAddition.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillBase.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillFormulaItem.cs" />
@@ -346,6 +356,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\TargetSelectFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\TriggerRunner.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\TriggerTicker.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\UpperLimitFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\TargetSelecter\ISelectWeightData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\TargetSelecter\ISelectWeightDataHolder.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\TargetSelecter\Member.cs" />
@@ -365,6 +376,8 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_AvatarAct.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_Constant.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_FightKeyValue.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_UnitFightData_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_achievement_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armyaim_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armyaoe_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_armybase_c.cs" />
@@ -391,6 +404,8 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_cardshop_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_commodity_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_currency_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_dailymission_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_effect_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equip_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equippower_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equiprecast_c.cs" />
@@ -399,6 +414,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_kezhi_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_maininterface_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_mapdata.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_mission_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_missionchapter_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_missionstage_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_pack_c.cs" />
@@ -810,6 +826,7 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UITableWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UITextureWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIToastWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIToggleWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UITweenerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIWidgetContainerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIWidgetWrap.cs" />
@@ -909,6 +926,7 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\VOBaseWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\WndManageWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\WndWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\WordFilterWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\chatItemWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\wndShowHideInfoWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\LuaConst.cs" />
@@ -1188,6 +1206,9 @@
     <None Include="Assets\StreamingAssets\SkillScript10002.txt" />
     <None Include="Assets\StreamingAssets\SkillScript10003.txt" />
     <None Include="Assets\StreamingAssets\SkillScript10004.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript10005.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript10006.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript10007.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1001.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1002.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1003.txt" />

@@ -26,7 +26,7 @@ public static class LuaBinder
 		UIGridWrap.Register(L);
 		UITableWrap.Register(L);
 		UIInputWrap.Register(L);
-        //UIToggleWrap.Register(L);
+		UIToggleWrap.Register(L);
 		UITextureWrap.Register(L);
 		UIScrollViewWrap.Register(L);
 		UICameraWrap.Register(L);
@@ -83,6 +83,7 @@ public static class LuaBinder
 		LoopItemScrollViewWrap.Register(L);
 		MailItemWrap.Register(L);
 		MailLoopGridWrap.Register(L);
+		WordFilterWrap.Register(L);
 		UIRectWrap.Register(L);
 		UIBasicSpriteWrap.Register(L);
 		UIProgressBarWrap.Register(L);

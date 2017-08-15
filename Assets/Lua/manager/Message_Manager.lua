@@ -7,6 +7,7 @@ require "proto/c2gw_pb"
 require "proto/header_pb"
 require "proto/chat_pb"
 
+
 -- 测试发送PBLUA--
 function Message_Manager:SendPB_10001()
     local c2gw = c2gw_pb:LoginGame()
@@ -99,6 +100,7 @@ function Message_Manager:sendPB_EquipPlus(id)
     local c2gw = c2gw_pb:EquipLvlup()
     c2gw.equipId = id
     local msg1 = c2gw:SerializeToString()
+
     Message_Manager:createSendPBHeader(10004, msg1)
 end
 function MSGID_EquipPlus(body)
@@ -601,10 +603,9 @@ function Message_Manager:SendPB_10022(itemList,CallBack)
     local c2gw = c2gw_pb:SellItem()
 
     for k,v in pairs(itemList) do
-        -- table.insert(c2gw.item,{id = v.id,num = v.num})
-        table.insert(c2gw.item,v)
-        print(k.." "..type(v))
-
+        local c2gw_item = c2gw.item:add()
+        c2gw_item.id = v.id
+        c2gw_item.num = v.num
     end
 
     local msg = c2gw:SerializeToString()
@@ -757,9 +758,12 @@ end
 --================================================================
 function Message_Manager:SendPB_10035(GfItemlst,CallBack)
     local c2gw = c2gw_pb:SetCardGf()
-
     for i=1,#GfItemlst do
-        table.insert(c2gw.lst,GfItemlst[i])
+        local GfItem = {}
+        GfItem =  c2gw.lst:add()
+
+        GfItem.cardId = GfItemlst[i]["cardId"]
+        GfItem.num = GfItemlst[i]["num"]
     end
 
     local msg = c2gw:SerializeToString()
@@ -775,9 +779,14 @@ end
 --================================================================
 function Message_Manager:SendPB_10036(PfItemlst,CallBack)
     local c2gw = c2gw_pb:SetCardPf()
+    for i=1,6 do
+            table.insert(c2gw.lst,PfItemlst[i])
+    end
 
-    for i=1,#PfItemlst do
-        table.insert(c2gw.lst,PfItemlst[i])
+    for k=1,#c2gw.lst do
+
+        print(tostring(c2gw.lst[k]))
+
     end
 
     local msg = c2gw:SerializeToString()
@@ -794,13 +803,15 @@ function Message_Manager:createSendPBHeader(msgId, body)
     local header = header_pb.Header()
     header.ID = _headerIDCounter
     header.msgId = msgId
-    header.userId = 8005--8001
+    header.userId = 8003--8001
     header.version = '1.0.0'
     header.errno = 0
     header.ext = 0
+
     if body then
         header.body = body
     end
+
     local msg2 = header:SerializeToString()
     local buffer = ByteBuffer()
     buffer:WriteBuffer(msg2)
@@ -814,7 +825,7 @@ function Message_Manager:createSendPBHeaderByUdp(msgId, body)
     local header = header_pb.Header()
     header.ID = 1
     header.msgId = msgId
-    header.userId = 8002--8001
+    header.userId = 8003--8001
     header.version = '1.0.0'
     header.errno = 0
     header.ext = 0
@@ -860,7 +871,7 @@ function Message_Manager:getAllData(gw2c)
     -- wnd_pve_model.AvoidWarCardTimestamp = gw2c.user.pvp.avoid
     --初始化主界面model
     ui_main_model = require("uiscripts/main/ui_main_model")
-    ui_main_model.AvoidWarCardTimestamp = gw2c.user.pvp.avoid
+    ui_main_model.AvoidWarCardTimestamp = gw2c.user.battle.avoid
 
     wnd_biandui_model = require("uiscripts/biandui/wnd_biandui_model")
     wnd_biandui_model:SetArmyData(gw2c.user.battle)
@@ -922,6 +933,15 @@ function MSGID_30002(body)
     local datalist = chat.rec
     --print(datalist[1].userName)
     print("监听到30002-------".."接受到的消息长度为："..#datalist)
+
+    --传输数据前，前端先过滤敏感词确保安全
+    for i = 1, #datalist do
+        if true then --确保不是系统消息
+            datalist[i].content = chatWindow_controller:chaekSensitive(datalist[i].content)
+        end
+    end
+
+
     if isFirstSend30002 then
         chat_model:insertDate(datalist)
         isFirstSend30002 =false
@@ -971,6 +991,10 @@ function MSGID_35001(body)
     local content = chat.rec.content
     local time = chat.rec.time
     --print(rid..username..content ..time)
+    --传输数据前，前端先过滤敏感词确保安全
+        if true then --确保不是系统消息
+            content = chatWindow_controller:chaekSensitive(content)
+        end
     chat_model:inserDate(rid, username, content, time)
 end
 --================================================================
@@ -985,6 +1009,26 @@ function Message_Manager:SendPB_10019()
     Event.AddListener("10019",MSGID_10019)
 end
 
+function Message_Manager:SendPB_10019(HCCallback)
+    printw("SendPB_10019")
+    Message_Manager:createSendPBHeader(10019)
+
+    local function msgid_10019(body)
+        print("监听到10019+HCCallback")
+        local gw2c = gw2c_pb.GetMailList()
+        gw2c:ParseFromString(body)
+        print("邮件列表大小:"..#gw2c.mails)
+        mail_model:insertData(gw2c.mails)
+        Event.RemoveListener("10019", msgid_10019)
+
+        if HCCallback ~= nil then
+            HCCallback(mail_model.new_mailNum)
+        end
+    end
+
+    Event.AddListener("10019", msgid_10019)
+end
+
 function MSGID_10019(body)
     print("监听到10019")
     local gw2c = gw2c_pb.GetMailList()
@@ -993,6 +1037,7 @@ function MSGID_10019(body)
     mail_model:insertData(gw2c.mails)
     Event.RemoveListener("10019", MSGID_10019)
 end
+
 
 --================================================================
 --10025 读取邮件

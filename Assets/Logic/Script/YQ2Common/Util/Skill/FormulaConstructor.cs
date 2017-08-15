@@ -34,7 +34,13 @@ public static class FormulaConstructor
         {"Death", typeof(DeathFormulaItem)},
         {"SummonedUnit", typeof(SummonedFormulaItem)},
         {"LifeDrain", typeof(LifeDrainFormulaItem)},
-        
+        { "CleanBuff",typeof(CleanBuffFormulaItem)},
+        { "CleanTarget",typeof(CleanTargetFormulaItem)},
+        { "UpperLimit",typeof(UpperLimitFormulaItem)},
+        { "ImmuneToDeath",typeof(ImmuneToDeathFormulaItem)},
+        { "ShareDamage",typeof(ShareDamageFormulaItem)},
+        { "ImmuneDemage",typeof(ImmuneDemageFormulaItem)},
+        { "Liner",typeof(LinerFormulaItem)},
     };
 
 
@@ -58,7 +64,17 @@ public static class FormulaConstructor
             var stackLevel = 0;
             // 创建临时堆栈, 存储不同层级的行为链
             var stack = new Stack<IFormulaItem>();
+            // buff触发时行为
+            IFormulaItem actionFormulaItem = new PauseFormulaItem();
+            // buff创建行为
+            IFormulaItem attachFormulaItem = new PauseFormulaItem();
+            // buff销毁行为
+            IFormulaItem detachFormulaItem = new PauseFormulaItem();
             IFormulaItem tmpItem = null;
+
+            var isAction = true;
+            var isAttach = false;
+            var isDetach = false;
 
             // 解析字符串
             // 根据对应行为列表创建Formula
@@ -93,6 +109,33 @@ public static class FormulaConstructor
                     // 创建新技能
                     skillInfo = new SkillInfo(skillId);
                 }
+
+                else if (line.Equals("Action"))
+                {
+                    // buff触发时行为
+                    //tmpItem = actionFormulaItem;
+                    isAction = true;
+                    isAttach = false;
+                    isDetach = false;
+                }
+                else if (line.Equals("Attach"))
+                {
+                    // buff 创建时行为
+                    //tmpItem = attachFormulaItem;
+
+                    isAction = false;
+                    isAttach = true;
+                    isDetach = false;
+                }
+                else if (line.Equals("Detach"))
+                {
+                    // buff 销毁时行为
+                    //tmpItem = detachFormulaItem;
+
+                    isAction = false;
+                    isAttach = false;
+                    isDetach = true;
+                }
                 else if (line.StartsWith("{"))
                 {
                     // 开始括号内容
@@ -100,7 +143,26 @@ public static class FormulaConstructor
 
                     // 将上级FormulaItem push进堆栈
                     stack.Push(tmpItem);
-                    tmpItem = null;
+                    // 如果是第一级的则根据不同行为分派不同formulaItem
+                    if (stackLevel == 1)
+                    {
+                        if (isAttach)
+                        {
+                            tmpItem = attachFormulaItem;
+                        }
+                        else if (isAction)
+                        {
+                            tmpItem = actionFormulaItem;
+                        }
+                        else if (isDetach)
+                        {
+                            tmpItem = detachFormulaItem;
+                        }
+                    }
+                    else
+                    {
+                        tmpItem = null;
+                    }
                 }
                 else if (line.StartsWith("}"))
                 {
@@ -112,6 +174,10 @@ public static class FormulaConstructor
                     {
                         prvLevelItem.AddSubFormulaItem(tmpItem.GetFirst());
                         tmpItem = prvLevelItem;
+                    }
+                    else
+                    {
+                        tmpItem = null;
                     }
                 }
                 else if (line.StartsWith("["))
@@ -135,17 +201,21 @@ public static class FormulaConstructor
                     TransData(skillInfo, line);
                 }
             }
-            // 技能行为
-            if (tmpItem != null)
+
+            if (skillInfo == null)
             {
-                // 获得行为链生成器的head
-                tmpItem = tmpItem.GetFirst();
-                if (skillInfo == null)
-                {
-                    throw new Exception("技能没有编号!");
-                }
-                skillInfo.AddActionFormulaItem(tmpItem);
+                throw new Exception("技能没有编号!");
             }
+            // buff触发行为
+            actionFormulaItem = actionFormulaItem.GetFirst();
+            skillInfo.AddActionFormulaItem(actionFormulaItem);
+            // buff创建行为
+            attachFormulaItem = attachFormulaItem.GetFirst();
+            skillInfo.AddAttachFormulaItem(attachFormulaItem);
+            // buff销毁行为
+            detachFormulaItem = detachFormulaItem.GetFirst();
+            skillInfo.AddDetachFormulaItem(detachFormulaItem);
+
         }
 
         return skillInfo;
@@ -816,17 +886,30 @@ public static class FormulaConstructor
                     var propertyType = (ChangeDataType)Enum.Parse(typeof(ChangeDataType), values[2]);
                     // 反射获取类中的属性
                     var property = skillInfo.ChangeData.GetType().GetProperty(propertyName);
+                    FieldInfo field = null;
                     if (property == null)
                     {
-                        throw new Exception("属性不存在, 请检查是否正确, 区分大小写:" + propertyName);
+                        field = skillInfo.ChangeData.GetType().GetField(propertyName);
+                        if (field == null)
+                        {
+                            throw new Exception("属性不存在, 请检查是否正确, 区分大小写:" + propertyName);
+                        }
                     }
                     // 如果该属性不可以被控制报错
-                    if (!property.GetCustomAttributes(typeof(SkillAddition), false).Any())
+                    if ((property == null || !property.GetCustomAttributes(typeof(SkillAddition), false).Any())
+                        && (field == null || !field.GetCustomAttributes(typeof(SkillAddition), true).Any()))
                     {
                         throw new Exception("该属性不可被技能控制:" + propertyName);
                     }
                     // 设置属性值
-                    property.SetValue(skillInfo.ChangeData, Convert.ChangeType(propertyValue, property.PropertyType), null);
+                    if (property != null)
+                    {
+                        property.SetValue(skillInfo.ChangeData, Convert.ChangeType(propertyValue, property.PropertyType), null);
+                    }
+                    if (field != null)
+                    {
+                        field.SetValue(skillInfo.ChangeData, Convert.ChangeType(propertyValue, field.FieldType));
+                    }
                     // 设置该属性的附加类型
                     skillInfo.ChangeDataTypeDic.Add(propertyName, propertyType);
                 }
@@ -864,6 +947,11 @@ public static class FormulaConstructor
                     }
                 }
                 break;
+                case "IntervalTime":
+                {
+                    skillInfo.IntervalTime = Convert.ToSingle(line.Substring(start + 1, length).Trim());
+                }
+                break;
                 case "ReleaseTime":
                 {
                     skillInfo.ReleaseTime = Convert.ToInt32(line.Substring(start + 1, length).Trim());
@@ -883,6 +971,15 @@ public static class FormulaConstructor
                     skillInfo.TriggerLevel2 = triggerType;
                 }
                 break;
+
+                case "TriggerProbability":
+                {      
+                        //技能触发概率
+                        float triggerProbability = Convert.ToSingle(line.Substring(start + 1, end - start - 1).Trim());
+                        skillInfo.TriggerProbability = triggerProbability;
+                    }
+                    break;
+
                 case "Description":
                 {
                     skillInfo.Description = line.Substring(start + 1, end - start - 1).Trim();
@@ -959,10 +1056,23 @@ public static class FormulaConstructor
                 case "TriggerLevel2":
                     {
                         // 技能触发事件level2
-                        var triggerType = (TriggerLevel2)Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
+                        var values = line.Substring(start + 1, end - start - 1).Trim().Split(',');
+                        var triggerType = (TriggerLevel2)Convert.ToInt32(values[0]);
                         buffInfo.TriggerLevel2 = triggerType;
+                        if (values.Length > 1)
+                        {
+                            // 血量范围
+                        }
                     }
                     break;
+                case "TriggerProbability":
+                    {
+                        //BUFF触发概率
+                        float triggerProbability = Convert.ToSingle(line.Substring(start + 1, end - start - 1).Trim());
+                        buffInfo.TriggerProbability = triggerProbability;
+                    }
+                    break;
+
                 case "DetachTriggerLevel1":
                     {
                         // buff Detach触发条件level1
@@ -1007,18 +1117,30 @@ public static class FormulaConstructor
                         // 属性值类型
                         var propertyType = (ChangeDataType)Enum.Parse(typeof(ChangeDataType), values[2].Trim());
                         // 反射获取类中的属性
-                        var property = buffInfo.ChangeData.GetType().GetProperty(propertyName);
+                        var property = buffInfo.ChangeData.GetType().GetProperty(propertyName); FieldInfo field = null;
                         if (property == null)
                         {
-                            throw new Exception("属性不存在, 请检查是否正确, 区分大小写:" + propertyName);
+                            field = buffInfo.ChangeData.GetType().GetField(propertyName);
+                            if (field == null)
+                            {
+                                throw new Exception("属性不存在, 请检查是否正确, 区分大小写:" + propertyName);
+                            }
                         }
                         // 如果该属性不可以被控制报错
-                        if (!property.GetCustomAttributes(typeof (SkillAddition), false).Any())
+                        if ((property == null || !property.GetCustomAttributes(typeof(SkillAddition), false).Any())
+                            && (field == null || !field.GetCustomAttributes(typeof(SkillAddition), true).Any()))
                         {
                             throw new Exception("该属性不可被技能控制:" + propertyName);
                         }
                         // 设置属性值
-                        property.SetValue(buffInfo.ChangeData, Convert.ChangeType(propertyValue, property.PropertyType), null);
+                        if (property != null)
+                        {
+                            property.SetValue(buffInfo.ChangeData, Convert.ChangeType(propertyValue, property.PropertyType), null);
+                        }
+                        if (field != null)
+                        {
+                            field.SetValue(buffInfo.ChangeData, Convert.ChangeType(propertyValue, field.FieldType));
+                        }
                         // 设置该属性的附加类型
                         buffInfo.ChangeDataTypeDic.Add(propertyName, propertyType);
                     }

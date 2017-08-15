@@ -29,7 +29,12 @@ end
 ----------------------------------------------------------------
 --★refreshView
 function ui_mobileInfo.updateBatteryInfo()
-	
+	if Application.platform == RuntimePlatform.Android then
+		local capacity = io.open("/sys/class/power_supply/battery/capacity", "r")
+		m.battery.value = tonumber(capacity:read()) / 100
+	elseif Application.platform == RuntimePlatform.IPhonePlayer then
+		-- TODO: ios电量
+	end
 end
 function ui_mobileInfo.updateSignalInfo(networkDelay)
 	print("刷新网络信号图标 "..networkDelay)

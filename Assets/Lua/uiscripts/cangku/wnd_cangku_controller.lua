@@ -11,6 +11,7 @@ require('uiscripts/cangku/const/wnd_cangku_Const')
 			_DecompositionPanelState 记录装备分解面板checkbox勾选状态
 			_selectedYekaButton 记录已选择的页卡按钮
 			_currentPanel_right 记录当前显示在右边的panel
+			mAtlas 页卡资源Atlas
 		function:
 			OnShowDone() extend wnd_base:OnShowDone()
 			show() 显示panel
@@ -279,20 +280,19 @@ end
 ----------------------------------------------------------------
 --★Control YekaButton
 function wnd_cangku_controller:SelectYekaButton(selectedButton)
-
 	if selectedButton == this._selectedYekaButton then
 		return
 	end
 
-	if mAtlas == nil then
-		mAtlas = this.view.Button_back:GetComponent(typeof(UISprite)).atlas
+	if this.mAtlas == nil then
+		this.mAtlas = this.view.Button_back:GetComponent(typeof(UISprite)).atlas
 	end
 
 	if this._selectedYekaButton ~= nil then
 		this._selectedYekaButton:GetComponent(typeof(UISprite)).atlas = nil
 	end
 
-	selectedButton:GetComponent(typeof(UISprite)).atlas = mAtlas
+	selectedButton:GetComponent(typeof(UISprite)).atlas = this.mAtlas
 	selectedButton:GetComponent(typeof(UISprite)).spriteName = cstr.SELECTED_YEKA
 	-- this.view.Panel_Tab.sTabTop.transform.localPosition = Vector3(selectedButton.transform.localPosition.x,
 	-- 	selectedButton.transform.localPosition.y + selectedButton:GetComponent(typeof(UIWidget)).height / 2 + this.view.Panel_Tab.sTabTop:GetComponent(typeof(UIWidget)).height / 2,
@@ -374,6 +374,7 @@ function wnd_cangku_controller:showPanelByItemData(ItemData)
 	
 		UIEventListener.Get(this.view.Panel_Detail_item.Button_path).onClick = function()
 				-- DONE: 碎片详细面板:添加途径/合成按钮的实现
+				-- FIXME: 碎片合成后如果有剩余的情况/无剩余的情况
 				if ItemData.num >= ItemData["ComposeNum"] then
 					local on_10024_rec = function(body)
 						local gw2c = gw2c_pb.ComposeEquip()
@@ -499,15 +500,29 @@ function wnd_cangku_controller:showPanelByItemData(ItemData)
 
 		UIEventListener.Get(this.view.Panel_Detail_item.Button_sale).onClick = function()
 				-- FIXME: 收藏品界面：添加出售按钮的实现
-				local Items = {{id = ItemData.id,num = ItemData.num}}
+				local str = this.view.Panel_Detail_item.Label_count:GetComponent(typeof(UILabel)).text
+				local pos = string.find(str,'/')
+				local count = tonumber(string.sub(str,1,pos-1))
+				local Items = {{id = ItemData.id,num = count}}
 				Message_Manager:SendPB_10022(Items)
 				local on_10022_rec = function(body)
 					local gw2c = gw2c_pb.SellItem()
 				    gw2c:ParseFromString(body)
 				    local items = gw2c.item
+				    currencyModel:initCurrencyTbl(gw2c.currency)
 
 				    for k,v in ipairs(items) do
-				    	print("出售："..v.id..v.num)
+				    	if v.num > 0 then
+				    		this:updateItemData(v.id,v.num)
+				    	else
+				    		this:removeItemByItemID(v.id)
+				    	end
+				    	printf("服务器传回数据："..v.id.." num:"..v.num)
+				    end
+				    this.scrollViewController:refreshList()
+				    
+				    if 1 <= #this.scrollViewController.currentItems then
+				    	this:showPanelByItemData(this.scrollViewController.currentItems[1])
 				    end
 
 					Event.RemoveListener("10022",on_10022_rec)
@@ -920,7 +935,7 @@ function wnd_cangku_controller:insertServData(user_equip)
 	
 	this.model.Processed_Items = {}
 	this:mergeServData()
-	this.scrollViewController.currentItems = this.model.Processed_Items
+	-- this.scrollViewController.currentItems = this.model.Processed_Items
 	this.scrollViewController:refreshList()
 end
 ----------------------------------------------------------------

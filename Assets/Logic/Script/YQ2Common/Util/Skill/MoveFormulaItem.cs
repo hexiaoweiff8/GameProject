@@ -116,41 +116,43 @@ public class MoveFormulaItem : AbstractFormulaItem
         {
             // 获取目标位置
             var targetPos = GetPosByType(myTargetPos, paramsPacker, scope); ;
-            if (myIsBlink)
+            //如果不是霸体则进行移动
+            if (!member.ClusterData.AllData.MemberData.IsDambody)
             {
-                // 瞬移
-                // 数据层面移动
-                member.ClusterData.X = targetPos.x;
-                member.ClusterData.Y = targetPos.y;
-
-                // 显示层面移动
-                member.GameObj.transform.position = targetPos;
-            }
-            else
-            {
-                // 计时器(超时停止, 防止双重移动导致一直无法到达终点)
-                var timer = new Timer(myCheckTime, OutTime);
-                // 移动
-                Action completeCallback = () =>
+                if (myIsBlink)
                 {
-                    // 计算夹角
-                    var diffDir = member.GameObj.transform.position - targetPos;
-                    // 判断达到目标, 停止
-                    if (diffDir.magnitude < mySpeed || moveTime <= 0)
+                    // 瞬移
+                    // 数据层面移动
+                    member.ClusterData.X = targetPos.x;
+                    member.ClusterData.Y = targetPos.y;
+                    // 显示层面移动
+                    member.GameObj.transform.position = targetPos;
+                }
+                else
+                {
+                    // 计时器(超时停止, 防止双重移动导致一直无法到达终点)
+                    var timer = new Timer(myCheckTime, OutTime);
+                    // 移动
+                    Action completeCallback = () =>
                     {
-                        timer.Kill();
-                    }
-                    var angle = Vector3.Angle(Vector3.forward, diffDir);
-                    // 求旋转方向
-                    float dir = (Vector3.Dot(Vector3.up, Vector3.Cross(Vector3.forward, diffDir)) < 0 ? 1 : -1);
-                    // 位置移动
-                    var xMove = (float)Math.Sin(angle * dir) * mySpeed;
-                    var yMove = (float)Math.Cos(angle * dir) * mySpeed;
-                    member.GameObj.transform.position += new Vector3(xMove, 0, yMove);
-                    moveTime--;
-                };
-
-                timer.OnCompleteCallback(completeCallback).Start();
+                        // 计算夹角
+                        var diffDir = member.GameObj.transform.position - targetPos;
+                        // 判断达到目标, 停止
+                        if (diffDir.magnitude < mySpeed || moveTime <= 0)
+                        {
+                            timer.Kill();
+                        }
+                        var angle = Vector3.Angle(Vector3.forward, diffDir);
+                        // 求旋转方向
+                        float dir = (Vector3.Dot(Vector3.up, Vector3.Cross(Vector3.forward, diffDir)) < 0 ? 1 : -1);
+                        // 位置移动
+                        var xMove = (float)Math.Sin(angle * dir) * mySpeed;
+                        var yMove = (float)Math.Cos(angle * dir) * mySpeed;
+                        member.GameObj.transform.position += new Vector3(xMove, 0, yMove);
+                        moveTime--;
+                    };
+                    timer.OnCompleteCallback(completeCallback).Start();
+                }
             }
             callback();
         }, myFormulaType);

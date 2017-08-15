@@ -1,5 +1,5 @@
 
-require("uiscripts/chat/subtlecodeUtil")
+--require("uiscripts/chat/subtlecodeUtil")
 
 local class = require("common/middleclass")
 chatWindow_controller = class("chatWindow_controller",wnd_base)
@@ -10,6 +10,7 @@ local model = require("uiscripts/chat/chat_model")
 local socket = require "socket"
 
 local loopSV
+local mself
 chatWindow_controller.lookingForOldData = false --是否正在接收更久之前的数据
 
 --local chatBubble_controller = require("uiscripts/chat/chatBubble/chatBubble_controller")
@@ -27,7 +28,7 @@ function chatWindow_controller:OnShowDone()
     --初始化按钮
     this:InitBtn()
 
-
+    mself = self
 
     ----先进入世界频道
     this.Enter_shijie()
@@ -38,7 +39,7 @@ function chatWindow_controller:OnShowDone()
     --view.scrollView:ResetPosition()
     --view.scrollView:UpdatePosition()
 
-    this.gameObject:SetActive(false)
+    --this.gameObject:SetActive(false)
 
     --Message_Manager:SendPB_30001("token")
     --this.testUdp()
@@ -169,19 +170,18 @@ end
 ----敏感词替换
 function chatWindow_controller:chaekSensitive(str)
     local fitStr = str
-    --print("替换前:"..fitStr)
-    local socket = require "socket"
-    local s = os.clock()
-    for index=1,#(subtlecodeUtil:GetTable().mData.body) do
-        local str1 = subtlecodeUtil:GetSensitiveById(index)
-        --print(str1)
-        fitStr = string.gsub(fitStr, str1, "***")
-    end
-    local e = os.clock()
-    --print("替换后:"..fitStr)
-    print("替换敏感词用时："..e-s.." seconds")
+
+    --print(#(subtlecodeUtil:GetTable()))
+    --for index=1,#(subtlecodeUtil:GetTable()) do
+    --    local str1 = subtlecodeUtil:GetSensitiveById(index)
+    --    fitStr = string.gsub(fitStr, str1, "***")
+    --end
+    print("替换前："..str)
+    str = subtlecodeUtil:FitWord(str)
+    print("替换后："..str)
     return fitStr
 end
+
 
 function chatWindow_controller:create_chatItem(rid,str)
 
@@ -210,13 +210,13 @@ function chatWindow_controller:otherPlayerHead_call()
 end
 
 function chatWindow_controller:btn_chatBack_call()
-    --print("btn_chatBack_call")
-    --print(this.gameObject.transform.parent.gameObject)
-    chatBubble_View.panel:SetActive(true)
-    --chatBubble_controller:RefreshNewContent()
-
-    --print(this.gameObject.name)
-    this.gameObject:SetActive(false)
+    
+    if ui_manager._shown_wnd_bases[WNDTYPE.chatBubble] == nil then
+        ui_manager:ShowWB(WNDTYPE.chatBubble)
+    else
+        ui_manager._shown_wnd_bases[WNDTYPE.chatBubble]:Show()
+    end
+    mself:Hide(0)
 
 end
 

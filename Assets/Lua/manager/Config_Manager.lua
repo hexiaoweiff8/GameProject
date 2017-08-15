@@ -37,6 +37,10 @@ function Config_Manager:LoadConfig()
     sdata_armyaim_data = luacsv.new(require("pk_tabs/armyaim_c"))
     --单位aoe表
     sdata_armyaoe_data = luacsv.new(require("pk_tabs/armyaoe_c"))
+    --单位Effect表
+    sdata_effect_data = luacsv.new(require("pk_tabs/effect_c"))
+    --单位unitFightData表
+    sdata_UnitFight_data = luacsv.new(require("pk_tabs/UnitFightData_c"))
     --卡牌表
     sdata_armybase_data = luacsv.new(require("pk_tabs/armybase_c"))
     --卡牌基础表
@@ -101,12 +105,16 @@ function Config_Manager:LoadConfig()
     sdata_cardplanenemy_data = luacsv.new(require("pk_tabs/cardplanenemy_c"))
     --主界面系统栏表
     sdata_maininterface_data = luacsv.new(require("pk_tabs/maininterface_c"))
+    --任务表
+    sdata_dailymission_data = luacsv.new(require("pk_tabs/dailymission_c"))
 
     -----------------------------------C#需要调用的配置表在以下位置添加---------------------------------------
     SDataUtils.setData("mapData", sdata_mapData_data.mData.head, sdata_mapData_data.mData.body)
     SDataUtils.setData("constant", sdata_constant_data.mData.head, sdata_constant_data.mData.body)
     SDataUtils.setData("armyaim_c", sdata_armyaim_data.mData.head, sdata_armyaim_data.mData.body)
     SDataUtils.setData("armyaoe_c", sdata_armyaoe_data.mData.head, sdata_armyaoe_data.mData.body)
+    SDataUtils.setData("effect_c", sdata_effect_data.mData.head, sdata_effect_data.mData.body)
+    SDataUtils.setData("unitfight_c", sdata_UnitFight_data.mData.head, sdata_UnitFight_data.mData.body)
     SDataUtils.setData("armybase_c", sdata_armybase_data.mData.head, sdata_armybase_data.mData.body)
     SDataUtils.setData("armycardbase_c", sdata_armycardbase_data.mData.head, sdata_armycardbase_data.mData.body)
     SDataUtils.setData("array_c", sdata_array_data.mData.head, sdata_array_data.mData.body)

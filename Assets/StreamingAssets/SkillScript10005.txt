@@ -1,0 +1,10 @@
+SkillNum(10005)
+{
+	//ImmuneDemage(1, 1);
+	ResistDemage(1,1000,1,true)
+}
+[
+	
+            TriggerLevel1(3)
+            TriggerLevel2(10)
+]

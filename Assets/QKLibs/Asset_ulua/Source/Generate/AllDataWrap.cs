@@ -14,6 +14,8 @@ public class AllDataWrap
 		L.RegVar("MemberData", get_MemberData, set_MemberData);
 		L.RegVar("SelectWeightData", get_SelectWeightData, set_SelectWeightData);
 		L.RegVar("AOEData", get_AOEData, set_AOEData);
+		L.RegVar("EffectData", get_EffectData, set_EffectData);
+		L.RegVar("ArmyTypeData", get_ArmyTypeData, set_ArmyTypeData);
 		L.RegVar("SkillInfoList", get_SkillInfoList, set_SkillInfoList);
 		L.EndClass();
 	}
@@ -138,6 +140,44 @@ public class AllDataWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_EffectData(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			AllData obj = (AllData)o;
+			EffectData ret = obj.EffectData;
+			ToLua.PushObject(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index EffectData on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_ArmyTypeData(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			AllData obj = (AllData)o;
+			ArmyTypeData ret = obj.ArmyTypeData;
+			ToLua.PushObject(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index ArmyTypeData on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_SkillInfoList(IntPtr L)
 	{
 		object o = null;
@@ -248,6 +288,44 @@ public class AllDataWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index AOEData on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_EffectData(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			AllData obj = (AllData)o;
+			EffectData arg0 = (EffectData)ToLua.CheckObject(L, 2, typeof(EffectData));
+			obj.EffectData = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index EffectData on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_ArmyTypeData(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			AllData obj = (AllData)o;
+			ArmyTypeData arg0 = (ArmyTypeData)ToLua.CheckObject(L, 2, typeof(ArmyTypeData));
+			obj.ArmyTypeData = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index ArmyTypeData on a nil value" : e.Message);
 		}
 	}
 

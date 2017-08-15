@@ -232,6 +232,14 @@ public class RanderControl : MonoBehaviour
         bloodBarCom.SetBloodBarValue(value);
     }
 
+    /// <summary>
+    /// 清除当前攻击目标
+    /// </summary>
+    public void CleanTarget()
+    {
+        _control.CleanTarget();
+    }
+
     ///// <summary>
     ///// 启动状态机
     ///// 传入创建的外层持有对象

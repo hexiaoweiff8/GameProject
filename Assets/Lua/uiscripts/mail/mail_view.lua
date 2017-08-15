@@ -107,4 +107,11 @@ function mail_view:HideRightWindow()
     --TweenPosition.Begin(this.rightWindow,0.1,Vector3(255.5,0.5,0,0),false)
 end
 
+function mail_view:CloseWindow()
+    this.rightWindow.gameObject:SetActive(false)
+    this.rightWindow.gameObject.transform.localPosition = Vector3(100,0,0)
+    this.leftWindow.gameObject.transform.localPosition = Vector3(0,0,0)
+
+end
+
 return mail_view

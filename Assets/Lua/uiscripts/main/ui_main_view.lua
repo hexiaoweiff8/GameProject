@@ -5,6 +5,8 @@ local m = ui_main_view
 function ui_main_view:initView(root)
 	self = root
 
+	m.btn_battle = self.transform:Find("btn_battle").gameObject
+
 	m.Widget_AdditionalSystem = self.transform:Find("Widget_AdditionalSystem").gameObject
 	m.Widget_AdditionalSystem_Item = self.transform:Find("Widget_AdditionalSystem/pSprite").gameObject
 
@@ -15,7 +17,7 @@ end
 function ui_main_view:initCollider()
 	local colliders = {}
 
-	table.insert(colliders,m.btn_AvoidWar)
+	table.insert(colliders,m.btn_battle)
 	table.insert(colliders,m.Widget_AdditionalSystem)
 
 	local collider = nil

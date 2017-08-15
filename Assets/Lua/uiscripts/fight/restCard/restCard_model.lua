@@ -13,7 +13,7 @@ function restCard_model:getRestTrainCost()
     for i = 1, #self.paiKutb do
         sumLastBingLi = sumLastBingLi + self.paiKutb[i].TrainCost * self.paiKutb[i].num
     end
-    return sumLastBingLi  + self.nextCard.TrainCost
+    return sumLastBingLi
 end
 
 ---牌库排序 => 剩余卡牌数量（由多至少）→卡牌费数（由多至少）→卡牌ID（由低至高）

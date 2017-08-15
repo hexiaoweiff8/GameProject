@@ -63,7 +63,8 @@ public class NormalGeneralAttack : IGeneralAttack
                         ReceiveMember = attackerDisplayOwner,
                         ReleaseMember = beAttackerDisplayOwner,
                         TypeLevel1 = TriggerLevel1.Fight,
-                        TypeLevel2 = TriggerLevel2.BeAttack
+                        TypeLevel2 = TriggerLevel2.BeAttack,
+                        DemageType = DemageType.NormalAttackDemage
                     });
                 }
                 // 命中时检测技能

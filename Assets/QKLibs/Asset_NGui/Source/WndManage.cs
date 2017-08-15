@@ -1,55 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using LuaInterface;
 using UnityEngine;
 
-public class wndInfo : ICloneable
-{
-    public string name;
-    public List<string> dependPackets = null;
-    public WndFadeMode fade;
-    public WndAnimationMode animaMode;
-    public bool isVisible = false;//当前是否处于显示状态
-    public int cacheTime;
-    public object Clone()
-    {
-        return this.MemberwiseClone();
-    }
-}
-
-public class wndShowHideInfo
-{
-    public string name;
-    //public bool needVisible = false;//逻辑当前是希望它显示还是隐藏
-    public WShowType needVisible = WShowType.hide;//逻辑当前是希望它显示还是隐藏,还是预加载
-    public float duration;//延迟
-    public bool isWithBg;
-}
-/*
-class SafeShowing:IDisposable 
-{
-    public SafeShowing(string wndName)
-    {
-        m_wndName = wndName;
-        WndManage.Single.__showing.Add(wndName);
-          
-    }
-
-    public void Dispose()
-    { 
-        WndManage.Single.__showing.Remove(m_wndName); 
-    }
-
-    string m_wndName;
-}*/
-public enum WShowType
-{
-    hide,
-    show,
-    preLoad,
-    destroy,
-}
 /// <summary>
 /// 窗体的管理类 当前实现了窗体注册、卸载、获取依赖等功能点
 /// </summary>
@@ -57,7 +10,6 @@ public class WndManage
 {
 
     static WndManage _Single = null;
-    // public HashSet<string> __showing = new HashSet<string>();//正在显示过程中的窗体
     Dictionary<string, DateTime> m_wndLastHideTime = new Dictionary<string, DateTime>();
 
     public delegate void Evt_WndDestroy(Wnd wndObj);
@@ -90,14 +42,12 @@ public class WndManage
     {
         UIRootObj = UnityEngine.GameObject.Find("/UIRoot");
 
-
-        // QKEvent Event_CheckRedundantUI = new QKEvent();
-        //  Event_CheckRedundantUI.AddCallback(new SharpEventCallback(CheckRedundantUI_CallBack));
-
         //定时检查并卸载时间过长未使用的ui
         new MonoEX.Timer(15.0f).Play().OnComplete(CheckRedundantUI_CallBack);
     }
-
+    /// <summary>
+    /// 定期检查过期UI  
+    /// </summary>
     void CheckRedundantUI_CallBack()
     {
         DateTime now = DateTime.Now;
@@ -148,9 +98,6 @@ public class WndManage
                 ResourceRefManage.Single.SubRef(packet);
         }
     }
-
-
-
     /// <summary>
     /// 
     /// </summary>
@@ -301,14 +248,17 @@ public class WndManage
                 }
             }
 
+            
             if (aInfo.needVisible != WShowType.hide && aInfo.needVisible != WShowType.destroy)
             {
+                //标记是否第一次打开（包括释放后再打开）
+                bool isFirstShow = false;
                 //从最近隐藏记录中清除
                 if (m_wndLastHideTime.ContainsKey(wndName + subID))
                     m_wndLastHideTime.Remove(wndName + subID);
-
+                isFirstShow = !m_wndInstances.ContainsKey(wndName + subID);
                 //窗体不存在，则创建
-                if (!m_wndInstances.ContainsKey(wndName + subID))
+                if (isFirstShow)
                 {
                     IEnumerator it = LoadDepend(wndName);
 
@@ -406,7 +356,14 @@ public class WndManage
                     wnd._Show(aInfo.duration);
                     //等待窗体组件准备就绪
                     yield return null;
-                    Wnd.OnShowFinish.Call(wnd);
+                    if (isFirstShow)
+                    {
+                        Wnd.OnShowFinish.Call(wnd);
+                    }
+                    else
+                    {
+                        Wnd.OnReOpenWnd.Call(wnd);
+                    }
                     if (OnWndOpen != null)
                         OnWndOpen.Call(wndName);
                 }
@@ -419,8 +376,14 @@ public class WndManage
                     if (aInfo.needVisible == WShowType.destroy && m_wndLastHideTime.ContainsKey(wndName + subID))
                         m_wndLastHideTime.Remove(wndName + subID);
                     Wnd wnd = m_wndInstances[wndName + subID];
-                    wnd._Hide(aInfo.duration, aInfo.needVisible);
-                    Wnd.OnDestroyFinish.Call(wnd);
+                    wnd._Hide(aInfo.duration, aInfo.needVisible, aInfo.PlantfromDetph);
+                    if (aInfo.needVisible == WShowType.hide)
+                    {
+                        Wnd.OnHideFinish.Call(wnd);
+                    }else if (aInfo.needVisible == WShowType.destroy)
+                    {
+                        Wnd.OnDestroyFinish.Call(wnd);
+                    }
                 }
 
             }

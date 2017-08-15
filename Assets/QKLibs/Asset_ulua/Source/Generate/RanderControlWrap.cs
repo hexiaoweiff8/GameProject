@@ -13,6 +13,7 @@ public class RanderControlWrap
 		L.RegFunction("PlayAni", PlayAni);
 		L.RegFunction("DestoryFSM", DestoryFSM);
 		L.RegFunction("SetBloodBarValue", SetBloodBarValue);
+		L.RegFunction("CleanTarget", CleanTarget);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("bloodBarCom", get_bloodBarCom, set_bloodBarCom);
@@ -115,6 +116,22 @@ public class RanderControlWrap
 			ToLua.CheckArgsCount(L, 1);
 			RanderControl obj = (RanderControl)ToLua.CheckObject(L, 1, typeof(RanderControl));
 			obj.SetBloodBarValue();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int CleanTarget(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			RanderControl obj = (RanderControl)ToLua.CheckObject(L, 1, typeof(RanderControl));
+			obj.CleanTarget();
 			return 0;
 		}
 		catch(Exception e)

@@ -2,7 +2,7 @@
 --- Created by Administrator.
 --- DateTime: 2017/8/2 16:57
 ---
-
+local CanNotArea = require("uiscripts/fight/CanNotArea")
 local cardAction = {}
 
 ---初始化数据
@@ -19,19 +19,25 @@ end
 ---控制不可下兵区域的显隐
 ---
 function cardAction:showCanNotArea()
-    _view.canotRect.gameObject:SetActive(true)
+    CanNotArea:Show()
 end
 function cardAction:hideCanNotArea()
-    _view.canotRect.gameObject:SetActive(false)
+    CanNotArea:Hide()
 end
 
 ---
 ---控制卡牌详细信息的显隐
 ---
 function cardAction:showCardInfo(cardIndex)
+    local card = _data.nowHandpaiKutb[cardIndex]
     _view.cardInfoBg.gameObject:SetActive(true)
     _view.cardInfoBg.transform.parent = _data.nowMyCardtb[cardIndex].transform.parent
-    _view.cardInfoBg.localPosition = _data.nowMyCardtb[cardIndex].transform.localPosition + Vector3(0, 100, 0)
+    _view.cardInfoBg.localPosition = _data.nowMyCardtb[cardIndex].transform.localPosition + Vector3(0,_data.nowMyCardtb[cardIndex]:GetComponent("UIWidget").height / 2,0)
+
+    _view.targetType:GetComponent("UILabel").text = cardUtil:getCardPropValue("AimGeneralType", card.id, card.lv)
+    _view.attackValue:GetComponent("UILabel").text = cardUtil:getCardPropValue("Attack1", card.id, card.lv)
+    _view.defenceValue:GetComponent("UILabel").text = cardUtil:getCardPropValue("Defence", card.id, card.lv)
+    _view.HPValue:GetComponent("UILabel").text = cardUtil:getCardPropValue("HP", card.id, card.lv)
 end
 function cardAction:hideCardInfo()
     _view.cardInfoBg.gameObject:SetActive(false)
@@ -76,7 +82,7 @@ function cardAction:doEvent(go,cardIndex)
         if _data.nowFei < _data.nowHandpaiKutb[cardIndex].TrainCost then
             UIToast.Show("能量不足")
             go.transform.localScale = Vector3.one
-            ModelControl:HideModel(cardIndex)
+            ModelControl:DestroyModel(cardIndex)
         else
             go.transform.localScale = Vector3.zero
             Event.Brocast(GameEventType.DROP_CARD, cardIndex)

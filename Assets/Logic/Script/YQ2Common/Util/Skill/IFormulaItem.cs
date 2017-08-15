@@ -276,6 +276,10 @@ public abstract class AbstractFormulaItem : IFormulaItem
         {
             resultType = 4;
         }
+        if (result is bool)
+        {
+            resultType = 5;
+        }
         var item = array[pos];
         if (item.StartsWith("%"))
         {
@@ -305,6 +309,10 @@ public abstract class AbstractFormulaItem : IFormulaItem
                 case 4:
                     // enum
                     result = (T)Enum.Parse(typeof(T), item);
+                    break;
+                case 5:
+                    // bool
+                    result = (T)Convert.ChangeType(item, typeof(T));
                     break;
             }
         }

@@ -149,13 +149,22 @@ public enum DemageOrCure
 }
 
 /// <summary>
-/// 伤害类型
+/// 伤害类型-技能攻击, 普通攻击
 /// </summary>
 public enum DemageType
 {
     None = 0,
     NormalAttackDemage = 1,
     SkillAttackDemage = 2,
+}
+
+/// <summary>
+/// 伤害类型-攻击, 被攻击
+/// </summary>
+public enum AttackOrBeAttach
+{
+    Attack = 0,
+    BeAttach = 1,
 }
 
 /// <summary>

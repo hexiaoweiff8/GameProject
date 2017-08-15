@@ -14,6 +14,8 @@ local lastContentTime = 0--math.floor(socket.gettime()*1000) --气泡最新一�
 
 local aniCd = 0 --气泡动画CD 1.5秒一次循环
 
+local mself
+
 function chatBubble_controller:OnShowDone()
     --this.view = require("uiscripts/chat/chatBubble/chatBubble_View")
     --初始化View
@@ -23,6 +25,7 @@ function chatBubble_controller:OnShowDone()
     --初始化按钮
     this.InitBtn()
 
+    mself = self
     --更新第一条数据
     --this:RefreshFirstDate()
 
@@ -109,8 +112,13 @@ end
 function chatBubble_controller:btn_Bubble_call()
     --view:ShowNextMessageGrid()
 
-    view.panel.transform.gameObject:SetActive(false)
-    chatWindow_controller.gameObject:SetActive(true)
+    if ui_manager._shown_wnd_bases[WNDTYPE.chatWindow] == nil then
+        ui_manager:ShowWB(WNDTYPE.chatWindow)
+    else
+        ui_manager._shown_wnd_bases[WNDTYPE.chatWindow]:Show()
+    end
+    mself:Hide(0)
+
     --chatWindow_controller.heartbeat_chat_timer = 300
 
     --进入世界频道

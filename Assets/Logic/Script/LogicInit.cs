@@ -9,6 +9,7 @@ public class LogicInit
     //游戏逻辑初始化
     public static IEnumerator InitLogic()
     {
+        // Debug.logger.logEnabled = false;
 
         Application.targetFrameRate = 30;//限定帧率
 
@@ -24,8 +25,12 @@ public class LogicInit
         packs.Add("uisound");
         packs.Add("scene_main");
         packs.Add("xuebaotujidui");
+        // 基地
         packs.Add("jidi");
+        // 防御塔
         packs.Add("turret");
+        // 特效(攻击特效)
+        packs.Add("attackeffect");
         //注册常驻包
         {
             foreach (var curr in packs)

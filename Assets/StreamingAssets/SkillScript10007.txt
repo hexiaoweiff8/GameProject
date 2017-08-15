@@ -1,0 +1,18 @@
+SkillNum(10007)
+        Attach
+        {
+            Liner(1,linePrfb.prefab,0,3,10)
+        }
+	Action
+	{
+            HealthChange(1,0,0,0,1)
+	}
+	Detach
+	{
+	
+	}
+
+        [
+            TriggerLevel1(3)
+            TriggerLevel2(9)
+        ]

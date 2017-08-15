@@ -450,6 +450,9 @@
     <None Include="Assets\StreamingAssets\SkillScript10002.txt" />
     <None Include="Assets\StreamingAssets\SkillScript10003.txt" />
     <None Include="Assets\StreamingAssets\SkillScript10004.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript10005.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript10006.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript10007.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1001.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1002.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1003.txt" />

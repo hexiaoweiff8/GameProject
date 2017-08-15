@@ -25,11 +25,7 @@ public class SData_armyaoe_c : MonoEX.Singleton<SData_armyaoe_c>
 					case "AOERadius": dif.AOERadius = (float)(double)o22; break;
 					case "AOELength": dif.AOELength = (float)(double)o22; break;
 					case "AOEWidth": dif.AOEWidth = (float)(double)o22; break;
-					case "BulletModel": dif.BulletModel = (string)o22; break;
-					case "BulletPath": dif.BulletPath = (short)(double)o22; break;
-					case "Ballistic": dif.Ballistic = (string)o22; break;
-					case "DamageEffect": dif.DamageEffect = (string)o22; break;
-					case "EffectTime": dif.EffectTime = (float)(double)o22; break;
+					case "SputteringRatio": dif.SputteringRatio = (float)(double)o22; break;
                 }
             });
             if (Data.ContainsKey(dif.ArmyID))
@@ -79,23 +75,7 @@ public struct armyaoe_cInfo
 	 /// </summary>
 	public float AOEWidth;
 	 /// <summary>
-	 ///子弹模型
+	 ///溅射比例
 	 /// </summary>
-	public string BulletModel;
-	 /// <summary>
-	 ///子弹轨迹
-	 /// </summary>
-	public short BulletPath;
-	 /// <summary>
-	 ///弹道特效
-	 /// </summary>
-	public string Ballistic;
-	 /// <summary>
-	 ///范围伤害特效
-	 /// </summary>
-	public string DamageEffect;
-	 /// <summary>
-	 ///特效持续时间
-	 /// </summary>
-	public float EffectTime;
+	public float SputteringRatio;
 }

@@ -1,8 +1,10 @@
 require('uiscripts/shop/timeUtil/TimeUtil')
+require 'uiscripts/main/RefreshManager'
 --[[
 	ui_main_controller:
 		variable:
 			AvoidTimer 免战计时器
+			MailTimer 邮件刷新计时器
 			AdditionalSystemBarItems 周边栏Item
 			playerInfoWidget 玩家信息卡模块
 			mainSystemBar 主系统栏模块
@@ -30,20 +32,38 @@ function ui_main_controller:OnShowDone()
 	this.model:initModel()
 	this.playerInfoWidget.show()
 	this.mobileInfoWidget.show()
-	this.mainSystemBar.toggleBar()
+	this.mainSystemBar.show()
 	this.mainCurrencyBar.show()
 
-	-- this:initListener()
+	this:initListener()
 	this.view:initCollider()
 	this:initAdditionalSystemItem()
 	this:toggleBar()
 	this:checkAvoidTime()
 
-	UnityEngine.SceneManagement.SceneManager.LoadScene("testMainScene",UnityEngine.SceneManagement.LoadSceneMode.Additive)
+	this:initMailRefreshTimer()
+
+	ui_manager:ShowWB(WNDTYPE.chatBubble)
+
+	-- printf(inspect(userModel))
+
+	-- UnityEngine.SceneManagement.SceneManager.LoadScene("testMainScene",UnityEngine.SceneManagement.LoadSceneMode.Additive)
+	-- SceneManager.LoadScene("testMainScene",UnityEngine.SceneManagement.LoadSceneMode.Additive)
 end
 
 function ui_main_controller:OnDestroyDone()
+	this.AvoidTimer:Kill()
+	this.MailTimer:Kill()
+end
 
+function ui_main_controller:initListener()
+	-- UIEventListener.Get(this.view.btn_battle).onClick = function()
+	-- 	if ui_manager._shown_wnd_bases[WNDTYPE.PVE] == nil then
+	-- 		ui_manager:ShowWB(WNDTYPE.PVE)
+	-- 	else
+	-- 		ui_manager._shown_wnd_bases[WNDTYPE.PVE]:Show()
+	-- 	end
+	-- end
 end
 ----------------------------------------------------------------
 --★周边系统栏模块控制
@@ -95,27 +115,72 @@ function ui_main_controller:initAdditionalSystemItem()
 		this.toggleBar()
 	end
 end
-function ui_main_controller:attachListener(ID,pItem)
-	if ID == 201 then -- 显示邮件
-		UIEventListener.Get(pItem).onClick = function()
-			-- ui_manager:ShowWB(WNDTYPE.ui_equip2)
-		end
-	elseif ID == 202 then -- 显示VIP界面
-		UIEventListener.Get(pItem).onClick = function()
-			-- ui_manager:ShowWB(WNDTYPE.BianDui)
-		end
-	elseif ID == 203 then -- 显示首充界面
-		UIEventListener.Get(pItem).onClick = function()
-			-- ui_manager:ShowWB(WNDTYPE.Cangku)
-		end
-	elseif ID == 204 then -- 显示签到界面
-		UIEventListener.Get(pItem).onClick = function()
-			ui_manager:ShowWB(WNDTYPE.QianDao)
-		end
-	elseif ID == 205 then -- 显示活动界面
-		UIEventListener.Get(pItem).onClick = function()
+--@Des 初始化邮件定时刷新计时器
+function ui_main_controller:initMailRefreshTimer()
+	local Refresh_Interval = 60
+	local UIDefine_mail = "ui_mail"
 
+	local function getMailWidget(_uiDefine)
+		for _,v in ipairs(this.AdditionalSystemBarItems) do
+			if tonumber(v.name) == this.model:getIDByUIDefine(_uiDefine) then
+				return v
+			end
 		end
+	end
+	-- TODO: 邮件红点将来可能改为计数
+	local mail_widget = getMailWidget(UIDefine_mail)
+	local mail_widget_redDot = mail_widget.transform:Find("RedDot").gameObject
+		mail_widget_redDot:SetActive(false)
+
+	local function refreshMailRedDotCount(count)
+		printw("邮件刷新返回值:"..count)
+		if count > 0 then
+			mail_widget_redDot:SetActive(true)
+		else
+			mail_widget_redDot:SetActive(false)
+		end
+	end
+
+	local function addFunctionParam(funcStr,param)
+		local funcStrLen = #funcStr
+		local part1 = string.sub(funcStr,1,funcStrLen-1)
+		local part2 = string.sub(funcStr,funcStrLen,funcStrLen)
+		return part1..param..part2
+	end
+
+	local param = 'callback'
+
+	loadstring("function mailRefreshAPI(callback) "..addFunctionParam(this.model:getRefreshAPIStrByUIDefine(UIDefine_mail),param).." end")()
+
+	local function onTick()
+		mailRefreshAPI(refreshMailRedDotCount)
+	end
+	onTick()
+	this.MailTimer = TimeUtil:CreateLoopTimer(Refresh_Interval,onTick,nil)
+end
+function ui_main_controller:attachListener(ID,pItem)
+
+	local function showWND(WNDTYPE_WndName)
+		if ui_manager._shown_wnd_bases[WNDTYPE_WndName] == nil then
+			ui_manager:ShowWB(WNDTYPE_WndName)
+		else
+			ui_manager._shown_wnd_bases[WNDTYPE_WndName]:Show()
+		end
+	end
+
+	UIEventListener.Get(pItem).onClick = function()
+		local function getEntrance(ID)
+			for i = 1,#this.model.local_AddtionalSystemBarData do
+				if this.model.local_AddtionalSystemBarData[i]["ID"] == ID then
+					if this.model.local_AddtionalSystemBarData[i]["UIDefine"] ~= '' then
+						return this.model.local_AddtionalSystemBarData[i]["UIDefine"]
+					else
+						error("未定义ui入口")
+					end
+				end
+			end
+		end
+		showWND(getEntrance(ID))
 	end
 end
 function ui_main_controller.toggleBar()

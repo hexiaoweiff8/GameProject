@@ -113,14 +113,6 @@ message ComposeEquip {
     repeated Item item              =2;
 }
 
-message ReadMail {
-    required Mail mail              =1;
-    repeated Card card              =2;
-    repeated Equip equip            =3;
-    required Currency currency      =4;
-    repeated Item item              =5;
-}
-
 message GetShopDetail {
     required ShopItem shop          =1;
 }
@@ -155,7 +147,7 @@ message BuyCard {
 message BuyAvoidTime {
     repeated Item item              =1;
     required Currency currency      =2;
-    required Pvp pvp                =3;
+    required Battle battle          =3;
 }
 
 message GetEquip {
@@ -166,8 +158,12 @@ message GetCard {
     repeated Card card              =1;
 }
 
-message SetCardGroup {
-    repeated int32 lst              =1;
+message SetCardPf {
+    required Battle battle          =1;
+}
+
+message SetCardGf {
+    required Battle battle          =1;
 }
 
 

@@ -153,6 +153,7 @@ public class TestSkillEditor : MonoBehaviour
         // 初始化列表
 	    InitList();
 	    InitLua();
+	    InitPack();
 	}
 
 
@@ -193,7 +194,7 @@ public class TestSkillEditor : MonoBehaviour
         if (!string.IsNullOrEmpty(skillId))
         {
             // 加载Skill
-            var skill = SkillManager.Single.CreateSkillInfo(Convert.ToInt32(skillId), null);
+            var skill = SkillManager.Single.CreateSkillInfo(Convert.ToInt32(skillId), new DisplayOwner(workingObj.gameObject, workingObj));
             if (skill != null)
             {
                 // 挂载技能
@@ -381,21 +382,21 @@ public class TestSkillEditor : MonoBehaviour
         }
 
         // 创建活动单位Cube
-        if (Input.GetKey(KeyCode.C))
+        if (Input.GetKeyUp(KeyCode.C))
         {
             CreateMember();
             Debug.Log("创建新单位");
         }
 
         // 初始化
-        if (Input.GetKey(KeyCode.R))
+        if (Input.GetKeyUp(KeyCode.R))
         {
             // 创建数组
             InitClusterManager();
             Debug.Log("初始化");
         }
 
-        if (Input.GetKey(KeyCode.A))
+        if (Input.GetKeyUp(KeyCode.A))
         {
             Attack();
             Debug.Log("普通攻击");
@@ -452,7 +453,7 @@ public class TestSkillEditor : MonoBehaviour
             if (workingObj.AllData.MemberData.AttackType == Utils.BulletTypeNormal)
             {
                 normalGeneralAttack = GeneralAttackManager.Instance()
-                    .GetNormalGeneralAttack(workingObj, targetObj, "test/TrailPrj",
+                    .GetNormalGeneralAttack(workingObj, targetObj, "linePrfb.prefab",
                         workingObj.transform.position + new Vector3(0, 10, 0),
                         targetObj.gameObject,
                         200,
@@ -465,67 +466,67 @@ public class TestSkillEditor : MonoBehaviour
             }
             else if (workingObj.AllData.MemberData.AttackType == Utils.BulletTypeScope)
             {
-                // 获取
-                //Debug.Log("AOE");
-                var armyAOE = workingObj.AllData.AOEData;
-                // 根据不同攻击类型获取不同数据
-                switch (armyAOE.AOEAim)
-                {
-                    case Utils.AOEObjScope:
-                        normalGeneralAttack = GeneralAttackManager.Instance().GetPointToObjScopeGeneralAttack(workingObj,
-                            new[] { armyAOE.BulletModel, armyAOE.DamageEffect },
-                            workingObj.transform.position,
-                            targetObj.gameObject,
-                            armyAOE.AOERadius,
-                            200,
-                            armyAOE.EffectTime,
-                            (TrajectoryAlgorithmType)armyAOE.BulletPath,
-                            () =>
-                            {
-                                //Debug.Log("AOE Attack1");
-                            });
-                        break;
-                    case Utils.AOEPointScope:
-                        normalGeneralAttack =
-                            GeneralAttackManager.Instance().GetPointToPositionScopeGeneralAttack(workingObj,
-                                new[] { armyAOE.BulletModel, armyAOE.DamageEffect },
-                                workingObj.transform.position,
-                                targetObj.transform.position,
-                                armyAOE.AOERadius,
-                                200,
-                                armyAOE.EffectTime,
-                                (TrajectoryAlgorithmType)armyAOE.BulletPath,
-                                () =>
-                                {
-                                    //Debug.Log("AOE Attack2");
-                                });
-                        break;
-                    case Utils.AOEScope:
-                        normalGeneralAttack = GeneralAttackManager.Instance().GetPositionScopeGeneralAttack(workingObj,
-                            armyAOE.DamageEffect,
-                            workingObj.transform.position,
-                            new CircleGraphics(new Vector2(workingObj.X, workingObj.Y), armyAOE.AOERadius),
-                            armyAOE.EffectTime,
-                            () =>
-                            {
-                                //Debug.Log("AOE Attack3");
-                            });
-                        break;
-                    case Utils.AOEForwardScope:
-                        normalGeneralAttack =
-                            GeneralAttackManager.Instance().GetPositionRectScopeGeneralAttack(workingObj,
-                                armyAOE.DamageEffect,
-                                workingObj.transform.position,
-                                armyAOE.AOEWidth,
-                                armyAOE.AOEHeight,
-                                Vector2.Angle(Vector2.up, new Vector2(workingObj.transform.forward.x, workingObj.transform.forward.z)),
-                                armyAOE.EffectTime,
-                                () =>
-                                {
-                                    //Debug.Log("AOE Attack4");
-                                });
-                        break;
-                }
+                //// 获取
+                ////Debug.Log("AOE");
+                //var armyAOE = workingObj.AllData.AOEData;
+                //// 根据不同攻击类型获取不同数据
+                //switch (armyAOE.AOEAim)
+                //{
+                //    case Utils.AOEObjScope:
+                //        normalGeneralAttack = GeneralAttackManager.Instance().GetPointToObjScopeGeneralAttack(workingObj,
+                //            new[] { armyAOE.BulletModel, armyAOE.DamageEffect },
+                //            workingObj.transform.position,
+                //            targetObj.gameObject,
+                //            armyAOE.AOERadius,
+                //            200,
+                //            armyAOE.EffectTime,
+                //            (TrajectoryAlgorithmType)armyAOE.BulletPath,
+                //            () =>
+                //            {
+                //                //Debug.Log("AOE Attack1");
+                //            });
+                //        break;
+                //    case Utils.AOEPointScope:
+                //        normalGeneralAttack =
+                //            GeneralAttackManager.Instance().GetPointToPositionScopeGeneralAttack(workingObj,
+                //                new[] { armyAOE.BulletModel, armyAOE.DamageEffect },
+                //                workingObj.transform.position,
+                //                targetObj.transform.position,
+                //                armyAOE.AOERadius,
+                //                200,
+                //                armyAOE.EffectTime,
+                //                (TrajectoryAlgorithmType)armyAOE.BulletPath,
+                //                () =>
+                //                {
+                //                    //Debug.Log("AOE Attack2");
+                //                });
+                //        break;
+                //    case Utils.AOEScope:
+                //        normalGeneralAttack = GeneralAttackManager.Instance().GetPositionScopeGeneralAttack(workingObj,
+                //            armyAOE.DamageEffect,
+                //            workingObj.transform.position,
+                //            new CircleGraphics(new Vector2(workingObj.X, workingObj.Y), armyAOE.AOERadius),
+                //            armyAOE.EffectTime,
+                //            () =>
+                //            {
+                //                //Debug.Log("AOE Attack3");
+                //            });
+                //        break;
+                //    case Utils.AOEForwardScope:
+                //        normalGeneralAttack =
+                //            GeneralAttackManager.Instance().GetPositionRectScopeGeneralAttack(workingObj,
+                //                armyAOE.DamageEffect,
+                //                workingObj.transform.position,
+                //                armyAOE.AOEWidth,
+                //                armyAOE.AOEHeight,
+                //                Vector2.Angle(Vector2.up, new Vector2(workingObj.transform.forward.x, workingObj.transform.forward.z)),
+                //                armyAOE.EffectTime,
+                //                () =>
+                //                {
+                //                    //Debug.Log("AOE Attack4");
+                //                });
+                //        break;
+                //}
             }
 
             if (normalGeneralAttack != null)
@@ -731,6 +732,8 @@ public class TestSkillEditor : MonoBehaviour
         ClusterManager.Single.Init(0, 0, MapWidth, MapHeight, UnitWidth, map);
         LoadMap.Single.Init(map, UnitWidth);
         DisplayerManager.AutoInstance();
+        // 启动携程器
+        CoroutineManage.AutoInstance();
     }
 
     /// <summary>
@@ -745,4 +748,24 @@ public class TestSkillEditor : MonoBehaviour
         buffButton.gameObject.transform.parent = null;
     }
 
+
+    /// <summary>
+    /// 初始化资源包
+    /// </summary>
+    private void InitPack()
+    {        // 加载资源包
+        var packLoader = new PacketLoader();
+        packLoader.Start(PackType.Res, new List<string>()
+            {
+                "ui_fightU",
+                "xuebaotujidui",
+                "attackeffect"
+            }, (isDone) =>
+            {
+                if (isDone)
+                {
+                    Debug.Log("加载完毕");
+                }
+            });
+    }
 }

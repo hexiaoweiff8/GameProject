@@ -34,6 +34,7 @@ wnd_cangku_ScrollView_controller = {
 
 local this = wnd_cangku_ScrollView_controller
 local ctrl,model,view
+local _scrollView,_scrollViewItem
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --function def
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■

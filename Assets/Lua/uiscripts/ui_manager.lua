@@ -10,6 +10,8 @@ function ui_manager:initialize()
     self._shown_wnd_bases = {}
     -- 弹出窗口用来导航用到的堆栈
     self._popup_back_sequence = stack:create()
+    --背景层列表 用来辅助管理互斥关系
+    self._background_sequence = stack:create()
     --UIRoot
     self.ui_layer = GameObject.Find("UIRoot").transform
 end
@@ -17,6 +19,7 @@ function ui_manager:reset()
     self._all_wnd_bases = {}
     self._shown_wnd_bases = {}
     self._popup_back_sequence:clear()
+    self._background_sequence:clear()
 end
 function ui_manager:ShowWB(wnd_base, duration, is_close_curPop)
     if type(wnd_base) == "string" then
@@ -42,9 +45,14 @@ function ui_manager:ShowWB(wnd_base, duration, is_close_curPop)
         end
     end
 
+    if wnd_base.wnd_base_type == wnd_base_type.BACKGROUND then
+        self:destroy_all_shown_background()
+        self._background_sequence:push(wnd_base)
+    end
+
     wnd_base:Show(duration)
-	ui_manager._all_wnd_bases[wnd_base_id] = wnd_base
-	ui_manager._shown_wnd_bases[wnd_base_id] = wnd_base
+    ui_manager._all_wnd_bases[wnd_base_id] = wnd_base
+    ui_manager._shown_wnd_bases[wnd_base_id] = wnd_base
 end
 function ui_manager:DestroyWB(wnd_base, duration, isPop)
     if type(wnd_base) == "string" then
@@ -178,6 +186,16 @@ function ui_manager:destroy_all_shown_pop(duration)
         self:DestroyWB(popwnd_base, duration, false)
     end)
     self._popup_back_sequence:clear()
+end
+--删除所有显示的背景层ui 互斥关系
+function ui_manager:destroy_all_shown_background(duration)
+    if duration == nil then
+        duration = 0.5
+    end
+    self._background_sequence:list(function(i, popwnd_base)
+        self:DestroyWB(popwnd_base, duration)
+    end)
+    self._background_sequence:clear()
 end
 function ui_manager:destroy_all_shown_wnd_bases(include_fixed)
     if include_fixed == nil then include_fixed = true end

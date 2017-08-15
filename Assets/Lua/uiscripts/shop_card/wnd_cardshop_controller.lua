@@ -14,11 +14,14 @@ require('uiscripts/cangku/const/wnd_cangku_Const')
 wnd_cardshop_controller = require("common/middleclass")("wnd_cardshop_controller",wnd_base)
 
 local this = wnd_cardshop_controller
+local instance = nil
 
 function wnd_cardshop_controller:OnShowDone()
 	this.view = require('uiscripts/shop_card/wnd_cardshop_view')
 	this.model = require('uiscripts/shop_card/wnd_cardshop_model')
 	this.scrollViewController = require("uiscripts/shop_card/wnd_cardshop_scrollView_controller")
+
+	instance = self
 
 	this.model:initModel()
 	this.view:initView(self)
@@ -35,10 +38,20 @@ function wnd_cardshop_controller:OnShowDone()
 	this.scrollViewController:ToggleIndicator()
 	this.scrollViewController:BindingAll()
 	this.scrollViewController:StartAllToggleAnime()
+
+	printe("wnd_cardshop_controller:OnShowDone")
+end
+function wnd_cardshop_controller:OnReOpenDone()
+	printw("OnReOpenDone")
 end
 function wnd_cardshop_controller:OnDestroyDone()
+	printe("wnd_cardshop_controller OnDestroyDone")
 	-- 该界面关闭时,销毁所有绑定动画
 	this.scrollViewController:KillAllToggleAnime()
+	this.view = nil
+	this.model = nil
+	this.scrollViewController = nil
+	wnd_cardshop_controller = nil
 end
 ----------------------------------------------------------------
 --★Init 
@@ -72,7 +85,7 @@ end
 function wnd_cardshop_controller:initListener()
 	UIEventListener.Get(this.view.Button_close).onClick = function()
 			-- TODO: 商店界面：关闭按钮的实现
-			ui_manager:DestroyWB(self)
+			instance:Hide(0)
 		end
 	-- 页卡
 	for i = 1,#this.model.local_Tabs do
@@ -94,15 +107,15 @@ function wnd_cardshop_controller:SelectYekaButton(selectedButton)
 		return
 	end
 
-	if mAtlas == nil then
-		mAtlas = this.view.Button_close:GetComponent(typeof(UISprite)).atlas
+	if this.mAtlas == nil then
+		this.mAtlas = this.view.Button_close:GetComponent(typeof(UISprite)).atlas
 	end
 
 	if this._selectedYekaButton ~= nil then
 		this._selectedYekaButton:GetComponent(typeof(UISprite)).atlas = nil
 	end
 
-	selectedButton:GetComponent(typeof(UISprite)).atlas = mAtlas
+	selectedButton:GetComponent(typeof(UISprite)).atlas = this.mAtlas
 	selectedButton:GetComponent(typeof(UISprite)).spriteName = cstr.SELECTED_YEKA_EX
 
 	local start, e = string.find(selectedButton.name, '_')
@@ -112,6 +125,7 @@ function wnd_cardshop_controller:SelectYekaButton(selectedButton)
 	this:showShoppingListByShopType(ShopType)
 
 	this._selectedYekaButton = selectedButton
+
 end
 ----------------------------------------------------------------
 --★Show

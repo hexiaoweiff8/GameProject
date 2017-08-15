@@ -6,8 +6,8 @@ wnd_qiandao_model =
     initModel,
     initLocalRefeshTime, --读取本地每日刷新时间的数据
     initLocalCheckinData, --读本地每日奖励表数据
-    --getLocalAwardDataByDay, --在本地每日奖励表查找对应的Day的数据
-    --getQualitySpriteStr,
+    getLocalAwardDataByDay, --在本地每日奖励表查找对应的Day的数据
+    getQualitySpriteStr,
     serv_qiandaoInfo = {} --服务器数据10002发送的签到信息
 
 }
@@ -57,7 +57,7 @@ function wnd_qiandao_model:getserv_qiandaoInfo()
     --this.serv_qiandaoInfo["isSigned"]= userModel:getUserRoleTbl().sign["isSigned"]
     --this.serv_qiandaoInfo["days"]= userModel:getUserRoleTbl().sign["days"]
     this.serv_qiandaoInfo["isSigned"]= 0
-    this.serv_qiandaoInfo["days"]= 11
+    this.serv_qiandaoInfo["days"]= 2
 end
 
 
@@ -66,15 +66,11 @@ function wnd_qiandao_model:getLocalRefeshTime()
 end
 
 function wnd_qiandao_model:getLocalAwardDataByDay(Day)
-
-
     for i = 1,30 do
         if this.local_checkin[i]["Day"] == Day then
             return this.local_checkin[i]
         end
     end
-
-
 
     Debugger.LogWarning(Day.." not found in wnd_qiandao_model:getLocalAwardDataByDay(Day)")
     return nil
@@ -94,6 +90,7 @@ function wnd_qiandao_model:getQualitySpriteStr(_Quality)
     end
     return str
 end
+
 
 
 return wnd_qiandao_model

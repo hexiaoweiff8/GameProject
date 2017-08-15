@@ -10,11 +10,11 @@ public class UIFollowWrap
 		L.RegFunction("ResetPosition", ResetPosition);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
-		L.RegVar("target", get_target, set_target);
 		L.RegVar("freazeX", get_freazeX, set_freazeX);
 		L.RegVar("freazeY", get_freazeY, set_freazeY);
 		L.RegVar("freazeZ", get_freazeZ, set_freazeZ);
 		L.RegVar("smoothTime", get_smoothTime, set_smoothTime);
+		L.RegVar("Target", get_Target, set_Target);
 		L.EndClass();
 	}
 
@@ -49,25 +49,6 @@ public class UIFollowWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_target(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			UIFollow obj = (UIFollow)o;
-			UnityEngine.Transform ret = obj.target;
-			ToLua.Push(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index target on a nil value" : e.Message);
 		}
 	}
 
@@ -148,7 +129,7 @@ public class UIFollowWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_target(IntPtr L)
+	static int get_Target(IntPtr L)
 	{
 		object o = null;
 
@@ -156,13 +137,13 @@ public class UIFollowWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			UIFollow obj = (UIFollow)o;
-			UnityEngine.Transform arg0 = (UnityEngine.Transform)ToLua.CheckUnityObject(L, 2, typeof(UnityEngine.Transform));
-			obj.target = arg0;
-			return 0;
+			UnityEngine.Transform ret = obj.Target;
+			ToLua.Push(L, ret);
+			return 1;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index target on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index Target on a nil value" : e.Message);
 		}
 	}
 
@@ -239,6 +220,25 @@ public class UIFollowWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index smoothTime on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_Target(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIFollow obj = (UIFollow)o;
+			UnityEngine.Transform arg0 = (UnityEngine.Transform)ToLua.CheckUnityObject(L, 2, typeof(UnityEngine.Transform));
+			obj.Target = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index Target on a nil value" : e.Message);
 		}
 	}
 }

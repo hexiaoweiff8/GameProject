@@ -44,6 +44,18 @@ public class SDataUtils
                     SData_armyaoe_c.Single.setData(table1, table2);
                 }
                 break;
+            case "effect_c":
+                {
+                    SData_effect_c.AutoInstance();
+                    SData_effect_c.Single.setData(table1, table2);
+                }
+                break;
+            case"unitfight_c":
+                {
+                    SData_UnitFightData_c.AutoInstance();
+                    SData_UnitFightData_c.Single.setData(table1, table2);
+                }
+                break;
             case "armybase_c":
                 {
                     SData_armybase_c.AutoInstance();

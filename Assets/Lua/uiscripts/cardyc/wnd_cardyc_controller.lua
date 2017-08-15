@@ -10,10 +10,12 @@ local upSoldier = require("uiscripts/cardyc/upSoldier/upSoldier_controller")
 local upSynergy = require("uiscripts/cardyc/upSynergy/upSynergy_controller")
 local upLevel = require("uiscripts/cardyc/upLevel/upLevel_controller")
 local upStar = require("uiscripts/cardyc/upStar/upStar_controller")
-
+local UIModel = require("uiscripts/commonGameObj/UIModel")
+local _UIModel
 local TabControl = require("uiscripts/tabsControl")
 
 
+local redDotControl = require("uiscripts/cardyc/redDotControl")
 
 
 local cardIndex = 1
@@ -37,15 +39,33 @@ function wnd_cardyc_controller:OnShowDone()
     upSynergy:init(self)
     upLevel:init(self)
     upStar:init(self)
-
+    _UIModel = UIModel(view.UIModelPosition)
+    _UIModel:showCardModel(data.cardId)
+    _UIModel:setDepth(1)
     self:init_tabPanel()
 
-    self:init_redDot()
+    self:init_redDot(data.cardId)
     self:refresh_leftCard_Data()
+    UIEventListener.Get(view.btn_Back).onClick = function(go)
+        print("back")
+        self:Hide()
+        RefreshManager.RefreshRedDot(self.wnd_base_id)
+    end
 end
 
 
+---
+---界面销毁回调
+---
+function equip_controller:OnDestroyDone()
 
+end
+---
+---重新打开时回调
+---
+function equip_controller:OnReOpenDone()
+
+end
 
 --刷新左侧界面
 function wnd_cardyc_controller:refresh_leftCard_Data()
@@ -98,6 +118,7 @@ function wnd_cardyc_controller:refresh_leftCard_Data()
     end
 end
 
+---刷新右侧窗体
 function wnd_cardyc_controller:refresh_TabBody_Data(tabIndex)
     -- body
     if tabIndex == 1 then
@@ -130,8 +151,8 @@ end
 
 
 --初始化红点提示
-function wnd_cardyc_controller:init_redDot()
-    redDotControl:refresh_cardyc(cardIndex)
+function wnd_cardyc_controller:init_redDot(cardId)
+    redDotControl:refresh_cardyc(cardId,cardIndex)
     --判断是否可以升级，并显示小红点
     view.btn_upLevel_redDot:SetActive(false)
     if redDotFlag.RD_UPLEVEL then
@@ -164,8 +185,6 @@ function wnd_cardyc_controller:init_redDot()
     if redDotFlag.RD_SYNERGY then
         view.btn_synergy_redDot:SetActive(true)
     end
-
-
 end
 
 
@@ -174,7 +193,8 @@ function wnd_cardyc_controller:refresh()
     if not data:getDatas(cardIndex) then
         return
     end
-    self:init_redDot()
+    self:init_redDot(data.cardId)
+    _UIModel:showCardModel(data.cardId)
     self:refresh_leftCard_Data()
     self:refresh_TabBody_Data(tabControl:getCurrentPanelIndex())
 

@@ -36,7 +36,7 @@ function ui_pause:OnShowDone()
     end
 end
 
-function ui_pause:OnDestroyDoneEnd()
+function ui_pause:OnHideDone()
     if isQuitGame == false then
         Event.Brocast(GameEventType.HUIFUZANTING)
     end

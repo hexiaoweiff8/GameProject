@@ -7,6 +7,7 @@ public class VOBaseWrap
 	public static void Register(LuaState L)
 	{
 		L.BeginClass(typeof(VOBase), typeof(System.Object));
+		L.RegFunction("SetCurrentHP", SetCurrentHP);
 		L.RegFunction("SetSoldierData", SetSoldierData);
 		L.RegFunction("ToString", ToString);
 		L.RegFunction("New", _CreateVOBase);
@@ -33,6 +34,7 @@ public class VOBaseWrap
 		L.RegVar("IsHide", get_IsHide, set_IsHide);
 		L.RegVar("IsMechanic", get_IsMechanic, set_IsMechanic);
 		L.RegVar("IsMelee", get_IsMelee, set_IsMelee);
+		L.RegVar("IsDambody", get_IsDambody, set_IsDambody);
 		L.RegVar("IsSummon", get_IsSummon, set_IsSummon);
 		L.RegVar("IsAntiHide", get_IsAntiHide, set_IsAntiHide);
 		L.RegVar("LifeTime", get_LifeTime, set_LifeTime);
@@ -84,6 +86,23 @@ public class VOBaseWrap
 			{
 				return LuaDLL.luaL_throw(L, "invalid arguments to ctor method: VOBase.New");
 			}
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int SetCurrentHP(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			VOBase obj = (VOBase)ToLua.CheckObject(L, 1, typeof(VOBase));
+			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
+			obj.SetCurrentHP(arg0);
+			return 0;
 		}
 		catch(Exception e)
 		{
@@ -540,6 +559,25 @@ public class VOBaseWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsMelee on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsDambody(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			bool ret = obj.IsDambody;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsDambody on a nil value" : e.Message);
 		}
 	}
 
@@ -1547,6 +1585,25 @@ public class VOBaseWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsMelee on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_IsDambody(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
+			obj.IsDambody = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsDambody on a nil value" : e.Message);
 		}
 	}
 

@@ -2,7 +2,7 @@
 require('uiscripts/skill/ui_skill_controller')
 
 wnd_biandui_controller ={}
---[[目录：
+--[[部分重要元素目录：
     wnd_biandui_controller:
         variable:
             ---卡牌相关---
@@ -80,8 +80,6 @@ local this = wnd_biandui_controller
 require("uiscripts/commonGameObj/Model")
 ---初始化相关-----------------------------------
 function wnd_biandui_controller:OnShowDone()
-
-
     this.view = require("uiscripts/biandui/wnd_biandui_view")
     this.view:initview(self)
 
@@ -91,13 +89,12 @@ function wnd_biandui_controller:OnShowDone()
     this:InitData()
     ---测试用代码---
     this:InitItemList()
+    print("222222222222222222222222222")
     this:InitPicItem()
     this:SetLimit(5000, 2000)
 
     this:SetBlingli()
     this:initListener()
-
-
 
     print("wnd_biandui +++++++ OnShowDone")
 end
@@ -155,6 +152,7 @@ end
 
 --@Des 初始化控制层卡库/大营/前锋数据
 function wnd_biandui_controller:InitItemList()
+    print("33333333333333333333333333")
     local ItemID = {}
     local ItemLv = {}
     for i=1,#this.model.CardItemList do
@@ -168,9 +166,18 @@ function wnd_biandui_controller:InitItemList()
         this:MakeDayingItem(v["cardId"],v["num"])
     end
 
-    for k,v in pairs(this.model.QianfengItemList) do
-        this:MakeQianfengItem(v["cardId"],v["pos"])
+    --for k,v in pairs(this.model.QianfengItemList) do
+    --    this:MakeQianfengItem(v["cardId"],v["pos"])
+    --end
+
+    for i=1,6 do
+        if(this.model.QianfengItemList[i] == 0) then
+            this.QianfengItemList[i] = 0
+        else
+            this:MakeQianfengItem(this.model.QianfengItemList[i],i)
+        end
     end
+
 end
 
 --@Des 新建大营区域卡牌数据
@@ -193,15 +200,12 @@ end
 --@Des 新建前锋区域卡牌数据
 --@params ArmyCardID(number):卡牌ID
 --        pos(number):卡牌位置
-function wnd_biandui_controller:MakeQianfengItem(ArmyCardID,pos)
+function wnd_biandui_controller:MakeQianfengItem(ArmyCardID,i)
     -----初始化前锋数据元素列表----
     for k,v in pairs(this.CardItemList) do
         if(v["ArmyCardID"] == ArmyCardID) then
             v["Num"] = v["Num"] - 1 --卡组区域中卡牌的数量 = 使用上限-目前大营中对应卡牌的数量
-            local Item = {}
-            Item["cardId"] = v["ArmyCardID"]
-            Item["pos"] = pos
-            this.QianfengItemList[pos] = Item
+            this.QianfengItemList[i] = ArmyCardID
             return
         end
     end
@@ -270,22 +274,38 @@ function wnd_biandui_controller:InitPicItem()
     this.view.daying_item_grid:GetComponent("UIGrid").enabled = true
 
     ---初始化前锋区域-----
-    if(this.QianfengItemList == nil) then
-        return
+
+
+    --for k,v in pairs(this.QianfengItemList) do
+    --    tempMod = Model:CreateUIZhenXing(v["cardId"])
+    --    tempMod.parent = this.view.camera3D.transform
+    --    tempMod.gameObject.name = tostring(v["pos"])
+    --    tempMod.localScale = Vector3(1, 1, 1);
+    --    tempMod.localRotation = Quaternion(0, 1.4, 0, 1);
+    --    tempMod.localPosition = this.modelpos[v["pos"]]
+    --    tempMod.gameObject:SetActive(true)
+    --    tempMod.gameObject.layer = UnityEngine.LayerMask.NameToLayer("3DUI")
+    --    this.qianfengmodllst[v["pos"]] = tempMod
+    --    this.view.pos[v["pos"]]:SetActive(true)
+    --end
+
+    for i=1,6 do
+        if(this.QianfengItemList[i] ~= 0) then
+            local cardId = this.QianfengItemList[i]
+            tempMod = Model:CreateUIZhenXing(cardId)
+            tempMod.parent = this.view.camera3D.transform
+            tempMod.gameObject.name = tostring(i)
+            tempMod.localScale = Vector3(1, 1, 1);
+            tempMod.localRotation = Quaternion(0, 1.4, 0, 1);
+            tempMod.localPosition = this.modelpos[i]
+            tempMod.gameObject:SetActive(true)
+            tempMod.gameObject.layer = UnityEngine.LayerMask.NameToLayer("3DUI")
+            this.qianfengmodllst[i] = tempMod
+            this.view.pos[i]:SetActive(true)
+            Model:ZhenXingAnimPlay(tempMod)
+        end
     end
 
-    for k,v in pairs(this.QianfengItemList) do
-        tempMod = Model:CreateZhenXing(v["cardId"])
-        tempMod.parent = this.view.camera3D.transform
-        tempMod.gameObject.name = tostring(v["pos"])
-        tempMod.localScale = Vector3(1, 1, 1);
-        tempMod.localRotation = Quaternion(0, 1.4, 0, 1);
-        tempMod.localPosition = this.modelpos[v["pos"]]
-        tempMod.gameObject:SetActive(true)
-        tempMod.gameObject.layer = UnityEngine.LayerMask.NameToLayer("3DUI")
-        this.qianfengmodllst[v["pos"]] = tempMod
-        this.view.pos[v["pos"]]:SetActive(true)
-    end
 end
 ----------------------------------------------------------
 
@@ -346,15 +366,21 @@ function wnd_biandui_controller:SetBlingli()
     this.view.daying_bingli_now:GetComponent("UILabel").text = tostring(this.dayingbingli_now)
 
     ----由于前锋每种牌只可以放一张，所以并不需要循环递加每个元素的数目，直接遍历前锋列表计算前锋兵力即可---
-    for k,v in pairs(this.QianfengItemList) do
-        cardnum = cardnum+1
-        for i=1,#this.CardItemList do
-            if(v["cardId"] == this.CardItemList[i]["ArmyCardID"]) then
-                nowcardbingli = this.CardItemList[i]["TrainCost"]
+    --for k,v in pairs(this.QianfengItemList) do
+    for i=1,6 do
+        if(this.QianfengItemList[i]~=0) then
+            cardnum = cardnum+1
+            for k=1,#this.CardItemList do
+                if(this.QianfengItemList[i] == this.CardItemList[k]["ArmyCardID"]) then
+                    nowcardbingli = this.CardItemList[k]["TrainCost"]
+                end
             end
+            this.qianfengbingli_now =this.qianfengbingli_now + nowcardbingli
         end
-        this.qianfengbingli_now =this.qianfengbingli_now + nowcardbingli
     end
+
+
+
     this.view.qianfeng_bingli_now:GetComponent("UILabel").text = tostring(this.qianfengbingli_now)
 
     ---总兵力 = 大营兵力+前锋兵力-----
@@ -393,9 +419,9 @@ function wnd_biandui_controller:initListener()
             elseif (this.QianfengCanbeAdd) then
                 this:AddCardToQianfeng(go)
             else
-                --if(this.pos ~=0 and this.qianfengmodllst[this.pos] == nil) then
-                --    this.view.pos[this.pos]:SetActive(false)
-                --end
+                if(this.pos ~=0 and this.qianfengmodllst[this.pos] == nil) then
+                    this.view.pos[this.pos]:SetActive(false)
+                end
                 local item = go.transform.parent.parent.parent.gameObject
                 local CardData = nil
                 for a,b in pairs(this.CardItemList) do
@@ -544,7 +570,7 @@ end
 function wnd_biandui_controller:Update()
     if(not this.isstop) then
         local v3 = nil
-        if(this.lastclickobj.name == "btn_left") then
+        if(this.lastclickobj.name == "btn_right") then
             v3 = Vector3(-30,0,0)
             if(this.carditem_pic_list[#this.carditem_pic_list].transform.position.x <= this.lastcardpos.x+0.15) then
                 return
@@ -594,56 +620,96 @@ function wnd_biandui_controller:UpdateArmyData()
     local dayingchange = this:CprDayingData()
     local qianfengchange = this:CprQianfengData()
 
+    ---==========================================--
+    ---调试用
+    ---==========================================--
+    local isDaYingChangeDone = false
+    local isQianFengChangeDone = false
+    coroutine.start(function()
+        local isOK = false
+        while not isOK do
+            coroutine.wait(0.1)
+            if not dayingchange then
+                isDaYingChangeDone = true
+            end
+            if  not qianfengchange then
+                isQianFengChangeDone = true
+            end
+            if isDaYingChangeDone and isQianFengChangeDone then
+                isOK = true
+            end
+        end
+        ui_manager:ShowWB(WNDTYPE.Prefight)
+    end)
+
 
     local on_10035_rec = function(body)
-        --print("on_10035_rec call")
-        --Event.RemoveListener("10035", on_10035_rec)
-        ----   UIToast.Show("已接收到来自服务器的签到信息.",nil,UIToast.ShowType.Queue)
-        --local gw2c = gw2c_pb:SetCardGf()
-        --gw2c:ParseFromString(body)
-        ------   this:updateServData(gw2c.currency,nil)
+        print("on_10035_rec call")
+        Event.RemoveListener("10035", on_10035_rec)
+
+        this.model.DayingItemList = {}
+
+        local gw2c = gw2c_pb:SetCardGf()
+        gw2c:ParseFromString(body)
+
+        for i=1,#gw2c.battle.gf do
+            local GfItem = {}
+            GfItem["cardId"] = gw2c.battle.gf[i]["cardId"]
+            GfItem["num"] = gw2c.battle.gf[i]["num"]
+            table.insert(this.model.DayingItemList,GfItem)
+        end
+
+        for k,v in pairs(this.model.DayingItemList) do
+            print("%%%%%"..tostring(v["cardId"]))
+            print("$$$$$"..tostring(v["num"]))
+        end
+
+
+        ---==========================================--
+        ---调试用
+        ---==========================================--
+        isDaYingChangeDone = true
     end
 
     if(dayingchange) then
         print("大营改变了")
-        --TODO:覆盖model层大营数据
-
-        this.model.DayingItemList = {}
-        for k,v in pairs(this.DayingItemList) do
-            local Item = {}
-            Item["cardId"] = v["cardId"]
-            Item["num"] = v["num"]
-            table.insert(this.model.DayingItemList,Item)
-        end
-        --Message_Manager:SendPB_10035(this.DayingItemList,on_10035_rec)
+        Message_Manager:SendPB_10035(this.DayingItemList,on_10035_rec)
     else
         print("大营没变")
     end
 
     local on_10036_rec = function(body)
-        --print("on_10036_rec call")
-        --Event.RemoveListener("10036", on_10036_rec)
-        ----   UIToast.Show("已接收到来自服务器的签到信息.",nil,UIToast.ShowType.Queue)
-        --local gw2c = gw2c_pb:SetCardGf()
-        --gw2c:ParseFromString(body)
-        ------   this:updateServData(gw2c.currency,nil)
+        print("on_10036_rec call")
+        Event.RemoveListener("10036", on_10036_rec)
+        this.model.QianfengItemList = {}
+
+        local gw2c = gw2c_pb:SetCardGf()
+        gw2c:ParseFromString(body)
+
+        for i=1,#gw2c.battle.pf do
+            local num = gw2c.battle.pf[i]
+            this.model.QianfengItemList[i] = num
+        end
+
+        for i=1,6 do
+            print("前锋数据。。"..tostring(this.model.QianfengItemList[i]))
+        end
+
+
+        ---==========================================--
+        ---调试用
+        ---==========================================--
+        isQianFengChangeDone = true
     end
 
     if(qianfengchange) then
-        --TODO:覆盖model层前锋数据
         print("前锋改变了")
-        this.model.QianfengItemList = {}
-        for i=1,6  do
-            if(this.QianfengItemList[i] == nil) then
-                this.model.QianfengItemList[i] = nil
-            else
-                local Item = {}
-                Item["cardId"] = this.QianfengItemList[i]["cardId"]
-                Item["pos"] = this.QianfengItemList[i]["pos"]
-                this.model.QianfengItemList[i] = Item
+        for i=1,6 do
+            if(this.QianfengItemList[i]~=0) then
+                print("前锋ID"..tostring(this.QianfengItemList[i]))
             end
         end
-        -- Message_Manager:SendPB_10036(this.QianfengItemList,on_10036_rec)
+        Message_Manager:SendPB_10036(this.QianfengItemList,on_10036_rec)
     else
         print("前锋没变")
     end
@@ -689,16 +755,11 @@ function wnd_biandui_controller:CprQianfengData()
     local num = 0
 
     for i=1,6  do
-        if(this.QianfengItemList[i] == nil and this.model.QianfengItemList[i] == nil) then num = num+1
-        else
-            if(this.QianfengItemList[i]~=nil and this.model.QianfengItemList[i]~=nil) then
-                if(this.QianfengItemList[i]["cardId"] == this.model.QianfengItemList[i]["cardId"]) then
-                    if(this.QianfengItemList[i]["pos"] == this.model.QianfengItemList[i]["pos"]) then num = num+1
-                    end
-                end
-            end
+        if(this.QianfengItemList[i] == this.model.QianfengItemList[i]) then
+            num = num+1
         end
     end
+
     print("num"..tostring(num))
     if(num == 6) then
         change = false
@@ -965,7 +1026,7 @@ function wnd_biandui_controller:AddCloneCardToArmy(go,TouchPosition)
         this.view.CloneTexture:SetActive(true)
         if(this.Clonemod == nil) then
             --this.Clonemod = DP_FightPrefabManage.InstantiateAvatar(CreateActorParam(1, false, 0, "xuebaotujidui", "xuebaotujidui", true, 101001001, 0)).transform
-            this.Clonemod = Model:CreateZhenXing(CardData["ArmyCardID"])
+            this.Clonemod = Model:CreateUIZhenXing(CardData["ArmyCardID"])
             this.Clonemod.parent = this.view.CloneCamera.transform
             this.Clonemod.gameObject.name = "clone"
             this.Clonemod.localScale = Vector3(1, 1, 1);
@@ -986,7 +1047,7 @@ function wnd_biandui_controller:AddCloneCardToArmy(go,TouchPosition)
         this:GetQianfengPos(c_p)
         if(this.pos ~=0 and this.qianfengmodllst[this.pos] ~= nil) then
             for k,v in pairs(this.CardItemList) do
-                if(v["ArmyCardID"] == this.QianfengItemList[this.pos]["cardId"]) then
+                if(v["ArmyCardID"] == this.QianfengItemList[this.pos]) then
                     nowitembingli = v["TrainCost"]
                 end
             end
@@ -1151,6 +1212,7 @@ function wnd_biandui_controller:AddCardToDaying(go)
         -----加入大营区域卡牌的拖动开始处理，在开始拖动的时候关闭当前打开的单击面板---
         UIEventListener.Get(dygo.transform:Find("card_item_frame/card_item_icon_bg/card_item_icon").gameObject).onDragStart = function(go)
             --拖动事件
+
             this.isDrag = true
             this:CloseSelectCardPanel()
             this:CloseSkillPanel()
@@ -1205,7 +1267,7 @@ function wnd_biandui_controller:AddCardToQianfeng(go)
         local id = 0
         local num = 0
         for a,b in pairs(this.CardItemList) do
-            if(b["ArmyCardID"] == this.QianfengItemList[this.pos]["cardId"]) then
+            if(b["ArmyCardID"] == this.QianfengItemList[this.pos]) then
                 b["Num"] = b["Num"]+1
                 num  = b["Num"]
                 id = b["ArmyCardID"]
@@ -1218,9 +1280,9 @@ function wnd_biandui_controller:AddCardToQianfeng(go)
         end
         GameObject.Destroy(this.qianfengmodllst[this.pos].gameObject)
         this.qianfengmodllst[this.pos] = nil --TODO：删除方法有待商榷
-        this.QianfengItemList[this.pos] = nil
+        this.QianfengItemList[this.pos] = 0
     end
-    tempMod = Model:CreateZhenXing(CardData["ArmyCardID"])
+    tempMod = Model:CreateUIZhenXing(CardData["ArmyCardID"])
     tempMod.parent = this.view.camera3D.transform
     tempMod.gameObject.name = tostring(this.pos)
     tempMod.localScale = Vector3(1, 1, 1);
@@ -1228,11 +1290,11 @@ function wnd_biandui_controller:AddCardToQianfeng(go)
     tempMod.localPosition = this.modelpos[this.pos]
     tempMod.gameObject:SetActive(true)
     tempMod.gameObject.layer = UnityEngine.LayerMask.NameToLayer("3DUI")
+    Model:ZhenXingAnimPlay(tempMod)
     this.qianfengmodllst[this.pos] = tempMod
-    local Item = {}
-    Item["pos"] = this.pos
-    Item["cardId"] = tonumber(item.name)
-    this.QianfengItemList[this.pos] = Item
+
+
+    this.QianfengItemList[this.pos] = tonumber(item.name)
 
 
     CardData["Num"] = CardData["Num"]-1
@@ -1363,8 +1425,10 @@ function wnd_biandui_controller:OnSkillPress(go,isPressed)
     local v3 = Vector3(-254,0,0)
     ui_skill_controller:Show(this.view.skill1,this.view.skill2,this.view.skill3,go,v3)
 end
-
 -------------------------------------------------------
+
+
+------模型拖动相关--------------------------------------
 --@Des 模型拖动响应
 --@params go(GameObject)：拖动的高亮面板碰撞体（碰撞体名字为1-6）
 --        TouchPosition(bool)：每次响应位移距离
@@ -1380,14 +1444,14 @@ function wnd_biandui_controller:OnDragModel(go,TouchPosition)
     local CardData = nil
     local CardItem = nil
 
-    CardItem,CardData = this:FindCardItemDataByName(tostring(this.QianfengItemList[pos]["cardId"]))
+    CardItem,CardData = this:FindCardItemDataByName(tostring(this.QianfengItemList[pos]))
     this.qianfengmodllst[pos].gameObject:SetActive(false) --TODO：删除方法有待商榷
 
     if(not this.isClone) then
         this.isClone = true
         this.view.card_clone_panel:SetActive(true)
         this.Cloneobj = GameObjectExtension.InstantiateFromPreobj(this.view.card_clone_item,this.view.card_clone_panel)
-        this.Cloneobj.name = tostring(this.QianfengItemList[pos]["cardId"])
+        this.Cloneobj.name = tostring(this.QianfengItemList[pos])
         this:SetStar(this.Cloneobj,CardData["Star"])
         this.Cloneobj.transform:Find("card_item_frame/card_item_numc_bg/card_item_consume"):GetComponent("UILabel").text = tostring(CardData["TrainCost"])
         this.Cloneobj.transform:Find("card_item_frame/card_item_numc_bg/card_item_num"):GetComponent("UILabel").text ="x1"
@@ -1418,7 +1482,7 @@ function wnd_biandui_controller:OnDragModel(go,TouchPosition)
         this.Cloneobj:SetActive(false)
         this.view.CloneTexture:SetActive(true)
         if(this.Clonemod == nil) then
-            this.Clonemod = Model:CreateZhenXing(CardData["ArmyCardID"])
+            this.Clonemod = Model:CreateUIZhenXing(CardData["ArmyCardID"])
             this.Clonemod.parent = this.view.CloneCamera.transform
             this.Clonemod.gameObject.name = "clone"
             this.Clonemod.localScale = Vector3(1, 1, 1);
@@ -1437,6 +1501,7 @@ function wnd_biandui_controller:OnDragModel(go,TouchPosition)
         this.ModeDragState = "change"
         tempQianfengbl = this.qianfengbingli_now
         tempZongbl = this.zongbingli_now
+
         this:GetQianfengPos(c_p)
     else
         this.ModeDragState = "back"
@@ -1481,23 +1546,29 @@ function wnd_biandui_controller:ChangeModel(go)
         this.qianfengmodllst[this.pos].gameObject:SetActive(true)
         return
     end
-    if(this.qianfengmodllst[this.pos] == nil and this.QianfengItemList[this.pos] == nil) then
+    if(this.qianfengmodllst[this.pos] == nil and this.QianfengItemList[this.pos] == 0 and this.pos~=0) then
+
         this.qianfengmodllst[this.pos] = this.qianfengmodllst[pos]
+
+
         this.QianfengItemList[this.pos] = this.QianfengItemList[pos]
+
+
         this.qianfengmodllst[this.pos].gameObject.name = tostring(this.pos)
         this.qianfengmodllst[this.pos].localPosition = this.modelpos[this.pos]
         this.qianfengmodllst[this.pos].gameObject:SetActive(true)
 
         --GameObject.Destroy(this.qianfengmodllst[pos].gameObject)
         this.qianfengmodllst[pos] = nil --TODO：删除方法有待商榷
-        this.QianfengItemList[pos] = nil
+        this.QianfengItemList[pos] = 0
         return
     end
 
 
-    if(this.qianfengmodllst[this.pos] ~= nil and this.QianfengItemList[this.pos] ~= nil) then
+    if(this.qianfengmodllst[this.pos] ~= nil and this.QianfengItemList[this.pos] ~= 0) then
         local tempmod = nil
         tempmod = this.qianfengmodllst[pos]
+
         this.qianfengmodllst[pos] = this.qianfengmodllst[this.pos]
         this.qianfengmodllst[pos].gameObject.name = tostring(pos)
         this.qianfengmodllst[pos].localPosition = this.modelpos[pos]
@@ -1508,10 +1579,14 @@ function wnd_biandui_controller:ChangeModel(go)
         this.qianfengmodllst[this.pos].localPosition = this.modelpos[this.pos]
         this.qianfengmodllst[this.pos].gameObject:SetActive(true)
 
-        local tempdata = {}
+        local tempdata = 0
         tempdata = this.QianfengItemList[pos]
+
         this.QianfengItemList[pos] = this.QianfengItemList[this.pos]
+
+
         this.QianfengItemList[this.pos] = tempdata
+
     end
     print(tostring(this.pos))
 end
@@ -1523,17 +1598,17 @@ function wnd_biandui_controller:BackModelToCard(go)
     local CardData = nil
     local CardItem = nil
 
-    CardItem,CardData = this:FindCardItemDataByName(tostring(this.QianfengItemList[pos]["cardId"]))
+    CardItem,CardData = this:FindCardItemDataByName(tostring(this.QianfengItemList[pos]))
     CardData["Num"] = CardData["Num"] +1
     CardItem.transform:Find("card_item_frame/card_item_numc_bg/card_item_num"):GetComponent("UILabel").text = "x"..tostring(CardData["Num"])
 
     GameObject.Destroy(this.qianfengmodllst[pos].gameObject)
     this.qianfengmodllst[pos] = nil --TODO：删除方法有待商榷
-    this.QianfengItemList[pos] = nil
+    this.QianfengItemList[pos] = 0
 
     this:SetBlingli()
     print(tostring(this.pos))
 end
-
+-------------------------------------------------------
 
 return wnd_biandui_controller

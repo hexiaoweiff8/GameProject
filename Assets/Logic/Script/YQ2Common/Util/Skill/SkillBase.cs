@@ -82,10 +82,10 @@ public class AbilityBase
     /// <param name="formulaItem">行为单元生成器</param>
     public void AddActionFormulaItem(IFormulaItem formulaItem)
     {
-        if (formulaItem == null)
-        {
-            throw new Exception("行为节点为空");
-        }
+        //if (formulaItem == null)
+        //{
+        //    throw new Exception("行为节点为空");
+        //}
         if (actionFormulaItem == null)
         {
             actionFormulaItem = formulaItem;
@@ -298,6 +298,23 @@ public class SkillBase : AbilityBase
     public TriggerLevel2 TriggerLevel2 { get; set; }
 
     /// <summary>
+    /// 技能触发几率
+    /// 0:触发概率0%
+    /// 1:触发概率100%
+    /// </summary>
+    public float TriggerProbability = 1; 
+
+    /// <summary>
+    /// 生命区间下限
+    /// </summary>
+    public int HpScopeMin = -1;
+
+    /// <summary>
+    /// 生命区间上限
+    /// </summary>
+    public int HpScopeMax = -1;
+
+    /// <summary>
     /// buff的Tick时间(单位 秒)
     /// 每次tick执行一次
     /// </summary>
@@ -343,11 +360,6 @@ public class SkillBase : AbilityBase
     /// </summary>
     public Dictionary<string, ChangeDataType> ChangeDataTypeDic = new Dictionary<string, ChangeDataType>();
 
-
-    ///// <summary>
-    ///// 技能是否释放完毕
-    ///// </summary>
-    //public bool IsDone { get; private set; }
     /// <summary>
     /// 描述
     /// </summary>

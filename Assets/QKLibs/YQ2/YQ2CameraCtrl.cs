@@ -425,7 +425,7 @@ public class YQ2CameraCtrl : MonoBehaviour
             m_Camera_Overall_Yoffset,
             m_Camera_Overall_Zoffset,
             lockY: true, lockZ: true);
-        uf.target = null;
+        uf.Target = null;
         m_ScrollObject.MoveTo(localPos);
 
 

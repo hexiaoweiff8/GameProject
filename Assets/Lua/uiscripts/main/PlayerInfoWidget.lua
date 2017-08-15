@@ -24,7 +24,7 @@ end
 --★refreshView
 function ui_playerInfo.updatePlayerInfo()
 	local userTbl = userModel:getUserRoleTbl()
-	m.vipLevel.text = "VIP "..userTbl.vipLv
+	-- m.vipLevel.text = "VIP "..userTbl.vipLv
 	m.playerLevel.text = "LV "..userTbl.lv
 	m.playerLevelProcess.value = userModel:getNextLevelExpProcess()
 end

@@ -38,6 +38,13 @@ public class TriggerData
         set { healthChangeValue = value; }
     }
 
+    /// <summary>
+    /// 伤害等级
+    /// 默认0
+    /// 不同level的伤害在结算时处理分级
+    /// </summary>
+    public int HealthChangeLevel { get; set; }
+
     ///// <summary>
     ///// 触发类型
     ///// 0: 技能
