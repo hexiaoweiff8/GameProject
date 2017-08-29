@@ -1,6 +1,5 @@
 local class = require("common/middleclass")
-local upStar_model=class("upStar_model", wnd_cardyc_model)
-
+local upStar_model = class("upStar_model", wnd_cardyc_model)
 
 
 --判断是否可以升星

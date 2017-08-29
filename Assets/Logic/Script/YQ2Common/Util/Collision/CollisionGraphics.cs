@@ -441,21 +441,22 @@ public abstract class CollisionGraphics : ICollisionGraphics
     /// </summary>
     /// <param name="graphics">图形单位</param>
     /// <param name="spaceSet">空间值</param>
-    public static void SetGraphicsSpaceSet(ICollisionGraphics graphics, float spaceSet)
+    /// <param name="unitWidth">单位宽度</param>
+    public static void SetGraphicsSpaceSet(ICollisionGraphics graphics, float spaceSet, int unitWidth = 1)
     {
         if (graphics != null && spaceSet > 0)
         {
             var circle = graphics as CircleGraphics;
             if (circle != null)
             {
-                circle.Radius = spaceSet;
+                circle.Radius = spaceSet * unitWidth;
                 return;
             }
             var rect = graphics as RectGraphics;
             if (rect != null)
             {
-                rect.Width = spaceSet*1.414f;
-                rect.Height = spaceSet*1.414f;
+                rect.Width = spaceSet * 1.414f * unitWidth;
+                rect.Height = spaceSet * 1.414f * unitWidth;
                 return;
             }
         }

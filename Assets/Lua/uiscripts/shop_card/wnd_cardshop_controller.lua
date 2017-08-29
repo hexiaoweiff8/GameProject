@@ -2,7 +2,15 @@ require('uiscripts/cangku/const/wnd_cangku_Const')
 --[[
 	wnd_cardshop_controller:
 		variable:
-			_selectedYekaButton
+			在OnDestroy时需要清理的临时变量:
+				_selectedYekaButton 临时记录当前已被选中的页卡
+				mAtlas 临时Atlas引用
+			需要使用Memory工具类释放的表:
+				view
+				model
+				scrollViewController
+			在OnDestroy时不需要清理的变量:
+				无
 		function:
 			OnShowDone() extend wnd_base:OnShowDone()
 			OnDestroyDone() extend wnd_base:OnDestroyDone()
@@ -26,6 +34,9 @@ function wnd_cardshop_controller:OnShowDone()
 	this.model:initModel()
 	this.view:initView(self)
 	this.scrollViewController:init(self)
+
+	printe("this.view mem = "..tostring(this.view))
+	printe("this.model mem = "..tostring(this.model))
 
 	this:initTabButton()
 	this:initListener()
@@ -51,7 +62,13 @@ function wnd_cardshop_controller:OnDestroyDone()
 	this.view = nil
 	this.model = nil
 	this.scrollViewController = nil
-	wnd_cardshop_controller = nil
+
+	Memory.free("uiscripts/shop_card/wnd_cardshop_view")
+	Memory.free("uiscripts/shop_card/wnd_cardshop_model")
+	Memory.free("uiscripts/shop_card/wnd_cardshop_scrollView_controller")
+
+	this._selectedYekaButton = nil
+	this.mAtlas = nil
 end
 ----------------------------------------------------------------
 --★Init 
@@ -84,8 +101,9 @@ function wnd_cardshop_controller:initTabButton()
 end
 function wnd_cardshop_controller:initListener()
 	UIEventListener.Get(this.view.Button_close).onClick = function()
-			-- TODO: 商店界面：关闭按钮的实现
+			-- DONE: 商店界面：关闭按钮的实现
 			instance:Hide(0)
+			-- instance:Destroy(0)
 		end
 	-- 页卡
 	for i = 1,#this.model.local_Tabs do

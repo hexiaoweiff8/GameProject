@@ -3,18 +3,18 @@
 --- DateTime: 2017/7/20 17:31
 ---
 local cardInHand_controller = {}
-local _view = require("uiscripts/fight/cardInHand/cardInHand_view")
-local _data = require("uiscripts/fight/cardInHand/cardInHand_model")
-local _cardAction = require("uiscripts/fight/cardInHand/cardAction")
-
-
+local _view
+local _data
+local _cardAction
 local _isDrag---判断是否拖拽的标志位
 local _isClickDrop---判断是否点击出牌的标志位
-
 local _onPressCoroutine---onPress方法的携程
 
 function cardInHand_controller:Init(view)
 
+    _view = require("uiscripts/fight/cardInHand/cardInHand_view")
+    _data = require("uiscripts/fight/cardInHand/cardInHand_model")
+    _cardAction = require("uiscripts/fight/cardInHand/cardAction")
     ---初始化数据
     _view:initView(view)
     _data:initDatas(_view)
@@ -77,7 +77,6 @@ function cardInHand_controller:AddListener()
         ---
         UIEventListener.Get(_data.nowMyCardtb[cardIndex]).onDragStart = function(go)
             ---拖动开始事件
-            print("onDragStart")
             _isDrag = true
             self:upDepth(go, 20)
             --显示不可下兵区域
@@ -101,19 +100,17 @@ function cardInHand_controller:AddListener()
         ---
         UIEventListener.Get(_data.nowMyCardtb[cardIndex]).onDrag = function(go,delta)
             ---拖动事件
-            --print("onDrag")
             ---
             ---卡牌跟随鼠标移动
             ---
             local touchPoint = TouchControl:getTouchPoint(cardIndex)
-            local cardWordPosition = _view.nowUICamera:ScreenToWorldPoint(touchPoint) / _data._urlc
-            go.transform.localPosition = Vector3(cardWordPosition.x, cardWordPosition.y, 0)
+            go.transform.localPosition = Vector3(touchPoint.x - UnityEngine.Screen.width/2, touchPoint.y - UnityEngine.Screen.height/2, 0)
             ---通过滑动的位置判断相应的功能。
-            local area , scale = _data:getArea(cardWordPosition,cardIndex)
+            local area , scale = _data:getArea(go.transform.localPosition,cardIndex)
             if area == _data.AREA_TODO.NOTHING then ---卡牌处于原始位置
-            if not scale then
-                scale = 1
-            end
+                if not scale then
+                    scale = 1
+                end
                 ---卡牌缩放效果
                 go.transform.localScale = Vector3(scale,scale,scale)
                 ModelControl:HideModel(cardIndex)
@@ -138,7 +135,6 @@ function cardInHand_controller:AddListener()
         ---
         UIEventListener.Get(_data.nowMyCardtb[cardIndex]).onDragEnd = function(go)
             ---拖动结束事件
-            print("onDragEnd")
             self:upDepth(go, -20)
             _cardAction:hideRecycleTips(cardIndex)
             _cardAction:doEvent(go,cardIndex)
@@ -149,8 +145,6 @@ function cardInHand_controller:AddListener()
         ---
         UIEventListener.Get(_data.nowMyCardtb[cardIndex]).onClick = function(go)
             ---点击事件事件
-            print("onClick")
-
             ---当不是点击出牌时，则只是进行卡牌的选中和取消选择。
             if not _isClickDrop then
                 if not _data.isCardSelected[cardIndex] then
@@ -171,17 +165,16 @@ function cardInHand_controller:AddListener()
         ---
         UIEventListener.Get(_data.nowMyCardtb[cardIndex]).onPress = function(go, args)
             if args then
-                print("onPress true")
                 ---初始化标志位
                 _isClickDrop = false
                 ---添加触控点
                 TouchControl:addTouch(cardIndex)
                 if _data.isCardSelected[cardIndex] then
                     local touchPoint = TouchControl:getTouchPoint(cardIndex)
-                    local cardWordPosition = _view.nowUICamera:ScreenToWorldPoint(touchPoint) / _data._urlc
-                    local clickPosition = Vector3(cardWordPosition.x, cardWordPosition.y, 0)
+                    local clickPosition = Vector3(touchPoint.x - UnityEngine.Screen.width/2, touchPoint.y - UnityEngine.Screen.height/2, 0)
                     if Vector3.Distance(clickPosition,_data.nowMyCardtb[cardIndex].transform.localPosition) > _data.max_Y then
                         _isClickDrop = true
+                        EasyTouch.instance.enabled = false
                         ModelControl:CreateModel(_data.nowHandpaiKutb[cardIndex].id, cardIndex)
                         -- 模型跟随鼠标位置移动
                         local ray = _view.nowWorldCamera:ScreenPointToRay(touchPoint)
@@ -201,7 +194,6 @@ function cardInHand_controller:AddListener()
                     end
                 end)
             else
-                print("onPress false")
                 ---点击出牌且没有拖动时
                 if _isClickDrop and not _isDrag then
                     _cardAction:doEvent(go, cardIndex)
@@ -209,16 +201,14 @@ function cardInHand_controller:AddListener()
                 else    ---重置标志位
                     _isClickDrop = false
                     _isDrag = false
-                    --ModelControl:DestroyModel(cardIndex)
                 end
+                EasyTouch.instance.enabled = true
                 ---删除无用触点
                 TouchControl:removeTouch(cardIndex)
                 coroutine.stop(_onPressCoroutine)
                 _cardAction:hideCardInfo()
             end
         end
-
-
     end
 end
 
@@ -271,4 +261,17 @@ function cardInHand_controller:upDepth(gameObj,depthDelta)
     return
 end
 
+
+
+function cardInHand_controller:OnDestroyDone()
+    _view = nil
+    _data = nil
+    _cardAction = nil
+    _isDrag = nil
+    _isClickDrop = nil
+    _onPressCoroutine = nil
+    Memory.free("uiscripts/fight/cardInHand/cardInHand_view")
+    Memory.free("uiscripts/fight/cardInHand/cardInHand_model")
+    Memory.free("uiscripts/fight/cardInHand/cardAction")
+end
 return cardInHand_controller

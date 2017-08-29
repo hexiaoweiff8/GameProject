@@ -2,6 +2,12 @@ require("common/init")
 require("framework/init")
 require("gameEventType")
 --[[
+	导入内存释放工具类
+	Usage:
+		Memory.free(requirePATH)
+]]
+require("manager/Memory_Manager")
+--[[
 	导入inspect全局调试工具类
 	Usage:
 		local str = inspect(<table>)
@@ -63,7 +69,6 @@ require("uiscripts/wnd_base")
 require("uiscripts/cm_gameinit_pan")
 require("uiscripts/main/NetworkDelay_Manager")
 
-require("uiscripts/equipP")
 require("uiscripts/kejiP")
 require("uiscripts/Const")
 require("uiscripts/commonModel/card_Model")
@@ -92,6 +97,18 @@ require("uiscripts/Util/dotweenUtil")
 require("uiscripts/Util/borderUtil")
 require("uiscripts.Util.dayilymissionUtil")
 require("uiscripts.Util.subtlecodeUtil")
+
+require("uiscripts/commonGameObj/equipDetail/equipDetail_controller")
+require("uiscripts/commonGameObj/UIModel")
+require("uiscripts/commonGameObj/remake/remake_controller")
+require("uiscripts/tips/ui_tips_confirm")
+require("uiscripts/commonGameObj/suitProps")
+require('uiscripts/shop/timeUtil/TimeUtil')
+require("uiscripts/TabsControl")
+require("uiscripts/commonGameObj/itemSlot")
+require("uiscripts/commonGameObj/cardhead")
+require("uiscripts/commonGameObj/skillItem")
+require("uiscripts/commonGameObj/synergyItem")
 
 
 -- require('uiscripts/Util/consoleUtil')

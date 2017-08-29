@@ -123,31 +123,54 @@ public class BuffManager
             }
             else
             {
-                // TODO 加载文件从包中加载 检测文件是否存在
-                var file = new FileInfo(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "BuffScript" + buffId + ".txt");
-                if (file.Exists)
+                // 加载文件内容
+                var buffTxt = GetBuffScript(buffId, SkillManager.Single.RunType);
+                if (!string.IsNullOrEmpty(buffTxt))
                 {
-                    // 加载文件内容
-                    var buffTxt = Utils.LoadFileInfo(file);
-                    if (!string.IsNullOrEmpty(buffTxt))
-                    {
-                        result = FormulaConstructor.BuffConstructor(buffTxt);
-                        // 将其放入缓存
-                        AddBuffInfo(result);
-                    }
-                }
-                else
-                {
-                    Debug.LogError("ID为:" + buffId + "的buff不存在.");
+                    result = FormulaConstructor.BuffConstructor(buffTxt);
+                    // 将其放入缓存
+                    AddBuffInfo(result);
                 }
             }
         }
         result = CopyBuffInfo(result);
+        result.ReplaceData(buffRank);
         // 将实现放入实现列表
         buffInstanceDic.Add(result.AddtionId, result);
         result.ReceiveMember = receive;
         result.ReleaseMember = release;
         result.BuffRank = buffRank;
+        return result;
+    }
+
+
+
+    /// <summary>
+    /// 获取Buff脚本
+    /// </summary>
+    /// <param name="buffNum"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public string GetBuffScript(int buffNum, int type = 0)
+    {
+        var result = "";
+        switch (type)
+        {
+            case 0:
+                result = PacketManage.Single.GetPacket(SkillManager.SkillPacketName).LoadString("BuffScript" + buffNum + ".txt");
+                break;
+            case 1:
+                var file =
+                    new FileInfo(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "BuffScript" +
+                                 buffNum + ".txt");
+                if (file.Exists)
+                {
+                    // 加载文件内容
+                    result = Utils.LoadFileInfo(file);
+                }
+                break;
+        }
+
         return result;
     }
 
@@ -188,12 +211,15 @@ public class BuffManager
         result = new BuffInfo(buffInfo.Num)
         {
             BuffLevel = buffInfo.BuffLevel,
+            BuffGroup = buffInfo.BuffGroup,
             BuffTime = buffInfo.BuffTime,
             BuffType = buffInfo.BuffType,
             ChangeData = buffInfo.ChangeData,
             ChangeDataTypeDic = buffInfo.ChangeDataTypeDic,
             DataList = buffInfo.DataList,
             Description = buffInfo.Description,
+            HpScopeMax = buffInfo.HpScopeMax,
+            HpScopeMin = buffInfo.HpScopeMin,
             //ExistType = buffInfo.ExistType,
             Icon = buffInfo.Icon,
             IsBeneficial = buffInfo.IsBeneficial,
@@ -215,7 +241,8 @@ public class BuffManager
             DemageChange = buffInfo.DemageChange,
             DemageChangeProbability = buffInfo.DemageChangeProbability,
             DemageChangeTargetType = buffInfo.DemageChangeTargetType,
-            DemageChangeType = buffInfo.DemageChangeType
+            DemageChangeType = buffInfo.DemageChangeType,
+            ReplaceSourceDataDic = buffInfo.ReplaceSourceDataDic
         };
         result.AddActionFormulaItem(buffInfo.GetActionFormulaItem());
         result.AddAttachFormulaItem(buffInfo.GetAttachFormulaItem());
@@ -272,13 +299,13 @@ public class BuffManager
         for (var i = 0; i < buffList.Count(); i++)
         {
             var buff = buffList[i];
-            if (buff == null)
+            if (buff == null || buff.ReceiveMember == null || buff.ReceiveMember.ClusterData.AllData.MemberData.IsAntiBuff)
             {
                 continue;
             }
 
             // 生命值百分比
-            var hpPercent = buff.ReleaseMember.ClusterData.AllData.MemberData.CurrentHP * 100 /
+            var hpPercent = buff.ReleaseMember.ClusterData.AllData.MemberData.CurrentHP /
                             buff.ReleaseMember.ClusterData.AllData.MemberData.TotalHp;
 
             // 构建数据packer
@@ -294,11 +321,11 @@ public class BuffManager
             {
 
                 int r = RandomPacker.Single.GetRangeI(0, 100);
-                Debug.Log("buff触发几率为   " + buff.TriggerProbability);
+                //Debug.Log("buff触发几率为   " + buff.TriggerProbability);
                 // 触发action
                 if (buff.TriggerLevel1 == triggerData.TypeLevel1 && buff.TriggerLevel2 == triggerData.TypeLevel2 && r<=buff.TriggerProbability*100)
                 {
-                    Debug.Log("ROLL出概率为   " + r);
+                    //Debug.Log("ROLL出概率为   " + r);
                     DoBuff(buff, BuffDoType.Action, paramsPacker);
                 }
             }
@@ -345,18 +372,18 @@ public class BuffManager
                     buffInfo.BuffStartTime = DateTime.Now.Ticks;
                     formula = buffInfo.GetAttachFormula(paramsPacker);
                     // 判断是否需要将buff放入TriggerTicker中
-                    if (buffInfo.TriggerLevel1 == TriggerLevel1.Time && buffInfo.TriggerLevel2 == TriggerLevel2.TickTime)
+                    if (buffInfo.BuffTime > Utils.ApproachZero)
                     {
                         TriggerTicker.Single.Add(buffInfo);
                     }
-                    //buffInfo.ReceiveMember.ClusterData.AllData.BuffInfoList.Add(buffInfo);
+                    buffInfo.ReceiveMember.ClusterData.AllData.BuffInfoList.Add(buffInfo);
                     // 如果buff增加属性, 则将属性加入对象中
                     SkillBase.AdditionAttribute(buffInfo.ReceiveMember.ClusterData.AllData.MemberData, buffInfo);
                 }
                 break;
 
             case BuffDoType.Detach:
-                Debug.Log("Buff Detach:" + buffInfo.AddtionId);
+                //Debug.Log("Buff Detach:" + buffInfo.AddtionId);
                 buffInfo.ReceiveMember.ClusterData.AllData.BuffInfoList.Remove(buffInfo);
                 formula = buffInfo.GetDetachFormula(paramsPacker);
                 // 检查TriggerTicker中是否有该buff, 如果有则删除
@@ -368,7 +395,6 @@ public class BuffManager
                 DelBuffInstance(buffInfo.AddtionId);
                 break;
         }
-        // TODO 数据是否完整有待商议
         SkillManager.Single.DoFormula(formula);
     }
 
@@ -421,7 +447,6 @@ public class BuffManager
     {
         if (buffList.Count == 0 || buffInfo.BuffGroup < 0)
         {
-            buffList.Add(buffInfo);
             return true;
         }
 
@@ -430,7 +455,6 @@ public class BuffManager
         // 如果没有返回
         if (!sameGroupBuffList.Any())
         {
-            buffList.Add(buffInfo);
             return true;
         }
         // 是否存在同组buff且不高于新buff的level的buff
@@ -446,7 +470,6 @@ public class BuffManager
             FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(replaceBuff.ReleaseMember,
                 replaceBuff.ReceiveMember, replaceBuff, 1, replaceBuff.IsNotLethal));
         // 新buff放入列表
-        buffList.Add(buffInfo);
         return true;
     }
 

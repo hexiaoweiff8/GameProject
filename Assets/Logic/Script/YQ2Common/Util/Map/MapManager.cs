@@ -10,6 +10,11 @@ using UnityEngine;
 /// </summary>
 public class MapManager : Singleton<MapManager>
 {
+
+    public const string MapDataPacket = "mapdatapack";
+
+
+    public const string MapDataFileName = "mapdata";
     /// <summary>
     /// 地图文件数据字典
     /// (地图文件名, 地图数据)
@@ -35,8 +40,11 @@ public class MapManager : Singleton<MapManager>
         if (!isLoaded)
         {
             // 加载文件
-            mapDataDic = Utils.DepartFileData(Utils.LoadFileRotate(@"MapData\mapdata"));
-
+            mapDataDic = Utils.DepartFileData(PacketManage.Single.GetPacket(MapDataPacket).LoadString(MapDataFileName));
+            
+            //mapDataDic = Utils.DepartFileData(Utils.LoadFileRotate(@"MapData\mapdata"));
+            //var mapData = GameObjectExtension.InstantiateModelFromPacket(MapDataPacket, MapDataFileName, null);
+            
             if (mapDataDic == null)
             {
                 Debug.LogError("加载失败");

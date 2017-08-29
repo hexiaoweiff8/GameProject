@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using UnityEngine;
 
@@ -73,130 +74,19 @@ public class TargetSelecter
     public static IList<T> TargetFilter<T>(T searchObj, IList<T> dataList) where T : IAllDataHolder, IBaseMember, IGraphicsHolder
     {
         IList<T> result = null;
-        if (searchObj != null && searchObj.AllData.MemberData != null && searchObj.AllData.SelectWeightData != null && dataList != null)
+        if (searchObj != null && searchObj.AllData.MemberData != null && dataList != null)
         {
-            // 目标列表Array
-            var targetArray = new T[dataList.Count];
-            // 目标权重值
-            var weightKeyArray = new float[dataList.Count];
 
-            for (var i = 0; i < dataList.Count; i++)
+
+            if (searchObj.AllData.SelectWeightData != null)
             {
-                var item = dataList[i];
-                if (item.Equals(searchObj))
-                {
-                    continue;
-                }
-                var sumWeight = 0f;
-
-
-                // 从列表中找到几项权重值最高的目标个数个单位
-                // 将各项值标准化, 然后乘以权重求和, 得到最高值
-
-                // -------------------------Level1-----------------------------
-                // 排除不可攻击单位
-                if (!CouldSelectTarget(searchObj, item))
-                {
-                    continue;
-                }
-                // 计算空地属性权重
-                switch (item.AllData.MemberData.GeneralType)
-                {
-                    case Utils.GeneralTypeAir:
-                        sumWeight += searchObj.AllData.SelectWeightData.AirWeight;
-                        break;
-                    case Utils.GeneralTypeBuilding:
-                        sumWeight += searchObj.AllData.SelectWeightData.BuildWeight;
-                        break;
-                    case Utils.GeneralTypeSurface:
-                        sumWeight += searchObj.AllData.SelectWeightData.SurfaceWeight;
-                        break;
-                }
-
-                // -------------------------Level2-----------------------------
-                // 计算单位类型权重
-                switch (item.AllData.MemberData.ArmyType)
-                {
-                    case Utils.MemberItemTypeHuman:
-                        sumWeight += searchObj.AllData.SelectWeightData.HumanWeight;
-                        break;
-                    case Utils.MemberItemTypeOrc:
-                        sumWeight += searchObj.AllData.SelectWeightData.OrcWeight;
-                        break;
-                    case Utils.MemberItemTypeOmnic:
-                        sumWeight += searchObj.AllData.SelectWeightData.OmnicWeight;
-                        break;
-                }
-
-                // -------------------------Level3-----------------------------
-                // 隐形单位
-                if (item.AllData.MemberData.IsHide)
-                {
-                    if (searchObj.AllData.SelectWeightData.HideWeight <= 0)
-                    {
-                        continue;
-                    }
-                    sumWeight += searchObj.AllData.SelectWeightData.HideWeight;
-                }
-                // 嘲讽单位
-                //if (item.IsTaunt)
-                //{
-                //    if (searchObj.TauntWeight < 0)
-                //    {
-                //        continue;
-                //    }
-                //    sumWeight += searchObj.TauntWeight;
-                //}
-
-                // -------------------------Level4-----------------------------
-                // 小生命权重, 血越少权重越高
-                if (searchObj.AllData.SelectWeightData.HealthMaxWeight > 0)
-                {
-                    // 血量 (最大血量 - 当前血量)/最大血量 * 生命权重
-                    sumWeight += searchObj.AllData.SelectWeightData.HealthMaxWeight * (item.AllData.MemberData.TotalHp - item.AllData.MemberData.CurrentHP) / item.AllData.MemberData.TotalHp;
-                }
-
-                // 大生命权重, 生命值越多权重越高
-                if (searchObj.AllData.SelectWeightData.HealthMinWeight > 0)
-                {
-                    // 血量 当前血量/最大血量 * 生命权重
-                    sumWeight += searchObj.AllData.SelectWeightData.HealthMinWeight * item.AllData.MemberData.CurrentHP / item.AllData.MemberData.TotalHp;
-                }
-
-                var distance = Utils.GetTwoPointDistance2D(searchObj.X, searchObj.Y, item.X, item.Y);
-                // 长距离权重, 距离越远权重越大
-                if (searchObj.AllData.SelectWeightData.DistanceMinWeight > 0)
-                {
-                    sumWeight += searchObj.AllData.SelectWeightData.DistanceMinWeight *
-                                 (searchObj.AllData.MemberData.AttackRange - distance) /
-                                 searchObj.AllData.MemberData.AttackRange;
-                }
-
-                // 短距离权重, 距离越远权重越小
-                if (searchObj.AllData.SelectWeightData.DistanceMaxWeight > 0)
-                {
-                    sumWeight += searchObj.AllData.SelectWeightData.DistanceMaxWeight * distance / searchObj.AllData.MemberData.AttackRange;
-                }
-
-                // TODO 各项为插入式结构
-                // 比对列表中的值, 大于其中某项值则将其替换位置并讲其后元素向后推一位.
-                for (var j = 0; j < weightKeyArray.Length; j++)
-                {
-                    if (sumWeight > weightKeyArray[j])
-                    {
-                        for (var k = weightKeyArray.Length - 1; k > j; k--)
-                        {
-                            weightKeyArray[k] = weightKeyArray[k - 1];
-                            targetArray[k] = targetArray[k - 1];
-                        }
-                        weightKeyArray[j] = sumWeight;
-                        targetArray[j] = item;
-                        break;
-                    }
-                }
+                result = TargetFilter(searchObj.AllData.SelectWeightData, searchObj, dataList);
             }
-
-            result = targetArray.Where(targetItem => targetItem != null).ToList();
+            else
+            {
+                // 无筛选条件则返回所有单位
+                result = dataList;
+            }
         }
 
         return result;
@@ -212,132 +102,194 @@ public class TargetSelecter
     public static IList<FormulaParamsPacker> TargetFilter(SelectWeightData searchWeightData, PositionObject searchPositionObject, IList<FormulaParamsPacker> dataList)
     {
         IList<FormulaParamsPacker> result = null;
-        if (searchWeightData != null && searchPositionObject != null && searchPositionObject.AllData.MemberData != null && dataList != null)
+        if (searchPositionObject != null && searchPositionObject.AllData.MemberData != null && dataList != null)
         {
-            // 目标列表Array
-            var targetArray = new FormulaParamsPacker[dataList.Count];
-            // 目标权重值
-            var weightKeyArray = new float[dataList.Count];
-
-            var searchMemberData = searchPositionObject.AllData.MemberData;
-
-            for (var i = 0; i < dataList.Count; i++)
+            if (searchWeightData != null)
             {
-                var item = dataList[i];
-                var sumWeight = 0f;
+                result = new List<FormulaParamsPacker>();
 
-                var targetPositionObj = item.ReceiverMenber.ClusterData;
-                var targetMemberData = targetPositionObj.AllData.MemberData;
-                // 从列表中找到几项权重值最高的目标个数个单位
-                // 将各项值标准化, 然后乘以权重求和, 得到最高值
-
-                // -------------------------Level1-----------------------------
-                // 排除不可攻击单位
-                if (!CouldSelectTarget(searchWeightData, targetMemberData))
+                for (var i = 0; i < dataList.Count; i++)
                 {
-                    continue;
-                }
-                // 计算空地属性权重
-                switch (targetMemberData.GeneralType)
-                {
-                    case Utils.GeneralTypeAir:
-                        sumWeight += searchWeightData.AirWeight;
-                        break;
-                    case Utils.GeneralTypeBuilding:
-                        sumWeight += searchWeightData.BuildWeight;
-                        break;
-                    case Utils.GeneralTypeSurface:
-                        sumWeight += searchWeightData.SurfaceWeight;
-                        break;
-                }
-
-                // -------------------------Level2-----------------------------
-                // 计算单位类型权重
-                switch (targetMemberData.ArmyType)
-                {
-                    case Utils.MemberItemTypeHuman:
-                        sumWeight += searchWeightData.HumanWeight;
-                        break;
-                    case Utils.MemberItemTypeOrc:
-                        sumWeight += searchWeightData.OrcWeight;
-                        break;
-                    case Utils.MemberItemTypeOmnic:
-                        sumWeight += searchWeightData.OmnicWeight;
-                        break;
-                }
-
-                // -------------------------Level3-----------------------------
-                // 隐形单位
-                if (targetMemberData.IsHide)
-                {
-                    if (searchWeightData.HideWeight <= 0)
+                    var item = dataList[i];
+                    if (GetWeight(searchWeightData, searchPositionObject, item.ReceiverMenber.ClusterData) >= 0)
                     {
-                        continue;
-                    }
-                    sumWeight += searchWeightData.HideWeight;
-                }
-                // 嘲讽单位
-                //if (item.IsTaunt)
-                //{
-                //    if (searchObj.TauntWeight < 0)
-                //    {
-                //        continue;
-                //    }
-                //    sumWeight += searchObj.TauntWeight;
-                //}
-
-                // -------------------------Level4-----------------------------
-                // 小生命权重, 血越少权重越高
-                if (searchWeightData.HealthMaxWeight > 0)
-                {
-                    // 血量 (最大血量 - 当前血量)/最大血量 * 生命权重
-                    sumWeight += searchWeightData.HealthMaxWeight * targetMemberData.TotalHp - targetMemberData.CurrentHP / targetMemberData.TotalHp;
-                }
-
-                // 大生命权重, 生命值越多权重越高
-                if (searchWeightData.HealthMinWeight > 0)
-                {
-                    // 血量 当前血量/最大血量 * 生命权重
-                    sumWeight += searchWeightData.HealthMinWeight * targetMemberData.CurrentHP / targetMemberData.TotalHp;
-                }
-
-                var distance = Utils.GetTwoPointDistance2D(searchPositionObject.X, searchPositionObject.Y, targetPositionObj.X, targetPositionObj.Y);
-                // 长距离权重, 距离越远权重越大
-                if (searchWeightData.DistanceMinWeight > 0)
-                {
-                    sumWeight += searchWeightData.DistanceMinWeight *
-                                 (searchMemberData.AttackRange - distance) /
-                                 searchMemberData.AttackRange;
-                }
-
-                // 短距离权重, 距离越远权重越小
-                if (searchWeightData.DistanceMaxWeight > 0)
-                {
-                    sumWeight += searchWeightData.DistanceMaxWeight * distance / searchMemberData.AttackRange;
-                }
-
-                // TODO 各项为插入式结构
-                // 比对列表中的值, 大于其中某项值则将其替换位置并讲其后元素向后推一位.
-                for (var j = 0; j < weightKeyArray.Length; j++)
-                {
-                    if (sumWeight > weightKeyArray[j])
-                    {
-                        for (var k = weightKeyArray.Length - 1; k > j; k--)
-                        {
-                            weightKeyArray[k] = weightKeyArray[k - 1];
-                            targetArray[k] = targetArray[k - 1];
-                        }
-                        weightKeyArray[j] = sumWeight;
-                        targetArray[j] = item;
-                        break;
+                        result.Add(item);
                     }
                 }
             }
-
-            result = targetArray.Where(targetItem => targetItem != null).ToList();
+            else
+            {
+                // 无筛选条件则返回所有单位
+                result = dataList;
+            }
         }
 
         return result;
+    }
+
+
+
+    /// <summary>
+    /// 筛选对象
+    /// </summary>
+    /// <param name="searchWeightData">搜索对象目标权重数据</param>
+    /// <param name="searchPositionObject">搜索对象集群数据</param>
+    /// <param name="dataList">搜索列表</param>
+    /// <returns></returns>
+    public static IList<T> TargetFilter<T>(SelectWeightData searchWeightData, T searchPositionObject, IList<T> dataList) where T : IAllDataHolder, IBaseMember, IGraphicsHolder
+    {
+        IList<T> result = null;
+        if (searchPositionObject != null && searchPositionObject.AllData.MemberData != null && dataList != null)
+        {
+            if (searchWeightData != null)
+            {
+                // 目标列表Array
+                var targetArray = new T[dataList.Count];
+                // 目标权重值
+                var weightKeyArray = new float[dataList.Count];
+
+                for (var i = 0; i < dataList.Count; i++)
+                {
+                    var targetPositionObj = dataList[i];
+                    var sumWeight = GetWeight(searchWeightData, searchPositionObject, targetPositionObj);
+
+                    // TODO 各项为插入式结构
+                    // 比对列表中的值, 大于其中某项值则将其替换位置并讲其后元素向后推一位.
+                    for (var j = 0; j < weightKeyArray.Length; j++)
+                    {
+                        if (sumWeight > weightKeyArray[j])
+                        {
+                            for (var k = weightKeyArray.Length - 1; k > j; k--)
+                            {
+                                weightKeyArray[k] = weightKeyArray[k - 1];
+                                targetArray[k] = targetArray[k - 1];
+                            }
+                            weightKeyArray[j] = sumWeight;
+                            targetArray[j] = targetPositionObj;
+                            break;
+                        }
+                    }
+                }
+
+                result = targetArray.Where(targetItem => targetItem != null).ToList();
+            }
+            else
+            {
+                // 无筛选条件则返回所有单位
+                result = dataList;
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 计算权重值
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="searchWeightData"></param>
+    /// <param name="searchPositionObject"></param>
+    /// <param name="targetPositionObject"></param>
+    /// <returns></returns>
+    public static float GetWeight<T>(SelectWeightData searchWeightData, T searchPositionObject, T targetPositionObject) where T : IAllDataHolder, IBaseMember, IGraphicsHolder
+    {
+        var sumWeight = 0f;
+
+        var targetAllData = targetPositionObject.AllData;
+        var targetMemberData = targetAllData.MemberData;
+        var searchMemberData = searchPositionObject.AllData.MemberData;
+        // 从列表中找到几项权重值最高的目标个数个单位
+        // 将各项值标准化, 然后乘以权重求和, 得到最高值
+
+        // -------------------------Level1-----------------------------
+        // 排除不可攻击单位
+        if (!CouldSelectTarget(searchWeightData, targetAllData))
+        {
+            return -1;
+        }
+        // 计算空地属性权重
+        switch (targetMemberData.GeneralType)
+        {
+            case Utils.GeneralTypeAir:
+                sumWeight += searchWeightData.AirWeight;
+                break;
+            case Utils.GeneralTypeBuilding:
+                sumWeight += searchWeightData.BuildWeight;
+                break;
+            case Utils.GeneralTypeSurface:
+                sumWeight += searchWeightData.SurfaceWeight;
+                break;
+        }
+
+        // -------------------------Level2-----------------------------
+        // 计算单位类型权重
+        switch (targetMemberData.ArmyType)
+        {
+            case Utils.MemberItemTypeHuman:
+                sumWeight += searchWeightData.HumanWeight;
+                break;
+            case Utils.MemberItemTypeOrc:
+                sumWeight += searchWeightData.OrcWeight;
+                break;
+            case Utils.MemberItemTypeOmnic:
+                sumWeight += searchWeightData.OmnicWeight;
+                break;
+        }
+
+        // -------------------------Level3-----------------------------
+        // 隐形单位
+        if (targetMemberData.IsHide)
+        {
+            if (searchWeightData.HideWeight <= 0)
+            {
+                return -1;
+            }
+            sumWeight += searchWeightData.HideWeight;
+        }
+        // 嘲讽单位
+        if (targetMemberData.IsTaunt)
+        {
+            if (searchWeightData.TauntWeight < 0)
+            {
+                return -1;
+            }
+            sumWeight += searchWeightData.TauntWeight;
+        }
+
+        // -------------------------Level4-----------------------------
+        // 小生命权重, 血越少权重越高
+        if (searchWeightData.HealthMaxWeight > 0)
+        {
+            // 血量 (最大血量 - 当前血量)/最大血量 * 生命权重
+            sumWeight += searchWeightData.HealthMaxWeight*(targetMemberData.TotalHp -
+                                                           targetMemberData.CurrentHP)/targetMemberData.TotalHp;
+        }
+
+        // 大生命权重, 生命值越多权重越高
+        if (searchWeightData.HealthMinWeight > 0)
+        {
+            // 血量 当前血量/最大血量 * 生命权重
+            sumWeight += searchWeightData.HealthMinWeight * targetMemberData.CurrentHP /
+                         targetMemberData.TotalHp;
+        }
+
+        var distance = Utils.GetTwoPointDistance2D(searchPositionObject.X, searchPositionObject.Y,
+            targetPositionObject.X, targetPositionObject.Y);
+        // 长距离权重, 距离越远权重越大
+        if (searchWeightData.DistanceMinWeight > 0)
+        {
+            sumWeight += searchWeightData.DistanceMinWeight *
+                         (searchMemberData.AttackRange - distance) /
+                         searchMemberData.AttackRange;
+        }
+
+        // 短距离权重, 距离越远权重越小
+        if (searchWeightData.DistanceMaxWeight > 0)
+        {
+            sumWeight += searchWeightData.DistanceMaxWeight * distance / searchMemberData.AttackRange;
+        }
+
+        return sumWeight;
     }
 
     /// <summary>
@@ -571,7 +523,7 @@ public class TargetSelecter
         }
         var result = false;
 
-        result = CouldSelectTarget(selecterData.AllData.SelectWeightData, targetData.AllData.MemberData);
+        result = CouldSelectTarget(selecterData.AllData.SelectWeightData, targetData.AllData);
 
         return result;
     }
@@ -580,11 +532,13 @@ public class TargetSelecter
     /// 是否可以选择目标
     /// </summary>
     /// <param name="selectWeightData">选择方权重数据</param>
-    /// <param name="targetData">目标方基础数据</param>
+    /// <param name="targetAllData">目标方基础数据</param>
     /// <returns>是否可以选择</returns>
-    public static bool CouldSelectTarget(SelectWeightData selectWeightData, VOBase targetData)
+    public static bool CouldSelectTarget(SelectWeightData selectWeightData, AllData targetAllData)
     {
-        var result = false;
+        var result = true;
+
+        var targetData = targetAllData.MemberData;
 
         // 如果不可攻击建筑并且是建筑 
         // 或不可攻击空中并且是空中 
@@ -592,22 +546,76 @@ public class TargetSelecter
         // 或处于死亡或假死状态
         // 或目标是障碍物
         // 则不能选择该单位
+        // 排除阵营
         if ((selectWeightData.BuildWeight < 0 &&
              targetData.GeneralType == Utils.GeneralTypeBuilding) ||
             (selectWeightData.AirWeight < 0 && targetData.GeneralType == Utils.GeneralTypeAir) ||
             (selectWeightData.SurfaceWeight < 0 &&
              targetData.GeneralType == Utils.GeneralTypeSurface) ||
-            targetData.CurrentHP <= 0 ||
-            targetData is FixtureData)
+            targetData.CurrentHP <= 0)
         {
             return false;
         }
-        // 如果可选类型相等或目标是建筑
-        // 如果目标隐形并且选择者反隐, 或者不隐形
-        if ((targetData.IsHide && selectWeightData.HideWeight > 0) || !targetData.IsHide)
+
+        // 判断阵营
+        if ((selectWeightData.CampWeight != 1 || targetData.Camp != 1)
+           && (selectWeightData.CampWeight != 2 || targetData.Camp != 2)
+            && selectWeightData.CampWeight != 0)
         {
-            // 目标可被选择
-            result = true;
+            return false;
+        }
+
+        // 判断生命区间
+        if (selectWeightData.HpScopeMaxValue >= 0 && selectWeightData.HpScopeMinValue >= 0)
+        {
+            // 区分判断类型
+            switch (selectWeightData.HpScopeType)
+            {
+                case 0:
+                    // 计算生命值百分比
+                    var percent = targetData.CurrentHP/targetData.TotalHp;
+                    if (percent < selectWeightData.HpScopeMinValue || percent > selectWeightData.HpScopeMaxValue)
+                    {
+                        return false;
+                    }
+                    break;
+                case 1:
+                    if (targetData.CurrentHP < selectWeightData.HpScopeMinValue || targetData.CurrentHP > selectWeightData.HpScopeMaxValue)
+                    {
+                        return false;
+                    }
+                    break;
+            }
+        }
+
+        // 判断负面buff
+        if (selectWeightData.DeBuffWeight > 0)
+        {
+            // 必须有负面buff
+            result = targetAllData.BuffInfoList.Any(buff => !buff.IsBeneficial);
+        }
+        else if (selectWeightData.DeBuffWeight < 0)
+        {
+            // 必须没有负面buff
+            result = targetAllData.BuffInfoList.All(buff => buff.IsBeneficial);
+        }
+
+        // 判断正面buff
+        if (selectWeightData.BuffWeight > 0)
+        {
+            // 必须有正面buff
+            result = targetAllData.BuffInfoList.Any(buff => buff.IsBeneficial);
+        }
+        else if (selectWeightData.BuffWeight < 0)
+        {
+            // 必须没有正面buff
+            result = targetAllData.BuffInfoList.All(buff => !buff.IsBeneficial);
+        }
+
+        // 如果目标隐形并且选择者反隐, 或者不隐形
+        if ((targetData.IsHide && selectWeightData.HideWeight < 0))
+        {
+            result = false;
         }
 
         return result;

@@ -3,7 +3,7 @@
 --- DateTime: 2017/7/15 16:34
 ---
 
-local ui_tips_confirm = {
+ui_tips_confirm = {
     cPARENT = "UIRoot/FlyRoot",
     bIsInitialed = false,
     bIsShowing = false,

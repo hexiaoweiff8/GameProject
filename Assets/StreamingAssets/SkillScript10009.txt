@@ -1,0 +1,5 @@
+SkillNum(10009)
+	Action
+	{
+		SubCD(1,3)
+	}

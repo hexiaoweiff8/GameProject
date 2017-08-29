@@ -8,7 +8,6 @@ public class ClusterDataWrap
 	{
 		L.BeginClass(typeof(ClusterData), typeof(PositionObject));
 		L.RegFunction("SetDataValue", SetDataValue);
-		L.RegFunction("RotateToWithoutYAxis", RotateToWithoutYAxis);
 		L.RegFunction("PushTarget", PushTarget);
 		L.RegFunction("PushTargetList", PushTargetList);
 		L.RegFunction("PopTarget", PopTarget);
@@ -35,23 +34,6 @@ public class ClusterDataWrap
 			ClusterData obj = (ClusterData)ToLua.CheckObject(L, 1, typeof(ClusterData));
 			VOBase arg0 = (VOBase)ToLua.CheckObject(L, 2, typeof(VOBase));
 			obj.SetDataValue(arg0);
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int RotateToWithoutYAxis(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 2);
-			ClusterData obj = (ClusterData)ToLua.CheckObject(L, 1, typeof(ClusterData));
-			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 2);
-			obj.RotateToWithoutYAxis(arg0);
 			return 0;
 		}
 		catch(Exception e)

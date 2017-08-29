@@ -4,6 +4,4 @@
 ---
 local class = require("common/middleclass")
 local detailPage_model = class("detailPage_model",equip_model)
-
-
 return detailPage_model

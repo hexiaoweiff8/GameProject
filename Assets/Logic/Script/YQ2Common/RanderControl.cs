@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class RanderControl : MonoBehaviour
 {
+    private const float UIcamare_defaulZ = 554; 
+
     /// <summary>
     /// 血条对象
     /// </summary>
@@ -42,20 +44,15 @@ public class RanderControl : MonoBehaviour
     public bool isSetShader = false;
 
     /// <summary>
-    /// 显示对象动画控制
+    /// 单位位置单位
     /// </summary>
     [HideInInspector]
-    public MFAModelRender ModelRander;
+    public PositionObject PosObj;
 
     /// <summary>
     /// 模型身上的动画组件
     /// </summary>
     private Animation _ani;
-    
-    /// <summary>
-    /// 显示持有类
-    /// </summary>
-    private DisplayOwner data;
 
     /// <summary>
     /// FSM状态机控制器
@@ -74,8 +71,8 @@ public class RanderControl : MonoBehaviour
         if (GlobalData.FightData.IsOnline)
         {
             // 如果是联网战斗则同步数据
-            GetDisplayOwner();
-            FightDataSyncer.Single.AddOptionalData(data);
+            //GetDisplayOwner();
+            FightDataSyncer.Single.AddOptionalData(PosObj.AllData.MemberData.ObjID);
             Debug.Log("网络单位创建:" + transform.position.x + "," + transform.position.z);
         }
         else
@@ -90,37 +87,37 @@ public class RanderControl : MonoBehaviour
     /// </summary>
     public void Begin()
     {
-        GetDisplayOwner();
-        isStart = true;
+        //GetDisplayOwner();
         LoadSource();
         StartFSM();
+        isStart = true;
     }
 
-    /// <summary>
-    /// 当绘制单位时设置shader
-    /// TODO 解决加载单位没有shader问题
-    /// </summary>
-    private void OnWillRenderObject()
-    {
-        if (!isSetShader)
-        {
-            isSetShader = true;
-            var rander = GetComponent<Renderer>();
-            if (rander != null)
-            {
-                var core = PacketManage.Single.GetPacket("core");
-                if (core != null)
-                {
-                    var shader = core.Load("Avatar_N.shader") as Shader;
-                    if (shader != null)
-                    {
-                        rander.material.shader = shader;
-                    }
-                }
+    ///// <summary>
+    ///// 当绘制单位时设置shader
+    ///// TODO 解决加载单位没有shader问题
+    ///// </summary>
+    //private void OnWillRenderObject()
+    //{
+    //    if (!isSetShader)
+    //    {
+    //        isSetShader = true;
+    //        var rander = GetComponent<Renderer>();
+    //        if (rander != null)
+    //        {
+    //            var core = PacketManage.Single.GetPacket("core");
+    //            if (core != null)
+    //            {
+    //                var shader = core.Load("Avatar_N.shader") as Shader;
+    //                if (shader != null)
+    //                {
+    //                    rander.material.shader = shader;
+    //                }
+    //            }
 
-            }
-        }
-    }
+    //        }
+    //    }
+    //}
 
     /// <summary>
     /// 加载
@@ -129,10 +126,12 @@ public class RanderControl : MonoBehaviour
     {
         NowWorldCamera = GameObject.Find("/PTZCamera/SceneryCamera").GetComponent<Camera>();
         Head = transform.Find("head").gameObject.transform;
-        bloodBar = GameObjectExtension.InstantiateFromPacket("ui_fightU", "blood.prefab", GameObject.Find("ui_fightU/bloodParent")).transform;
-        bloodBar.localScale = Vector3.zero;
+        GameObject parent = GameObject.Find("ui_fightU/bloodParent");
+        bloodBar = GameObjectExtension.InstantiateFromPacket("ui_fightu", "blood.prefab", parent ).transform;
+        bloodBar.localPosition = Vector3.zero;
+        bloodBar.localScale = Vector3.one;
         bloodBarCom = bloodBar.gameObject.AddComponent<BloodBar>();
-        ModelRander = gameObject.GetComponent<MFAModelRender>();
+        //ModelRander = gameObject.GetComponent<MFAModelRender>();
     }
 
     /// <summary>
@@ -142,22 +141,7 @@ public class RanderControl : MonoBehaviour
     {
         // 启动士兵的状态控制
         _control = new SoldierFSMControl();
-        data.RanderControl = this;
-        _control.StartFSM(data);
-    }
-
-    /// <summary>
-    /// 获取显示数据包装
-    /// </summary>
-    private void GetDisplayOwner()
-    {
-        if (data == null)
-        {
-            // 数据来源非正常方式, 抽出
-            // TODO 日了狗了 循环引用实在去不掉先这么写有空了改.
-            var clusterData = gameObject.GetComponent<ClusterData>();
-            data = DisplayerManager.Single.GetElementById(clusterData.AllData.MemberData.ObjID);
-        }
+        _control.StartFSM(PosObj.AllData.MemberData.ObjID);
     }
 
     public void OnEnable()
@@ -174,7 +158,7 @@ public class RanderControl : MonoBehaviour
     {
         if (null == _ani)
         {
-             Debug.LogError("模型身上需要挂Animation组件");
+             Debug.LogError("模型身上需要挂Animation组件:" + gameObject.name);
              return;
         }
         try
@@ -188,7 +172,8 @@ public class RanderControl : MonoBehaviour
         }
         catch (Exception ex)
         {
-            throw new Exception("播放动画失败！error:"+ex.Message);
+            Debug.LogError("播放动画失败！error:" + ex.Message);
+            //throw new Exception("播放动画失败！error:"+ex.Message);
         }
     }
 
@@ -215,7 +200,13 @@ public class RanderControl : MonoBehaviour
             _control = null;
         }
     }
-
+//    void OnGUI()
+//    {
+////        print("OnGui");
+//        Vector3 pt = NowWorldCamera.WorldToScreenPoint(Head.position);
+//        GUI.Button(new Rect(pt.x, Screen.height - pt.y, 200f, 30f), pt.x + "::::::" + pt.y);
+//
+//    }
     /// <summary>
     /// 刷新血条
     /// </summary>
@@ -226,9 +217,10 @@ public class RanderControl : MonoBehaviour
             return;
         }
         Vector3 pt = NowWorldCamera.WorldToScreenPoint(Head.position);
-        Vector3 ff = UICamera.currentCamera.ScreenToWorldPoint(pt);
+        Vector3 ff = UIAdaptation.UICamera.ScreenToWorldPoint(pt);
         bloodBar.position = ff;
-        var value = data.ClusterData.AllData.MemberData.CurrentHP / data.ClusterData.AllData.MemberData.TotalHp;
+
+        var value = PosObj.AllData.MemberData.CurrentHP / PosObj.AllData.MemberData.TotalHp;
         bloodBarCom.SetBloodBarValue(value);
     }
 

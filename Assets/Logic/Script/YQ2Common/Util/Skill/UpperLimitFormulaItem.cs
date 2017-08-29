@@ -27,8 +27,8 @@ public class UpperLimitFormulaItem : AbstractFormulaItem
         }
 
 
-        FormulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        LimitDemage = GetDataOrReplace<float>("LimitDemage", array, 1, ReplaceDic);
+        FormulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        LimitDemage = GetDataOrReplace<float>("LimitDemage", array, 1);
 
     }
 

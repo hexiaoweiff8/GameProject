@@ -315,9 +315,11 @@ public class ClusterManager : ILoopItem
         {
             foreach (var member in memberInSightScope)
             {
+                // 单位有效
                 // 区分空地属性
                 // 区分阵营
-                if (member.AllData.MemberData.CurrentHP > 0
+                if (member != null && 
+                    member.AllData.MemberData.CurrentHP > 0
                     && (myCamp == -1
                     || (isExceptMyCamp && member.AllData.MemberData.Camp != myCamp)
                     || (!isExceptMyCamp && member.AllData.MemberData.Camp == myCamp))
@@ -373,11 +375,19 @@ public class ClusterManager : ILoopItem
     /// <param name="member">单个单位</param>
     private void OneMemberMove(ClusterData member)
     {
-        if (member == null || !member.IsMoving)
+        if (member == null)
         {
             return;
         }
 
+
+        // 计算周围单位碰撞
+        GetCloseMemberGrivity2(member);
+
+        if (!member.IsMoving)
+        {
+            return;
+        }
         // 高度控制
         var heightDiff = member.transform.position.y - member.Height;
         if (heightDiff != 0)
@@ -412,9 +422,6 @@ public class ClusterManager : ILoopItem
                 rotate += ((int)rotate / 180) * 180 * (Mathf.Sign(rotate));
             }
         }
-
-        // 计算周围单位碰撞
-        GetCloseMemberGrivity2(member);
         // 转向
         member.Rotate = Vector3.up * rotate * member.RotateSpeed * Time.deltaTime;
         member.Position += member.SpeedDirection * Time.deltaTime;
@@ -648,7 +655,7 @@ public class ClusterManager : ILoopItem
                     if (graphics.CheckCollision(closeGraphics))
                     {
                         // 最小距离
-                        var minDistance = member.Diameter * 0.5f + closeMember.Diameter * 0.5f;
+                        var minDistance = member.Diameter * UnitWidth * 0.5f + closeMember.Diameter * UnitWidth * 0.5f;
                         // 质量比例
                         var qualityRate = Math.Min(member.Quality / closeMember.Quality, CollisionWeight);
                         // 插入深度
@@ -657,7 +664,7 @@ public class ClusterManager : ILoopItem
                         if (insertDis > 0)
                         {
                             // 插入深度
-                            var diffCollisionThoughDir = diffPosition.normalized * (insertDis);
+                            var diffCollisionThoughDir = diffPosition.normalized * (insertDis) * 0.5f;
                             
                             collisionThoughDir += diffCollisionThoughDir / qualityRate;
                                                   //*CollisionThrough
@@ -678,7 +685,7 @@ public class ClusterManager : ILoopItem
                                 // 直接设置未碰撞位置
                                 closeMember.Position -= offPos;
                                 // 影响速度
-                                closeMember.SpeedDirection -= diffCollisionThoughDir * qualityRate;
+                                //closeMember.SpeedDirection -= diffCollisionThoughDir * qualityRate;
                             }
                             member.Position += diffCollisionThoughDir;
                         }

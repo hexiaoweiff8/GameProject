@@ -37,6 +37,7 @@ public class SkillScriptEditor : BaseScriptEditor
     void OnGUI()
     {
         Refresh();
+        scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(640), GUILayout.Height(800));
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.BeginVertical("box", GUILayout.Width(400), GUILayout.Height(400));
         #region ScrollView - Script Content
@@ -62,7 +63,7 @@ public class SkillScriptEditor : BaseScriptEditor
 
         #region ScrollView - Data Content
 
-        EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(400), GUILayout.Height(400));
+        EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(400), GUILayout.Height(800));
         //GUIStyle style = new GUIStyle(GUI.skin.button);
         for (int i = 0; i < dataContent.Count; i++)
         {
@@ -101,6 +102,7 @@ public class SkillScriptEditor : BaseScriptEditor
         GUI.color = Color.yellow;
 
         // 获取的实例
+        SkillTriggerScriptEditor.WinType = 1;
         SkillTriggerScriptEditor.GetIns();
 
         if (GUILayout.Button("子级左括号"))
@@ -123,6 +125,10 @@ public class SkillScriptEditor : BaseScriptEditor
         {
             SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Point, this.position);
         }
+        if (GUILayout.Button("连线特效"))
+        {
+            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Liner, this.position);
+        }
         if (GUILayout.Button("范围碰撞检测"))
         {
             SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.CollisionDetection, this.position);
@@ -139,6 +145,14 @@ public class SkillScriptEditor : BaseScriptEditor
         {
             SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Buff, this.position);
         }
+        if (GUILayout.Button("清除Buff"))
+        {
+            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.CleanBuff, this.position);
+        }
+        if (GUILayout.Button("删除指定Buff"))
+        {
+            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.DelBuff, this.position);
+        }
         if (GUILayout.Button("Skill"))
         {
             SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Skill, this.position);
@@ -151,9 +165,33 @@ public class SkillScriptEditor : BaseScriptEditor
         {
             SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.HealthChange, this.position);
         }
+        if (GUILayout.Button("秒杀"))
+        {
+            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Death, this.position);
+        }
         if (GUILayout.Button("伤害吸收"))
         {
             SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.ResistDemage, this.position);
+        }
+        if (GUILayout.Button("免疫伤害"))
+        {
+            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.ImmuneDemage, this.position);
+        }
+        if (GUILayout.Button("免疫致死"))
+        {
+            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.ImmuneDeath, this.position);
+        }
+        if (GUILayout.Button("受到伤害上限"))
+        {
+            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.UpperLimit, this.position);
+        }
+        if (GUILayout.Button("吸血"))
+        {
+            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.LifeDrain, this.position);
+        }
+        if (GUILayout.Button("分担伤害"))
+        {
+            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.ShareDamage, this.position);
         }
         if (GUILayout.Button("移动"))
         {
@@ -167,6 +205,24 @@ public class SkillScriptEditor : BaseScriptEditor
         {
             SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.TargetPointSelector, this.position);
         }
+        if (GUILayout.Button("清除攻击目标"))
+        {
+            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.CleanTarget, this.position);
+        }
+        if (GUILayout.Button("循环"))
+        {
+            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.For, this.position);
+        }
+        if (GUILayout.Button("减技能CD"))
+        {
+            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.SubCD, this.position);
+        }
+        if (GUILayout.Button("召唤"))
+        {
+            SkillTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Summoned, this.position);
+        }
+
+
         GUI.color = Color.white;
         EditorGUILayout.EndVertical();
         #endregion
@@ -176,52 +232,78 @@ public class SkillScriptEditor : BaseScriptEditor
         EditorGUILayout.BeginVertical("box");
         GUI.color = Color.green;
 
+        if (GUILayout.Button("技能名称"))
+        {
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, (int)SkillDataType.SkillName, this.position);
+        }
         if (GUILayout.Button("技能等级数据"))
         {
-            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.LevelData, this.position);
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, (int)SkillDataType.LevelData, this.position);
         }
         if (GUILayout.Button("技能CD值"))
         {
-            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.CDTime, this.position);
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, (int)SkillDataType.CDTime, this.position);
         }
         if (GUILayout.Button("技能CD组"))
         {
-            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.CDGroup, this.position);
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, (int)SkillDataType.CDGroup, this.position);
         }
-        if (GUILayout.Button("技能可释放次数"))
+        if (GUILayout.Button("技能可释放次数(持续技能)"))
         {
-            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.ReleaseTime, this.position);
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, (int)SkillDataType.ReleaseTime, this.position);
         }
         if (GUILayout.Button("触发事件Level1"))
         {
-            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.TriggerLevel1, this.position);
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, (int)SkillDataType.TriggerLevel1, this.position);
         }
         if (GUILayout.Button("触发事件Level2"))
         {
-            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.TriggerLevel2, this.position);
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, (int)SkillDataType.TriggerLevel2, this.position);
+        }
+        if (GUILayout.Button("触发概率"))
+        {
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, (int)SkillDataType.TriggerProbability, this.position);
         }
         if (GUILayout.Button("数据修正"))
         {
-            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.ChangeData, this.position);
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, (int)SkillDataType.ChangeData, this.position);
         }
         if (GUILayout.Button("技能是否为主动技能(默认否)"))
         {
-            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.IsActive, this.position);
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, (int)SkillDataType.IsActive, this.position);
         }
         if (GUILayout.Button("技能描述"))
         {
-            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.Description, this.position);
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, (int)SkillDataType.Description, this.position);
         }
         if (GUILayout.Button("技能Icon路径"))
         {
-            SkillTriggerScriptEditor.ShowDataScriptWindow(this, DataType.Icon, this.position);
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, (int)SkillDataType.Icon, this.position);
         }
+        if (GUILayout.Button("技能执行间隔(持续技能)"))
+        {
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, (int)SkillDataType.IntervalTime, this.position);
+        }
+        if (GUILayout.Button("生命值区间下限(触发条件)"))
+        {
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, (int)SkillDataType.HpScopeMin, this.position);
+        }
+        if (GUILayout.Button("生命值区间上限(触发条件)"))
+        {
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, (int)SkillDataType.HpScopeMax, this.position);
+        }
+        if (GUILayout.Button("伤害增强/减免"))
+        {
+            SkillTriggerScriptEditor.ShowDataScriptWindow(this, (int)SkillDataType.DemageChange, this.position);
+        }
+
         EditorGUILayout.EndVertical();
         #endregion
         #endregion
 
         EditorGUILayout.EndVertical();
         EditorGUILayout.EndHorizontal();
+        EditorGUILayout.EndScrollView();
     }
 
 
@@ -344,4 +426,28 @@ public class SkillScriptEditor : BaseScriptEditor
         }
         return ret;
     }
+}
+/// <summary>
+/// 技能数据类型
+/// </summary>
+public enum SkillDataType
+{
+    LevelData = 0,      // 技能等级数据
+    CDTime = 1,         // 技能CD时间
+    CDGroup = 2,        // 技能CD组
+    ReleaseTime = 3,    // 技能可释放次数(持续技能用)
+    Description = 4,    // 技能描述
+    Icon = 5,           // 技能Icon
+    TriggerLevel1 = 6,
+    TriggerLevel2 = 7,
+    TickTime = 8,
+    ChangeData = 9,
+    IsActive = 10,          // 是否为主动技能
+    IntervalTime = 11,      // 间隔时间(持续技能用)
+    HpScopeMin = 12,        // 生命值区间下限(触发条件)
+    HpScopeMax = 13,        // 生命值区间上限(触发条件)
+    DemageChange = 14,      // 伤害增强/减免
+    TriggerProbability = 15,      // 伤害增强/减免
+    SkillName = 16,      // 伤害增强/减免
+
 }

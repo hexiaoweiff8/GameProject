@@ -4,7 +4,6 @@
 ---
 
 AStarControl = {}
-local CanNotArea = require("uiscripts/fight/CanNotArea")
 function AStarControl:Init(maxPointX)
     --AstarFight
     self.AstarFight = GameObject.Find("/AstarFight"):GetComponent(typeof(AstarFight))
@@ -98,5 +97,11 @@ function AStarControl:setQianFengZhangAi(position, index)
     end
     Debugger.LogWarning("设置阵型信息出错，可能是未初始化AStarFight！！！")
 
+end
+
+
+function AStarControl:OnDestroyDone()
+    self.AstarFight = nil
+    AStarControl = nil
 end
 return AStarControl

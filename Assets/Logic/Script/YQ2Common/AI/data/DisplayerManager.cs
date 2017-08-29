@@ -60,20 +60,48 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
     /// <summary>
     /// 创建单位, 如果对象池内有引用直接使用
     /// </summary>
-    /// <param name="soldiername"></param>
-    /// <param name="param"></param>
+    /// <param name="voBase"></param>
     /// <returns></returns>
-    public GameObject CreateAvatar(string soldiername, CreateActorParam param)
+    public GameObject CreateAvatar(VOBase voBase)
     {
-        if (displayPool.ContainsKey(soldiername) && displayPool[soldiername].Count > 0)
+        GameObject result = null;
+        if (displayPool.ContainsKey(voBase.Name) && displayPool[voBase.Name].Count > 0)
         {
-            var member = displayPool[soldiername].Pop();
+            result = displayPool[voBase.Name].Pop();
             // 清空父级引用
-            member.transform.parent = null;
-            member.SetActive(true);
-            return member;
+            result.transform.parent = null;
+            result.SetActive(true);
         }
-        return DP_FightPrefabManage.InstantiateAvatar(param);
+        else
+        {
+            result = GameObjectExtension.InstantiateModelFromPacket(voBase.ModelPack, voBase.ModelName, null);//DP_FightPrefabManage.InstantiateAvatar(voBase);
+        }
+
+        if (result != null)
+        {
+            // 加载材质
+            var meshList = result.GetComponentsInChildren<SkinnedMeshRenderer>();
+            Texture texture = null;
+            // 区分阵营加载不同皮肤
+            switch (voBase.Camp)
+            {
+                case Utils.MyCamp:
+                    // 我方阵营
+                    // 更换皮肤
+                    texture = PacketManage.Single.GetPacket(voBase.ModelPack).Load(voBase.ModelTexture + Utils.MyCampTextureNameTrail) as Texture;
+                    break;
+                case Utils.EnemyCamp:
+                    // 敌方阵营
+                    // 更换皮肤
+                    texture = PacketManage.Single.GetPacket(voBase.ModelPack).Load(voBase.ModelTexture + Utils.EnemyCampTextureNameTrail) as Texture;
+                    break;
+            }
+            foreach (var mesh in meshList)
+            {
+                mesh.material.mainTexture = texture;
+            }
+        }
+        return result;
     }
 
     /// <summary>
@@ -103,6 +131,18 @@ public class DisplayerManager : MonoEX.Singleton<DisplayerManager>
         // 设置父级
         obj.GameObj.transform.parent = ParentManager.Instance().GetParent(ParentManager.PoolParent).transform;
         displayPool[soldierType].Push(obj.GameObj);
+    }
+
+    /// <summary>
+    /// 清理缓存
+    /// </summary>
+    public void Clear()
+    {
+        _allMyDisPlayDict.Clear();
+        _allEnemyDisPlayDict.Clear();
+        myBuilding.Clear();
+        enemyBuilding.Clear();
+        displayPool.Clear();
     }
 
     /// <summary>

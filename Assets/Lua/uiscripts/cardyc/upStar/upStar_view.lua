@@ -7,7 +7,7 @@ end
 
 function upStar_view:init_UpStarPanel()
     -- body 
-    self.upStarPanel = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "upStarPanel",  self.gameObject)
+    self.upStarPanel = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "upStarPanel", view.gameObject)
     self.upStarP_skillPanel = self.upStarPanel.transform:Find("skillPanel").gameObject
     self.upStarP_skillP_NameLab = self.upStarPanel.transform:Find("skillPanel/skillNameLab").gameObject
     self.upStarP_skillP_skillInfo = self.upStarPanel.transform:Find("skillPanel/skillInfo").gameObject
@@ -31,7 +31,7 @@ function upStar_view:init_UpStarPanel()
 end
 
 function upStar_view:init_UpStar_SuccessPanel()
-    self.upStarSuccessPanel = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "upStarSuccess",self.gameObject)
+    self.upStarSuccessPanel = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "upStarSuccess",view.gameObject)
     self.upStarSP_titleL=self.upStarSuccessPanel.transform:Find("title_Lab").gameObject
     self.upStarSP_live_nameL=self.upStarSuccessPanel.transform:Find("property/livegrow/nameLab").gameObject
     self.upStarSP_live_valueBL=self.upStarSuccessPanel.transform:Find("property/livegrow/value_1").gameObject

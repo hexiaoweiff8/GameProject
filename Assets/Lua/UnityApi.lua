@@ -12602,6 +12602,14 @@ function SaveValue() end
 ----Void UIInput:LoadValue()
 function LoadValue() end 
 
+InputType = {} 
+
+Standard = nil;
+
+AutoCorrect = nil;
+
+Password = nil;
+
 UIToggle = {} 
 --*
 --[Comment]
@@ -12660,6 +12668,96 @@ function Start() end
 
 ----Void UIToggle:Set(Boolean state,Boolean notify)
 function Set() end 
+
+UIPopupList = {} 
+--*
+--[Comment]
+--consturctor for UIPopupList overrides:
+--*
+--UIPopupList.New()
+--*
+
+function UIPopupList.New() end
+--*
+--[Comment]
+-- property: Object UIPopupList.ambigiousFont	get	set	
+ambigiousFont = nil 
+--*
+--[Comment]
+-- property: Boolean UIPopupList.isOpen	get	
+isOpen = nil 
+--*
+--[Comment]
+-- property: String UIPopupList.value	get	set	
+value = nil 
+--*
+--[Comment]
+-- property: Object UIPopupList.data	get	
+data = nil 
+--*
+--[Comment]
+-- property: Boolean UIPopupList.isColliderEnabled	get	
+isColliderEnabled = nil 
+--*
+--[Comment]
+-- property: Boolean UIPopupList.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean UIPopupList.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean UIPopupList.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform UIPopupList.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject UIPopupList.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String UIPopupList.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String UIPopupList.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags UIPopupList.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void UIPopupList:Set(String value,Boolean notify)
+function Set() end 
+
+----Void UIPopupList:Clear()
+function Clear() end 
+
+----Void UIPopupList:AddItem(String text)
+--Void UIPopupList:AddItem(String text,Object data)
+function AddItem() end 
+
+----Void UIPopupList:RemoveItem(String text)
+function RemoveItem() end 
+
+----Void UIPopupList:RemoveItemByData(Object data)
+function RemoveItemByData() end 
+
+----Void UIPopupList:Start()
+function Start() end 
+
+----Void UIPopupList.Close()
+function UIPopupList.Close() end 
+
+----Void UIPopupList:CloseSelf()
+function CloseSelf() end 
+
+----Void UIPopupList:Show()
+function Show() end 
 
 UITexture = {} 
 --*
@@ -13850,9 +13948,6 @@ function DP_FightPrefabManage.InstantiateObject3D() end
 ----Void DP_FightPrefabManage.ReLoad3DObjects()
 function DP_FightPrefabManage.ReLoad3DObjects() end 
 
-----GameObject DP_FightPrefabManage.InstantiateAvatar(CreateActorParam param)
-function DP_FightPrefabManage.InstantiateAvatar() end 
-
 ----Material DP_FightPrefabManage.CreateMat(Boolean colorMat)
 function DP_FightPrefabManage.CreateMat() end 
 
@@ -14542,6 +14637,9 @@ function _OnWndHide() end
 ----Void WndManage:LogicInit_Go()
 function LogicInit_Go() end 
 
+----Void WndManage:LogicInitPackage()
+function LogicInitPackage() end 
+
 ----Single WndManage:LogicInit_GetInitProgress()
 function LogicInit_GetInitProgress() end 
 
@@ -14706,6 +14804,9 @@ function Utils.GetDistancePointToLine() end
 
 ----Single Utils.GetDistancePointToPoint(Vector2 point1,Vector2 point2)
 function Utils.GetDistancePointToPoint() end 
+
+----Single Utils.GetAngleWithZ(Vector3 vec)
+function Utils.GetAngleWithZ() end 
 
 ----Void Utils.CreateOrOpenFile(String path,String fileName,String info)
 function Utils.CreateOrOpenFile() end 
@@ -15055,6 +15156,9 @@ hideFlags = nil
 ----Void AstarFight:InitMap(Int32[][] obMapInfo,Int32[][] buildingMapInfo)
 function InitMap() end 
 
+----Void AstarFight:AnalysisMap()
+function AnalysisMap() end 
+
 ----Void AstarFight:Clear()
 function Clear() end 
 
@@ -15128,6 +15232,9 @@ name = nil
 -- property: HideFlags UIFollow.hideFlags	get	set	
 hideFlags = nil 
 --*
+----Void UIFollow:Stop()
+function Stop() end 
+
 ----Void UIFollow:ResetPosition()
 function ResetPosition() end 
 
@@ -15335,13 +15442,13 @@ CreateActorParam = {}
 --[Comment]
 --consturctor for CreateActorParam overrides:
 --*
---CreateActorParam.New(Int32 cmType,Boolean colorMat,Int32 flagColorIdx,String meshPackName,String texturePackName,Boolean isHero,Int32 soldierID,Int32 cardID)
---*
-
 --CreateActorParam.New(Single x,Single y,Int32 level)
 --*
 
 --CreateActorParam.New(Single x,Single y)
+--*
+
+--CreateActorParam.New(Int32 soldierId)
 --*
 
 function CreateActorParam.New() end
@@ -15443,6 +15550,9 @@ function GameObjectExtension.InstantiateFromPreobj() end
 ----GameObject GameObjectExtension.InstantiateFromPacket(String packName,String preObjName,GameObject parent)
 function GameObjectExtension.InstantiateFromPacket() end 
 
+----GameObject GameObjectExtension.InstantiateModelFromPacket(String packName,String preObjName,GameObject parent)
+function GameObjectExtension.InstantiateModelFromPacket() end 
+
 LayerMask = {} 
 --*
 --[Comment]
@@ -15513,10 +15623,7 @@ DisplayOwner = {}
 --DisplayOwner.New(GameObject gameObj,PositionObject clusterData)
 --*
 
---DisplayOwner.New(GameObject gameObj,PositionObject clusterData,MFAModelRender mfa)
---*
-
---DisplayOwner.New(GameObject gameObj,PositionObject clusterData,MFAModelRender modelRender,RanderControl randerControl)
+--DisplayOwner.New(GameObject gameObj,PositionObject clusterData,RanderControl randerControl)
 --*
 
 function DisplayOwner.New() end
@@ -15528,10 +15635,6 @@ GameObj = nil
 --[Comment]
 -- property: PositionObject DisplayOwner.ClusterData	get	set	
 ClusterData = nil 
---*
---[Comment]
--- property: MFAModelRender DisplayOwner.MFAModelRender	get	set	
-MFAModelRender = nil 
 --*
 --[Comment]
 -- property: RanderControl DisplayOwner.RanderControl	get	set	
@@ -15662,6 +15765,9 @@ function StopMove() end
 ----Void PositionObject:ContinueMove()
 function ContinueMove() end 
 
+----Void PositionObject:RotateToWithoutYAxis(Vector3 target)
+function RotateToWithoutYAxis() end 
+
 ----Void PositionObject:Clear()
 function Clear() end 
 
@@ -15718,6 +15824,10 @@ Dodge = nil
 --[Comment]
 -- property: Single VOBase.Crit	get	set	
 Crit = nil 
+--*
+--[Comment]
+-- property: Single VOBase.FixCrit	get	set	
+FixCrit = nil 
 --*
 --[Comment]
 -- property: Single VOBase.AntiCrit	get	set	
@@ -15954,9 +16064,6 @@ hideFlags = nil
 --*
 ----Void ClusterData:SetDataValue(VOBase data)
 function SetDataValue() end 
-
-----Void ClusterData:RotateToWithoutYAxis(Vector3 target)
-function RotateToWithoutYAxis() end 
 
 ----Void ClusterData:PushTarget(Vector3 target)
 function PushTarget() end 
@@ -16330,6 +16437,12 @@ function UIToast.ShowWithCallback() end
 ----Void UIToast.Show(String messageToShow)
 function UIToast.Show() end 
 
+ShowType = {} 
+
+Queue = nil;
+
+Upwards = nil;
+
 SceneChanger = {} 
 --*
 ----Int32 SceneChanger.LoadFight(Action callback)
@@ -16358,6 +16471,9 @@ Single = nil
 ----Void FightManager:StartFight(Int32 mapId,MapDataParamsPacker mapDataPacker,Boolean isOnline)
 function StartFight() end 
 
+----Void FightManager:AnalysisMap()
+function AnalysisMap() end 
+
 ----Void FightManager:EndFight()
 function EndFight() end 
 
@@ -16367,6 +16483,33 @@ function InitMap() end
 
 ----Void FightManager:Clear()
 function Clear() end 
+
+----Void FightManager:SetMemberPos(Int32 camp,MemberType memberType,Vector3 pos)
+function SetMemberPos() end 
+
+----Vector3 FightManager:GetPos(Int32 camp,MemberType memberType)
+function GetPos() end 
+
+----Void FightManager:DoHealthChangeAction(GameObject obj,Single totalHp,Single currentHp,Single changeValue,HurtType type,ObjectType objType)
+function DoHealthChangeAction() end 
+
+----Void FightManager:DoEndGameAction(Int32 fieldCamp)
+function DoEndGameAction() end 
+
+----Void FightManager:DoMemberDeadAction(GameObject obj,Int32 camp,MemberType memberType)
+function DoMemberDeadAction() end 
+
+----Void FightManager:SetHealthChangeAction(Action`1 action)
+function SetHealthChangeAction() end 
+
+----Void FightManager:SetEndGameAction(Action`1 action)
+function SetEndGameAction() end 
+
+----Void FightManager:SetMemberDeadAction(Action`3 action)
+function SetMemberDeadAction() end 
+
+----HurtType FightManager.GetDemageHurtType(TriggerData trigger)
+function FightManager.GetDemageHurtType() end 
 
 MapDataParamsPacker = {} 
 --*
@@ -16378,6 +16521,447 @@ MapDataParamsPacker = {}
 
 function MapDataParamsPacker.New() end
 --*
+UIPopupListExtended = {} 
+--*
+--[Comment]
+--consturctor for UIPopupListExtended overrides:
+--*
+--UIPopupListExtended.New()
+--*
+
+function UIPopupListExtended.New() end
+--*
+--[Comment]
+-- property: Boolean UIPopupListExtended.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean UIPopupListExtended.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean UIPopupListExtended.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform UIPopupListExtended.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject UIPopupListExtended.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String UIPopupListExtended.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String UIPopupListExtended.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags UIPopupListExtended.hideFlags	get	set	
+hideFlags = nil 
+--*
+LoadMap = {} 
+--*
+--[Comment]
+--consturctor for LoadMap overrides:
+--*
+--LoadMap.New()
+--*
+
+function LoadMap.New() end
+--*
+--[Comment]
+-- property: Int32 LoadMap.MapWidth	get	
+MapWidth = nil 
+--*
+--[Comment]
+-- property: Int32 LoadMap.MapHeight	get	
+MapHeight = nil 
+--*
+--[Comment]
+-- property: Int32 LoadMap.UnitWidth	get	
+UnitWidth = nil 
+--*
+--[Comment]
+-- property: Boolean LoadMap.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean LoadMap.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean LoadMap.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform LoadMap.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject LoadMap.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String LoadMap.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String LoadMap.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags LoadMap.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void LoadMap:Init(Int32[][] map,Int32 unitWidth)
+function Init() end 
+
+----Vector3 LoadMap:GetLeftBottom()
+function GetLeftBottom() end 
+
+----Int32[][] LoadMap:GetSurfaceMapData()
+function GetSurfaceMapData() end 
+
+----Int32[][] LoadMap:GetAirMapData()
+function GetAirMapData() end 
+
+----Vector3 LoadMap:MapItemToEnemy(Vector3 pos)
+function MapItemToEnemy() end 
+
+SkillManager = {} 
+--*
+--[Comment]
+--consturctor for SkillManager overrides:
+--*
+--SkillManager.New()
+--*
+
+function SkillManager.New() end
+--*
+--[Comment]
+-- property: SkillManager SkillManager.Single	get	
+Single = nil 
+--*
+--[Comment]
+-- property: Boolean SkillManager.isPause	get	set	
+isPause = nil 
+--*
+----SkillInfo SkillManager:CreateSkillInfo(Int32 skillNum,Int32 skillLevel)
+--SkillInfo SkillManager:CreateSkillInfo(Int32 skillNum,DisplayOwner skillHolder,Int32 skillLevel)
+function CreateSkillInfo() end 
+
+----String SkillManager:GetSkillScript(Int32 skillNum,Int32 type)
+function GetSkillScript() end 
+
+----IList`1 SkillManager:CreateSkillInfoList(IList`1 skillIdList,DisplayOwner skillHolder)
+function CreateSkillInfoList() end 
+
+----Void SkillManager:AttachSkillAttribute(SkillInfo skillInfo,VOBase memberData)
+function AttachSkillAttribute() end 
+
+----SkillInfo SkillManager:CopySkillInfo(SkillInfo skillInfo)
+function CopySkillInfo() end 
+
+----Void SkillManager:DoFormula(IFormula formula,Action callback)
+function DoFormula() end 
+
+----Boolean SkillManager:SkillCouldRelease(SkillBase skillbase)
+function SkillCouldRelease() end 
+
+----Void SkillManager:SetSkillInCD(SkillInfo skillInfo)
+function SetSkillInCD() end 
+
+----Void SkillManager:SubSkillCD(SkillInfo skillInfo,Single subTime)
+function SubSkillCD() end 
+
+----Void SkillManager:DoSkillInfo(SkillBase skillBase,FormulaParamsPacker packer,Boolean isSubSkill,Action callback)
+function DoSkillInfo() end 
+
+----Void SkillManager:DoSkillNum(Int32 skillNum,FormulaParamsPacker packer,Boolean isSubSkill,Action callback)
+function DoSkillNum() end 
+
+----Void SkillManager:AddSkillInfo(SkillInfo skillInfo)
+function AddSkillInfo() end 
+
+----Boolean SkillManager:ContainsInstanceSkillId(Int64 skillAddtionId)
+function ContainsInstanceSkillId() end 
+
+----SkillInfo SkillManager:GetSkillInstance(Int64 skillAddtionId)
+function GetSkillInstance() end 
+
+----Void SkillManager:DelBuffInstance(Int64 skillAddtionId)
+function DelBuffInstance() end 
+
+----Void SkillManager:CheckAndDoSkillInfo(IList`1 skillsList,TriggerData triggerData)
+function CheckAndDoSkillInfo() end 
+
+----Void SkillManager:Pause()
+function Pause() end 
+
+----Void SkillManager:Start()
+function Start() end 
+
+----Void SkillManager:SetTriggerData(TriggerData triggerData)
+function SetTriggerData() end 
+
+----List`1 SkillManager:GetSkillTriggerDataList(ObjectID objId,TriggerLevel1 type1,TriggerLevel2 type2)
+function GetSkillTriggerDataList() end 
+
+----Void SkillManager:ClearSkillTriggerData(ObjectID objId,TriggerLevel1 typeLevel1,TriggerLevel2 typeLevel2)
+function ClearSkillTriggerData() end 
+
+----Void SkillManager:ClearAllSkillTriggerData()
+function ClearAllSkillTriggerData() end 
+
+----Void SkillManager:SetEachAction(ObjectID objId,Action`3 each,Boolean isDelBeforeEnd)
+function SetEachAction() end 
+
+SkillInfo = {} 
+--*
+--[Comment]
+--consturctor for SkillInfo overrides:
+--*
+--SkillInfo.New(Int32 skillNum)
+--*
+
+function SkillInfo.New() end
+--*
+--[Comment]
+-- property: Boolean SkillInfo.IsActive	get	set	
+IsActive = nil 
+--*
+--[Comment]
+-- property: Boolean SkillInfo.IsDone	get	set	
+IsDone = nil 
+--*
+--[Comment]
+-- property: SelectWeightData SkillInfo.WeightData	get	set	
+WeightData = nil 
+--*
+--[Comment]
+-- property: Single SkillInfo.CDTime	get	set	
+CDTime = nil 
+--*
+--[Comment]
+-- property: Int32 SkillInfo.CDGroup	get	set	
+CDGroup = nil 
+--*
+--[Comment]
+-- property: Single SkillInfo.IntervalTime	get	set	
+IntervalTime = nil 
+--*
+--[Comment]
+-- property: Int32 SkillInfo.ReleaseTime	get	set	
+ReleaseTime = nil 
+--*
+--[Comment]
+-- property: String SkillInfo.Icon	get	set	
+Icon = nil 
+--*
+--[Comment]
+-- property: String SkillInfo.SkillName	get	set	
+SkillName = nil 
+--*
+--[Comment]
+-- property: TriggerLevel1 SkillInfo.TriggerLevel1	get	set	
+TriggerLevel1 = nil 
+--*
+--[Comment]
+-- property: TriggerLevel2 SkillInfo.TriggerLevel2	get	set	
+TriggerLevel2 = nil 
+--*
+--[Comment]
+-- property: Single SkillInfo.TriggerProbability	get	set	
+TriggerProbability = nil 
+--*
+--[Comment]
+-- property: Single SkillInfo.HpScopeMin	get	set	
+HpScopeMin = nil 
+--*
+--[Comment]
+-- property: Single SkillInfo.HpScopeMax	get	set	
+HpScopeMax = nil 
+--*
+--[Comment]
+-- property: Single SkillInfo.TickTime	get	set	
+TickTime = nil 
+--*
+--[Comment]
+-- property: Int32 SkillInfo.DemageChangeType	get	set	
+DemageChangeType = nil 
+--*
+--[Comment]
+-- property: Single SkillInfo.DemageChangeProbability	get	set	
+DemageChangeProbability = nil 
+--*
+--[Comment]
+-- property: DemageAdditionOrReductionTargetType SkillInfo.DemageChangeTargetType	get	set	
+DemageChangeTargetType = nil 
+--*
+--[Comment]
+-- property: Single SkillInfo.DemageChange	get	set	
+DemageChange = nil 
+--*
+--[Comment]
+-- property: VOBase SkillInfo.ChangeData	get	set	
+ChangeData = nil 
+--*
+--[Comment]
+-- property: VOBase SkillInfo.ChangedData	get	set	
+ChangedData = nil 
+--*
+--[Comment]
+-- property: String SkillInfo.Description	get	set	
+Description = nil 
+--*
+--[Comment]
+-- property: Int32 SkillInfo.Num	get	set	
+Num = nil 
+--*
+--[Comment]
+-- property: Int64 SkillInfo.AddtionId	get	set	
+AddtionId = nil 
+--*
+--[Comment]
+-- property: DisplayOwner SkillInfo.ReleaseMember	get	set	
+ReleaseMember = nil 
+--*
+----Void SkillInfo:AddSubFormulaItem(IFormulaItem formulaItem)
+function AddSubFormulaItem() end 
+
+----List`1 SkillInfo:GetSubFormulaList(FormulaParamsPacker paramsPacker)
+function GetSubFormulaList() end 
+
+AbilityBase = {} 
+--*
+--[Comment]
+--consturctor for AbilityBase overrides:
+--*
+--AbilityBase.New()
+--*
+
+function AbilityBase.New() end
+--*
+--[Comment]
+-- property: Int32 AbilityBase.Num	get	set	
+Num = nil 
+--*
+--[Comment]
+-- property: Int64 AbilityBase.AddtionId	get	set	
+AddtionId = nil 
+--*
+--[Comment]
+-- property: DisplayOwner AbilityBase.ReleaseMember	get	set	
+ReleaseMember = nil 
+--*
+----Void AbilityBase:AddActionFormulaItem(IFormulaItem formulaItem)
+function AddActionFormulaItem() end 
+
+----Void AbilityBase:AddAttachFormulaItem(IFormulaItem formulaItem)
+function AddAttachFormulaItem() end 
+
+----Void AbilityBase:AddDetachFormulaItem(IFormulaItem formulaItem)
+function AddDetachFormulaItem() end 
+
+----IFormulaItem AbilityBase:GetActionFormulaItem()
+function GetActionFormulaItem() end 
+
+----IFormulaItem AbilityBase:GetAttachFormulaItem()
+function GetAttachFormulaItem() end 
+
+----IFormulaItem AbilityBase:GetDetachFormulaItem()
+function GetDetachFormulaItem() end 
+
+----IFormula AbilityBase:GetAttachFormula(FormulaParamsPacker paramsPacker)
+function GetAttachFormula() end 
+
+----IFormula AbilityBase:GetDetachFormula(FormulaParamsPacker paramsPacker)
+function GetDetachFormula() end 
+
+----IFormula AbilityBase:GetActionFormula(FormulaParamsPacker paramsPacker)
+function GetActionFormula() end 
+
+----Void AbilityBase:ReplaceData(Int32 level)
+function ReplaceData() end 
+
+FightDataStatistical = {} 
+--*
+--[Comment]
+--consturctor for FightDataStatistical overrides:
+--*
+--FightDataStatistical.New()
+--*
+
+function FightDataStatistical.New() end
+--*
+--[Comment]
+-- property: FightDataStatistical FightDataStatistical.Single	get	
+Single = nil 
+--*
+----Void FightDataStatistical:AddCostData(ArmyTypeData data)
+function AddCostData() end 
+
+----Void FightDataStatistical:DelCostData(ArmyTypeData data)
+function DelCostData() end 
+
+----Int32 FightDataStatistical:GetCostData(Int32 camp,Int32 armyId,Int32 armyType,Int32 generalType,Int32 isAntiAir,Int32 isAntiSurface,Int32 isAntiHide,Int32 isAntiGroup,Int32 isHide,Int32 isGroup)
+function GetCostData() end 
+
+----Void FightDataStatistical:AddHealthChange(String key,Single changeValue,Int32 camp,DemageOrCure changeType,DemageType demageType,AttackOrBeAttach attackOrBeAttach)
+function AddHealthChange() end 
+
+----Single FightDataStatistical:GetHealthChange(String key,Int32 camp,DemageOrCure changeType,DemageType demageType,AttackOrBeAttach attackOrBeAttach)
+function GetHealthChange() end 
+
+----Void FightDataStatistical:AddKillCount(String key,Int32 killCount,Int32 camp)
+function AddKillCount() end 
+
+----Int32 FightDataStatistical:GetKillCount(String key,Int32 camp)
+function GetKillCount() end 
+
+----Void FightDataStatistical:AddBeKillCount(String key,Int32 killCount,Int32 camp,Int32 armyType,Int32 generalType)
+function AddBeKillCount() end 
+
+----Int32 FightDataStatistical:GetBeKillCount(String key,Int32 camp,Int32 armyType,Int32 generalType)
+function GetBeKillCount() end 
+
+----Void FightDataStatistical:AddSkillCount(String key,Int32 skillCount,Int32 camp)
+function AddSkillCount() end 
+
+----Int32 FightDataStatistical:GetSkillCount(String key,Int32 camp)
+function GetSkillCount() end 
+
+----Single FightDataStatistical:GetCampHealthChange(Int32 camp,DemageOrCure demageOrCure,AttackOrBeAttach attackOrBeAttach)
+function GetCampHealthChange() end 
+
+----Single FightDataStatistical:GetAllHealthChange(DemageOrCure demageOrCure,AttackOrBeAttach attackOrBeAttach)
+function GetAllHealthChange() end 
+
+----Void FightDataStatistical:AddMemberCount(Int32 camp,Int32 count,Int32 armyType,Int32 generalType)
+function AddMemberCount() end 
+
+----Int32 FightDataStatistical:GetMemberCount(Int32 camp,Int32 armyType,Int32 generalType)
+function GetMemberCount() end 
+
+----Void FightDataStatistical:SetFloat(String key,Single value)
+function SetFloat() end 
+
+----Single FightDataStatistical:GetFloat(String key)
+function GetFloat() end 
+
+----Void FightDataStatistical:AddInt(String key,Int32 value)
+function AddInt() end 
+
+----Int32 FightDataStatistical:GetInt(String key)
+function GetInt() end 
+
+----Void FightDataStatistical:Clear()
+function Clear() end 
+
 ChatBubbleAni = {} 
 --*
 --[Comment]
@@ -16652,6 +17236,51 @@ function WordFilter.AddStirngToFilters() end
 ----String WordFilter.filter(String content,String& result_str,Int32 filter_deep,Boolean check_only,Boolean bTrim,String replace_str)
 function WordFilter.filter() end 
 
+ShadowObj = {} 
+--*
+--[Comment]
+--consturctor for ShadowObj overrides:
+--*
+--ShadowObj.New()
+--*
+
+function ShadowObj.New() end
+--*
+--[Comment]
+-- property: Boolean ShadowObj.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean ShadowObj.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean ShadowObj.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform ShadowObj.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject ShadowObj.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String ShadowObj.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String ShadowObj.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags ShadowObj.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void ShadowObj.ObjAddShadow(Transform tran)
+function ShadowObj.ObjAddShadow() end 
+
 SceneManager = {} 
 --*
 --[Comment]
@@ -16737,3 +17366,327 @@ Single = nil;
 
 Additive = nil;
 
+PlayerPrefs = {} 
+--*
+--[Comment]
+--consturctor for PlayerPrefs overrides:
+--*
+--PlayerPrefs.New()
+--*
+
+function PlayerPrefs.New() end
+--*
+----Void PlayerPrefs.SetInt(String key,Int32 value)
+function PlayerPrefs.SetInt() end 
+
+----Int32 PlayerPrefs.GetInt(String key,Int32 defaultValue)
+--Int32 PlayerPrefs.GetInt(String key)
+function PlayerPrefs.GetInt() end 
+
+----Void PlayerPrefs.SetFloat(String key,Single value)
+function PlayerPrefs.SetFloat() end 
+
+----Single PlayerPrefs.GetFloat(String key,Single defaultValue)
+--Single PlayerPrefs.GetFloat(String key)
+function PlayerPrefs.GetFloat() end 
+
+----Void PlayerPrefs.SetString(String key,String value)
+function PlayerPrefs.SetString() end 
+
+----String PlayerPrefs.GetString(String key,String defaultValue)
+--String PlayerPrefs.GetString(String key)
+function PlayerPrefs.GetString() end 
+
+----Boolean PlayerPrefs.HasKey(String key)
+function PlayerPrefs.HasKey() end 
+
+----Void PlayerPrefs.DeleteKey(String key)
+function PlayerPrefs.DeleteKey() end 
+
+----Void PlayerPrefs.DeleteAll()
+function PlayerPrefs.DeleteAll() end 
+
+----Void PlayerPrefs.Save()
+function PlayerPrefs.Save() end 
+
+SystemInfo = {} 
+--*
+--[Comment]
+--consturctor for SystemInfo overrides:
+--*
+--SystemInfo.New()
+--*
+
+function SystemInfo.New() end
+--*
+--[Comment]
+-- property: String SystemInfo.operatingSystem	get	
+--Operating system name with version (Read Only).
+operatingSystem = nil 
+--*
+--[Comment]
+-- property: String SystemInfo.processorType	get	
+--Processor name (Read Only).
+processorType = nil 
+--*
+--[Comment]
+-- property: Int32 SystemInfo.processorFrequency	get	
+--Processor frequency in MHz (Read Only).
+processorFrequency = nil 
+--*
+--[Comment]
+-- property: Int32 SystemInfo.processorCount	get	
+--Number of processors present (Read Only).
+processorCount = nil 
+--*
+--[Comment]
+-- property: Int32 SystemInfo.systemMemorySize	get	
+--Amount of system memory present (Read Only).
+systemMemorySize = nil 
+--*
+--[Comment]
+-- property: Int32 SystemInfo.graphicsMemorySize	get	
+--Amount of video memory present (Read Only).
+graphicsMemorySize = nil 
+--*
+--[Comment]
+-- property: String SystemInfo.graphicsDeviceName	get	
+--The name of the graphics device (Read Only).
+graphicsDeviceName = nil 
+--*
+--[Comment]
+-- property: String SystemInfo.graphicsDeviceVendor	get	
+--The vendor of the graphics device (Read Only).
+graphicsDeviceVendor = nil 
+--*
+--[Comment]
+-- property: Int32 SystemInfo.graphicsDeviceID	get	
+--The identifier code of the graphics device (Read Only).
+graphicsDeviceID = nil 
+--*
+--[Comment]
+-- property: Int32 SystemInfo.graphicsDeviceVendorID	get	
+--The identifier code of the graphics device vendor (Read Only).
+graphicsDeviceVendorID = nil 
+--*
+--[Comment]
+-- property: GraphicsDeviceType SystemInfo.graphicsDeviceType	get	
+--The graphics API type used by the graphics device (Read Only).
+graphicsDeviceType = nil 
+--*
+--[Comment]
+-- property: String SystemInfo.graphicsDeviceVersion	get	
+--The graphics API type and driver version used by the graphics device (Read Only).
+graphicsDeviceVersion = nil 
+--*
+--[Comment]
+-- property: Int32 SystemInfo.graphicsShaderLevel	get	
+--Graphics device shader capability level (Read Only).
+graphicsShaderLevel = nil 
+--*
+--[Comment]
+-- property: Boolean SystemInfo.graphicsMultiThreaded	get	
+--Is graphics device using multi-threaded rendering (Read Only)?
+graphicsMultiThreaded = nil 
+--*
+--[Comment]
+-- property: Boolean SystemInfo.supportsShadows	get	
+--Are built-in shadows supported? (Read Only)
+supportsShadows = nil 
+--*
+--[Comment]
+-- property: Boolean SystemInfo.supportsRawShadowDepthSampling	get	
+--Is sampling raw depth from shadowmaps supported? (Read Only)
+supportsRawShadowDepthSampling = nil 
+--*
+--[Comment]
+-- property: Boolean SystemInfo.supportsRenderTextures	get	
+--Are render textures supported? (Read Only)
+supportsRenderTextures = nil 
+--*
+--[Comment]
+-- property: Boolean SystemInfo.supportsMotionVectors	get	
+--Are motion vectors supported.
+supportsMotionVectors = nil 
+--*
+--[Comment]
+-- property: Boolean SystemInfo.supportsRenderToCubemap	get	
+--Are cubemap render textures supported? (Read Only)
+supportsRenderToCubemap = nil 
+--*
+--[Comment]
+-- property: Boolean SystemInfo.supportsImageEffects	get	
+--Are image effects supported? (Read Only)
+supportsImageEffects = nil 
+--*
+--[Comment]
+-- property: Boolean SystemInfo.supports3DTextures	get	
+--Are 3D (volume) textures supported? (Read Only)
+supports3DTextures = nil 
+--*
+--[Comment]
+-- property: Boolean SystemInfo.supports2DArrayTextures	get	
+--Are 2D Array textures supported? (Read Only)
+supports2DArrayTextures = nil 
+--*
+--[Comment]
+-- property: CopyTextureSupport SystemInfo.copyTextureSupport	get	
+--Support for various Graphics.CopyTexture cases (Read Only).
+copyTextureSupport = nil 
+--*
+--[Comment]
+-- property: Boolean SystemInfo.supportsComputeShaders	get	
+--Are compute shaders supported? (Read Only)
+supportsComputeShaders = nil 
+--*
+--[Comment]
+-- property: Boolean SystemInfo.supportsInstancing	get	
+--Is GPU draw call instancing supported? (Read Only)
+supportsInstancing = nil 
+--*
+--[Comment]
+-- property: Boolean SystemInfo.supportsSparseTextures	get	
+--Are sparse textures supported? (Read Only)
+supportsSparseTextures = nil 
+--*
+--[Comment]
+-- property: Int32 SystemInfo.supportedRenderTargetCount	get	
+--How many simultaneous render targets (MRTs) are supported? (Read Only)
+supportedRenderTargetCount = nil 
+--*
+--[Comment]
+-- property: Int32 SystemInfo.supportsStencil	get	
+--Is the stencil buffer supported? (Read Only)
+supportsStencil = nil 
+--*
+--[Comment]
+-- property: NPOTSupport SystemInfo.npotSupport	get	
+--What NPOT (non-power of two size) texture support does the GPU provide? (Read Only)
+npotSupport = nil 
+--*
+--[Comment]
+-- property: String SystemInfo.deviceUniqueIdentifier	get	
+--A unique device identifier. It is guaranteed to be unique for every device (Read Only).
+deviceUniqueIdentifier = nil 
+--*
+--[Comment]
+-- property: String SystemInfo.deviceName	get	
+--The user defined name of the device (Read Only).
+deviceName = nil 
+--*
+--[Comment]
+-- property: String SystemInfo.deviceModel	get	
+--The model of the device (Read Only).
+deviceModel = nil 
+--*
+--[Comment]
+-- property: Boolean SystemInfo.supportsAccelerometer	get	
+--Is an accelerometer available on the device?
+supportsAccelerometer = nil 
+--*
+--[Comment]
+-- property: Boolean SystemInfo.supportsGyroscope	get	
+--Is a gyroscope available on the device?
+supportsGyroscope = nil 
+--*
+--[Comment]
+-- property: Boolean SystemInfo.supportsLocationService	get	
+--Is the device capable of reporting its location?
+supportsLocationService = nil 
+--*
+--[Comment]
+-- property: Boolean SystemInfo.supportsVibration	get	
+--Is the device capable of providing the user haptic feedback by vibration?
+supportsVibration = nil 
+--*
+--[Comment]
+-- property: Boolean SystemInfo.supportsAudio	get	
+--Is there an Audio device available for playback?
+supportsAudio = nil 
+--*
+--[Comment]
+-- property: DeviceType SystemInfo.deviceType	get	
+--Returns the kind of device the application is running on (Read Only).
+deviceType = nil 
+--*
+--[Comment]
+-- property: Int32 SystemInfo.maxTextureSize	get	
+--Maximum texture size (Read Only).
+maxTextureSize = nil 
+--*
+----Boolean SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat format)
+function SystemInfo.SupportsRenderTextureFormat() end 
+
+----Boolean SystemInfo.SupportsTextureFormat(TextureFormat format)
+function SystemInfo.SupportsTextureFormat() end 
+
+CameraController = {} 
+--*
+--[Comment]
+--consturctor for CameraController overrides:
+--*
+--CameraController.New()
+--*
+
+function CameraController.New() end
+--*
+--[Comment]
+-- property: Boolean CameraController.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean CameraController.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean CameraController.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform CameraController.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject CameraController.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String CameraController.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String CameraController.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags CameraController.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void CameraController:Add_OnCameraToggle2Static_EventListener(Action OnCameraToggle2Static)
+function Add_OnCameraToggle2Static_EventListener() end 
+
+----Void CameraController:Add_OnCameraToggle2Moving_EventListener(Action OnCameraToggle2Moving)
+function Add_OnCameraToggle2Moving_EventListener() end 
+
+----Void CameraController:Remove_OnCameraToggle2Static_EventListener(Action OnCameraToggle2Static)
+function Remove_OnCameraToggle2Static_EventListener() end 
+
+----Void CameraController:Remove_OnCameraToggle2Moving_EventListener(Action OnCameraToggle2Moving)
+function Remove_OnCameraToggle2Moving_EventListener() end 
+
+----Void CameraController:HandleOnWNDShowFinish(String wnd_base_id)
+function HandleOnWNDShowFinish() end 
+
+----Void CameraController:HandleOnWNDHide(String wnd_base_id)
+function HandleOnWNDHide() end 
+
+FightParameter = {} 
+--*
+--[Comment]
+--consturctor for FightParameter overrides:
+--*
+--FightParameter.New()
+--*
+
+function FightParameter.New() end
+--*

@@ -38,25 +38,41 @@ public class TriggerRunner : MonoBehaviour
                 // 统计受到的治疗量
                 FightDataStatistical.Single.AddHealthChange("" + alldata.MemberData.ObjID.ID, trigger.HealthChangeValue,
                     alldata.MemberData.Camp, DemageOrCure.Cure, trigger.DemageType);
+
                 // 统计产生的治疗量
                 FightDataStatistical.Single.AddHealthChange(
                     "" + trigger.ReleaseMember.ClusterData.AllData.MemberData.ObjID.ID, trigger.HealthChangeValue,
                     trigger.ReleaseMember.ClusterData.AllData.MemberData.Camp, DemageOrCure.Cure, trigger.DemageType,
                     AttackOrBeAttach.Attack);
+
+                // 抛出治疗事件给外层
+                FightManager.Single.DoHealthChangeAction(trigger.ReleaseMember.GameObj, alldata.MemberData.TotalHp,
+                    alldata.MemberData.CurrentHP, trigger.HealthChangeValue, FightManager.HurtType.Cure,
+                    alldata.MemberData.ObjID.ObjType);
+
             }
             // 伤害结算
             if (type1 == TriggerLevel1.Fight && type2 == TriggerLevel2.BeAttack)
             {
                 //Debug.Log("结算生命值:" + trigger.HealthChangeValue);
                 alldata.MemberData.SetCurrentHP(alldata.MemberData.CurrentHP - trigger.HealthChangeValue);
+
                 // 统计受到的伤害量
                 FightDataStatistical.Single.AddHealthChange("" + alldata.MemberData.ObjID.ID, trigger.HealthChangeValue,
                     alldata.MemberData.Camp, DemageOrCure.Demage, trigger.DemageType);
+
                 // 统计产生的伤害量
                 FightDataStatistical.Single.AddHealthChange(
                     "" + trigger.ReleaseMember.ClusterData.AllData.MemberData.ObjID.ID, trigger.HealthChangeValue,
                     trigger.ReleaseMember.ClusterData.AllData.MemberData.Camp, DemageOrCure.Demage, trigger.DemageType,
                     AttackOrBeAttach.Attack);
+
+                // 转换伤害类型
+                var hurtType = FightManager.GetDemageHurtType(trigger);
+                // 抛出伤害事件给外层
+                FightManager.Single.DoHealthChangeAction(trigger.ReleaseMember.GameObj, alldata.MemberData.TotalHp,
+                    alldata.MemberData.CurrentHP, trigger.HealthChangeValue, hurtType,
+                    alldata.MemberData.ObjID.ObjType);
                 if (alldata.MemberData.CurrentHP < Utils.ApproachZero)
                 {
                     alldata.MemberData.SetCurrentHP(0);
@@ -97,6 +113,39 @@ public class TriggerRunner : MonoBehaviour
                         TypeLevel2 = TriggerLevel2.Absorption
                     });
                 }
+                // 抛出伤害事件
+                if (trigger.HealthChangeValue > 0)
+                {
+                    tmpList.Add(new TriggerData()
+                    {
+                        HealthChangeValue = trigger.HealthChangeValue,
+                        ReceiveMember = trigger.ReceiveMember,
+                        ReleaseMember = trigger.ReleaseMember,
+                        TypeLevel1 = TriggerLevel1.Fight,
+                        TypeLevel2 = TriggerLevel2.BeHurt
+                    });
+                    // 伤害类型
+                    var attackType = TriggerLevel2.BeNormalAttackHurt;
+                    switch (trigger.DemageType)
+                    {
+                            // 普通伤害
+                        case DemageType.NormalAttackDemage:
+                            attackType = TriggerLevel2.BeNormalAttackHurt;
+                            break;
+                            // 技能伤害
+                        case DemageType.SkillAttackDemage:
+                            attackType = TriggerLevel2.BeSkillHurt;
+                            break;
+                    }
+                    tmpList.Add(new TriggerData()
+                    {
+                        HealthChangeValue = trigger.HealthChangeValue,
+                        ReceiveMember = trigger.ReceiveMember,
+                        ReleaseMember = trigger.ReleaseMember,
+                        TypeLevel1 = TriggerLevel1.Fight,
+                        TypeLevel2 = attackType
+                    });
+                }
                 isChange = true;
             }
 
@@ -132,14 +181,6 @@ public class TriggerRunner : MonoBehaviour
         var allData = display.ClusterData.AllData;
         if (allData.MemberData != null)
         {
-            // 抛出None事件用于持续技能执行
-            //SkillManager.Single.SetTriggerData(new TriggerData()
-            //{
-            //    ReceiveMember = display,
-            //    ReleaseMember = display,
-            //    TypeLevel1 = TriggerLevel1.None,
-            //    TypeLevel2 = TriggerLevel2.None
-            //});
             // 触发当前单位的所有事件
             SkillManager.Single.SetEachAction(allData.MemberData.ObjID, (type1, type2, trigger) =>
             {

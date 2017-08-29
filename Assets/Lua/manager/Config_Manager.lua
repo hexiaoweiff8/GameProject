@@ -108,6 +108,14 @@ function Config_Manager:LoadConfig()
     --任务表
     sdata_dailymission_data = luacsv.new(require("pk_tabs/dailymission_c"))
 
+
+    sdata_unittacticdata_data = luacsv.new(require("pk_tabs/unittacticdata_c"))
+    sdata_tactictype_data = luacsv.new(require("pk_tabs/tactictype_c"))
+    sdata_essentialfilter_data = luacsv.new(require("pk_tabs/essentialfilter_c"))
+    sdata_excludefilter_data = luacsv.new(require("pk_tabs/excludefilter_c"))
+    sdata_combofilter_data = luacsv.new(require("pk_tabs/combofilter_c"))
+
+
     -----------------------------------C#需要调用的配置表在以下位置添加---------------------------------------
     SDataUtils.setData("mapData", sdata_mapData_data.mData.head, sdata_mapData_data.mData.body)
     SDataUtils.setData("constant", sdata_constant_data.mData.head, sdata_constant_data.mData.body)

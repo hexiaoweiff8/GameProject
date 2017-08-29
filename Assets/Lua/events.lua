@@ -65,7 +65,7 @@ function Event.Brocast(event,...)
 		elseif ... == 10033 then error("errno: " .. ... .. " 该商店不存在")
 		elseif ... == 10034 then error("errno: " .. ... .. " 刷新商店次数已达上限")
 		elseif ... == 15001 then error("errno: " .. ... .. " 此账号在其他地方登陆")	
-		else error("errno: " .. ... .. " have no event")
+		-- else error("errno: " .. ... .. " have no event")
 		end
 	else
 		events[event]:fire(...)

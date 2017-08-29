@@ -3,4 +3,26 @@ Action
 {
 }
 [
+0,1,2,3,4,5,6,7,8,9,true
+BuffTime({%3})
+TickTime({%3})
+BuffType({%3})
+TriggerLevel1({%3})
+TriggerLevel2({%3})
+TriggerProbability({%3})
+DetachTriggerLevel1({%3})
+DetachTriggerLevel2({%3})
+BuffLevel({%3})
+BuffGroup({%3})
+IsBeneficial({%10})
+DemageChange({%3},{%3},{%3},{%3})
+IsDeadDisappear({%10})
+IsNotLethal({%10})
+IsCouldNotClear({%10})
+Description(≤‚ ‘{%0},Test{%10})
+Icon({%10})
+HpScopeMax({%3})
+HpScopeMin({%3})
+DetachHpScopeMax({%3})
+DetachHpScopeMin({%3})
 ]

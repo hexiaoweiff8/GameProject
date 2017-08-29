@@ -3,22 +3,9 @@
 ]]
 
 local class = require("common/middleclass")
-skillUtil = class("skillUtil")
+local skillList = {}
 
---[[
-    根据卡牌的信息获取技能ID
-    cardId  卡牌id
-    cardLv  卡牌等级
-    index   开牌技能的index（卡牌的第几个技能或者卡牌星级）
-]]
-function skillUtil:getSkillIDByCard( cardId, cardLv, index )
-    -- body
-    if index > 5 then 
-        return
-    end 
-    local uid = tonumber(string.format("%d%.3d", cardId, cardLv))--通过卡牌id和卡牌等级联合获取
-    return sdata_armybase_data:GetFieldV("Skill"..index, uid)
-end
+skillUtil = class("skillUtil")
 
 --[[
     获取技能升至该等级所需技能点
@@ -29,40 +16,33 @@ function skillUtil:getUpSkillNeedPoints(skillLv)
 end
 
 --[[
-    通过卡牌星级获取该星级解锁技能名称
-    cardId  卡牌id
-    cardLv  卡牌等级
-    starLv  卡牌星级
-]]
-function skillUtil:getSkillNameByCard(cardId,cardLv,starLv)
-    if starLv > 5 then 
-        return
-    end 
-    --通过卡牌id和卡牌等级联合获取
-    local uid = tonumber(string.format("%d%.3d",cardId,cardLv))
-    local skillid = sdata_armybase_data:GetFieldV("Skill"..starLv, uid)
-    return sdata_skill_data:GetFieldV("Name",tonumber(skillid))
-end
---[[
     通过技能ID获取名称
-    skillid     技能ID
+    skillId     技能ID
 ]]
-function skillUtil:getskillNameByID(skillid)
-    return sdata_skill_data:GetFieldV("Name",skillid)
+function skillUtil:getSkillName(skillId)
+    if not skillList[skillId] then
+        skillList[skillId] = SkillManager.Single:CreateSkillInfo(skillId,1)
+    end
+    return skillList[skillId].SkillName
 end
 --[[
     通过技能ID获取技能Icon
-    skillid     技能ID
+    skillId     技能ID
 ]]
-function skillUtil:getskillIconByID(skillid)
-    return sdata_skill_data:GetFieldV("SkillIcon",skillid)
+function skillUtil:getSkillIcon(skillId)
+    if not skillList[skillId] then
+        skillList[skillId] = SkillManager.Single:CreateSkillInfo(skillId,1)
+    end
+    return skillList[skillId].Icon
 end
 --[[
     通过技能ID获取技能详细描述
-    skillid     技能ID
+    skillId     技能ID
+    skillLV     技能等级
 ]]
-function skillUtil:getskillDesByID(skillid)
-    return sdata_skill_data:GetFieldV("Des",skillid)
+function skillUtil:getSkillDescription(skillId,skillLv)
+    skillList[skillId] = SkillManager.Single:CreateSkillInfo(skillId,skillLv)
+    return skillList[skillId].Description
 end
 
 return skillUtil

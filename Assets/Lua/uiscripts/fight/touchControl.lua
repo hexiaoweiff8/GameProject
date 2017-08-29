@@ -14,7 +14,7 @@ function TouchControl:getTouchPoint(Index)
 
     if touchTbl[Index] == -1 then
         return Input.mousePosition
-    elseif touchTbl[Index] > 0 then
+    elseif touchTbl[Index] >= 0 then
         return Input.GetTouch(touchTbl[Index]).position
     else
         return nil
@@ -22,11 +22,14 @@ function TouchControl:getTouchPoint(Index)
 end
 function TouchControl:removeTouch(Index)
     if touchTbl[Index] then
-        touchTbl[Index] = 0
+        touchTbl[Index] = nil
     end
 end
 function TouchControl:getTouchTbl()
     return touchTbl
 end
-
+function TouchControl:OnDestroyDone()
+    touchTbl = {}
+    TouchControl = nil
+end
 return TouchControl

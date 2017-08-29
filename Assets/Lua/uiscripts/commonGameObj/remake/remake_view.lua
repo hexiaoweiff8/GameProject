@@ -5,7 +5,7 @@
 local remake_view = {}
 function remake_view:init(parent)
     ---初始化控件
-    self.RemakePanel = GameObjectExtension.InstantiateFromPacket("commonU", "RemakePanel", parent).gameObject
+    self.RemakePanel = GameObjectExtension.InstantiateFromPacket("commonu", "RemakePanel", parent).gameObject
     self.btn_back = self.RemakePanel.transform:Find("Btn_backSp").gameObject
     self.maskPanel = self.RemakePanel.transform:Find("MaskPanel").gameObject
     self.Btn_RemakeAndExchange = self.RemakePanel.transform:Find("Btn_RemakeAndExchange").gameObject

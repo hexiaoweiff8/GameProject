@@ -84,14 +84,14 @@ public class PointToObjFormulaItem : AbstractFormulaItem
             throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
         }
         // 是否等待完成,特效Key,速度,飞行轨迹
-        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        var effectKey = GetDataOrReplace<string>("EffectKey", array, 1, ReplaceDic);
-        var speed = GetDataOrReplace<float>("Speed", array, 2, ReplaceDic);
-        var flyType = GetDataOrReplace<TrajectoryAlgorithmType>("FlyType", array, 3, ReplaceDic);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        var effectKey = GetDataOrReplace<string>("EffectKey", array, 1);
+        var speed = GetDataOrReplace<float>("Speed", array, 2);
+        var flyType = GetDataOrReplace<TrajectoryAlgorithmType>("FlyType", array, 3);
 
-        var scaleX = GetDataOrReplace<float>("ScaleX", array, 4, ReplaceDic);
-        var scaleY = GetDataOrReplace<float>("ScaleY", array, 5, ReplaceDic);
-        var scaleZ = GetDataOrReplace<float>("ScaleZ", array, 6, ReplaceDic);
+        var scaleX = GetDataOrReplace<float>("ScaleX", array, 4);
+        var scaleY = GetDataOrReplace<float>("ScaleY", array, 5);
+        var scaleZ = GetDataOrReplace<float>("ScaleZ", array, 6);
 
 
         FormulaType = formulaType;

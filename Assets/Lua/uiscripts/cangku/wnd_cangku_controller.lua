@@ -39,6 +39,8 @@ function wnd_cangku_controller:OnShowDone()
 
     instance = self
 
+    printf("cangku view "..tostring(this.view))
+
 	this.view:initView(self)
 	-- this.model:initModel()
 	this.scrollViewController:init(self)
@@ -55,10 +57,20 @@ function wnd_cangku_controller:OnShowDone()
 	this.view.MessageBox.mBox_decomposition_detail_tips.panel:SetActive(false)
 	this.view.MessageBox.mBox_chestBox.panel:SetActive(false)
 	this.view.MessageBox.panel:SetActive(true)
-	-- local tween = this.view.MessageBox.mBox.panel.transform:DOPunchScale(Vector3(1.5, 1.5, 0), 1, 1, 1)
 
 	-- 默认选中第一个按钮
 	this:SelectYekaButton(this.view.Panel_Tab.TabButtons[1])
+end
+function wnd_cangku_controller:OnDestroyDone()
+	printw("Cangku OnDestroyDone")
+	Memory.free("uiscripts/cangku/wnd_cangku_view")
+	Memory.free("uiscripts/cangku/scrollview/wnd_cangku_ScrollView_controller")
+	Memory.free("uiscripts/commonGameObj/equipDetail/equipDetail_controller")
+	Memory.free("uiscripts/cangku/wnd_cangku_controller")
+
+	this._selectedYekaButton = nil
+	this.mAtlas = nil
+	this._currentPanel_right = nil
 end
 ----------------------------------------------------------------
 --★Init
@@ -563,7 +575,7 @@ end
 function wnd_cangku_controller:showEquipmentDetailsPanel(equip,cangkuItem)
 	this:show(this.view.Panel_Detail_equipment)
 
-	local mDepth = GameObject.Find("ui_cangku"):GetComponent("UIPanel").depth
+	local mDepth = GameObject.Find("UIRoot/NormalRoot/ui_cangku_panel/ui_cangku"):GetComponent("UIPanel").depth
 
 	equipDetail:showEquip(equip,this.view.Panel_Detail_equipment.panel,mDepth + 1)
 	---------------------------------------------------------------

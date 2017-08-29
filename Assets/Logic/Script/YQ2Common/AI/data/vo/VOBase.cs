@@ -99,6 +99,11 @@ public class VOBase
     [SkillAddition]
     public float CritDamage;
     /// <summary>
+    /// 修正暴击伤害
+    /// </summary>
+    [SkillAddition]
+    public float FixCritDemage;
+    /// <summary>
     /// 子弹类型
     /// </summary>
     [SkillAddition]
@@ -129,6 +134,11 @@ public class VOBase
     [SkillAddition]
     public bool IsHide;
     /// <summary>
+    /// 是否嘲讽
+    /// </summary>
+    [SkillAddition]
+    public bool IsTaunt;
+    /// <summary>
     /// 是否为机械单位
     /// </summary>
     [SkillAddition]
@@ -143,12 +153,31 @@ public class VOBase
     /// </summary>
     [SkillAddition]
     public bool IsDambody;
-
     /// <summary>
     /// 是否为召唤生物
     /// </summary>
     [SkillAddition]
     public bool IsSummon;
+    /// <summary>
+    /// 是否可移动
+    /// </summary>
+    [SkillAddition]
+    public bool CouldMove = true;
+    /// <summary>
+    /// 是否可普通攻击
+    /// </summary>
+    [SkillAddition]
+    public bool CouldNormalAttack = true;
+    /// <summary>
+    /// 是否可释放技能
+    /// </summary>
+    [SkillAddition]
+    public bool CouldReleaseSkill = true;
+    /// <summary>
+    /// 是否抵抗Buff
+    /// </summary>
+    [SkillAddition]
+    public bool IsAntiBuff;
     /// <summary>
     /// 是否反隐形
     /// </summary>
@@ -201,7 +230,7 @@ public class VOBase
     /// </summary>
     public string ModelPack
     {
-        get { return _modelPack; }  
+        get { return _modelPack; }
         set { _modelPack = value; }
     }
     /// <summary>
@@ -281,6 +310,12 @@ public class VOBase
         get { return _crit; }
         set { _crit = value; }
     }
+    /// <summary>
+    /// 暴击修正(二重暴击)概率
+    /// </summary>
+    [SkillAddition]
+    public float FixCrit { get; set; }
+
     /// <summary>
     /// 防爆率
     /// </summary>
@@ -379,7 +414,19 @@ public class VOBase
     public float TotalHp
     {
         get { return _totalHP; }
-        set { _totalHP = value; }
+        set
+        {
+            if (value > _totalHP)
+            {
+                _currentHP += value - _totalHP;
+            }
+            if (value < _currentHP)
+            {
+                _currentHP = value;
+            }
+            _totalHP = value; 
+            
+        }
     }
     /// <summary>
     /// 当前实际血量[0,TotalHp]
@@ -480,7 +527,9 @@ public class VOBase
         Skill3 = data.Skill3;
         Skill4 = data.Skill4;
         Skill5 = data.Skill5;
-
+        ModelPack = data.Pack;
+        ModelName = data.Prefab;
+        ModelTexture = data.Texture;
     }
 
 

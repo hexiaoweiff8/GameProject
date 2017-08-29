@@ -5,10 +5,11 @@ local this = dailyMission_controller
 
 local view = require("uiscripts/dailyMission/dailyMission_view")
 local model = require("uiscripts/dailyMission/dailyMission_model")
+local mself
 
 function dailyMission_controller:OnShowDone()
     print("dailyMission_controller:OnShowDone")
-
+    mself = self
     view:InitView(self)
     model:InitModel()
     this:InitBtn()
@@ -20,7 +21,8 @@ end
 
 function dailyMission_controller:InitBtn()
     UIEventListener.Get(view.btn_close).onClick = function ()
-        print("每日关闭按钮")
+        --print("每日关闭按钮")
+        mself:Hide(0)
     end
 
     UIEventListener.Get(view.meirirenwu).onClick = function()
@@ -64,7 +66,7 @@ end
 --刷新战略任务Item
 function dailyMission_controller:RefershZhanlueItem()
     --删除Grid下面所有子物体
-    NGUITools.DestroyChildren(view.itemGrid.transform)
+        NGUITools.DestroyChildren(view.itemGrid.transform)
 
     if #model.zhanluerenwuDataList ~= 0 then
         for i = 1, #model.zhanluerenwuDataList do

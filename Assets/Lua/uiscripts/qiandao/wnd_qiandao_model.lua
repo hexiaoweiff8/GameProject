@@ -16,7 +16,6 @@ local this = wnd_qiandao_model
 function wnd_qiandao_model:initModel()
     this:initLocalCheckinData()
     this:initLocalRefeshTime()
-    this:getserv_qiandaoInfo()
 end
 
 
@@ -51,15 +50,6 @@ function wnd_qiandao_model:initLocalRefeshTime()
         end
     end
 end
-
-
-function wnd_qiandao_model:getserv_qiandaoInfo()
-    --this.serv_qiandaoInfo["isSigned"]= userModel:getUserRoleTbl().sign["isSigned"]
-    --this.serv_qiandaoInfo["days"]= userModel:getUserRoleTbl().sign["days"]
-    this.serv_qiandaoInfo["isSigned"]= 0
-    this.serv_qiandaoInfo["days"]= 2
-end
-
 
 function wnd_qiandao_model:getLocalRefeshTime()
     return this.LocalRefeshTime

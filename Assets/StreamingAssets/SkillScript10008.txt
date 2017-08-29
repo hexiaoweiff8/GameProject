@@ -1,0 +1,12 @@
+SkillNum(10008)
+	Action
+	{
+	    For(1,9)
+	    {
+                PointToObj(1,linePrfb.prefab,10,0,10,1,10)
+	    }
+	}
+
+[
+	CDTime(5)
+]

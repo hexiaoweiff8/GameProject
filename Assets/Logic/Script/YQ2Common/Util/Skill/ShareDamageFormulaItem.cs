@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 
 /// <summary>
 /// 分摊伤害
 /// </summary>
-class ShareDamageFormulaItem : AbstractFormulaItem
-    {
+internal class ShareDamageFormulaItem : AbstractFormulaItem
+{
     /// <summary>
     /// Buff状态
     /// 0: action
@@ -35,7 +34,6 @@ class ShareDamageFormulaItem : AbstractFormulaItem
     /// <param name="array">数据数组</param>
     /// 0>单元行为类型(0: 不等待完成, 1: 等待其执行完毕)
     /// 1>目标点
-
     public ShareDamageFormulaItem(string[] array)
     {
         if (array == null)
@@ -50,8 +48,8 @@ class ShareDamageFormulaItem : AbstractFormulaItem
         }
 
         // 如果该项值是以%开头的则作为替换数据
-        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        var buffstate = GetDataOrReplace<int>("BuffState", array, 1, ReplaceDic);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        var buffstate = GetDataOrReplace<int>("BuffState", array, 1);
 
         FormulaType = formulaType;
         BuffState = buffstate;
@@ -73,7 +71,7 @@ class ShareDamageFormulaItem : AbstractFormulaItem
     public override IFormula GetFormula(FormulaParamsPacker paramsPacker)
     {
 
-        Debug.Log("BuffState----" + BuffState);
+        //Debug.Log("BuffState----" + BuffState);
 
 
         if (paramsPacker == null)
@@ -101,14 +99,14 @@ class ShareDamageFormulaItem : AbstractFormulaItem
             callback();
         }, myFormulaType);
 
-       
+
 
         if (target == null || target.ClusterData == null)
         {
             Debug.Log("目标已经死亡");
             return result;
         }
-  
+
         if (BuffState == 0)
         {
 
@@ -122,44 +120,48 @@ class ShareDamageFormulaItem : AbstractFormulaItem
             {
                 return result;
             }
-            
+
             var Damage = myTrigger.HealthChangeValue;
             //计算平均数值
-            var AverageDamage = Damage / SkillDataBuffer.SkillDataCache["shareDamageMember"].Count;
+            var AverageDamage = Damage/SkillDataBuffer.SkillDataCache["shareDamageMember"].Count;
             Debug.Log("平均伤害数值" + AverageDamage);
 
 
             for (int i = 0; i < SkillDataBuffer.SkillDataCache["shareDamageMember"].Count; i++)
             {
-                if (SkillDataBuffer.SkillDataCache["shareDamageMember"][i] == null || SkillDataBuffer.SkillDataCache["shareDamageMember"][i].ClusterData == null)
-                {                  
+                if (SkillDataBuffer.SkillDataCache["shareDamageMember"][i] == null ||
+                    SkillDataBuffer.SkillDataCache["shareDamageMember"][i].ClusterData == null)
+                {
                     Debug.Log("目标已经死亡");
                     //删除该元素
-                    SkillDataBuffer.SkillDataCache["shareDamageMember"].Remove(SkillDataBuffer.SkillDataCache["shareDamageMember"][i]);
+                    SkillDataBuffer.SkillDataCache["shareDamageMember"].Remove(
+                        SkillDataBuffer.SkillDataCache["shareDamageMember"][i]);
                 }
             }
 
-                for (int i = 0; i < SkillDataBuffer.SkillDataCache["shareDamageMember"].Count; i++)
+            for (int i = 0; i < SkillDataBuffer.SkillDataCache["shareDamageMember"].Count; i++)
             {
-               // var shareMember = SkillDataBuffer.SkillDataCache["shareDamageMember"][i];
+                // var shareMember = SkillDataBuffer.SkillDataCache["shareDamageMember"][i];
 
-                if (target.ClusterData.AllData.MemberData.ObjID.ID == SkillDataBuffer.SkillDataCache["shareDamageMember"][i].ClusterData.AllData.MemberData.ObjID.ID)
+                if (target.ClusterData.AllData.MemberData.ObjID.ID ==
+                    SkillDataBuffer.SkillDataCache["shareDamageMember"][i].ClusterData.AllData.MemberData.ObjID.ID)
                 {
                     //如果是承伤发起者则修改自己受到的伤害数值
-                    myTrigger.HealthChangeValue -= (AverageDamage * (SkillDataBuffer.SkillDataCache["shareDamageMember"].Count - 1));
+                    myTrigger.HealthChangeValue -= (AverageDamage*
+                                                    (SkillDataBuffer.SkillDataCache["shareDamageMember"].Count - 1));
                     myTrigger.HealthChangeLevel = 1;
                 }
                 else
                 {
                     //如果是其他被承伤者则抛出伤害事件
                     SkillManager.Single.SetTriggerData(new TriggerData()
-                    {            
+                    {
                         HealthChangeValue = AverageDamage,
                         ReceiveMember = member,
                         ReleaseMember = SkillDataBuffer.SkillDataCache["shareDamageMember"][i],
                         HealthChangeLevel = 1,
                         TypeLevel1 = TriggerLevel1.Fight,
-                        TypeLevel2 = TriggerLevel2.BeAttack                      
+                        TypeLevel2 = TriggerLevel2.BeAttack
                     });
                 }
             }
@@ -172,7 +174,8 @@ class ShareDamageFormulaItem : AbstractFormulaItem
             {
                 var shareMember = SkillDataBuffer.SkillDataCache["shareDamageMember"][i];
                 //如果承伤成员列表中存在该单位则直接返回
-                if (target.ClusterData.AllData.MemberData.ObjID.ID == shareMember.ClusterData.AllData.MemberData.ObjID.ID)
+                if (target.ClusterData.AllData.MemberData.ObjID.ID ==
+                    shareMember.ClusterData.AllData.MemberData.ObjID.ID)
                 {
                     Debug.Log("Target has in list");
                     return result;
@@ -187,19 +190,20 @@ class ShareDamageFormulaItem : AbstractFormulaItem
             {
                 var shareMember = SkillDataBuffer.SkillDataCache["shareDamageMember"][i];
                 //如果找到了该单位则将其从列表中移出
-                if (target.ClusterData.AllData.MemberData.ObjID.ID == shareMember.ClusterData.AllData.MemberData.ObjID.ID)
+                if (target.ClusterData.AllData.MemberData.ObjID.ID ==
+                    shareMember.ClusterData.AllData.MemberData.ObjID.ID)
                 {
-                    SkillDataBuffer.SkillDataCache["shareDamageMember"].Remove(SkillDataBuffer.SkillDataCache["shareDamageMember"][i]);
+                    SkillDataBuffer.SkillDataCache["shareDamageMember"].Remove(
+                        SkillDataBuffer.SkillDataCache["shareDamageMember"][i]);
                     break;
                 }
             }
         }
         else
         {
-            Debug.Log("BuffState输入有误" );
+            Debug.Log("BuffState输入有误");
         }
         return result;
     }
 
 }
-

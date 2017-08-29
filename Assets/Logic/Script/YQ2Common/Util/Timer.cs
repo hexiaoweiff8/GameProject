@@ -26,7 +26,7 @@ namespace Util
         /// <summary>
         /// 执行循环时间
         /// </summary>
-        public float LoopTime { get; private set; }
+        public float LoopTime { get; set; }
 
         /// <summary>
         /// 超时时间

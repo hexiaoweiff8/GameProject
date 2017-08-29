@@ -1,9 +1,7 @@
 local class = require("common/middleclass")
-local equipDetail = class("equipDetail")
-require('uiscripts/shop/timeUtil/TimeUtil')
-local view = require("uiscripts/commonGameObj/equipDetail/equipDetail_view")
-local data = require("uiscripts/commonGameObj/equipDetail/equipDetail_model")
-local SuitProps = require("uiscripts/commonGameObj/suitProps")
+EquipDetail = class("EquipDetail")
+local VIEW = require("uiscripts/commonGameObj/equipDetail/equipDetail_view")
+local DATA = require("uiscripts/commonGameObj/equipDetail/equipDetail_model")
 
 ---
 ---构造函数
@@ -15,10 +13,10 @@ local SuitProps = require("uiscripts/commonGameObj/suitProps")
 local ON_RIGHT = 1
 local ON_LEFT = 0
 
-function equipDetail:initialize(model)
+function EquipDetail:initialize(model)
 
-    self.view = view()
-    self.data = data()
+    self.view = VIEW()
+    self.data = DATA()
     self.view:init()
     if model == ON_LEFT then
         self.view.btn_decomposition:SetActive(false)
@@ -47,7 +45,7 @@ function equipDetail:initialize(model)
     ---model不存在     仓库界面
     ---
     self.data.model = model
-    self.view.equipDetail:SetActive(false)
+    self.view.equipDetailUI:SetActive(false)
 end
 
 
@@ -59,18 +57,18 @@ end
 ---parent   父物体
 ---depth    设置显示层级
 ---
-function equipDetail:showEquip(equip, parent, depth)
+function EquipDetail:showEquip(equip, parent, depth)
     if not equip or not parent then
         return
     end
     ---
     ---设置设置父对象,初始化位置和显示层级
     ---
-    if not self.view.equipDetail.transform.parent or self.view.equipDetail.transform.parent.name ~= parent.name then
-        self.view.equipDetail.transform:SetParent(parent.transform)
-        self.view.equipDetail.transform.localPosition = Vector3(0, 0, 0)
-        self.view.equipDetail.transform.localScale = Vector3(1, 1, 1)
-        self.view.equipDetail:GetComponent("UIPanel").depth = depth
+    if not self.view.equipDetailUI.transform.parent or self.view.equipDetailUI.transform.parent.name ~= parent.name then
+        self.view.equipDetailUI.transform:SetParent(parent.transform)
+        self.view.equipDetailUI.transform.localPosition = Vector3(0, 0, 0)
+        self.view.equipDetailUI.transform.localScale = Vector3(1, 1, 1)
+        self.view.equipDetailUI:GetComponent("UIPanel").depth = depth
     end
     ---
     ---刷新要显示的数据
@@ -80,14 +78,14 @@ function equipDetail:showEquip(equip, parent, depth)
     ---
     ---显示装备信息界面
     ---
-    self.view.equipDetail:SetActive(true)
+    self.view.equipDetailUI:SetActive(true)
 end
 
 
 ---
 ---刷新
 ---
-function equipDetail:refresh(equipToShow)
+function EquipDetail:refresh(equipToShow)
     local _data = self.data
     local _EquipToShow = self.data.equipToShow
     if equipToShow then
@@ -187,7 +185,7 @@ end
 
 ---为升级按钮添加长按监听
 ---长按升级按钮显示下一等级信息
-function equipDetail:addListener()
+function EquipDetail:addListener()
     local timer
     UIEventListener.Get(self.view.btn_plus).onPress = function (btn_plus, isPress)
         if isPress then
@@ -212,14 +210,14 @@ end
 ---
 ---获取数据
 ---
-function equipDetail:get_Data()
+function EquipDetail:get_Data()
     return self.data
 end
 
 ---
 ---获取控件
 ---
-function equipDetail:get_View()
+function EquipDetail:get_View()
     return self.view
 end
 
@@ -227,21 +225,21 @@ end
 ---设置界面背景图片
 ---bgName   背景图片名称
 ---
-function equipDetail:setBg(bgName)
+function EquipDetail:setBg(bgName)
     self.view.bg:GetComponent("UISprite").spriteName = bgName
 end
 
 ---========================================================装备界面专用=====================================
 ---
 local _showRemakePanelFunc
-function equipDetail:setShowRemakePanelFunc(showRemakePanelFunc)
+function EquipDetail:setShowRemakePanelFunc(showRemakePanelFunc)
     _showRemakePanelFunc = showRemakePanelFunc
 end
 ---
 ---外部调用
 ---如果当前在装备界面为按钮添加监听
 ---
-function equipDetail:setListener()
+function EquipDetail:setListener()
     ---判断要显示的装备是否存在
     if not self.data.equipToShow then
         Debugger.LogWarning("要显示的装备不存在")
@@ -332,7 +330,7 @@ end
 ---
 ---为装备界面中的更换按钮添加监听
 ---
-function equipDetail:setListenerToBtnChange(func)
+function EquipDetail:setListenerToBtnChange(func)
     if func then
         if not self.view.btn_commander:GetComponent(typeof(UnityEngine.BoxCollider)) then
             local collider = self.view.btn_commander:AddComponent(typeof(UnityEngine.BoxCollider))
@@ -350,11 +348,17 @@ end
 ---
 ---获取当前显示的装备
 ---
-function equipDetail:getEquipToShow()
+function EquipDetail:getEquipToShow()
     if self.data.equipToShow then
         return self.data.equipToShow
     end
     return nil
 end
 
-return equipDetail
+
+function EquipDetail:Destroy()
+    self.view = nil
+    self.data = nil
+    self._suitProp = nil
+end
+return EquipDetail

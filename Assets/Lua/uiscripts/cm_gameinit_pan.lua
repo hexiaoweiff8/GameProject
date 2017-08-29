@@ -14,13 +14,11 @@ WNDTYPE = {
     Login = "ui_login",
     Healthadvice = "ui_healthadvice",
     Prefight = "ui_prefight",
-    ui_fight_before = "ui_fightU_before",
     ui_fight = "ui_fightU",
     ui_pause = "ui_pauseU",
     ui_quitGame = "ui_quitGame",
     quiteEnsure_ui = "ui_quiteensure",
     ui_equip = "ui_equip",
-    ui_equip2 = "ui_equip2",
     ui_chongzhu = "ui_chongzhu",
     ui_keji_jiasu = "ui_keji_jiasu",
     ui_kejitree = "ui_kejitree",
@@ -38,23 +36,24 @@ WNDTYPE = {
     pvpList = "ui_pvpList",
     mail = "ui_mail",
     dailyMission = "ui_dailyMission",
+    Login_Reg = "ui_login_reg",
+    Zhanshu = "ui_zhanshu",
 }
 UiDefine = luacsv.new(require("pk_tabs/UiDefine"))
 -- 登录窗体组件名列表 
 local lgwnds = {
-    {name = WNDTYPE.Healthadvice, cm = "uiscripts/wnd_healthadvice"}
+    {name = WNDTYPE.Healthadvice, cm = "uiscripts/wnd_healthadvice"},
 }
 -- 窗体枚举 --对应文件名
 gameinit.wndlist = {
     {name = WNDTYPE.Login, cm = "uiscripts/wndtz_login"},
-    {name = WNDTYPE.ui_fight_before, cm = "uiscripts/ui_fight"},
+    {name = WNDTYPE.Login_Reg, cm = "uiscripts/login/ui_login_controller"},
     {name = WNDTYPE.ui_fight, cm = "uiscripts/fight/fight_controller"},
     {name = WNDTYPE.ui_pause, cm = "uiscripts/ui_pause"},
     {name = WNDTYPE.ui_quitGame, cm = "uiscripts/ui_quitGame"},
     {name = WNDTYPE.quiteEnsure_ui, cm = "uiscripts/ui_pause"},
     {name = WNDTYPE.Prefight, cm = "uiscripts/ui_prefight"},
-    {name = WNDTYPE.ui_equip2, cm = "uiscripts/myEquip/equip_controller"},
-    {name = WNDTYPE.ui_equip, cm = "uiscripts/ui_equip"},
+    {name = WNDTYPE.ui_equip, cm = "uiscripts/myEquip/equip_controller"},
     {name = WNDTYPE.ui_chongzhu, cm = "uiscripts/ui_chongzhu"},
     {name = WNDTYPE.ui_keji_jiasu, cm = "uiscripts/ui_keji_jiasu"},
     {name = WNDTYPE.ui_kejitree, cm = "uiscripts/ui_kejitree"},
@@ -72,7 +71,7 @@ gameinit.wndlist = {
      --{name = WNDTYPE.pvpList, cm = "uiscripts/pvp/pvpList/pvpList_controller"},
     {name = WNDTYPE.mail, cm = "uiscripts/mail/mail_controller"},
     {name = WNDTYPE.dailyMission, cm = "uiscripts/dailyMission/dailyMission_controller"},
-
+    {name = WNDTYPE.Zhanshu, cm = "uiscripts/zhanshu/wnd_zhanshu_controller"},
 }
 _all_Reg_Wnd_list = {}
 --- <summary>
@@ -82,10 +81,10 @@ function gameinit:InitWnds(initPogressManage, wnds)
     local wndcount = #wnds
     local currIndex = 1
     local eachfunc = function(_, wndInfo)
-            -- 设置装载进度
-            require(wndInfo.cm)(wndInfo.name)
-            -- 初始化窗体
-            currIndex = currIndex + 1
+        -- 设置装载进度
+        require(wndInfo.cm)(wndInfo.name)
+        -- 初始化窗体
+        currIndex = currIndex + 1
     end
     table.foreach(wnds, eachfunc)
 end
@@ -194,14 +193,13 @@ function gameinit:coStartGame(parm)
     require "uiscripts/ui_manager"
     ui_manager = ui_manager()
     -- ui_manager:ShowWB(WNDTYPE.Healthadvice)
-    self:coLoading();
-
+    self:coLoading()   
+    ui_manager:ShowWB(WNDTYPE.Login)
 end
 -- 后台装资源
 function gameinit:coLoading(parm)
     self:InitCSharpLogic(initPogressManage)
     self:InitWnds(initPogressManage, self.wndlist)
-    ui_manager:ShowWB(WNDTYPE.Login)
 end
 function gameinit:OnPacketDone(isDone)
     self.mPacketLoadDone = true

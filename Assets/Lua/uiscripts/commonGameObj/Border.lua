@@ -23,7 +23,7 @@ function Border:initialize(scrollV)
     self.isMoving = false
 
     ---初始化上下边界的显示
-    self.Prop_border = GameObjectExtension.InstantiateFromPacket("commonU", "border", scrollV.transform.parent.gameObject).gameObject
+    self.Prop_border = GameObjectExtension.InstantiateFromPacket("commonu", "border", scrollV.transform.parent.gameObject).gameObject
     self.Prop_border:GetComponent("UIPanel").depth = self.ScrollV_UIPanel.depth + 1
     self.Prop_border_up = self.Prop_border.transform:Find("up").gameObject
     self.Prop_border_down = self.Prop_border.transform:Find("down").gameObject

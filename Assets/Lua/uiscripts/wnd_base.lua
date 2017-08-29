@@ -57,10 +57,12 @@ function wnd_base:initialize(_wnd_base_id)
     self.TimeTickerTb = {}
 end
 
-
-function wnd_base:Show(duration)
+function wnd_base:Show(pre_wnd_base_id,duration)
     if duration == nil then
         duration = 0.5
+    end
+    if pre_wnd_base_id ~= nil then
+        self.pre_wnd_base_id = pre_wnd_base_id
     end
     local isWithBg
     if self.wnd_base_baffleType == wnd_base_baffleType.WITHBG then
@@ -79,8 +81,8 @@ function wnd_base:Hide(duration)
     WndManage.Single:HideWnd(self.name, duration)
 end
 
-
 function wnd_base:Destroy(duration)
+
     if duration == nil then
         duration = 0.5
     end
@@ -100,9 +102,9 @@ function wnd_base:_OnShowFinish(wnd)
     -- if self.wnd_base_baffleType == wnd_base_baffleType.NONE then
     --     wnd.m_baffleObj:SetActive(false)
     -- end
-  
+
     -- Tools.AdjustBaseWindowDepth(rootGameObject.gameObject, tfp.gameObject, wndDepth[self.wnd_base_type])
-    
+
     AdjustBaseWindowDepth(wnd,self)
 
     --显示完成通知
@@ -113,12 +115,22 @@ function wnd_base:_OnShowFinish(wnd)
     if (self.OnAddHandler ~= nil) then
         self:OnAddHandler()
     end
+    -- 如果打开的是主界面的UI,则广播消息
+    if IsMainSceneUI(self.name) then
+        printe("Broadcast "..self.name..' open')
+        BroadcastUIEvent(UIEventType.SHOW,self.name)
+    end
 end
 
 function wnd_base:_OnHideFinish(wnd)
     --隐藏或销毁完成通知
     if (self.OnHideDone ~= nil) then
         self:OnHideDone()
+    end
+    -- 如果隐藏的是主界面的UI,则广播消息
+    if IsMainSceneUI(self.name) then
+        printe("Broadcast "..self.name..' Hide')
+        BroadcastUIEvent(UIEventType.HIDE,self.name)
     end
 end
 
@@ -136,6 +148,11 @@ function wnd_base:_OnDestroyFinish(wnd)
     --删除事件监听
     if (self.OnRemoveHandler ~= nil) then
         self:OnRemoveHandler()
+    end
+    -- 如果销毁的是主界面的UI,则广播消息
+    if IsMainSceneUI(self.name) then
+        printe("Broadcast "..self.name..' Destroy')
+        BroadcastUIEvent(UIEventType.DESTROY,self.name)
     end
 end
 
@@ -170,7 +187,6 @@ function wnd_base:_OnPreLoadFinish(wnd)
     end
 end
 
-
 function OnShowFinish(wnd)
     local wndName = wnd.Name
     local wnd_base = _all_Reg_Wnd_list[wndName]
@@ -185,7 +201,6 @@ function OnHideFinish(wnd)
     wnd_base:_OnHideFinish(wnd)
 end
 
-
 function OnDestroyFinish(wnd)
     local wndName = wnd.Name
     local wnd_base = _all_Reg_Wnd_list[wndName]
@@ -193,17 +208,22 @@ function OnDestroyFinish(wnd)
     wnd_base:_OnDestroyFinish(wnd)
 end
 
-
 function OnShowFinishEnd(wnd)
     local wndName = wnd.Name
     local wnd_base = _all_Reg_Wnd_list[wndName]
     if (wnd_base == nil) then return end
     wnd_base:_OnShowFinishEnd(wnd)
 end
+
 function wnd_base:_OnReOpenWnd(wnd)
     AdjustBaseWindowDepth(wnd,self)
     if (self.OnReOpenDone ~= nil) then
         self:OnReOpenDone()
+    end
+    -- 如果重新打开的是主界面的UI,则广播消息
+    if IsMainSceneUI(self.name) then
+        printe("Broadcast "..self.name..' ReOpen')
+        BroadcastUIEvent(UIEventType.SHOW,self.name)
     end
 end
 
@@ -213,8 +233,6 @@ function OnReOpenWnd(wnd)
     if (wnd_base == nil) then return end
     wnd_base:_OnReOpenWnd(wnd)
 end
-
-
 
 function OnDestroyFinishEnd(wnd)
     local wndName = wnd.Name
@@ -243,4 +261,25 @@ function AdjustBaseWindowDepth(wnd,instance)
     end
 
     Tools.AdjustBaseWindowDepth(rootGameObject.gameObject, tfp.gameObject, wndDepth[instance.wnd_base_type])
+end
+-----------------------------------------------
+--添加 测试交互代码
+--判断该UI是否会影响主场景相机的控制
+function IsMainSceneUI(wnd_base_id)
+    if wnd_base_id == WNDTYPE.ui_equip or
+    wnd_base_id == WNDTYPE.ui_chongzhu or
+    wnd_base_id == WNDTYPE.Cangku or
+    wnd_base_id == WNDTYPE.Shop or
+    wnd_base_id == WNDTYPE.Zhanshu or
+    wnd_base_id == WNDTYPE.mail or
+    wnd_base_id == WNDTYPE.CardShop or
+    wnd_base_id == WNDTYPE.chatWindow or
+    wnd_base_id == WNDTYPE.dailyMission or
+    wnd_base_id == WNDTYPE.QianDao then
+        return true
+    else return false end
+end
+--推送UI打开/关闭/销毁事件
+function BroadcastUIEvent(uiEventType,wnd_base_id)
+    Event.Brocast(uiEventType,wnd_base_id)
 end

@@ -10,6 +10,7 @@ public class PositionObjectWrap
 		L.RegFunction("Begin", Begin);
 		L.RegFunction("StopMove", StopMove);
 		L.RegFunction("ContinueMove", ContinueMove);
+		L.RegFunction("RotateToWithoutYAxis", RotateToWithoutYAxis);
 		L.RegFunction("Clear", Clear);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
@@ -75,6 +76,23 @@ public class PositionObjectWrap
 			ToLua.CheckArgsCount(L, 1);
 			PositionObject obj = (PositionObject)ToLua.CheckObject(L, 1, typeof(PositionObject));
 			obj.ContinueMove();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int RotateToWithoutYAxis(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			PositionObject obj = (PositionObject)ToLua.CheckObject(L, 1, typeof(PositionObject));
+			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 2);
+			obj.RotateToWithoutYAxis(arg0);
 			return 0;
 		}
 		catch(Exception e)

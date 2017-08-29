@@ -5,26 +5,40 @@ using System;
 
 public class Soldier_PutongGongji_State : SoldierFSMState
 {
-    /// <summary>
-    /// 开火间隔
-    /// </summary>
-    private float _fireTick;
+    ///// <summary>
+    ///// 开火间隔
+    ///// </summary>
+    //private float _fireTick;
+
     /// <summary>
     /// 当前发射的子弹数量 当达到子弹上限后 需要填充子弹 并清零
     /// </summary>
     private int _bulletCount;
-    /// <summary>
-    /// 一弹夹子弹上限
-    /// </summary>
-    private int _bulletMax;
+
+    ///// <summary>
+    ///// 一弹夹子弹上限
+    ///// </summary>
+    //private int _bulletMax;
+
     /// <summary>
     /// 开火计时器
     /// </summary>
     private Timer _fireTimer;
+
     /// <summary>
-    /// 装填时间 两弹夹子弹之间的间隔
+    /// 再装填计时器
     /// </summary>
-    private float _reloadTime;
+    private Timer _reloadTimer;
+
+    ///// <summary>
+    ///// 装填时间 两弹夹子弹之间的间隔
+    ///// </summary>
+    //private float _reloadTime;
+
+    /// <summary>
+    /// 是否正在待机
+    /// </summary>
+    private bool _isDaiJi = false;
 
     public override void Init()
     {
@@ -34,17 +48,15 @@ public class Soldier_PutongGongji_State : SoldierFSMState
 
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
-        //Debug.Log("普通攻击:" + fsm.Display.GameObj.name);
-        _fireTick = fsm.Display.ClusterData.AllData.MemberData.AttackRate1;
-        _fireTimer = new Timer(_fireTick,true);
+        _fireTimer = new Timer(fsm.Display.ClusterData.AllData.MemberData.AttackRate1, true);
         _fireTimer.OnCompleteCallback(() => { fire(fsm); }).Start();
 
         _bulletCount = fsm.Display.ClusterData.AllData.MemberData.Clipsize1;
-        _bulletMax = fsm.Display.ClusterData.AllData.MemberData.Clipsize1;
-        _reloadTime = fsm.Display.ClusterData.AllData.MemberData.ReloadTime1;
+        //_bulletMax = fsm.Display.ClusterData.AllData.MemberData.Clipsize1;
+        //_reloadTime = fsm.Display.ClusterData.AllData.MemberData.ReloadTime1;
         // 单位转向目标
-        var clusterData = fsm.Display.ClusterData as ClusterData;
-        if (clusterData != null)
+        var clusterData = fsm.Display.ClusterData;
+        if (clusterData != null && fsm.EnemyTarget != null && fsm.EnemyTarget.ClusterData != null)
         {
             clusterData.RotateToWithoutYAxis(fsm.EnemyTarget.ClusterData.transform.position);
         }
@@ -63,148 +75,83 @@ public class Soldier_PutongGongji_State : SoldierFSMState
         }
         var enemyDisplayOwner = fsm.EnemyTarget;
         var myDisplayOwner = fsm.Display;
-        var enemyClusterData = enemyDisplayOwner.ClusterData;
         var myClusterData = myDisplayOwner.ClusterData;
-        // 无子弹reload不攻击
-        if (_bulletCount <= 0)
-        {
-            Globals.Instance.StartCoroutine(_waitFor(() =>
-            {
-                _bulletCount = _bulletMax;
-                _fireTimer.GoOn();
-            }));
-            _fireTimer.Pause();
-            return;
-        }
+        var myMemberData = myClusterData.AllData.MemberData;
 
         // 单位转向目标
-        var clusterData = fsm.Display.ClusterData as ClusterData;
-        if (clusterData != null)
-        {
-            clusterData.RotateToWithoutYAxis(fsm.EnemyTarget.ClusterData.transform.position);
-        }
-
-        //var fightVO = fsm.Display.ClusterData.MemberData as FightVO;
-        // 攻击时检测技能
-        SkillManager.Single.SetTriggerData(new TriggerData()
-        {
-            ReceiveMember = enemyDisplayOwner,
-            ReleaseMember = myDisplayOwner,
-            TypeLevel1 = TriggerLevel1.Fight,
-            TypeLevel2 = TriggerLevel2.Attack
-        });
+        myClusterData.RotateToWithoutYAxis(myClusterData.transform.position);
 
 
-        var effect = myClusterData.AllData.EffectData;
-        // 如果攻击方的攻击方式不为普通攻击的读取攻击表, 获取对应攻击方式
-        IGeneralAttack normalGeneralAttack = null;
-        switch (myClusterData.AllData.MemberData.AttackType)
+        // 重置攻击时间间隔
+        _fireTimer.LoopTime = myMemberData.AttackRate1;
+
+        // 如果能攻击
+        if (myMemberData.CouldNormalAttack)
         {
-            case Utils.BulletTypeNormal:
-                normalGeneralAttack = GeneralAttackManager.Instance()
-                    .GetNormalGeneralAttack(myClusterData, enemyClusterData, effect.Bullet,
-                        myClusterData.transform.position + new Vector3(0, 10, 0),
-                        enemyClusterData.gameObject,
-                        200,
-                        TrajectoryAlgorithmType.Line,
-                        () =>
-                        {
-                            //Debug.Log("普通攻击");
-                        
-                        });
-                break;
-            case Utils.BulletTypeScope:
-                // 获取
-                //Debug.Log("AOE");
-                var armyAOE = myClusterData.AllData.AOEData;
-                // 根据不同攻击类型获取不同数据
-                switch (armyAOE.AOEAim)
+            // 无子弹reload不攻击
+            if (_bulletCount <= 0)
+            {
+                _reloadTimer = new Timer(myMemberData.ReloadTime1);
+                // 等待装填
+                _reloadTimer.OnCompleteCallback(() =>
                 {
-                    case Utils.AOEObjScope:
-                        normalGeneralAttack = GeneralAttackManager.Instance().GetPointToObjScopeGeneralAttack(myClusterData,
-                            new[] { effect.Bullet, effect.MuzzleFlashEffect },
-                            myClusterData.transform.position,
-                            enemyClusterData.gameObject,
-                            armyAOE.AOERadius,
-                            200,
-                            1, //effect.EffectTime,
-                            (TrajectoryAlgorithmType)Enum.Parse(typeof(TrajectoryAlgorithmType), effect.TrajectoryEffect),
-                            () =>
-                            {
-                                //Debug.Log("AOE Attack1");
-                            });
-                        break;
-                    case Utils.AOEPointScope:
-                        normalGeneralAttack =
-                            GeneralAttackManager.Instance().GetPointToPositionScopeGeneralAttack(myClusterData,
-                                new[] { effect.Bullet, effect.MuzzleFlashEffect },
-                                myClusterData.transform.position,
-                                enemyClusterData.transform.position,
-                                armyAOE.AOERadius,
-                                200,
-                                1, //effect.EffectTime,
-                                (TrajectoryAlgorithmType)Enum.Parse(typeof(TrajectoryAlgorithmType), effect.TrajectoryEffect),
-                                () =>
-                                {
-                                    //Debug.Log("AOE Attack2");
-                                });
-                        break;
-                    case Utils.AOEScope:
-                        normalGeneralAttack = GeneralAttackManager.Instance().GetPositionScopeGeneralAttack(myClusterData,
-                            effect.MuzzleFlashEffect,
-                            myClusterData.transform.position,
-                            new CircleGraphics(new Vector2(myClusterData.X, myClusterData.Y), armyAOE.AOERadius),
-                            1, //effect.EffectTime,
-                            () =>
-                            {
-                                //Debug.Log("AOE Attack3");
-                            });
-                        break;
-                    case Utils.AOEForwardScope:
-                        normalGeneralAttack =
-                            GeneralAttackManager.Instance().GetPositionRectScopeGeneralAttack(myClusterData,
-                                effect.MuzzleFlashEffect,
-                                myClusterData.transform.position,
-                                armyAOE.AOEWidth,
-                                armyAOE.AOEHeight,
-                                Vector2.Angle(Vector2.up, new Vector2(myClusterData.transform.forward.x, myClusterData.transform.forward.z)),
-                                1, //effect.EffectTime,
-                                () =>
-                                {
-                                    //Debug.Log("AOE Attack4");
-                                });
-                        break;
+                    _bulletCount = myMemberData.Clipsize1;
+                    _fireTimer.GoOn();
+                }).Start();
+
+                _fireTimer.Pause();
+
+                // 是否有装填动作使用装填时间来判定
+                if (myMemberData.ReloadTime1 > Utils.ApproachZero)
+                {
+                    SwitchAnim(fsm, SoldierAnimConst.ZHUANGTIAN, WrapMode.Once);
                 }
-                break;
-        }
-        SwitchAnim(fsm, SoldierAnimConst.GONGJI, WrapMode.Once);
+                return;
+            }
 
-        if (normalGeneralAttack != null)
+            // 抛出攻击事件
+            SkillManager.Single.SetTriggerData(new TriggerData()
+            {
+                ReceiveMember = enemyDisplayOwner,
+                ReleaseMember = myDisplayOwner,
+                TypeLevel1 = TriggerLevel1.Fight,
+                TypeLevel2 = TriggerLevel2.Attack
+            });
+
+            // 发射子弹
+            ShootBullet(fsm);
+
+            // 攻击动作
+            SwitchAnim(fsm, SoldierAnimConst.GONGJI, WrapMode.Once);
+            // 开火后子弹数量-1
+            _bulletCount--;
+        }
+        else
         {
-            normalGeneralAttack.Begin();
+            // 不能攻击
+            // 播放待机动作
+            if (!_isDaiJi)
+            {
+                SwitchAnim(fsm, SoldierAnimConst.DAIJI, WrapMode.Once);
+                _isDaiJi = true;
+            }
         }
-
-        // 攻击动作
-        //var myself = fsm.Display.RanderControl;
-        // TODO 部分单位没有attack动画会报错
-        //myself.ModelRander.SetClip("attack".GetHashCode());
-
-        // 开火后子弹数量-1
-        _bulletCount--;
-    }
-
-    private IEnumerator _waitFor(Action waitEnd)
-    {
-        yield return new WaitForSeconds(_reloadTime);
         
-        waitEnd();
     }
 
     public override void DoBeforeLeaving(SoldierFSMSystem fsm)
     {
         fsm.IsCanInPutonggongji = false;
         fsm.TargetIsLoseEfficacy = true;
-        _fireTimer.Kill();
+        if (_fireTimer != null)
+        {
+            _fireTimer.Kill();
+        }
+        if (_reloadTimer != null)
+        {
+            _reloadTimer.Kill();
+        }
+        _isDaiJi = false;
     }
 
     public override void Action(SoldierFSMSystem fsm)
@@ -217,8 +164,6 @@ public class Soldier_PutongGongji_State : SoldierFSMState
                 fsm.IsCanInPutonggongji = false;
                 fsm.TargetIsLoseEfficacy = true;
             }
-            // 有技能可放
-
         }
     }
 
@@ -235,8 +180,112 @@ public class Soldier_PutongGongji_State : SoldierFSMState
         }
         var targetPos = fsm.EnemyTarget.ClusterData.Position;
         var myPos = fsm.Display.ClusterData.Position;
-        var distance = AI_Math.V2Distance(targetPos.x, targetPos.z, myPos.x, myPos.z) - fsm.EnemyTarget.ClusterData.Diameter * 0.5f - fsm.Display.ClusterData.Diameter * 0.5f;
+        var distance = AI_Math.V2Distance(targetPos.x, targetPos.z, myPos.x, myPos.z)
+            - fsm.EnemyTarget.ClusterData.Diameter * ClusterManager.Single.UnitWidth * 0.5f
+            - fsm.Display.ClusterData.Diameter * ClusterManager.Single.UnitWidth * 0.5f;
         return (distance > fsm.Display.ClusterData.AllData.MemberData.AttackRange) ||
                (fsm.EnemyTarget.ClusterData.AllData.MemberData.CurrentHP <= 0);
+    }
+
+    /// <summary>
+    /// 发射子弹
+    /// </summary>
+    /// <param name="fsm"></param>
+    private void ShootBullet(SoldierFSMSystem fsm)
+    {
+
+        var enemyDisplayOwner = fsm.EnemyTarget;
+        var myDisplayOwner = fsm.Display;
+        var enemyClusterData = enemyDisplayOwner.ClusterData;
+        var myClusterData = myDisplayOwner.ClusterData;
+        var myMemberData = myClusterData.AllData.MemberData;
+        var effect = myClusterData.AllData.EffectData;
+
+        // 如果攻击方的攻击方式不为普通攻击的读取攻击表, 获取对应攻击方式
+        IGeneralAttack normalGeneralAttack = null;
+        switch (myMemberData.AttackType)
+        {
+            case Utils.BulletTypeNormal:
+                normalGeneralAttack = GeneralAttackManager.Instance()
+                    .GetNormalGeneralAttack(myClusterData, enemyClusterData, effect.Bullet,
+                        myClusterData.transform.position + new Vector3(0, 10, 0),
+                        enemyClusterData.gameObject,
+                        myMemberData.BulletSpeed,
+                        TrajectoryAlgorithmType.Line,
+                        (obj) =>
+                        {
+                            //Debug.Log("普通攻击");
+                            // 播受击特效
+
+                        });
+                break;
+            case Utils.BulletTypeScope:
+                // 获取
+                //Debug.Log("AOE");
+                var armyAOE = myClusterData.AllData.AOEData;
+                // 根据不同攻击类型获取不同数据
+                switch (armyAOE.AOEAim)
+                {
+                    case Utils.AOEObjScope:
+                        normalGeneralAttack = GeneralAttackManager.Instance().GetPointToObjScopeGeneralAttack(myClusterData,
+                            new[] { effect.Bullet, effect.RangeEffect },
+                            myClusterData.transform.position,
+                            enemyClusterData.gameObject,
+                            armyAOE.AOERadius,
+                            myMemberData.BulletSpeed,
+                            1, //effect.EffectTime,
+                            (TrajectoryAlgorithmType)Enum.Parse(typeof(TrajectoryAlgorithmType), effect.TrajectoryEffect),
+                            () =>
+                            {
+                                //Debug.Log("AOE Attack1");
+                            });
+                        break;
+                    case Utils.AOEPointScope:
+                        normalGeneralAttack =
+                            GeneralAttackManager.Instance().GetPointToPositionScopeGeneralAttack(myClusterData,
+                                myClusterData.transform.position,
+                                enemyClusterData.transform.position,
+                                armyAOE.AOERadius,
+                                myMemberData.BulletSpeed,
+                                (TrajectoryAlgorithmType)Enum.Parse(typeof(TrajectoryAlgorithmType), effect.TrajectoryEffect),
+                                () =>
+                                {
+                                    //Debug.Log("AOE Attack2");
+                                });
+                        break;
+                    case Utils.AOEScope:
+                        normalGeneralAttack = GeneralAttackManager.Instance().GetPositionScopeGeneralAttack(myClusterData,
+                            effect.RangeEffect,
+                            myClusterData.transform.position,
+                            new CircleGraphics(new Vector2(myClusterData.X, myClusterData.Y), armyAOE.AOERadius),
+                            1, //effect.EffectTime,
+                            () =>
+                            {
+                                //Debug.Log("AOE Attack3");
+                            });
+                        break;
+                    case Utils.AOEForwardScope:
+                        normalGeneralAttack =
+                            GeneralAttackManager.Instance().GetPositionRectScopeGeneralAttack(myClusterData,
+                                effect.RangeEffect,
+                                myClusterData.transform.position,
+                                armyAOE.AOEWidth,
+                                armyAOE.AOEHeight,
+                                Vector2.Angle(Vector2.up, new Vector2(myClusterData.transform.forward.x, myClusterData.transform.forward.z)),
+                                1, //effect.EffectTime,
+                                () =>
+                                {
+                                    //Debug.Log("AOE Attack4");
+                                    // 播放目标的受击特效
+                                });
+                        break;
+                }
+                break;
+        }
+
+        if (normalGeneralAttack != null)
+        {
+            normalGeneralAttack.Begin();
+        }
     }
 }

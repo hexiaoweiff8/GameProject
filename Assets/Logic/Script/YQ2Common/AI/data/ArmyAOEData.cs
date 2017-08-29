@@ -45,31 +45,6 @@ public class ArmyAOEData
     /// </summary>
     public float AOEHeight { get; set; }
 
-    ///// <summary>
-    ///// 子弹模型
-    ///// </summary>
-    ////public string BulletModel { get; set; }
-
-    ///// <summary>
-    ///// 子弹飞行轨迹
-    ///// </summary>
-    ////public int BulletPath { get; set; }
-
-    ///// <summary>
-    ///// 子弹弹道特效
-    ///// </summary>
-    ////public string Ballistic { get; set; }
-
-    ///// <summary>
-    ///// 范围伤害特效
-    ///// </summary>
-    ////public string DamageEffect { get; set; }
-
-    ///// <summary>
-    ///// 范围特效持续时间
-    ///// </summary>
-    ////public float EffectTime { get; set; }
-
 
     /// <summary>
     /// 初始化
@@ -84,11 +59,6 @@ public class ArmyAOEData
         AOERadius = aoeData.AOERadius;
         AOEWidth = aoeData.AOEWidth;
         AOEHeight = aoeData.AOELength;
-//        BulletModel = aoeData.BulletModel;
-//        BulletPath = aoeData.BulletPath;
-//        Ballistic = aoeData.Ballistic;
-//        DamageEffect = aoeData.DamageEffect;
-//        EffectTime = aoeData.EffectTime;
     }
 
 }

@@ -5,13 +5,16 @@
 
 local comPropty_controller = {}
 
-local _view = require("uiscripts/myEquip/comPropty/comPropty_view")
-local _data = require("uiscripts/myEquip/comPropty/comPropty_model")
-local SuitProps = require("uiscripts/commonGameObj/suitProps")
-local _comProptyP = nil
+local _view
+local _data
+local _comProptyP
 local _isShow = false
 
 function comPropty_controller:init(args)
+    _view = require("uiscripts/myEquip/comPropty/comPropty_view")
+    _data = require("uiscripts/myEquip/comPropty/comPropty_model")
+    _isShow = false
+
     _view:init_view(args)
     _view.btn_comPropL:SetActive(false)
     _view.btn_comPropR:SetActive(false)
@@ -115,9 +118,6 @@ function comPropty_controller:addListener()
 
 
 end
-
-
-
 
 ---
 ---显示全部装属性界面
@@ -233,6 +233,22 @@ function comPropty_controller:refreshSuit()
             i = i + 1
         end
     end
+end
+
+
+
+---界面销毁时调用
+function comPropty_controller:OnDestroyDone()
+
+    Memory.free("uiscripts/myEquip/comPropty/comPropty_view")
+    Memory.free("uiscripts/myEquip/comPropty/comPropty_model")
+    _view = nil
+    _data = nil
+    _comProptyP = nil
+    _isShow = nil
+    _basicPropsLab = {}
+    _suitPanel = {}
+    _suitProp = {}
 end
 
 

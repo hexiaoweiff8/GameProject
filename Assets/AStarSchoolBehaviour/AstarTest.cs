@@ -115,7 +115,6 @@ public class AstarTest : MonoBehaviour
         Application.targetFrameRate = 60;
         var loadMapPos = LoadMap.GetLeftBottom();
         ClusterManager.Single.Init(loadMapPos.x + LoadMap.MapWidth * LoadMap.UnitWidth, loadMapPos.z + LoadMap.MapHeight * LoadMap.UnitWidth, MapWidth, MapHeight, UnitWidth, null);
-        InitMapInfo();
 
         // 启动显示管理器
         DisplayerManager.AutoInstance();
@@ -129,6 +128,7 @@ public class AstarTest : MonoBehaviour
         InitLua();
         // 初始化技能
         InitSkill();
+        
 
     }
     
@@ -139,6 +139,10 @@ public class AstarTest : MonoBehaviour
         Scan();
         // 显示数据
         //Log();
+        //foreach (var g in GList)
+        //{
+        //    Utils.DrawGraphics(g, Color.magenta);
+        //}
     }
 
     /// <summary>
@@ -173,7 +177,9 @@ public class AstarTest : MonoBehaviour
             {
                 "ui_fightU",
                 "xuebaotujidui",
-                "attackeffect"
+                "attackeffect",
+                "mapdatapack",
+                "skill"
             }, (isDone) =>
             {
                 if (isDone)
@@ -206,10 +212,10 @@ public class AstarTest : MonoBehaviour
 }";
         string formulaStr3 = @"SkillNum(1003)
 {
-        SlideCollisionDetection(1, 0, 2, 1, %0, 40, -1)
+        SlideCollisionDetection(1, 0, 2, 1, {%0}, 40, -1)
         {
             //PointToObj(1,test/TrailPrj,10,0,10,1,10),
-            Point(1,test/ExplordScope,1,%1,10,1,10),
+            Point(1,test/ExplordScope,1,{%1},10,1,10),
         }
 }
         // 数据
@@ -232,13 +238,13 @@ public class AstarTest : MonoBehaviour
 ";
         string formulaStr5 = @"SkillNum(1005)
         {
-            SlideCollisionDetection(1, 0, 2, 1, %0, 40, -1)
+            SlideCollisionDetection(1, 0, 2, 1, {%0}, 40, -1)
             {
                 //If(1, 0, Health, 0_100)
                 //{
                     HealthChange(1,0,0,0,1)
                     //PointToObj(1,test/TrailPrj,10,0,10,1,10),
-                    Point(1,test/ExplordScope,1,%1,10,1,10),   
+                    Point(1,test/ExplordScope,1,{%1},10,1,10),   
                 //}
             }
         
@@ -259,14 +265,14 @@ public class AstarTest : MonoBehaviour
 
         string formulaStr7 = @"SkillNum(1007)
         {
-            SlideCollisionDetection(1, 0, 2, 1, %0, 40, -1)
+            SlideCollisionDetection(1, 0, 2, 1, {%0}, 40, -1)
             {
                 //If(1, 0, Health, 0_100)
                 //{
                     Buff(1,1007, 1)
                     Buff(1,1008, 1)
                     //PointToObj(1,test/TrailPrj,10,0,10,1,10),
-                    //Point(1,test/ExplordScope,1,%1,10,1,10),   
+                    //Point(1,test/ExplordScope,1,{%1},10,1,10),   
                 //}
             }
         }
@@ -285,7 +291,7 @@ public class AstarTest : MonoBehaviour
         string formulaStr8 = @"SkillNum(1008)
         {
             // 选择目标点
-            TargetPointSelector(1,3,90,0)
+            TargetPointSelector(1,3,<Attack1>+10,0)
             Remain(1, 2, 10000, false)
         }
 
@@ -297,18 +303,18 @@ public class AstarTest : MonoBehaviour
             TriggerLevel1(1)
             TriggerLevel2(1)
             Description(Test{%0},测试{%1})
-            100, 5
+            10, 5
         ]
 ";
         string formulaStr9 = @"SkillNum(1009)
         {
-            CollisionDetection(0, 50, 1, 0, -1, 10, 0, 0, 101009, 1)
+            CollisionDetection(0, 50, 1, 1, -1, 100, 100, 0, 101009, true)
             {
-                If(1,0,IsMechanic,false_true)
-                {
-                    PointToObj(1,test/TrailPrj,10,0,10,1,10),
-                    Point(1,test/ExplordScope,1,0,3,10,1,10),
-                }
+                //If(1,0,IsMechanic,false_true)
+                //{
+                    PointToObj(1,zidan1.prefab,10,0,10,1,10),
+                    //Point(1,test/ExplordScope,1,0,3,10,1,10),
+                //}
             }
             // 选择目标点
             // TargetPointSelector(1,0,10,10)
@@ -349,7 +355,7 @@ public class AstarTest : MonoBehaviour
         string buffStr1 = @"BuffNum(1007)
         Action
         {
-            HealthChange(1,0,0,0,1)
+            HealthChange(1,0,0,0,1,1,0)
         }
 
         [
@@ -405,12 +411,12 @@ public class AstarTest : MonoBehaviour
 ";
 
 
-        var skillInfo = FormulaConstructor.SkillConstructor(formulaStr);
-        var skillInfo2 = FormulaConstructor.SkillConstructor(formulaStr2);
-        var skillInfo3 = FormulaConstructor.SkillConstructor(formulaStr3);
-        var skillInfo4 = FormulaConstructor.SkillConstructor(formulaStr4);
-        var skillInfo5 = FormulaConstructor.SkillConstructor(formulaStr5);
-        var skillInfo7 = FormulaConstructor.SkillConstructor(formulaStr7);
+        //var skillInfo = FormulaConstructor.SkillConstructor(formulaStr);
+        //var skillInfo2 = FormulaConstructor.SkillConstructor(formulaStr2);
+        //var skillInfo3 = FormulaConstructor.SkillConstructor(formulaStr3);
+        //var skillInfo4 = FormulaConstructor.SkillConstructor(formulaStr4);
+        //var skillInfo5 = FormulaConstructor.SkillConstructor(formulaStr5);
+        //var skillInfo7 = FormulaConstructor.SkillConstructor(formulaStr7);
         var skillInfo8 = FormulaConstructor.SkillConstructor(formulaStr8);
         var skillInfo9 = FormulaConstructor.SkillConstructor(formulaStr9);
         var skillInfo10 = FormulaConstructor.SkillConstructor(formulaStr10);
@@ -422,12 +428,12 @@ public class AstarTest : MonoBehaviour
 
         remain = FormulaConstructor.RemainConstructor(remainStr1);
 
-        SkillManager.Single.AddSkillInfo(skillInfo);
-        SkillManager.Single.AddSkillInfo(skillInfo2);
-        SkillManager.Single.AddSkillInfo(skillInfo3);
-        SkillManager.Single.AddSkillInfo(skillInfo4);
-        SkillManager.Single.AddSkillInfo(skillInfo5);
-        SkillManager.Single.AddSkillInfo(skillInfo7);
+        //SkillManager.Single.AddSkillInfo(skillInfo);
+        //SkillManager.Single.AddSkillInfo(skillInfo2);
+        //SkillManager.Single.AddSkillInfo(skillInfo3);
+        //SkillManager.Single.AddSkillInfo(skillInfo4);
+        //SkillManager.Single.AddSkillInfo(skillInfo5);
+        //SkillManager.Single.AddSkillInfo(skillInfo7);
         SkillManager.Single.AddSkillInfo(skillInfo8);
         SkillManager.Single.AddSkillInfo(skillInfo9);
         SkillManager.Single.AddSkillInfo(skillInfo10);
@@ -440,7 +446,12 @@ public class AstarTest : MonoBehaviour
 
         RemainManager.Single.AddRemainInfo(remain);
 
-        Debug.Log(skillInfo5.GetReplacedDescription(1));
+        //Debug.Log(skillInfo5.GetReplacedDescription(1));
+
+        //foreach (var item in "{%1} + {%2}{%3}".Split('{', '}'))
+        //{
+        //    Debug.Log(item);
+        //}
     }
 
     /// <summary>
@@ -474,7 +485,7 @@ public class AstarTest : MonoBehaviour
             if (hit.collider != null && hit.collider.name.Equals(LoadMap.MapPlane.name))
             {
 
-                SkillManager.Single.DoSkillNum(10006, new FormulaParamsPacker()
+                SkillManager.Single.DoSkillNum(1009, new FormulaParamsPacker()
                 {
                     StartPos = new Vector3(hit.point.x, 0, hit.point.z),
                     TargetPos = new Vector3(hit.point.x, 0, hit.point.z),
@@ -485,6 +496,11 @@ public class AstarTest : MonoBehaviour
         }
         if (Input.GetMouseButtonDown(0))
         {
+
+            var skill = SkillManager.Single.CreateSkillInfo(20001);
+            Debug.Log(skill.SkillName);
+            // 加载地图数据
+            //Debug.Log(PacketManage.Single.GetPacket("mapdatapack").LoadString("mapdata"));
             // 获取地图上的点击点
             var ray = MainCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
@@ -502,7 +518,7 @@ public class AstarTest : MonoBehaviour
                 //StartCoroutine(Step(path));
                 
                 var loadMapPos = LoadMap.GetLeftBottom();
-                ClusterManager.Single.Init(loadMapPos.x + LoadMap.MapWidth * LoadMap.UnitWidth * 0.5f, loadMapPos.z + LoadMap.MapHeight * LoadMap.UnitWidth * 0.5f, MapWidth, MapHeight, UnitWidth, mapInfoData);
+                ClusterManager.Single.Init(loadMapPos.x + LoadMap.MapWidth * LoadMap.UnitWidth * 0.5f, loadMapPos.z + LoadMap.MapHeight * UnitWidth * 0.5f, MapWidth, MapHeight, UnitWidth, mapInfoData);
                 //LoadMap.RefreshMap();
                 StartMoving(path, mapInfoData, lastTimeTargetX, lastTimeTargetY);
 
@@ -575,15 +591,19 @@ public class AstarTest : MonoBehaviour
         {
             MainCamera.transform.localPosition = new Vector3(MainCamera.transform.localPosition.x, MainCamera.transform.localPosition.y - 1, MainCamera.transform.localPosition.z);
         }
-        if (Input.GetKey(KeyCode.P))
+        if (Input.GetKeyUp(KeyCode.P))
         {
             // 暂停
             ClusterManager.Single.Pause();
         }
-        if (Input.GetKey(KeyCode.G))
+        if (Input.GetKeyUp(KeyCode.G))
         {
             // 继续
             ClusterManager.Single.GoOn();
+        }
+        if (Input.GetKeyUp(KeyCode.R))
+        {
+            InitMapInfo();
         }
         //if (Input.GetKey(KeyCode.A))
         //{
@@ -633,7 +653,7 @@ public class AstarTest : MonoBehaviour
         //var mapInfoData = DeCodeInfo(mapInfoStr);
         var mapInfoData = MapManager.Instance().GetMapInfoById(1, 1);
         LoadMap.Init(mapInfoData, UnitWidth);
-        ClusterManager.Single.Init(-MapWidth * 0.5f, -MapHeight * 0.5f, MapWidth, MapHeight, 10, mapInfoData);
+        ClusterManager.Single.Init(-MapWidth * 0.5f, -MapHeight * 0.5f, MapWidth, MapHeight, UnitWidth, mapInfoData);
         MapWidth = mapInfoData[0].Length;
         MapHeight = mapInfoData.Length;
         return mapInfoData;
@@ -756,7 +776,8 @@ public class AstarTest : MonoBehaviour
                 ObjID = objId,
                 MoveSpeed = 60,
                 GeneralType = 1,
-                Camp = 1
+                Camp = 1,
+                Attack1 = 10
             };
             //school.GroupId = 1;
             // TODO 物理信息中一部分来自于数据
@@ -765,7 +786,7 @@ public class AstarTest : MonoBehaviour
             school.transform.localPosition = new Vector3((i % 3) * 2 + start.x, start.y, i / 3 * 2 + start.z);
             school.name = "item" + i;
             school.TargetPos = target;
-            school.Diameter = (i == 0 ? 10 : 3) * 5;
+            school.Diameter = (i == 0 ? 10 : 3);
             school.PushTargetList(Utils.NumToPostionByList(LoadMap.transform.position, cloneList, UnitWidth, MapWidth, MapHeight));
             //school.Moveing = (a) => { Debug.Log(a.name + "Moving"); };
 
@@ -817,7 +838,10 @@ public class AstarTest : MonoBehaviour
             ClusterManager.Single.Add(school);
             var displayOwner = new DisplayOwner(schoolItem, school);
             DisplayerManager.Single.AddElement(objId, displayOwner);
-            remain.ReleaseMember = displayOwner;
+            if (remain != null)
+            {
+                remain.ReleaseMember = displayOwner;
+            }
 
             if (IsFSM)
             {
@@ -874,13 +898,13 @@ public class AstarTest : MonoBehaviour
                         fix = fixItem.AddComponent<FixtureData>();
                         fix.AllData.MemberData = new VOBase()
                         {
-                            SpaceSet = 1 * UnitWidth
+                            SpaceSet = 1
                         };
                         fix.transform.localScale = new Vector3(UnitWidth, UnitWidth, UnitWidth);
                         fix.transform.position = Utils.NumToPosition(transform.position, new Vector2(j, i), UnitWidth, MapWidth, MapHeight);
                         fix.X = j * UnitWidth - MapWidth * UnitWidth * 0.5f;
                         fix.Y = i * UnitWidth - MapHeight * UnitWidth * 0.5f;
-                        fix.Diameter = 1*UnitWidth;
+                        fix.Diameter = 1;
                         itemList.Add(fix);
                         ClusterManager.Single.Add(fix);
                         break;
@@ -913,5 +937,11 @@ public class AstarTest : MonoBehaviour
     }
 
 
+    //public static void AddGraphics(ICollisionGraphics graphics)
+    //{
+    //    GList.Add(graphics);
+    //}
 
+
+    //private static List<ICollisionGraphics> GList = new List<ICollisionGraphics>();
 }

@@ -28,14 +28,18 @@ public class BuffInfo : SkillBase
     /// 高等级的buff会覆盖低等级的buff
     /// 反之不会
     /// </summary>
-    public int BuffLevel = 1;
+    public int BuffLevel{get { return buffLevel; }set { buffLevel = value; }}
 
     /// <summary>
     /// buff组 相同组的会互斥, 
     /// 由高Level的顶掉低level的buff
     /// 如果buffGroup为-1则与其他buff完全不冲突
     /// </summary>
-    public int BuffGroup = -1;
+    public int BuffGroup
+    {
+        get { return buffGroup; }
+        set { buffGroup = value; }
+    }
 
     /// <summary>
     /// 是增益buff还是负增益buff
@@ -100,12 +104,12 @@ public class BuffInfo : SkillBase
     /// <summary>
     /// Detach生命区间下限
     /// </summary>
-    public int DetachHpScopeMin = -1;
+    public float DetachHpScopeMin{get { return detachHpScopeMin; } set { detachHpScopeMin = value; }}
 
     /// <summary>
     /// Detach生命区间上限
     /// </summary>
-    public int DetachHpScopeMax = -1;
+    public float DetachHpScopeMax{get { return detachHpScopeMax; } set { detachHpScopeMax = value; }}
 
     /// <summary>
     /// detach-键
@@ -122,6 +126,27 @@ public class BuffInfo : SkillBase
     /// </summary>
     public IList<string> DetachQualifiedValueList = new List<string>();
 
+
+
+    /// <summary>
+    /// buff互斥组
+    /// </summary>
+    private int buffGroup = -1;
+
+    /// <summary>
+    /// buff等级
+    /// </summary>
+    private int buffLevel = 1;
+
+    /// <summary>
+    /// Detach生命区间下限
+    /// </summary>
+    public float detachHpScopeMin = -1;
+
+    /// <summary>
+    /// Detach生命区间上限
+    /// </summary>
+    public float detachHpScopeMax = -1;
 
     /// <summary>
     /// 初始化

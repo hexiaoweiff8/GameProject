@@ -1,6 +1,8 @@
 ﻿
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -97,7 +99,12 @@ public abstract class AbstractFormulaItem : IFormulaItem
     /// <summary>
     /// 被替换列表
     /// </summary>
-    protected Dictionary<string, string> ReplaceDic = new Dictionary<string, string>();  
+    protected Dictionary<string, List<string>> ReplaceDic = new Dictionary<string, List<string>>();
+
+    /// <summary>
+    /// 被替换列表
+    /// </summary>
+    protected Dictionary<string, string> ReplaceSourceDataDic = new Dictionary<string, string>();  
 
     /// <summary>
     /// 是否包含下一节点
@@ -235,9 +242,8 @@ public abstract class AbstractFormulaItem : IFormulaItem
     /// <param name="name">数据名称</param>
     /// <param name="array">数据列表</param>
     /// <param name="pos">当前数据位置</param>
-    /// <param name="replaceDic">替换列表(如果数据需要替换会放入该列表, 否则返回数据不放入列表)</param>
     /// <returns>转换后数据</returns>
-    protected T GetDataOrReplace<T>(string name, string[] array, int pos, Dictionary<string, string> replaceDic)
+    protected T GetDataOrReplace<T>(string name, string[] array, int pos)
     {
         if (string.IsNullOrEmpty(name))
         {
@@ -251,20 +257,21 @@ public abstract class AbstractFormulaItem : IFormulaItem
         {
             throw new Exception("数据位置非法pos:" + pos);
         }
-        if (replaceDic == null)
-        {
-            throw new Exception("替换列表为空.");
-        }
+        //if (replaceDic == null)
+        //{
+        //    throw new Exception("替换列表为空.");
+        //}
 
         var resultType = -1;
 
-        T result = default(T);
-        var typeName = typeof (T).Name;
-        if (result is int)
+        var result = default(T);
+        var type = typeof (T);
+        var typeName = type.Name;
+        if (typeName.Equals("Int32"))
         {
             resultType = 1;
         }
-        if (result is float)
+        if (typeName.Equals("Single"))
         {
             resultType = 2;
         }
@@ -272,23 +279,36 @@ public abstract class AbstractFormulaItem : IFormulaItem
         {
             resultType = 3;
         }
-        if (result is Enum)
+        else if (result is Enum)
         {
             resultType = 4;
         }
-        if (result is bool)
+        if (typeName.Equals("Boolean"))
         {
             resultType = 5;
         }
-        var item = array[pos];
-        if (item.StartsWith("%"))
+        if (typeName.Equals("FormulaItemValueComputer"))
         {
-            var replacePos = Convert.ToInt32(item.Trim().Replace("%", ""));
-            if (replacePos < 0)
-            {
-                throw new Exception("");
-            }
-            ReplaceDic.Add(name, resultType + "," + replacePos);
+            resultType = 6;
+        }
+        var item = array[pos];
+        // 数据是否需要替换
+        if (item.Contains("{%") || item.Contains("<"))
+        {
+            ReplaceSourceDataDic.Add(name, resultType + "," + item);
+            //var replacePos = Convert.ToInt32(item.Trim().Replace("{%", ""));
+            //if (replacePos < 0)
+            //{
+            //    throw new Exception("");
+            //}
+            //if (ReplaceDic.ContainsKey(name))
+            //{
+            //    ReplaceDic[name].Add(resultType + "," + replacePos);
+            //}
+            //else
+            //{
+            //    ReplaceDic.Add(name, new List<string>() { resultType + "," + replacePos });
+            //}
         }
         else
         {
@@ -314,6 +334,10 @@ public abstract class AbstractFormulaItem : IFormulaItem
                     // bool
                     result = (T)Convert.ChangeType(item, typeof(T));
                     break;
+                case 6:
+                    // 数值计算类, 支持加减乘数公式
+                    result = (T)Convert.ChangeType((new FormulaItemValueComputer(item)), typeof(T));
+                    break;
             }
         }
 
@@ -334,43 +358,306 @@ public abstract class AbstractFormulaItem : IFormulaItem
         var type = this.GetType();
 
         // 遍历替换列表 如果存在数据则替换对应数据
-        if (ReplaceDic.Count > 0)
+        if (ReplaceSourceDataDic.Count > 0)
         {
-            foreach (var item in ReplaceDic)
+
+            // 技能等级
+            var skillLevel = paramsPacker.SkillLevel - 1;
+            if (skillLevel < 0) skillLevel = 0;
+            // 该等级的数据列表
+            var dataRow = paramsPacker.DataList[skillLevel];
+            var dataClassType = paramsPacker.ReleaseMember.ClusterData.AllData.MemberData.GetType();
+
+            foreach (var item in ReplaceSourceDataDic)
             {
                 var propertyName = item.Key;
                 var value = item.Value.Split(',');
                 var itemType = Convert.ToInt32(value[0]);
-                var pos = Convert.ToInt32(value[1]);
-                // 获取当前等级-1(从0开始)的数据
-                // 如果当前等级小于1则赋予1
-                var skillLevel = paramsPacker.SkillLevel - 1;
-                if (skillLevel < 0) skillLevel = 0;
-                var dataRow = paramsPacker.DataList[skillLevel];
+                var strInfo = value[1];
+
+                // 替换DataList中数据
+                for (var i = 0; i < dataRow.Count; i++)
+                {
+                    strInfo = strInfo.Replace("{%" + i + "}", dataRow[i]);
+                }
+
+                // 获取strInfo中所有被替换数据
+                // 循环这些被替换数据
+                // 先替换数据, 再转换类型
+                var strParts = strInfo.Split('<', '>');
+                var dataStr = "";
+                for (var i = 0; i < strParts.Length; i++)
+                {
+                    var tmpStr = strParts[i].Trim();
+                    // 判断字符串有效
+                    if (!string.IsNullOrEmpty(tmpStr))
+                    {
+                        if (i%2 == 1)
+                        {
+                            // 替换数据
+                            dataStr += GetPropertyOrFieldValue(dataClassType, tmpStr, paramsPacker.ReleaseMember.ClusterData.AllData.MemberData);
+                        }
+                        else
+                        {
+                            dataStr += tmpStr;
+                        }
+                    }
+                }
+
                 var property = type.GetProperty(propertyName);
                 if (property == null)
                 {
-                    throw new Exception("属性不存在:" + propertyName);
+                    throw new Exception("数据目标属性不存在:" + propertyName);
                 }
                 switch (itemType)
                 {
                     case 1:
                         // int
-                        property.SetValue(this, Convert.ToInt32(dataRow[pos]), null);
+                        property.SetValue(this, Convert.ToInt32(dataStr), null);
                         break;
                     case 2:
                         // float
-                        property.SetValue(this, Convert.ToSingle(dataRow[pos]), null);
+                        property.SetValue(this, Convert.ToSingle(dataStr), null);
                         break;
                     case 3:
                         // string
-                        property.SetValue(this, dataRow[pos], null);
+                        property.SetValue(this, dataStr, null);
                         break;
                     case 4:
                         // 枚举
-                        property.SetValue(this, Convert.ToInt32(dataRow[pos]), null);
+                        property.SetValue(this, Convert.ToInt32(dataStr), null);
+                        break;
+                    case 5:
+                        // 枚举
+                        property.SetValue(this, Convert.ToBoolean(dataStr), null);
+                        break;
+                    case 6:
+                        // 计算公式类
+                        property.SetValue(this, new FormulaItemValueComputer(dataStr), null);
                         break;
                 }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 获取属性的值
+    /// </summary>
+    /// <param name="type">被获取类型</param>
+    /// <param name="propertyOrFieldName">字段名称</param>
+    /// <param name="obj">被获取对象</param>
+    /// <returns>获取的值</returns>
+    public static string GetPropertyOrFieldValue(Type type, string propertyOrFieldName, object obj)
+    {
+        string result = null;
+        var dataProperty = type.GetProperty(propertyOrFieldName);
+        if (dataProperty == null)
+        {
+            var dataField = type.GetField(propertyOrFieldName);
+            if (dataField == null)
+            {
+                throw new Exception("数据源属性不存在:" + propertyOrFieldName);
+            }
+            else
+            {
+                result = "" + dataField.GetValue(obj);
+            }
+        }
+        else
+        {
+            result = "" + dataProperty.GetValue(obj, null);
+        }
+        return result;;
+    }
+
+
+    /// <summary>
+    /// 行为数据计算器
+    /// 用于计算
+    /// </summary>
+    public class FormulaItemValueComputer
+    {
+        /// <summary>
+        /// 被计算的字符串值
+        /// </summary>
+        public string StringVal = null;
+
+        /// <summary>
+        /// 生成计算类
+        /// </summary>
+        /// <param name="stringVal">被计算字符串</param>
+        public FormulaItemValueComputer(string stringVal)
+        {
+            StringVal = stringVal;
+        }
+
+
+        /// <summary>
+        /// 获取值
+        /// </summary>
+        /// <returns></returns>
+        public float GetValue()
+        {
+            var result = 0f;
+            if (!string.IsNullOrEmpty(StringVal))
+            {
+                // 生成计算类
+                var compute = new Compute(StringVal);
+                // 返回计算值
+                return compute.GetValue();
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 加减乘除计算类
+        /// </summary>
+        private class Compute
+        {
+            /// <summary>
+            /// 本地计算
+            /// </summary>
+            private List<Compute> computeList = new List<Compute>();
+
+            /// <summary>
+            /// 计算类型
+            /// </summary>
+            private ComputeType computeType = ComputeType.None;
+
+            /// <summary>
+            /// 被计算字符串
+            /// </summary>
+            private string myFormula = null;
+
+
+            public Compute(string formula)
+            {
+                if (string.IsNullOrEmpty(formula))
+                {
+                    return;
+                }
+                myFormula = formula;
+                // 检测当前节点的计算类型
+                if (formula.Contains("-"))
+                {
+                    computeType = ComputeType.Sub;
+                }
+                else if (formula.Contains("+"))
+                {
+                    computeType = ComputeType.Plus;
+                }
+                else if (formula.Contains("/"))
+                {
+                    computeType = ComputeType.Div;
+                }
+                else if (formula.Contains("*"))
+                {
+                    computeType = ComputeType.Mult;
+                }
+                else
+                {
+                    return;
+                }
+
+                char sign = '\0';
+                switch (computeType)
+                {
+                    // 乘
+                    case ComputeType.Mult:
+                        sign = '*';
+                        break;
+                    // 除
+                    case ComputeType.Div:
+                        sign = '/';
+                        break;
+                    // 加
+                    case ComputeType.Plus:
+                        sign = '+';
+                        break;
+                    // 减
+                    case ComputeType.Sub:
+                        sign = '-';
+                        break;
+                }
+
+                var array = formula.Split(sign);
+                foreach (var item in array)
+                {
+                    AddCompute(new Compute(item));
+                }
+            }
+
+            /// <summary>
+            /// 添加子集运算
+            /// </summary>
+            /// <param name="compute">被添加子集运算</param>
+            public void AddCompute(Compute compute)
+            {
+                if (compute == null)
+                {
+                    return;
+                }
+                computeList.Add(compute);
+            }
+
+            /// <summary>
+            /// 获取值
+            /// </summary>
+            /// <returns></returns>
+            public float GetValue()
+            {
+                var result = 0f;
+                switch (computeType)
+                {
+                        // 乘
+                    case ComputeType.Mult:
+                        result = computeList[0].GetValue();
+                        for (var i = 1; i < computeList.Count; i++)
+                        {
+                            result *= computeList[i].GetValue();
+                        }
+                        break;
+                        // 除
+                    case ComputeType.Div:
+                        result = computeList[0].GetValue();
+                        for (var i = 1; i < computeList.Count; i++)
+                        {
+                            result /= computeList[i].GetValue();
+                        }
+                        break;
+                        // 加
+                    case ComputeType.Plus:
+                        computeList.ForEach(item => result += item.GetValue());
+                        break;
+                        // 减
+                    case ComputeType.Sub:
+                        result = computeList[0].GetValue();
+                        for (var i = 1; i < computeList.Count; i++)
+                        {
+                            result -= computeList[i].GetValue();
+                        }
+                        break;
+                        // 无操作
+                    case ComputeType.None:
+                        result = Convert.ToSingle(myFormula);
+                        break;
+                }
+
+                return result;
+            }
+
+
+            /// <summary>
+            /// 计算类型
+            /// </summary>
+            public enum ComputeType
+            {
+                None,   // 无计算
+                Plus,   // 加
+                Sub,    // 减
+                Mult,   // 乘
+                Div     // 除
             }
         }
     }

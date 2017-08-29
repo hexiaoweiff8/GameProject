@@ -3,12 +3,14 @@
 --- DateTime: 2017/7/24 11:51
 ---
 local power_controller = {}
-local _view = require("uiscripts/fight/power/power_view")
-local _data = require("uiscripts/fight/power/power_model")
+local _view
+local _data
 
 
 
 function power_controller:Init(view)
+    _view = require("uiscripts/fight/power/power_view")
+    _data = require("uiscripts/fight/power/power_model")
     _view:initView(view)
     _view.powerTips:SetActive(false)
 end
@@ -53,4 +55,11 @@ function power_controller:hideRecycleTips()
     _view.powerTips:SetActive(false)
 end
 
+
+function power_controller:OnDestroyDone()
+    _view = nil
+    _data = nil
+    Memory.free("uiscripts/fight/power/power_view")
+    Memory.free("uiscripts/fight/power/power_model")
+end
 return power_controller

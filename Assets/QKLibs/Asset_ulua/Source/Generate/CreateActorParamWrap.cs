@@ -16,7 +16,6 @@ public class CreateActorParamWrap
 		L.RegVar("TexturePackName", get_TexturePackName, set_TexturePackName);
 		L.RegVar("IsHero", get_IsHero, set_IsHero);
 		L.RegVar("SoldierID", get_SoldierID, set_SoldierID);
-		L.RegVar("CardID", get_CardID, set_CardID);
 		L.RegVar("Level", get_Level, set_Level);
 		L.RegVar("X", get_X, set_X);
 		L.RegVar("Y", get_Y, set_Y);
@@ -30,7 +29,14 @@ public class CreateActorParamWrap
 		{
 			int count = LuaDLL.lua_gettop(L);
 
-			if (count == 2)
+			if (count == 1)
+			{
+				int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
+				CreateActorParam obj = new CreateActorParam(arg0);
+				ToLua.PushObject(L, obj);
+				return 1;
+			}
+			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(float), typeof(float)))
 			{
 				float arg0 = (float)LuaDLL.luaL_checknumber(L, 1);
 				float arg1 = (float)LuaDLL.luaL_checknumber(L, 2);
@@ -44,20 +50,6 @@ public class CreateActorParamWrap
 				float arg1 = (float)LuaDLL.luaL_checknumber(L, 2);
 				int arg2 = (int)LuaDLL.luaL_checknumber(L, 3);
 				CreateActorParam obj = new CreateActorParam(arg0, arg1, arg2);
-				ToLua.PushObject(L, obj);
-				return 1;
-			}
-			else if (count == 8 && TypeChecker.CheckTypes(L, 1, typeof(int), typeof(bool), typeof(int), typeof(string), typeof(string), typeof(bool), typeof(int), typeof(int)))
-			{
-				int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
-				bool arg1 = LuaDLL.luaL_checkboolean(L, 2);
-				int arg2 = (int)LuaDLL.luaL_checknumber(L, 3);
-				string arg3 = ToLua.CheckString(L, 4);
-				string arg4 = ToLua.CheckString(L, 5);
-				bool arg5 = LuaDLL.luaL_checkboolean(L, 6);
-				int arg6 = (int)LuaDLL.luaL_checknumber(L, 7);
-				int arg7 = (int)LuaDLL.luaL_checknumber(L, 8);
-				CreateActorParam obj = new CreateActorParam(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 				ToLua.PushObject(L, obj);
 				return 1;
 			}
@@ -202,25 +194,6 @@ public class CreateActorParamWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index SoldierID on a nil value" : e.Message);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_CardID(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			CreateActorParam obj = (CreateActorParam)o;
-			int ret = obj.CardID;
-			LuaDLL.lua_pushinteger(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index CardID on a nil value" : e.Message);
 		}
 	}
 
@@ -411,25 +384,6 @@ public class CreateActorParamWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index SoldierID on a nil value" : e.Message);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_CardID(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			CreateActorParam obj = (CreateActorParam)o;
-			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
-			obj.CardID = arg0;
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index CardID on a nil value" : e.Message);
 		}
 	}
 

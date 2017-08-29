@@ -134,19 +134,19 @@ public static class SceneChanger
         //GC.Collect();
         Resources.UnloadUnusedAssets();
 
-        //装载资源包 
-        List<string> dyPacks = AI_Single.Single.Battlefield.GeneratePackList();
+        ////装载资源包 
+        //List<string> dyPacks = AI_Single.Single.Battlefield.GeneratePackList();
 
 
         //装载场景
         bool loadDone = false;
-        DP_Battlefield.Single.SwapScene(param.sceneID, dyPacks, () => loadDone = true);
+        DP_Battlefield.Single.SwapScene(param.sceneID, null, () => loadDone = true);
         //DP_Battlefield.Single.LoadBase();
         while (!loadDone) yield return null; //等待场景装载完成
 
 
         //重新装载3D物体预置
-        DP_FightPrefabManage.ReLoad3DObjects();
+        //DP_FightPrefabManage.ReLoad3DObjects();
 
 
         //隐藏loading
@@ -159,9 +159,14 @@ public static class SceneChanger
             callback();
         }
 
-        LuaFunction main = LuaClient.GetMainState().GetFunction("Onfs");
-        main.Call();
-        main.Dispose();
-        main = null;
+//        if (loadDone)
+//        {
+//            LuaFunction main = LuaClient.GetMainState().GetFunction("Onfs");
+//            main.Call();
+//            main.Dispose();
+//            main = null;
+//
+//        }
+       
     }
 }

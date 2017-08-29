@@ -169,8 +169,19 @@ message SetCardPf {
     repeated int32  lst          =1;
 }
 
+
 message SetCardGf {
     repeated GfItem lst          =1;
+}
+
+
+message CardToCoinItem {
+    required int32 cardId       =1;
+    required int32 num          =2;
+}
+
+message CardToCoin {
+    repeated CardToCoinItem lst =1;
 }
 
 

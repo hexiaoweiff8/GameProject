@@ -6,7 +6,7 @@ function upLevel_view:init_view(arg)
 end
 
 function upLevel_view:init_Uplevel_Panel()
-    self.upLevelPanel = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "upLevelPanel",self.gameObject).gameObject
+    self.upLevelPanel = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "upLevelPanel",view.gameObject).gameObject
     self.btn_upLevelP = self.upLevelPanel.transform:Find("Btn_upLevel").gameObject
     self.btn_upLevelOne = self.upLevelPanel.transform:Find("Btn_upLevel/Btn_upLevelOne").gameObject
     self.btn_upLevelTen = self.upLevelPanel.transform:Find("Btn_upLevel/Btn_upLevelTen").gameObject

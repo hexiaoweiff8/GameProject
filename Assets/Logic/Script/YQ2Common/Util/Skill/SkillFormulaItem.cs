@@ -47,8 +47,8 @@ public class SkillFormulaItem : AbstractFormulaItem
         }
         // 解析参数
         // 是否等待完成, 技能编号, 技能未接收方(0: 释放者, 1: 被释放者)
-        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        var skillNum = GetDataOrReplace<int>("SkillNum", array, 1, ReplaceDic);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        var skillNum = GetDataOrReplace<int>("SkillNum", array, 1);
 
         FormulaType = formulaType;
         SkillNum = skillNum;

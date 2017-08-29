@@ -201,7 +201,14 @@
     <Compile Include="Assets\Logic\Script\Game\UI\LoopHorizontalScrollRect.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\LoopScrollRect.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\LoopVerticalScrollRect.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\Main\CameraController.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\Main\InputManager.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\Main\UIFollowMe.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\PVP\PVPList\PVPListData.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\PVP\PVPList\PVPListItem.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\PVP\PVPList\PVPloopGrid.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\UILongPressButton.cs" />
+    <Compile Include="Assets\Logic\Script\Game\UI\UIPopupListExtended.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\UIRoot.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\UITextGradient.cs" />
     <Compile Include="Assets\Logic\Script\Game\UI\UITextOutline.cs" />
@@ -224,11 +231,10 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\AStar\MapInfo.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\CD\CDTimer.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\DP_TweenFuncs.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\AI\FSM\TriggerFuncFactory.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\AI\FSM\soldier\FSMPacker.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\FSM\soldier\SoldierFSMControl.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\FSM\soldier\SoldierFSMFactory.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\FSM\soldier\SoldierFSMSystem.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\AI\FSM\soldier\TriggerFuncFactory.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\FSM\soldier\state\SoldierFSMState.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\FSM\soldier\state\Soldier_Daiji_State.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\AI\FSM\soldier\state\Soldier_JinengGongji_State.cs" />
@@ -320,6 +326,8 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\CleanTargetFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\CollisionDetectionFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\DeathFormulaItem.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\DelBuffFormulaItem.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\ForFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\Formula\Formula.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\Formula\IFormula.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\FormulaConstructor.cs" />
@@ -348,12 +356,11 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillInfo.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillManager.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillMixer.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SkillTriggerData.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SlideCollisionDetectionFormulaItem.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SubCDFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\SummonedFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\TargetPointSelectorFormulaItem.cs" />
-    <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\TargetSelectFormulaItem.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\TriggerRunner.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\TriggerTicker.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\Util\Skill\UpperLimitFormulaItem.cs" />
@@ -402,6 +409,7 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_cardplanenemy_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_cardplanmine_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_cardshop_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_combofilter_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_commodity_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_currency_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_dailymission_c.cs" />
@@ -410,6 +418,8 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equippower_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equiprecast_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_equipsuit_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_essentialfilter_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_excludefilter_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_item_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_kezhi_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_maininterface_c.cs" />
@@ -425,7 +435,9 @@
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_soldierRender_data.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_soldier_data.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_subtlecode_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_tactictype_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_tech_c.cs" />
+    <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_unittacticdata_c.cs" />
     <Compile Include="Assets\Logic\Script\YQ2Common\sdata\SData_userdata_c.cs" />
     <Compile Include="Assets\Logic\Script\YQFightSystem\AI_Single.cs" />
     <Compile Include="Assets\Logic\Script\YQFightSystem\CreateActorParam.cs" />
@@ -435,6 +447,9 @@
     <Compile Include="Assets\Logic\Script\YQFightSystem\DP_FightEvent.cs" />
     <Compile Include="Assets\Logic\Script\YQFightSystem\DP_FightPrefabManage.cs" />
     <Compile Include="Assets\Logic\Script\YQFightSystem\sdata\SData_SenceDefine.cs" />
+    <Compile Include="Assets\Logic\Script\projectorShadow\ShadowObj.cs" />
+    <Compile Include="Assets\Logic\Script\projectorShadow\ShadowProjector.cs" />
+    <Compile Include="Assets\Logic\Script\projectorShadow\ShadowUtils.cs" />
     <Compile Include="Assets\Logic\Script\wnd\wnd_MsgBox.cs" />
     <Compile Include="Assets\Logic\Script\wnd\wnd_fight.cs" />
     <Compile Include="Assets\Logic\Script\wnd\wnd_poptip.cs" />
@@ -740,12 +755,14 @@
     <Compile Include="Assets\QKLibs\Asset_U3DEX\Source\http\CMHttpSession.cs" />
     <Compile Include="Assets\QKLibs\Asset_U3DEX\Source\http\HttpSession.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\AStarPathFindingWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\AbilityBaseWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\AllDataWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\AstarFightWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\BaseFingerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\BaseWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\BoxScrollObjectWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\ByteBufferWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\CameraControllerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\ChatBubbleAniWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\ClusterDataWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\ClusterManagerWrap.cs" />
@@ -764,7 +781,9 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\DelegateFactory.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\DisplayOwnerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\EasyTouchWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\FightDataStatisticalWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\FightManagerWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\FightParameterWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\FightUnitFactoryWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\FileSystem_RES_LOCATIONWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\GAMELOGWrap.cs" />
@@ -772,6 +791,7 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\HUDTextWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\ItemObjWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\LGYLOGWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\LoadMapWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\LoopGridWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\LoopItemObjectWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\LoopItemScrollViewWrap.cs" />
@@ -797,6 +817,10 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\SDataUtilsWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\SceneChangerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\ScrollObjectWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\ShadowObjWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\SkillBaseWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\SkillInfoWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\SkillManagerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\SpinWithMouseWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\TimeTickerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\ToolsWrap.cs" />
@@ -812,9 +836,12 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIFollowWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIGridWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIInputWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIInput_InputTypeWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UILabelWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIPanelEXWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIPanelWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIPopupListExtendedWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIPopupListWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIProgressBarWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIRectWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIRect_AnchorUpdateWrap.cs" />
@@ -826,6 +853,7 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UITableWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UITextureWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIToastWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIToast_ShowTypeWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIToggleWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UITweenerWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UIWidgetContainerWrap.cs" />
@@ -868,6 +896,7 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_ParticleSystemWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_PhysicsWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_PlayModeWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_PlayerPrefsWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_QualitySettingsWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_QueueModeWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_RectTransformUtilityWrap.cs" />
@@ -887,6 +916,7 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_SpaceWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_SphereColliderWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_SpriteWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_SystemInfoWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_Texture2DWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_TextureWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\UnityEngine_TimeWrap.cs" />
@@ -1178,6 +1208,8 @@
     <None Include="Assets\QKLibs\Asset_ulua\Editor\3rd Tools\GenBabeluaApi\readme.txt" />
     <None Include="Assets\QKLibs\Asset_ulua\ToLua\readme.txt" />
     <None Include="Assets\QKLibs\Protobuf\Web\TODO.txt" />
+    <None Include="Assets\Resources\Shader\ProjectorShader\ShadowProjector.shader" />
+    <None Include="Assets\Resources\Shader\ProjectorShader\ShadowReplace.shader" />
     <None Include="Assets\Resources\Shader\QK - Cloud - 1.shader" />
     <None Include="Assets\Resources\Shader\QK - Cloud - 2.shader" />
     <None Include="Assets\Resources\Shader\QK - Cloud - 3.shader" />
@@ -1209,13 +1241,21 @@
     <None Include="Assets\StreamingAssets\SkillScript10005.txt" />
     <None Include="Assets\StreamingAssets\SkillScript10006.txt" />
     <None Include="Assets\StreamingAssets\SkillScript10007.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript10008.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript10009.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1001.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript10010.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1002.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1003.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1004.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1005.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1112.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1113.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript20001.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript20002.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript20003.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript20004.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript20005.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
 </Project>

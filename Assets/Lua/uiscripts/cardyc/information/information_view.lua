@@ -74,7 +74,7 @@ end
 ---初始化品质升级成功界面
 ---
 function information_view:init_UpQuality_SuccessPanel()
-    self.upQuality_SuccessP = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "adSuccess",  self.gameObject)
+    self.upQuality_SuccessP = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "adSuccess",  view.gameObject)
     self.upQualitySP_clickPanel = self.upQuality_SuccessP.transform:Find("clickPanel").gameObject
     self.upQualitySP_titleL = self.upQuality_SuccessP.transform:Find("title_Lab").gameObject
     for i=1,#qualityUtil.qualityPropName do
@@ -90,7 +90,7 @@ end
 ---初始化物品信息界面
 ---
 function information_view:init_itemInfoPanel()
-    self.itemInfoPanel = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "medalItemPanel", self.gameObject)
+    self.itemInfoPanel = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "medalItemPanel", view.gameObject)
     self.itemInfoP_itemImg = self.itemInfoPanel.transform:Find("ItemBk/itemImg_Sp").gameObject--物品图
     self.itemInfoP_itemNameLab = self.itemInfoPanel.transform:Find("itemName_Lab").gameObject --物品名
     self.itemInfoP_addDesLab = self.itemInfoPanel.transform:Find("addDes_Lab").gameObject --属性加成

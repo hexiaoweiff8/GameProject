@@ -9,12 +9,12 @@ public class IfFormulaItem : AbstractFormulaItem
     /// <summary>
     /// 条件Name
     /// </summary>
-    public string Condition = null;
+    public string Condition { get; private set; }
 
     /// <summary>
     /// 具体条件
     /// </summary>
-    public string ConditionArgs = null;
+    public string ConditionArgs { get; private set; }
 
     /// <summary>
     /// 是否break
@@ -22,7 +22,7 @@ public class IfFormulaItem : AbstractFormulaItem
     /// break时会跳出整个流程, 后面的不再执行
     /// 如果为0则只会影响其下的二级流程
     /// </summary>
-    public int IsBreak = 0;
+    public int IsBreak { get; private set; }
 
 
     /// <summary>
@@ -133,10 +133,10 @@ public class IfFormulaItem : AbstractFormulaItem
             throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
         }
 
-        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        var isBreak = GetDataOrReplace<int>("IsBreak", array, 1, ReplaceDic);
-        var condition = GetDataOrReplace<string>("Condition", array, 2, ReplaceDic);
-        var conditionArgs = GetDataOrReplace<string>("ConditionArgs", array, 3, ReplaceDic);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        var isBreak = GetDataOrReplace<int>("IsBreak", array, 1);
+        var condition = GetDataOrReplace<string>("Condition", array, 2);
+        var conditionArgs = GetDataOrReplace<string>("ConditionArgs", array, 3);
 
         FormulaType = formulaType;
         IsBreak = isBreak;

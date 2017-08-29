@@ -16,6 +16,8 @@ public class Soldier_Siwang_State : SoldierFSMState
         // 释放死亡时技能
         var allData = fsm.Display.ClusterData.AllData;
 
+        var memberType = FightManager.MemberType.Soldier;
+
         // 判断死亡单位类型
         switch (allData.MemberData.ArmyType)
         {
@@ -33,15 +35,22 @@ public class Soldier_Siwang_State : SoldierFSMState
             {
                 // 一方胜利
                 Debug.Log("一方基地被摧毁,战斗结束.");
+                memberType = FightManager.MemberType.Base;
+                // 向外层抛出失败事件
+                FightManager.Single.DoEndGameAction(allData.MemberData.Camp);
             }
                 break;
             // 防御塔
             case Utils.TurretArmyType:
             {
                 Debug.Log("一方防御塔被摧毁,可拖兵范围变更.");
+                memberType = FightManager.MemberType.Turret;
             }
                 break;
         }
+
+        // 向外层抛出单位死亡事件
+        FightManager.Single.DoMemberDeadAction(fsm.Display.GameObj, allData.MemberData.Camp, memberType);
 
         // 死亡时检测技能
         if (allData.SkillInfoList != null)

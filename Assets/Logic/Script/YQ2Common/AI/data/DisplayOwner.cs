@@ -18,10 +18,10 @@ public class DisplayOwner
     /// </summary>
     public PositionObject ClusterData { get; set; }
 
-    /// <summary>
-    /// 显示数据引用
-    /// </summary>
-    public MFAModelRender MFAModelRender { get; set; }
+    ///// <summary>
+    ///// 显示数据引用
+    ///// </summary>
+    //public MFAModelRender MFAModelRender { get; set; }
 
     /// <summary>
     /// 显示对象引用
@@ -41,18 +41,11 @@ public class DisplayOwner
         ClusterData = clusterData;
     }
 
-    public DisplayOwner([NotNull] GameObject gameObj, [NotNull] PositionObject clusterData, MFAModelRender mfa)
+    public DisplayOwner([NotNull]GameObject gameObj, [NotNull]PositionObject clusterData, [NotNull]RanderControl randerControl)
     {
         GameObj = gameObj;
         ClusterData = clusterData;
-        MFAModelRender = mfa;
-    }
-
-    public DisplayOwner([NotNull]GameObject gameObj, [NotNull]PositionObject clusterData, MFAModelRender modelRender, [NotNull]RanderControl randerControl)
-    {
-        GameObj = gameObj;
-        ClusterData = clusterData;
-        MFAModelRender = modelRender;
+        //MFAModelRender = modelRender;
         RanderControl = randerControl;
         //MemberData = memberData;
     }
@@ -74,7 +67,7 @@ public class DisplayOwner
     public void CleanData()
     {
         ClusterData = null;
-        MFAModelRender = null;
+        //MFAModelRender = null;
         //MemberData = null;
     }
 }

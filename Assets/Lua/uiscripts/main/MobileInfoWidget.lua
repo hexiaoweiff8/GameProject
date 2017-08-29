@@ -1,5 +1,5 @@
 ui_mobileInfo = {
-	cPARENT = "UIRoot/FlyRoot",
+	cPARENT = "UIRoot/BackGroundRoot/ui_main_panel/ui_main",
 	-- 1136x640分辨率相对坐标
 	cLocalPosition = Vector3(520,293,0),
 	-- 是否已经初始化

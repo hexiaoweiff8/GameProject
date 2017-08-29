@@ -58,6 +58,11 @@ public class TriggerData
     public bool IsBuff { get; set; }
 
     /// <summary>
+    /// 是否暴击
+    /// </summary>
+    public bool IsCrit { get; set; }
+
+    /// <summary>
     /// 是否不致死
     /// </summary>
     public bool IsNotLethal { get; set; }

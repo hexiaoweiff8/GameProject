@@ -1,29 +1,39 @@
 local upSynergy_controller = {}
-local view = require("uiscripts/cardyc/upSynergy/upSynergy_view")
-local data = require("uiscripts/cardyc/upSynergy/upSynergy_model")
-
-require("uiscripts/commonGameObj/synergyItem")
-require("uiscripts/commonGameObj/cardhead")
-
-local UpSynergyIndex = 0        --保存所选中的协同选项
-local isAttrItemInit = false    --是否初始化协同选项
-local isInitxtLayer = false     --是否初始化协同详细信息界面
-
-local synergyItems = {}
+local view
+local data
+local UpSynergyIndex    --保存所选中的协同选项
+local isAttrItemInit    --是否初始化协同选项
+local isInitxtLayer     --是否初始化协同详细信息界面
+local synergyItems
 local cardHead
 function upSynergy_controller:init( args )
+    view = require("uiscripts/cardyc/upSynergy/upSynergy_view")
+    data = require("uiscripts/cardyc/upSynergy/upSynergy_model")
+    UpSynergyIndex = 0        --保存所选中的协同选项
+    isAttrItemInit = false    --是否初始化协同选项
+    isInitxtLayer = false     --是否初始化协同详细信息界面
+    synergyItems = {}
     view:init_view(args)
 end
 
+function upSynergy_controller:OnDestroyDone()
+    Memory.free("uiscripts/cardyc/upSynergy/upSynergy_view")
+    Memory.free("uiscripts/cardyc/upSynergy/upSynergy_model")
+    view = nil
+    data = nil
+    UpSynergyIndex = nil
+    isAttrItemInit  = nil
+    isInitxtLayer = nil
+    synergyItems = nil
+    cardHead = nil
+end
+
+
 function upSynergy_controller:Refresh()
-    print("upSynergy_controller refresh!!!!")
     data:init_synergyIDTbl()
     data:init_synergyStateTbl()
     self:synergy_Body()
 end
-
-
-
 --刷新协同部分
 function upSynergy_controller:synergy_Body()
 

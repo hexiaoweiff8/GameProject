@@ -1,22 +1,39 @@
 local upSkill_controller = {}
-local view = require("uiscripts/cardyc/upSkill/upSkill_view")
-local data = require("uiscripts/cardyc/upSkill/upSkill_model")
-require("uiscripts/commonGameObj/skillItem")
-require("uiscripts/commonGameObj/cardhead")
-
-local UpSkillIndex = 0          --保存升级的技能的index
-local isInitSUpLayer = false    --是否初始化技能详细信息界面
-local isfiveSIinit = false      --是否初始化技能选项
-local isInitSptReset = false    --是否初始化技能重置界面
-
-local skillItems = {}
+local view
+local data
+local UpSkillIndex           --保存升级的技能的index
+local isInitSUpLayer     --是否初始化技能详细信息界面
+local isfiveSIinit      --是否初始化技能选项
+local isInitSptReset     --是否初始化技能重置界面
+local skillItems
 local skillInfoItem
 local cardhead
 function upSkill_controller:init( args )
+
+    view = require("uiscripts/cardyc/upSkill/upSkill_view")
+    data = require("uiscripts/cardyc/upSkill/upSkill_model")
+    UpSkillIndex = 0
+    isInitSUpLayer = false
+    isfiveSIinit = false
+    isInitSptReset = false
+    skillItems = {}
+
     view:init_view(args)
     
 end
-
+function upSkill_controller:OnDestroyDone()
+    Memory.free("uiscripts/cardyc/upSkill/upSkill_view")
+    Memory.free("uiscripts/cardyc/upSkill/upSkill_model")
+    view = nil
+    data = nil
+    UpSkillIndex = nil
+    isInitSUpLayer = nil
+    isfiveSIinit = nil
+    isInitSptReset = nil
+    skillItems = nil
+    skillInfoItem = nil
+    cardhead = nil
+end
 function upSkill_controller:Refresh()
     -- body
     print("upSkill_controller refresh!!!!")
@@ -67,7 +84,7 @@ function upSkill_controller:show_SkillItem_UpPanel(index)
     view.skillInfoP_lvProLab.transform:GetComponent("UILabel").text 
         = string.format("[f15c03]%d[-]/%d",data.skill_Lv_Table[index],Const.MAX_SKILL_LV)--当前技能/技能总级
     view.skillInfoP_sdes_Lab.transform:GetComponent("UILabel").text 
-        = skillUtil:getskillDesByID(data.skill_ID_Table[index])
+        = skillUtil:getSkillDescription(data.skill_ID_Table[index],data.skill_Lv_Table[index])
     view.skillInfoPanel:SetActive(true)
         
     --判断是否达到最大技能等级

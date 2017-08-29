@@ -53,7 +53,7 @@ public struct UnitFightData_cInfo
 	 /// </summary>
 	public int ArmyID;
 	 /// <summary>
-	 ///单位费用
+	 ///单兵费用
 	 /// </summary>
 	public short CostPerUnit;
 	 /// <summary>

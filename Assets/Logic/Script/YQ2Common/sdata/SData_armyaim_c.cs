@@ -19,6 +19,8 @@ public class SData_armyaim_c : MonoEX.Singleton<SData_armyaim_c>
                 switch (head[(int)(double)o11 - 1])
 				{
 					case "ArmyID": dif.ArmyID = (int)(double)o22; break;
+					case "Camp": dif.Camp = (short)(double)o22; break;
+					case "CampType": dif.CampType = (short)(double)o22; break;
 					case "Surface": dif.Surface = (short)(double)o22; break;
 					case "SurfaceType": dif.SurfaceType = (short)(double)o22; break;
 					case "Air": dif.Air = (short)(double)o22; break;
@@ -67,6 +69,14 @@ public struct armyaim_cInfo
 	 ///兵种ID
 	 /// </summary>
 	public int ArmyID;
+	 /// <summary>
+	 ///阵营筛选
+	 /// </summary>
+	public short Camp;
+	 /// <summary>
+	 ///类型
+	 /// </summary>
+	public short CampType;
 	 /// <summary>
 	 ///对地权重
 	 /// </summary>

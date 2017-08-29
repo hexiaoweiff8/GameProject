@@ -108,7 +108,7 @@ public class DP_Battlefield : MonoEX.SingletonAuto<DP_Battlefield>
     /// </summary>
     public void Reset()
     {
-            DP_CameraTrackObjectManage.Single.Reset();
+            //DP_CameraTrackObjectManage.Single.Reset();
             MFAModelManage.Single.Clean();//清缓存的模型和材质
             ClusterManager.Single.ClearAll();
             m_CameraTouchCount = 0;

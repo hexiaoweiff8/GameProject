@@ -54,22 +54,10 @@ public class AStarPathFinding
         var colCount = map[0].Length;
 
         // 柔化边缘寻路
-        if (endX + diameterX >= colCount)
-        {
-            endX = colCount - diameterX - 1;
-        }
-        if (endX - diameterX <= 0)
-        {
-            endX = diameterX + 1;
-        }
-        if (endY + diameterY >= rowCount)
-        {
-            endY = rowCount - diameterY - 1;
-        }
-        if (endY - diameterY <= 0)
-        {
-            endY = diameterY + 1;
-        }
+        endX = FormatPoint(endX, diameterX, colCount);
+        endY = FormatPoint(endY, diameterY, rowCount);
+        startX = FormatPoint(startX, diameterX, colCount);
+        startY = FormatPoint(startY, diameterY, rowCount);
         // 获取可行进目标点
         var targetNode = GetFormatTarget(map, endX, endY, diameterX, diameterY);
         if (targetNode == null)
@@ -90,24 +78,12 @@ public class AStarPathFinding
         // 如果搜索次数大于(w+h) * 4 则停止搜索
         var maxSearchCount = (rowCount + colCount) * 40;
 
-        // 计算结束偏移
-        //endX = endX - diameterX;
-        //endY = endY - diameterY;
-
         var counter = 0;
-
         // 中间变量定义
         // 寻路G值
         float g;
         // 当前被搜索节点
         Node currentPoint;
-        //// 开放节点值
-        //Node node = null;
-        //// 当前节点与目标点x,y差
-        //int xOff = 0;
-        //int yOff = 0;
-        //// 当前路线斜率
-        //float k = 0;
         
         do
         {
@@ -629,6 +605,26 @@ public class AStarPathFinding
         return true;
     }
 
+    /// <summary>
+    /// 格式化地图上点
+    /// </summary>
+    /// <param name="val">被格式化值</param>
+    /// <param name="diameter">直径</param>
+    /// <param name="max">最大值</param>
+    /// <returns>被格式化值</returns>
+    private static int FormatPoint(int val, int diameter, int max)
+    {
+        var result = val;
+        if (result + diameter >= max)
+        {
+            result = max - diameter - 1;
+        }
+        if (result - diameter <= 0)
+        {
+            result = diameter + 1;
+        }
+        return result;
+    }
 
 
 }

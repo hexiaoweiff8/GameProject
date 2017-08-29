@@ -12,6 +12,7 @@ public class GameObjectExtensionWrap
 		L.RegFunction("FindChild", FindChild);
 		L.RegFunction("InstantiateFromPreobj", InstantiateFromPreobj);
 		L.RegFunction("InstantiateFromPacket", InstantiateFromPacket);
+		L.RegFunction("InstantiateModelFromPacket", InstantiateModelFromPacket);
 		L.EndStaticLibs();
 	}
 
@@ -111,6 +112,25 @@ public class GameObjectExtensionWrap
 			string arg1 = ToLua.CheckString(L, 2);
 			UnityEngine.GameObject arg2 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 3, typeof(UnityEngine.GameObject));
 			UnityEngine.GameObject o = GameObjectExtension.InstantiateFromPacket(arg0, arg1, arg2);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int InstantiateModelFromPacket(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			string arg0 = ToLua.CheckString(L, 1);
+			string arg1 = ToLua.CheckString(L, 2);
+			UnityEngine.GameObject arg2 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 3, typeof(UnityEngine.GameObject));
+			UnityEngine.GameObject o = GameObjectExtension.InstantiateModelFromPacket(arg0, arg1, arg2);
 			ToLua.Push(L, o);
 			return 1;
 		}

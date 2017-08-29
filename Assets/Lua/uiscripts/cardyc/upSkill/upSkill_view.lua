@@ -13,7 +13,7 @@ end
 
 function upSkill_view:init_skillPointResetPanels()
     -- body
-    self.sPtRPanel = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "sPtReset",  self.gameObject)
+    self.sPtRPanel = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "sPtReset",  view.gameObject)
     self.sPtRP_titleL = self.sPtRPanel.transform:Find("title_Lab").gameObject
     self.sPtRP_desL = self.sPtRPanel.transform:Find("des_Lab").gameObject
     self.sPtRP_btnBack = self.sPtRPanel.transform:Find("Btn_backSp").gameObject
@@ -27,7 +27,7 @@ end
 
 function upSkill_view:init_skillInfoPanel()
     -- body
-    self.skillInfoPanel = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "skillItemUpLayer",  self.gameObject)
+    self.skillInfoPanel = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "skillItemUpLayer",  view.gameObject)
     self.skillInfoP_BtnBack = self.skillInfoPanel.transform:Find("Btn_backSp").gameObject
     self.skillInfoP_lv_Lab = self.skillInfoPanel.transform:Find("lv_Lab").gameObject
     self.skillInfoP_lvProLab = self.skillInfoPanel.transform:Find("lvProgress_Lab").gameObject

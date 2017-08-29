@@ -90,13 +90,13 @@ public class SlideCollisionDetectionFormulaItem : AbstractFormulaItem
         }
 
         // 如果该项值是以%开头的则作为替换数据
-        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        var targetPos = GetDataOrReplace<int>("TargetPos", array, 1, ReplaceDic);
-        var startPos = GetDataOrReplace<int>("StartPos", array, 2, ReplaceDic);
-        var speed = GetDataOrReplace<float>("Speed", array, 3, ReplaceDic);
-        var width = GetDataOrReplace<float>("Width", array, 4, ReplaceDic);
-        var length = GetDataOrReplace<float>("Length", array, 5, ReplaceDic);
-        var targetCamps = GetDataOrReplace<TargetCampsType>("TargetCamps", array, 6, ReplaceDic);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        var targetPos = GetDataOrReplace<int>("TargetPos", array, 1);
+        var startPos = GetDataOrReplace<int>("StartPos", array, 2);
+        var speed = GetDataOrReplace<float>("Speed", array, 3);
+        var width = GetDataOrReplace<float>("Width", array, 4);
+        var length = GetDataOrReplace<float>("Length", array, 5);
+        var targetCamps = GetDataOrReplace<TargetCampsType>("TargetCamps", array, 6);
 
         FormulaType = formulaType;
         Speed = speed;

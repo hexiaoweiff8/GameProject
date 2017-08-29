@@ -24,10 +24,10 @@ function network_manager.on_socket_data(key, data)
     if key == Protocal.Message then
         local header = header_pb.Header();
         header:ParseFromString(data);
-        --printe('ID==>' .. header.ID);
-        --printw('msgId==>' .. header.msgId);
-        --printf('userId==>' .. header.userId);
-        --printw('version==>' .. header.version);
+        printe('ID==>' .. header.ID);
+        printw('msgId==>' .. header.msgId);
+        printf('userId==>' .. header.userId);
+        printw('version==>' .. header.version);
         lgyPrint('errno==>' .. header.errno);
         lgyPrint('ext==>' .. header.ext);
         if header.errno == 0 then --错误码为0

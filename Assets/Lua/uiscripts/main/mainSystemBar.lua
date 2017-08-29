@@ -1,5 +1,5 @@
 ui_mainSystemBar = {
-	cPARENT = "UIRoot/FlyRoot",
+	cPARENT = "UIRoot/BackGroundRoot/ui_main_panel/ui_main",
 	local_MainSystemBarData = {},
 	MainSystemBarItems = {},
 	-- 行间距,相对于分辨率
@@ -101,16 +101,6 @@ function ui_mainSystemBar.initItem()
 	m.bIsInitialed = true
 end
 function ui_mainSystemBar.attachListener(ID,pItem)
-
-	local function showWND(WNDTYPE_WndName)
-		local WND_instance = ui_manager:GetWB(WNDTYPE_WndName)
-		if WND_instance == nil then
-			ui_manager:ShowWB(WNDTYPE_WndName)
-		else
-			WND_instance:Show()
-		end
-	end
-
 	UIEventListener.Get(pItem).onClick = function()
 		local function getEntrance(ID)
 			for i = 1,#m.local_MainSystemBarData do

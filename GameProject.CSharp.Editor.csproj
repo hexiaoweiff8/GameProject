@@ -422,6 +422,8 @@
     <None Include="Assets\QKLibs\Asset_ulua\Editor\3rd Tools\GenBabeluaApi\readme.txt" />
     <None Include="Assets\QKLibs\Asset_ulua\ToLua\readme.txt" />
     <None Include="Assets\QKLibs\Protobuf\Web\TODO.txt" />
+    <None Include="Assets\Resources\Shader\ProjectorShader\ShadowProjector.shader" />
+    <None Include="Assets\Resources\Shader\ProjectorShader\ShadowReplace.shader" />
     <None Include="Assets\Resources\Shader\QK - Cloud - 1.shader" />
     <None Include="Assets\Resources\Shader\QK - Cloud - 2.shader" />
     <None Include="Assets\Resources\Shader\QK - Cloud - 3.shader" />
@@ -453,13 +455,21 @@
     <None Include="Assets\StreamingAssets\SkillScript10005.txt" />
     <None Include="Assets\StreamingAssets\SkillScript10006.txt" />
     <None Include="Assets\StreamingAssets\SkillScript10007.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript10008.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript10009.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1001.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript10010.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1002.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1003.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1004.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1005.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1112.txt" />
     <None Include="Assets\StreamingAssets\SkillScript1113.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript20001.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript20002.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript20003.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript20004.txt" />
+    <None Include="Assets\StreamingAssets\SkillScript20005.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
 </Project>

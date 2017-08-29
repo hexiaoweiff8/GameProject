@@ -3,13 +3,14 @@
 --- DateTime: 2017/7/10 11:34
 ---
 local class = require("common/middleclass")
-local Remake = class("Remake")
-local _view = require("uiscripts/commonGameObj/remake/remake_view")
-local _data = require("uiscripts/commonGameObj/remake/remake_model")
-local confirmP = require("uiscripts/tips/ui_tips_confirm")
-local _isInit = false
+Remake = class("Remake")
+local _view
+local _data
+local _isInit
 function Remake:initialize()
-
+    _view = require("uiscripts/commonGameObj/remake/remake_view")
+    _data = require("uiscripts/commonGameObj/remake/remake_model")
+    _isInit = false
 end
 
 ---
@@ -253,7 +254,7 @@ function Remake:refreshChooseProps()
         if selectAttributeID == chooseAttributeID and selectAttributeIsMax and chooseAttributeIsMax then
 
             ---《《弹窗提示》》》》》》“当前属性与选择替换属性相同，确认继续替换？”《《《《《《
-            confirmP:Show(stringUtil:getString(30109), function()
+            ui_tips_confirm:Show(stringUtil:getString(30109), function()
                 Message_Manager:SendPB_RemakeExchange(_data.equipToShow.id, _data.selectIndex, _data.chooseIndex, self)
             end)
             return
@@ -318,4 +319,13 @@ function Remake:exchangeRefresh()
     self:refreshRemakePanel()
 end
 
+
+
+function Remake:Destroy()
+    Memory.free("uiscripts/commonGameObj/remake/remake_view")
+    Memory.free("uiscripts/commonGameObj/remake/remake_model")
+    _view = nil
+    _data = nil
+    _isInit = nil
+end
 return Remake

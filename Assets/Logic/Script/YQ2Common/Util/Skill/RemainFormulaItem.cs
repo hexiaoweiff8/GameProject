@@ -17,17 +17,17 @@ public class RemainFormulaItem : AbstractFormulaItem
     /// 1: 目标单位
     /// 2: 已选目标点
     /// </summary>
-    public int Target;
+    public int Target { get; private set; }
 
     /// <summary>
     /// 被加载范围技能编号
     /// </summary>
-    public int RemainNum;
+    public int RemainNum { get; private set; }
 
     /// <summary>
     /// 是否跟随单位
     /// </summary>
-    public bool IsFollow;
+    public bool IsFollow { get; private set; }
 
 
     /// <summary>
@@ -49,10 +49,10 @@ public class RemainFormulaItem : AbstractFormulaItem
             throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
         }
 
-        FormulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        Target = GetDataOrReplace<int>("Target", array, 1, ReplaceDic);
-        RemainNum = GetDataOrReplace<int>("RemainNum", array, 2, ReplaceDic);
-        IsFollow = GetDataOrReplace<bool>("IsFollow", array, 3, ReplaceDic);
+        FormulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        Target = GetDataOrReplace<int>("Target", array, 1);
+        RemainNum = GetDataOrReplace<int>("RemainNum", array, 2);
+        IsFollow = GetDataOrReplace<bool>("IsFollow", array, 3);
 
     }
 

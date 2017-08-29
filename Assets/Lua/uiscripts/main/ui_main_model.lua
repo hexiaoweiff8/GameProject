@@ -9,6 +9,9 @@ local this = ui_main_model
 --function def
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function ui_main_model:initModel()
+	if not this.AvoidWarCardTimestamp then
+		this.AvoidWarCardTimestamp = os.time()
+	end
 	this:initLocalInterfaceData()
 end
 

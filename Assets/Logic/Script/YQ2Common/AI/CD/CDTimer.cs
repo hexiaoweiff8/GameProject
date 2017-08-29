@@ -14,7 +14,7 @@ public class CDTimer : Singleton<CDTimer>
     /// <summary>
     /// 公共cd时间
     /// </summary>
-    public float PublicCDTime = 1;
+    public float PublicCDTime = 0.5f;
 
 
     /// <summary>
@@ -48,7 +48,7 @@ public class CDTimer : Singleton<CDTimer>
     /// <param name="objId">单位唯一ID</param>
     /// <param name="cdGroup">cd组</param>
     /// <returns></returns>
-    public bool IsInCD(int skillId, int objId, int cdGroup)
+    public bool IsInCD(int skillId, int objId = -1, int cdGroup = -1)
     {
         var keyForCD = Utils.GetKey(objId, skillId);
         if (cdGroup < 0)
@@ -136,8 +136,47 @@ public class CDTimer : Singleton<CDTimer>
         timer = new Timer(PublicCDTime);
         timer.OnCompleteCallback(() =>
         {
-            // 时间到消除CD
-            cdGroupDic.Remove(key);
+            // 时间到消除CD状态
+            if (cdGroupDic.ContainsKey(key))
+            {
+                cdGroupDic.Remove(key);
+            }
         }).Start();
+    }
+
+    /// <summary>
+    /// 减少CD
+    /// </summary>
+    /// <param name="skillId">技能ID</param>
+    /// <param name="objId">单位ObjId</param>
+    /// <param name="cdTime">原CD时间</param>
+    /// <param name="subTime">被减时间</param>
+    public void SubCD(int skillId, float cdTime, float subTime, int objId = -1)
+    {
+        var keyForCD = Utils.GetKey(objId, skillId);
+        if (cdDic.ContainsKey(keyForCD))
+        {
+            if (cdTime <= subTime)
+            {
+                cdDic.Remove(keyForCD);
+                return;
+            }
+            var begin = cdDic[keyForCD];
+            var endTime = begin + cdTime;
+            var nowTime = Time.realtimeSinceStartup;
+            if (nowTime < endTime)
+            {
+                var nowCD = cdTime - subTime;
+                // 减少CD时间
+                cdDic[keyForCD] = begin + nowCD;
+
+                var timer = new Timer(nowCD - nowTime + begin);
+                // 时间到消除CD
+                timer.OnCompleteCallback(() =>
+                {
+                    cdDic.Remove(keyForCD);
+                }).Start();
+            }
+        }
     }
 }

@@ -5,24 +5,26 @@
 
 local class = require("common/middleclass")
 equip_controller = class("equip_controller", wnd_base)
-local view = require("uiscripts/myEquip/equip_view")
-local data = require("uiscripts/myEquip/equip_model")
-local equipPage = require("uiscripts/myEquip/equipPage/equipPage_controller")
-local detailPage = require("uiscripts/myEquip/detailPage/detailPage_controller")
-local equipOnBody = require("uiscripts/myEquip/equipOnBody/equipOnBody_controller")
-local comPropty = require("uiscripts/myEquip/comPropty/comPropty_controller")
-local UIModel = require("uiscripts/commonGameObj/UIModel")
+local view
+local data
+local equipPage
+local detailPage
+local equipOnBody
+local comPropty
 local _UIModel
-
-local Remake = require("uiscripts/commonGameObj/remake/remake_controller")
-local remakePanel
-
-
+local _RemakePanel
 
 ---
 ---显示界面时执行
 ---
 function equip_controller:OnShowDone()
+    view = require("uiscripts/myEquip/equip_view")
+    data = require("uiscripts/myEquip/equip_model")
+    equipPage = require("uiscripts/myEquip/equipPage/equipPage_controller")
+    detailPage = require("uiscripts/myEquip/detailPage/detailPage_controller")
+    equipOnBody = require("uiscripts/myEquip/equipOnBody/equipOnBody_controller")
+    comPropty = require("uiscripts/myEquip/comPropty/comPropty_controller")
+
     ---
     ---初始化view和数据
     ---
@@ -39,7 +41,7 @@ function equip_controller:OnShowDone()
     comPropty:init(self)
 
     ---初始化重铸界面
-    remakePanel = Remake()
+    _RemakePanel = Remake()
 
     ---初始化UIModel
     _UIModel = UIModel(view.UIModelPosition)
@@ -49,21 +51,49 @@ function equip_controller:OnShowDone()
     ---
     self:initShow()
     UIEventListener.Get(view.btn_Back).onClick = function(go)
-        print("back")
-        self:Hide()
+        self:Hide(0)
+        --if ui_manager._shown_wnd_bases[WNDTYPE.Prefight] == nil then
+        --    ui_manager:ShowWB(WNDTYPE.Prefight)
+        --else
+        --    ui_manager._shown_wnd_bases[WNDTYPE.Prefight]:Show()
+        --end
+        --if ui_manager._shown_wnd_bases[WNDTYPE.Cardyc] == nil then
+        --    ui_manager:ShowWB(WNDTYPE.Cardyc)
+        --else
+        --    ui_manager._shown_wnd_bases[WNDTYPE.Cardyc]:Show()
+        --end
     end
 end
 ---
 ---界面销毁回调
 ---
 function equip_controller:OnDestroyDone()
-
+    detailPage:OnDestroyDone()
+    comPropty:OnDestroyDone()
+    equipPage:OnDestroyDone()
+    equipOnBody:OnDestroyDone()
+    Memory.free("uiscripts/myEquip/equip_view")
+    Memory.free("uiscripts/myEquip/equip_model")
+    Memory.free("uiscripts/myEquip/equipPage/equipPage_controller")
+    Memory.free("uiscripts/myEquip/detailPage/detailPage_controller")
+    Memory.free("uiscripts/myEquip/equipOnBody/equipOnBody_controller")
+    Memory.free("uiscripts/myEquip/comPropty/comPropty_controller")
+    view = nil
+    data = nil
+    equipPage = nil
+    detailPage = nil
+    equipOnBody = nil
+    comPropty = nil
+    _UIModel:Destroy()
+    _UIModel = nil
+    _RemakePanel:Destroy()
+    _RemakePanel = nil
 end
 ---
 ---重新打开时回调
 ---
 function equip_controller:OnReOpenDone()
-
+    self:initShow()
 end
 ---
 ---初始化界面显示
@@ -81,18 +111,17 @@ function equip_controller:initShow()
     ---
     self:showRightPanel(equipOnBody:getCurrentSelectEquipType())
 
-
 end
 
 ---
 ---获取重铸界面
 ---
 function equip_controller:getRemakePanel()
-    return remakePanel
+    return _RemakePanel
 end
 function equip_controller:showRemakePanel(equip)
-    remakePanel:show(equip, view.remakeP, 21)
-    remakePanel:setExchangeRefreshFunc(equip_controller.remakeExchangeRefresh)
+    _RemakePanel:show(equip, view.remakeP, 21)
+    _RemakePanel:setExchangeRefreshFunc(equip_controller.remakeExchangeRefresh)
 end
 ---
 ---
@@ -261,6 +290,8 @@ function equip_controller:remakeExchangeRefresh()
         detailPage:refresh()
     end
 end
+
+
 
 return equip_controller
 

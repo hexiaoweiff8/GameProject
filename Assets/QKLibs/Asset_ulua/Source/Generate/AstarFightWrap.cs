@@ -8,6 +8,7 @@ public class AstarFightWrap
 	{
 		L.BeginClass(typeof(AstarFight), typeof(UnityEngine.MonoBehaviour));
 		L.RegFunction("InitMap", InitMap);
+		L.RegFunction("AnalysisMap", AnalysisMap);
 		L.RegFunction("Clear", Clear);
 		L.RegFunction("isZhangAi", isZhangAi);
 		L.RegFunction("isQianFengZhangAi", isQianFengZhangAi);
@@ -43,6 +44,22 @@ public class AstarFightWrap
 			int[][] arg0 = ToLua.CheckObjectArray<int[]>(L, 2);
 			int[][] arg1 = ToLua.CheckObjectArray<int[]>(L, 3);
 			obj.InitMap(arg0, arg1);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int AnalysisMap(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			AstarFight obj = (AstarFight)ToLua.CheckObject(L, 1, typeof(AstarFight));
+			obj.AnalysisMap();
 			return 0;
 		}
 		catch(Exception e)

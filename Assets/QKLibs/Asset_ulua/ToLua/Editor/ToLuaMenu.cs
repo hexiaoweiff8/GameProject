@@ -1036,6 +1036,89 @@ public static class ToLuaMenu
         AssetDatabase.Refresh();
     }
 
+    [MenuItem("Lua/Build Lua files to StreamingAssets With LuaJit64 and make files", false, 61)]
+    public static void BuildLuaToStResourcesWithJit64()
+    {
+        ClearAllLuaFiles();
+        string tempDir = CreateStreamDir("Lua_back");
+        string destDir = Application.streamingAssetsPath + "/lua";//Application.dataPath + "/Resources" + "/Lua";
+
+        string path = Application.dataPath.Replace('\\', '/');
+        path = path.Substring(0, path.LastIndexOf('/'));
+        File.Copy(path + "/Luajit64/Build.bat", tempDir + "/Build.bat", true);
+        CopyLuaBytesFiles(LuaConst.luaDir, tempDir, false);
+        Process proc = Process.Start(tempDir + "/Build.bat");
+        proc.WaitForExit();
+        CopyLuaBytesFiles(tempDir + "/Out/", destDir, false, "*.lua.bytes");
+        CopyLuaBytesFiles(LuaConst.toluaDir, destDir);
+
+        BuildFiles();
+
+        Directory.Delete(tempDir, true);
+        AssetDatabase.Refresh();
+    }
+    [MenuItem("Lua/Build Lua files to StreamingAssets NoJit and make files", false, 62)]
+    public static void BuildLuaToStResourcesNojit()
+    {
+        ClearAllLuaFiles();
+        string destDir = Application.streamingAssetsPath + "/lua";
+        CopyLuaBytesFiles(LuaConst.luaDir, destDir,false);
+        CopyLuaBytesFiles(LuaConst.toluaDir, destDir,false); 
+
+        BuildFiles();
+
+        Debug.Log("Copy lua files over and make files.txt over");
+        AssetDatabase.Refresh();
+    }
+
+    private static void Recursive_LuaDir(string path, ref List<string> mPaths, ref List<string> mFiles)
+    {
+        string[] names = Directory.GetFiles(path);
+        string[] dirs = Directory.GetDirectories(path);
+        foreach (string filename in names)
+        {
+            string ext = Path.GetExtension(filename);
+            if (ext.Equals(".meta")) continue;
+            mFiles.Add(filename.Replace('\\', '/'));
+        }
+        foreach (string dir in dirs)
+        {
+            mPaths.Add(dir.Replace('\\', '/'));
+            Recursive_LuaDir(dir, ref mPaths, ref mFiles);
+        }
+    }
+
+    private static void BuildFiles()
+    {
+        ///----------------------创建文件列表-----------------------
+        string osStreamPath = Application.streamingAssetsPath;
+        string newFilePath = osStreamPath + "/files.txt";
+        if (File.Exists(newFilePath)) File.Delete(newFilePath);
+
+        List<string> mPaths = new List<string>();
+        List<string> mFiles = new List<string>();
+        mPaths.Clear();
+        mFiles.Clear();
+        Recursive_LuaDir(osStreamPath + "/lua",ref  mPaths,ref mFiles);
+  
+
+        FileStream fs = new FileStream(newFilePath, FileMode.CreateNew);
+        StreamWriter sw = new StreamWriter(fs);
+        for (int i = 0; i < mFiles.Count; i++)
+        {
+            string file = mFiles[i];
+            //string ext = Path.GetExtension(file);
+            if (file.EndsWith(".meta") || file.Contains(".DS_Store")) continue;
+
+            string md5 = Tools.md5file(file);
+            string value = file.Replace(osStreamPath + "/", string.Empty);
+            sw.WriteLine(value + "|" + md5);
+        }
+        sw.Close();
+        fs.Close();
+    }
+
+
     [MenuItem("Lua/Build Lua files to Persistent (PC)", false, 54)]
     public static void BuildLuaToPersistent()
     {

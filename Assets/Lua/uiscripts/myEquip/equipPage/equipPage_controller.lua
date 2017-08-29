@@ -3,10 +3,9 @@
 --- DateTime: 2017/6/28 17:59
 ---
 local equipPage_controller = {}
-local view = require("uiscripts/myEquip/equipPage/equipPage_view")
-local data = require("uiscripts/myEquip/equipPage/equipPage_model")
-local EquipDetail = require("uiscripts/commonGameObj/equipDetail/equipDetail_controller")
-local equipItemControl = require("uiscripts/myEquip/equipPage/equipItemControl")
+local view
+local data
+local equipItemControl
 ---
 ---装备信息显示界面
 ---
@@ -21,6 +20,10 @@ local currentEquip
 ---装备栏正显示的装备类型
 ---
 function equipPage_controller:init(equipController)
+    view = require("uiscripts/myEquip/equipPage/equipPage_view")
+    data = require("uiscripts/myEquip/equipPage/equipPage_model")
+    equipItemControl = require("uiscripts/myEquip/equipPage/equipItemControl")
+
     view:init_view(equipController)
     view.otherEquip_DetailP:SetActive(false)
     equipItemControl:init(self, view)
@@ -165,4 +168,22 @@ function equipPage_controller:showRemakePanel(equip)
     equip_controller:showRemakePanel(equip)
 end
 
+
+function equipPage_controller:OnDestroyDone()
+    Memory.free("uiscripts/myEquip/equipPage/equipPage_view")
+    Memory.free("uiscripts/myEquip/equipPage/equipPage_model")
+    Memory.free("uiscripts/myEquip/equipPage/equipItemControl")
+    view = nil
+    data = nil
+    equipItemControl = nil
+    if onBodyDetail then
+        onBodyDetail:Destroy()
+    end
+    onBodyDetail = nil
+    if otherEquipDetail then
+        otherEquipDetail:Destroy()
+    end
+    otherEquipDetail = nil
+    currentEquip = nil
+end
 return equipPage_controller

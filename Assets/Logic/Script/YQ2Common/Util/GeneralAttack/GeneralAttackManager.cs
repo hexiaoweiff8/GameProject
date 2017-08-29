@@ -43,7 +43,7 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
         GameObject targetObj, 
         float speed, 
         TrajectoryAlgorithmType taType, 
-        Action callback)
+        Action<GameObject> callback)
     {
         IGeneralAttack result = null;
 
@@ -72,6 +72,7 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
     /// <param name="durTime">范围特效持续时间</param>
     /// <param name="taType">子弹飞行轨迹</param>
     /// <param name="callback">攻击结束回调</param>
+    /// <param name="callbackForEveryOne">每个受击单位的回调</param>
     /// <returns></returns>
     public IGeneralAttack GetPointToObjScopeGeneralAttack(PositionObject attacker,
         string[] effectKey,
@@ -81,7 +82,8 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
         float speed,
         float durTime,
         TrajectoryAlgorithmType taType,
-        Action callback)
+        Action callback,
+        Action<GameObject> callbackForEveryOne = null)
     {
         IGeneralAttack result = null;
 
@@ -93,7 +95,8 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
             speed, 
             durTime, 
             taType, 
-            callback);
+            callback,
+            callbackForEveryOne);
 
         return result;
     }
@@ -103,37 +106,34 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
     /// 点对点范围伤害
     /// </summary>
     /// <param name="attacker">攻击者</param>
-    /// <param name="effectKey">特效key(或Path)数组(第一个为飞行特效, 第二个为范围特效)</param>
     /// <param name="releasePos">发射点</param>
     /// <param name="targetPos">目标点</param>
     /// <param name="scopeRaduis">范围伤害半径</param>
     /// <param name="speed">飞行速度</param>
-    /// <param name="durTime">范围特效持续时间</param>
     /// <param name="taType">弹道类型</param>
     /// <param name="callback">完成回调</param>
+    /// <param name="callbackForEveryOne">每个受击单位的回调</param>
     /// <returns></returns>
     public IGeneralAttack GetPointToPositionScopeGeneralAttack(PositionObject attacker,
-        string[] effectKey,
         Vector3 releasePos,
         Vector3 targetPos,
         float scopeRaduis,
         float speed,
-        float durTime,
         TrajectoryAlgorithmType taType,
-        Action callback)
+        Action callback,
+        Action<GameObject> callbackForEveryOne = null)
     {
 
         IGeneralAttack result = null;
 
         result = new PointToPositionScopeGeneralAttack(attacker,
-            effectKey,
             releasePos,
             targetPos,
             scopeRaduis,
             speed,
-            durTime,
             taType,
-            callback);
+            callback,
+            callbackForEveryOne);
 
         return result;
     }
@@ -148,13 +148,15 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
     /// <param name="scopeRaduis">范围半径</param>
     /// <param name="durTime">持续时间</param>
     /// <param name="callback">结束回调</param>
+    /// <param name="callbackForEveryOne">每个受击单位的回调</param>
     /// <returns></returns>
     public IGeneralAttack GetPositionCircleScopeGeneralAttack(PositionObject attacker,
         string effectKey,
         Vector3 targetPos,
         float scopeRaduis,
         float durTime,
-        Action callback)
+        Action callback,
+        Action<GameObject> callbackForEveryOne = null)
     {
         IGeneralAttack result = null;
 
@@ -162,8 +164,9 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
             effectKey, 
             targetPos, 
             scopeRaduis, 
-            durTime, 
-            callback);
+            durTime,
+            callback,
+            callbackForEveryOne);
 
         return result;
     }
@@ -180,6 +183,7 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
     /// <param name="rotate">旋转角度(0度为z轴正方向)</param>
     /// <param name="durTime">持续时间</param>
     /// <param name="callback">结束回调</param>
+    /// <param name="callbackForEveryOne">每个受击单位的回调</param>
     /// <returns></returns>
     public IGeneralAttack GetPositionSectorScopeGeneralAttack(PositionObject attacker,
         string effectKey,
@@ -188,7 +192,8 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
         float openAngle,
         float rotate,
         float durTime,
-        Action callback)
+        Action callback,
+        Action<GameObject> callbackForEveryOne = null)
     {
         IGeneralAttack result = null;
 
@@ -199,7 +204,8 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
             targetPos,
             graphics,
             durTime,
-            callback);
+            callback,
+            callbackForEveryOne);
 
         return result;
     }
@@ -215,6 +221,7 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
     /// <param name="rotate">旋转角度(0度为z轴正方向)</param>
     /// <param name="durTime">持续时间</param>
     /// <param name="callback">结束回调</param>
+    /// <param name="callbackForEveryOne">每个受击单位的回调</param>
     /// <returns></returns>
     public IGeneralAttack GetPositionRectScopeGeneralAttack(PositionObject attacker,
         string effectKey,
@@ -223,7 +230,8 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
         float height,
         float rotate,
         float durTime,
-        Action callback)
+        Action callback,
+        Action<GameObject> callbackForEveryOne = null)
     {
         IGeneralAttack result = null;
 
@@ -234,7 +242,8 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
             targetPos,
             graphics,
             durTime,
-            callback);
+            callback,
+            callbackForEveryOne);
 
         return result;
     }
@@ -252,6 +261,7 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
     /// <param name="offset">正方向偏移值</param>
     /// <param name="durTime">持续时间</param>
     /// <param name="callback">结束回调</param>
+    /// <param name="callbackForEveryOne">每个受击单位的回调</param>
     /// <returns></returns>
     public IGeneralAttack GetPositionRectScopeGeneralAttack(PositionObject attacker,
         string effectKey,
@@ -261,7 +271,8 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
         float rotate,
         float offset,
         float durTime,
-        Action callback)
+        Action callback,
+        Action<GameObject> callbackForEveryOne = null)
     {
         IGeneralAttack result = null;
 
@@ -275,7 +286,8 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
             targetPos,
             graphics,
             durTime,
-            callback);
+            callback,
+            callbackForEveryOne);
 
         return result;
     }
@@ -290,13 +302,15 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
     /// <param name="graphics">范围检测图形</param>
     /// <param name="durTime">持续时间</param>
     /// <param name="callback">结束回调</param>
+    /// <param name="callbackForEveryOne">每个受击单位的回调</param>
     /// <returns></returns>
     public IGeneralAttack GetPositionScopeGeneralAttack(PositionObject attacker,
         string effectKey,
         Vector3 targetPos,
         ICollisionGraphics graphics, 
         float durTime,
-        Action callback)
+        Action callback,
+        Action<GameObject> callbackForEveryOne = null)
     {
         IGeneralAttack result = null;
 
@@ -305,7 +319,8 @@ public class GeneralAttackManager : Singleton<GeneralAttackManager>
             targetPos,
             graphics,
             durTime,
-            callback);
+            callback,
+            callbackForEveryOne);
 
         return result;
     }

@@ -1,5 +1,5 @@
 ui_mainCurrencyBar = {
-	cPARENT = "UIRoot/FlyRoot",
+	cPARENT = "UIRoot/BackGroundRoot/ui_main_panel/ui_main",
 	-- 1136x640分辨率相对坐标
 	cLocalPosition = Vector3(106,293,0),
 	bIsInitialed = false,

@@ -27,15 +27,24 @@ function ui_quitGame:OnShowDone()
         end
     end
 end
-function ui_quitGame:OnDestroyDoneEnd()
+function ui_quitGame:OnDestroyDone()
     if isQuitGame then
         Time.timeScale = 1
-        --卸掉场景
-        DP_Battlefield.Single:SwapScene(0, nil, nil)
+        FightManager.Single:EndFight()
         --清理战场
         DP_Battlefield.Single:Reset()
-        ui_manager:ShowWB(WNDTYPE.Login)
-        WndManage.Single:DestroyHideWnds()
+        --卸掉场景
+        DP_Battlefield.Single:SwapScene(0, nil, nil)
+
+        -- ui_manager:ShowWB(WNDTYPE.BianDui)
+        --ui_manager:ShowWB(WNDTYPE.Main)
+        --ui_manager:ShowWB(WNDTYPE.ui_equip)
+        --WndManage.Single:DestroyHideWnds()
+        if ui_manager._shown_wnd_bases[WNDTYPE.Main] == nil then
+            ui_manager:ShowWB(WNDTYPE.Main)
+        else
+            ui_manager._shown_wnd_bases[WNDTYPE.Main]:Show()
+        end
     end
 end
 return ui_quitGame

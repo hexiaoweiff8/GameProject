@@ -119,7 +119,7 @@ public class TriggerTicker : ILoopItem
                     if (tmpBuffInfo != null)
                     {
                         // 检测上次tick与上次tick的时差, 超过或相等的执行action一次, 并更新tick
-                        if (tickDiff >= tmpBuffInfo.TickTime * Utils.TicksTimeToSecond)
+                        if (tmpBuffInfo.TickTime > 0 && tickDiff >= tmpBuffInfo.TickTime * Utils.TicksTimeToSecond)
                         {
                             // 执行buff的Action
                             BuffManager.Single.DoBuff(tmpBuffInfo, BuffDoType.Action, FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(tmpBuffInfo.ReleaseMember, tmpBuffInfo.ReceiveMember, tmpBuffInfo, 1, tmpBuffInfo.IsNotLethal));

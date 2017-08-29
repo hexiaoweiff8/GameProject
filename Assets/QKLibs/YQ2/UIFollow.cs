@@ -5,13 +5,18 @@ public class UIFollow : MonoBehaviour
     // 需要跟随的目标对象
     private Transform target;
     private bool isFollow;
+    private bool isStop;
     public Transform Target
     {
         get { return target; }
         set
         {
             target = value;
-            if (target) { isFollow = true; }
+            if (target)
+            {
+                isFollow = true;
+                isStop = false;
+            }
         }
     }
 
@@ -41,6 +46,10 @@ public class UIFollow : MonoBehaviour
 
     void LateUpdate()
     {
+        if (isStop)
+        {
+            return;
+        }
         if (!target||!isFollow)
         {
             return;
@@ -75,6 +84,10 @@ public class UIFollow : MonoBehaviour
 
     }
 
+    public void Stop()
+    {
+        isStop = true;
+    }
 
     /// <summary>
     /// 用于重新开始游戏时直接重置相机位置

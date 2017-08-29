@@ -1,24 +1,42 @@
 local information_controller = {}
-local view = require("uiscripts/cardyc/information/information_view")
-local data = require("uiscripts/cardyc/information/information_model")
-
-require("uiscripts/commonGameObj/itemSlot")
-
-local isInitMedalItemLayer = false  --是否初始化物品内容界面
-local isInitGainLayer  = false      --是否初始化获得方式界面
-local isSlotInit = false            --是否初始化物品插槽
-local isInitAmSLayer = false        --是否初始化晋升成功界面
-local isinitDetail = false          --是否初始化卡牌信息界面
-
+local view
+local data
+local isInitMedalItemLayer  --是否初始化物品内容界面
+local isInitGainLayer       --是否初始化获得方式界面
+local isSlotInit            --是否初始化物品插槽
+local isInitAmSLayer        --是否初始化晋升成功界面
+local isinitDetail          --是否初始化卡牌信息界面
 local itemSlots = {}
-
 local success_cardhead_left
 local success_cardhead_right
 local detail_cardhead
 function information_controller:init( args )
-    -- body
-    view:init_view(args)
+    view = require("uiscripts/cardyc/information/information_view")
+    data = require("uiscripts/cardyc/information/information_model")
+    isInitMedalItemLayer = false
+    isInitGainLayer  = false
+    isSlotInit = false
+    isInitAmSLayer = false
+    isinitDetail = false
+    itemSlots = {}
 
+    view:init_view(args)
+end
+
+function information_controller:OnDestroyDone()
+    Memory.free("uiscripts/cardyc/information/information_view")
+    Memory.free("uiscripts/cardyc/information/information_model")
+    view = nil
+    data = nil
+    isInitMedalItemLayer = nil
+    isInitGainLayer = nil
+    isSlotInit = nil
+    isInitAmSLayer = nil
+    isinitDetail = nil
+    itemSlots = nil
+    success_cardhead_left = nil
+    success_cardhead_right = nil
+    detail_cardhead = nil
 end
 
 function information_controller:setPropItemInfo(propItem, propsName)
@@ -386,5 +404,8 @@ function information_controller:equipSlot_Success()
         view.itemInfoPanel:SetActive(false)
     end
 end
+
+
+
 
 return information_controller

@@ -37,7 +37,12 @@ public class PositionScopeGeneralAttack : IGeneralAttack
     /// <summary>
     /// 结束时回调
     /// </summary>
-    public Action callback;
+    private Action callback;
+
+    /// <summary>
+    /// 每个被击目标的回调
+    /// </summary>
+    private Action<GameObject> callbackForEveryOne;
 
 
     /// <summary>
@@ -49,12 +54,14 @@ public class PositionScopeGeneralAttack : IGeneralAttack
     /// <param name="scopeRaduis">范围半径</param>
     /// <param name="durTime">持续时间</param>
     /// <param name="callback">结束回调</param>
+    /// <param name="callbackForEveryOne">每个受击单位的回调</param>
     public PositionScopeGeneralAttack(PositionObject attacker, 
         string effectKey, 
         Vector3 targetPos, 
         float scopeRaduis, 
         float durTime, 
-        Action callback)
+        Action callback = null,
+        Action<GameObject> callbackForEveryOne = null)
     {
         if (attacker == null)
         {
@@ -67,6 +74,7 @@ public class PositionScopeGeneralAttack : IGeneralAttack
         graphics = new CircleGraphics(new Vector2(targetPos.x, targetPos.z), scopeRaduis);
         this.durTime = durTime;
         this.callback = callback;
+        this.callbackForEveryOne = callbackForEveryOne;
     }
 
     /// <summary>
@@ -78,12 +86,14 @@ public class PositionScopeGeneralAttack : IGeneralAttack
     /// <param name="graphics">范围检测图形</param>
     /// <param name="durTime">持续时间</param>
     /// <param name="callback">结束回调</param>
+    /// <param name="callbackForEveryOne">每个受击单位的回调</param>
     public PositionScopeGeneralAttack(PositionObject attacker, 
         string effectKey, 
         Vector3 targetPos, 
         ICollisionGraphics graphics, 
-        float durTime, 
-        Action callback)
+        float durTime,
+        Action callback,
+        Action<GameObject> callbackForEveryOne = null)
     {
         if (attacker == null)
         {
@@ -96,6 +106,7 @@ public class PositionScopeGeneralAttack : IGeneralAttack
         this.graphics = graphics;
         this.durTime = durTime;
         this.callback = callback;
+        this.callbackForEveryOne = callbackForEveryOne;
     }
 
     public void Begin()
@@ -114,6 +125,10 @@ public class PositionScopeGeneralAttack : IGeneralAttack
         {
             // 被攻击者数据
             var beAttackDisplayOwner = DisplayerManager.Single.GetElementByPositionObject(member);
+            if (beAttackDisplayOwner == null || attackerDisplayOwner == null)
+            {
+                continue;
+            }
             // 独计算是否命中, 是否伤害
             var isMiss = HurtResult.AdjustIsMiss(attackerDisplayOwner, beAttackDisplayOwner);
             if (!isMiss)
@@ -128,8 +143,62 @@ public class PositionScopeGeneralAttack : IGeneralAttack
                     ReleaseMember = beAttackDisplayOwner,
                     TypeLevel1 = TriggerLevel1.Fight,
                     TypeLevel2 = TriggerLevel2.BeAttack,
-                    DemageType = DemageType.NormalAttackDemage
+                    DemageType = DemageType.NormalAttackDemage,
+                    IsCrit = HurtResult.IsCrit
                 });
+                // 回调每个受击单位
+                if (callbackForEveryOne != null && member != null)
+                {
+                    callbackForEveryOne(member.gameObject);
+                }
+
+                var effect = member.AllData.EffectData;
+
+                var getHitEffect = effect.GetHitByBulletEffect;
+                var getHitDurTime = 0f;
+                // 分辨特效类型
+                switch (effect.BulletType)
+                {
+                    case 1:
+                        getHitEffect = effect.GetHitByBulletEffect;
+                        getHitDurTime = effect.GetHitByBulletEffectTime;
+                        break;
+
+                    case 2:
+                        getHitEffect = effect.GetHitByBombEffect;
+                        getHitDurTime = effect.GetHitByBombEffectTime;
+                        break;
+                }
+
+                if (getHitDurTime > 0)
+                {
+                    // 对每个单位播受击特效
+                    // TODO 使用挂点
+                    EffectsFactory.Single.CreatePointEffect(getHitEffect,
+                        ParentManager.Instance().GetParent(ParentManager.BallisticParent).transform,
+                        member.gameObject.transform.position,
+                        new Vector3(1, 1, 1),
+                        getHitDurTime,
+                        0,
+                        null,
+                        Utils.EffectLayer).Begin();
+                }
+            }
+            else
+            {
+
+                // 闪避时事件
+                SkillManager.Single.SetTriggerData(new TriggerData()
+                {
+                    ReceiveMember = attackerDisplayOwner,
+                    ReleaseMember = beAttackDisplayOwner,
+                    TypeLevel1 = TriggerLevel1.Fight,
+                    TypeLevel2 = TriggerLevel2.Dodge
+                });
+                var beAttackVOBase = beAttackDisplayOwner.ClusterData.AllData.MemberData;
+                // 抛出miss事件
+                FightManager.Single.DoHealthChangeAction(beAttackDisplayOwner.GameObj, beAttackVOBase.TotalHp,
+                    beAttackVOBase.CurrentHP, 0f, FightManager.HurtType.Miss, beAttackVOBase.ObjID.ObjType);
             }
         }
 

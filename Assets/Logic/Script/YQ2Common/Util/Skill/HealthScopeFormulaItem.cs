@@ -38,9 +38,9 @@ public class HealthScopeFormulaItem : AbstractFormulaItem
         }
 
         // 如果该项值是以%开头的则作为替换数据
-        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        var lower = GetDataOrReplace<float>("HealthLowerLimit", array, 1, ReplaceDic);
-        var upper = GetDataOrReplace<int>("HealthUpperLimit", array, 2, ReplaceDic);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        var lower = GetDataOrReplace<float>("HealthLowerLimit", array, 1);
+        var upper = GetDataOrReplace<int>("HealthUpperLimit", array, 2);
 
         FormulaType = formulaType;
         HealthLowerLimit = lower;

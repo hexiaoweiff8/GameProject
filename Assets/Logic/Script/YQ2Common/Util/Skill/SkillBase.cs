@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 
 
@@ -42,6 +43,11 @@ public class AbilityBase
     public int Level = 1;
 
     /// <summary>
+    /// 被替换列表
+    /// </summary>
+    public Dictionary<string, string> ReplaceSourceDataDic = new Dictionary<string, string>();
+
+    /// <summary>
     /// 能力共享数据
     /// 在执行流程内
     /// </summary>
@@ -75,6 +81,8 @@ public class AbilityBase
     /// buff 结束行为
     /// </summary>
     protected IFormulaItem detachFormulaItem = null;
+
+
 
     /// <summary>
     /// 添加触发行为生成器
@@ -238,6 +246,170 @@ public class AbilityBase
     }
 
 
+    /// <summary>
+    /// 获得数据或替换
+    /// </summary>
+    /// <param name="name">数据名称</param>
+    /// <param name="val">数据</param>
+    /// <returns>转换后数据</returns>
+    public T GetDataOrReplace<T>(string name, string val)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            throw new Exception("字段名为空.");
+        }
+        if (string.IsNullOrEmpty(val))
+        {
+            throw new Exception("数据为空.");
+        }
+        //if (replaceDic == null)
+        //{
+        //    throw new Exception("替换列表为空.");
+        //}
+
+        var resultType = -1;
+
+        var result = default(T);
+        var type = typeof(T);
+        var typeName = type.Name;
+        if (typeName.Equals("Int32"))
+        {
+            resultType = 1;
+        }
+        if (typeName.Equals("Single"))
+        {
+            resultType = 2;
+        }
+        if (typeName.Equals("String"))
+        {
+            resultType = 3;
+        }
+        else if (result is Enum)
+        {
+            resultType = 4;
+        }
+        if (typeName.Equals("Boolean"))
+        {
+            resultType = 5;
+        }
+        if (typeName.Equals("FormulaItemValueComputer"))
+        {
+            resultType = 6;
+        }
+        var item = val;
+        // 数据是否需要替换
+        if (item.Contains("{%") || item.Contains("<"))
+        {
+            ReplaceSourceDataDic.Add(name, resultType + "--,--" + item);
+        }
+        else
+        {
+            switch (resultType)
+            {
+                case 1:
+                    // int
+                    result = (T)Convert.ChangeType(item, typeof(T));
+                    break;
+                case 2:
+                    // float
+                    result = (T)Convert.ChangeType(item, typeof(T));
+                    break;
+                case 3:
+                    // string
+                    result = (T)(object)item;
+                    break;
+                case 4:
+                    // enum
+                    result = (T)Enum.Parse(typeof(T), item);
+                    break;
+                case 5:
+                    // bool
+                    result = (T)Convert.ChangeType(item, typeof(T));
+                    break;
+                case 6:
+                    // 数值计算类, 支持加减乘数公式
+                    result = (T)Convert.ChangeType((new AbstractFormulaItem.FormulaItemValueComputer(item)), typeof(T));
+                    break;
+            }
+        }
+
+
+        return result;
+    }
+
+    /// <summary>
+    /// 按照等级替换数据
+    /// </summary>
+    /// <param name="level">技能等级</param>
+    public void ReplaceData(int level)
+    {
+        if (level <= 0)
+        {
+            throw new Exception("技能等级非法:" + level);
+        }
+        var type = this.GetType();
+
+        // 遍历替换列表 如果存在数据则替换对应数据
+        if (ReplaceSourceDataDic.Count > 0)
+        {
+
+            // 技能等级
+            var skillLevel = level - 1;
+            if (skillLevel < 0) skillLevel = 0;
+            // 该等级的数据列表
+            var dataRow = DataList[skillLevel];
+
+            foreach (var item in ReplaceSourceDataDic)
+            {
+                var propertyName = item.Key;
+                var value = Regex.Split(item.Value, "--,--");
+                var itemType = Convert.ToInt32(value[0]);
+                var strInfo = value[value.Length - 1];
+
+                // 替换DataList中数据
+                for (var i = 0; i < dataRow.Count; i++)
+                {
+                    strInfo = strInfo.Replace("{%" + i + "}", dataRow[i]);
+                }
+
+                var property = type.GetProperty(propertyName);
+                if (property == null)
+                {
+                    throw new Exception("数据目标属性不存在:" + propertyName);
+                }
+                switch (itemType)
+                {
+                    case 1:
+                        // int
+                        property.SetValue(this, Convert.ToInt32(strInfo), null);
+                        break;
+                    case 2:
+                        // float
+                        property.SetValue(this, Convert.ToSingle(strInfo), null);
+                        break;
+                    case 3:
+                        // string
+                        property.SetValue(this, strInfo, null);
+                        break;
+                    case 4:
+                        // 枚举
+                        property.SetValue(this, Convert.ToInt32(strInfo), null);
+                        break;
+                    case 5:
+                        // 枚举
+                        property.SetValue(this, Convert.ToBoolean(strInfo), null);
+                        break;
+                    case 6:
+                        // 计算公式类
+                        property.SetValue(this, new AbstractFormulaItem.FormulaItemValueComputer(strInfo), null);
+                        break;
+                }
+            }
+        }
+    }
+
+
+
 
 
     /// <summary>
@@ -302,17 +474,18 @@ public class SkillBase : AbilityBase
     /// 0:触发概率0%
     /// 1:触发概率100%
     /// </summary>
-    public float TriggerProbability = 1; 
+    public float TriggerProbability {
+        get { return triggerProbability; } set { triggerProbability = value; } }
 
     /// <summary>
     /// 生命区间下限
     /// </summary>
-    public int HpScopeMin = -1;
+    public float HpScopeMin { get { return hpScopeMin; } set { hpScopeMin = value; } }
 
     /// <summary>
     /// 生命区间上限
     /// </summary>
-    public int HpScopeMax = -1;
+    public float HpScopeMax { get { return hpScopeMax; } set { hpScopeMax = value; } }
 
     /// <summary>
     /// buff的Tick时间(单位 秒)
@@ -364,6 +537,23 @@ public class SkillBase : AbilityBase
     /// 描述
     /// </summary>
     public string Description { get; set; }
+
+    /// <summary>
+    /// 技能触发几率
+    /// 0:触发概率0%
+    /// 1:触发概率100%
+    /// </summary>
+    private float triggerProbability = 1;
+
+    /// <summary>
+    /// 生命区间下限
+    /// </summary>
+    private float hpScopeMin = -1;
+
+    /// <summary>
+    /// 生命区间上限
+    /// </summary>
+    private float hpScopeMax = -1;
 
 
 
@@ -830,5 +1020,8 @@ public enum DemageAdditionOrReductionTargetType
     Mechanics = 7,          // 机械单位
     Melee = 8,              // 近战单位
     Summoned = 9,           // 召唤单位
+
+    NotMelee = 10,          // 非近战单位
+    NotMechanics = 11,      // 非械单位
 
 }

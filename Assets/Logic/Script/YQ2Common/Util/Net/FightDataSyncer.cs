@@ -232,10 +232,10 @@ public class FightDataSyncer : ILoopItem
                 ",UniqueId:" + displayOwner.ClusterData.AllData.MemberData.UniqueID +
                 ",UnitType:" + (int)displayOwner.ClusterData.AllData.MemberData.ObjID.ObjType +
                 //",CmName:" + objPos.name.Substring(0, objPos.name.IndexOf("(", StringComparison.Ordinal)) +
-                ",Level:" + displayOwner.ClusterData.AllData.MemberData.ArmyLevel +
-                (displayOwner.MFAModelRender == null ? "" :
-                ",MeshPackName:" + displayOwner.MFAModelRender.MeshPackName +
-                ",TexturePackName:" + displayOwner.MFAModelRender.TexturePackName));
+                ",Level:" + displayOwner.ClusterData.AllData.MemberData.ArmyLevel);// +
+                //(displayOwner.MFAModelRender == null ? "" :
+                //",MeshPackName:" + displayOwner.MFAModelRender.MeshPackName +
+                //",TexturePackName:" + displayOwner.MFAModelRender.TexturePackName));
 
         // 本地缓存
         PushBeComfirmData(msgOp, true);
@@ -255,6 +255,15 @@ public class FightDataSyncer : ILoopItem
 
         // 数据放入缓冲
         PushtBeSendData(msgOp, (int)MsgId.MsgOptional);
+    }
+
+    /// <summary>
+    /// 添加数据
+    /// </summary>
+    /// <param name="objId"></param>
+    public void AddOptionalData(ObjectID objId)
+    {
+        AddOptionalData(DisplayerManager.Single.GetElementById(objId));
     }
 
 
@@ -774,10 +783,10 @@ public class FightDataSyncer : ILoopItem
             // 创建单位
             memberDisplay = FightUnitFactory.CreateUnit(unitType, new CreateActorParam(mapingPos.x, mapingPos.z, level)
             {
-                ColorMat = true,
-                CardID = 0,
-                MeshPackName = meshPackname,
-                TexturePackName = texturePackname,
+                //ColorMat = true,
+                //CardID = 0,
+                //MeshPackName = meshPackname,
+                //TexturePackName = texturePackname,
                 SoldierID = uniqueId,
             });
             memberDisplay.ClusterData.Begin();

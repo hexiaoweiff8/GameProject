@@ -1,11 +1,10 @@
 local upSoldier_controller = {}
-require("uiscripts/commonGameObj/cardhead")
-local view = require("uiscripts/cardyc/upSoldier/upSoldier_view")
-local data = require("uiscripts/cardyc/upSoldier/upSoldier_model")
-
+local view
+local data
 local cardhead
 function upSoldier_controller:init( args )
-
+    view = require("uiscripts/cardyc/upSoldier/upSoldier_view")
+    data = require("uiscripts/cardyc/upSoldier/upSoldier_model")
     view:init_view(args)
     local position = Vector3(0,136,0)
     cardhead = CardHead(view.soldierPanel,position)
@@ -17,7 +16,13 @@ function upSoldier_controller:init( args )
     self:Refresh()
 end
 
-
+function upSoldier_controller:OnDestroyDone()
+    Memory.free("uiscripts/cardyc/upSoldier/upSoldier_view")
+    Memory.free("uiscripts/cardyc/upSoldier/upSoldier_model")
+    view = nil
+    data = nil
+    cardhead = nil
+end
 
 function upSoldier_controller:Refresh()
     -- body

@@ -31,7 +31,7 @@ public class ImmuneToDeathFormulaItem : AbstractFormulaItem
         }
         // 是否等待完成,特效Key,目标位置,持续时间
         // 如果该项值是以%开头的则作为替换数据
-        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0);
 
 
         FormulaType = formulaType;

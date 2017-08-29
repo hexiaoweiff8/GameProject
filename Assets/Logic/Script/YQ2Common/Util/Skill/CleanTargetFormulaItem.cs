@@ -12,9 +12,8 @@ using System.Text;
 
         /// <summary>
         /// 目标点
-        /// 0: 自己的位置
-        /// 1: 目标的位置
-        /// 2: 目标点选择的位置
+        /// 0: 自己
+        /// 1: 目标
         /// </summary>
         public int TargetPos { get; private set; }
 
@@ -50,8 +49,8 @@ using System.Text;
             }
 
             // 如果该项值是以%开头的则作为替换数据
-            var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-            var targetPos = GetDataOrReplace<int>("TargetPos", array, 1, ReplaceDic);
+            var formulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+            var targetPos = GetDataOrReplace<int>("TargetPos", array, 1);
 
             FormulaType = formulaType;
             TargetPos = targetPos;

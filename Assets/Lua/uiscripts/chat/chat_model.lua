@@ -12,7 +12,7 @@ chat_model= {
     oldWorldRecordList = {},--更旧的聊天记录信息
 
     bubbleRecordList = {},--气泡的信息保存地
---    -- userid,username,content,time,type(0世界，1军团，1001是时间Item)
+--    -- userid,username,content,time,chattype(0世界，1军团，),type(0自己 1别人 2是时间Item)
 
 
     lastTime = 0,--最新的聊天时间
@@ -37,24 +37,6 @@ function chat_model:initmodel()
 
 end
 
-local testOnece = true --测试一次数据更新
---local lastNum = 0--最后一次请求所保存的数量
-----数据更新请求
-function chat_model:RefreshDate()
-    --local lastNum = #this.chatRecordList
-    --print("更新前："..lastNum)
-    if testOnece then
-        --向服务器发送请求拉取新的聊天数据
-        --local date = this.testdate2 --测试用的数据
-
-        --更新数据
-        chat_model:insertDate(date)
-    end
-    testOnece = false
-
-
-
-end
 
 --this.chatWindow_controller = require("uiscripts/chat/chatWindow_controller")
 

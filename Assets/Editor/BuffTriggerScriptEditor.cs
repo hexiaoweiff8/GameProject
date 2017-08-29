@@ -18,20 +18,33 @@ public class BuffTriggerScriptEditor : BaseTriggerScriptEditor
             new List<string>(), 
             new List<string>(), 
             // 类型标识:V3,Txt,Int,Float
-             new List<string>() {"是否等待执行完(0否,1是):", "特效资源Key(或Path):", "释放位置(0放技能方, 1目标方,2):", "命中位置(0放技能方, 1目标方,2):", "速度:","飞行轨迹:","缩放(三位 1,1,1):"},
+            new List<string>() {"是否等待执行完(0否,1是):", "特效资源Key(或Path):", "释放位置(0放技能方, 1目标方,2):", "命中位置(0放技能方, 1目标方,2):", "速度:","飞行轨迹:","缩放(三位 1,1,1):"},
             new List<string>() {"是否等待执行完(0否,1是):", "特效资源Key(或Path):", "速度:","飞行轨迹:","缩放(三位 1,1,1):"},
             new List<string>() {"是否等待执行完(0否,1是):", "特效资源Key(或Path):", "位置(0放技能方, 1目标方,2):", "速度:","持续时间:","缩放(三位 1,1,1):"},
-            new List<string>() {"是否等待执行完(0否,1是):", "目标数量上限:", "检测位置(0放技能方, 1目标方,2):", "检测范围形状(0圆, 1方):", "目标阵营(-1:都触发, 1: 己方, 2: 非己方):", "范围大小(方 第一个宽, 第二个长, 第三个旋转角度, 圆的就取第一个值当半径, 扇形第一个半径, 第二个开口角度, 第三个旋转角度有更多的参数都放进来):"},
+            new List<string>() {"是否等待执行完(0否,1是):", "目标数量上限:", "检测位置(0放技能方, 1目标方,2):", "检测范围形状(0圆, 1方):", "目标阵营(-1:都触发, 1: 己方, 2: 非己方):", "Arg1:", "Arg2:", "Arg3:", "目标筛选数据ID:", "是否跟随旋转:"},
             new List<string>() {"是否等待执行完(0否,1是):", "目标数量上限:", "目标位置(0放技能方, 1目标方,2):", "释放位置(0放技能方, 1目标方,2):", "滑动速度:", "检测宽度:", "检测总长度:", "目标阵营(-1:都触发, 1: 己方, 2: 非己方):"},
             new List<string>() {"是否等待执行完(0否,1是):", "音效Key(或Path):", "起始时间:", "播放时长:","是否循环(0/1):", "循环次数:"},
             new List<string>() {"是否等待执行完(0否,1是):", "Buff ID:", "Buff目标(0自己/1对方)"},
-            new List<string>() {"是否等待执行完(0否,1是):", "固定/百分比(0/1)","伤害/治疗(0/1):", "目标(自己/对方)(0/1):","数值固定/百分比(0-1):"},
-            new List<string>() {"是否等待执行完(0否,1是):", "移动速度:", "是否瞬移(0/1 如果为1速度无效):"},
+            new List<string>() {"是否等待执行完(0否,1是):", "固定/百分比(0/1)","伤害/治疗(0/1):", "目标(自己/对方)(0/1):","数值固定/百分比(0-1):", "伤害系数:", "变更类型(0真实/1):"},
+            new List<string>() {"是否等待执行完(0否,1是):", "被移动单位(0自己,1目标):","目标位置:","移动速度:", "是否瞬移(0/1 如果为1速度无效):"},
             new List<string>() {"是否等待执行完(0否,1是):", "Skill ID:"},
             new List<string>() {"是否等待执行完(0否,1是):", "是否停止后面(0/1):", "条件:","条件内容:"},
             new List<string>() {"是否等待执行完(0否,1是):", "吸收量:", "每次百分比(0-1):","是否吸收过量伤害(true/false):"},
             new List<string>() {"是否等待执行完(0否,1是):", "目标(0自己/1对方/2):", "Remain编号:","是否跟随:"},
             new List<string>() {"是否等待执行完(0否,1是):", "相对(0自己/1对方/2选择点/3我到你方向/4你到我方向):", "距离:","角度:"},
+            new List<string>() {"是否等待执行完(0否,1是):", "目标(0自己/1对方):"},
+            new List<string>() {"是否等待执行完(0否,1是):", "目标(0自己/1对方):"},
+            new List<string>() {"是否等待执行完(0否,1是):", "目标(0自己/1对方):"},
+            new List<string>() {"是否等待执行完(0否,1是):", "循环次数:"},
+            new List<string>() {"是否等待执行完(0否,1是):", "伤害类型:"},
+            new List<string>() {"是否等待执行完(0否,1是):"},
+            new List<string>() {"是否等待执行完(0否,1是):", "吸血类型(0:绝对值,1:百分比:", "吸血量:"},
+            new List<string>() {"是否等待执行完(0否,1是):", "特效路径:", "释放位置:", "接收位置:", "持续时间:"},
+            new List<string>() {"是否等待执行完(0否,1是):", "buff状态(Attach,Action,Detach):"},
+            new List<string>() {"是否等待执行完(0否,1是):", "减少时间(单位秒):"},
+            new List<string>() {"是否等待执行完(0否,1是):", "召唤位置(0/1/2):", "召唤类型:", "召唤单位ID:", "召唤单位等级:"},
+            new List<string>() {"是否等待执行完(0否,1是):", "伤害上限:"},
+            new List<string>() {"是否等待执行完(0否,1是):", "Buff ID:", "Buff目标(0自己/1对方)"},
         };
         DataParamTitles = new[]
         {
@@ -55,6 +68,11 @@ public class BuffTriggerScriptEditor : BaseTriggerScriptEditor
             new List<string>(){"Detach条件Key:", "条件对比(>,<,=)", "对比值"},
             new List<string>(){"是否死亡消失:"},
             new List<string>(){"是否不致死:"},
+            new List<string>(){"生命值区间下限(触发条件):"},
+            new List<string>(){"生命值区间上限(触发条件):"},
+            new List<string>(){"触发概率:"},
+            new List<string>(){"伤害增强/减免(类型,数值,几率,目标/来源类型):"},
+            new List<string>(){"是否不可被技能清除:"},
         };
     }
 
@@ -71,7 +89,7 @@ public class BuffTriggerScriptEditor : BaseTriggerScriptEditor
         }
         else if (ParamsType == 2)
         {
-            typePos = (int)DataType;
+            typePos = (int)MyDataType;
             titles = DataParamTitles;
         }
 
@@ -120,12 +138,6 @@ public class BuffTriggerScriptEditor : BaseTriggerScriptEditor
         {
             switch (TriggerType)
             {
-                //case TriigerType.PlayAnimation:
-                //    ret += "PlayAnimation";
-                //    break;
-                //case TriigerType.SingleDamage:
-                //    ret += "SingleDamage";
-                //    break;
                 case TriggerType.LeftBracket:
                     ret += "{";
                     break;
@@ -174,13 +186,53 @@ public class BuffTriggerScriptEditor : BaseTriggerScriptEditor
                 case TriggerType.TargetPointSelector:
                     ret += "TargetPointSelector";
                     break;
+                case TriggerType.CleanBuff:
+                    ret += "CleanBuff";
+                    break;
+                case TriggerType.CleanTarget:
+                    ret += "CleanTarget";
+                    break;
+                case TriggerType.DelBuff:
+                    ret += "DelBuff";
+                    break;
+                case TriggerType.Death:
+                    ret += "Death";
+                    break;
+                case TriggerType.For:
+                    ret += "For";
+                    break;
+                case TriggerType.ImmuneDemage:
+                    ret += "ImmuneDemage";
+                    break;
+                case TriggerType.ImmuneDeath:
+                    ret += "ImmuneDeath";
+                    break;
+                case TriggerType.LifeDrain:
+                    ret += "LifeDrain";
+                    break;
+                case TriggerType.Liner:
+                    ret += "Liner";
+                    break;
+                case TriggerType.ShareDamage:
+                    ret += "ShareDamage";
+                    break;
+                case TriggerType.SubCD:
+                    ret += "SubCD";
+                    break;
+                case TriggerType.Summoned:
+                    ret += "Summoned";
+                    break;
+                case TriggerType.UpperLimit:
+                    ret += "UpperLimit";
+                    break;
+
                 default:
                     return String.Empty;
             }
         }
         else if (ParamsType == 2)
         {
-            switch (DataType)
+            switch (MyDataType)
             {
                 //case TriigerType.PlayAnimation:
                 //    ret += "PlayAnimation";
@@ -188,66 +240,81 @@ public class BuffTriggerScriptEditor : BaseTriggerScriptEditor
                 //case TriigerType.SingleDamage:
                 //    ret += "SingleDamage";
                 //    break;
-                case DataType.LevelData:
+                case (int)BuffDataType.LevelData:
                     ret += "";
                     needBraket = true;
                     break;
-                case DataType.CDTime:
+                case (int)BuffDataType.CDTime:
                     ret += "CDTime";
                     break;
-                case DataType.CDGroup:
+                case (int)BuffDataType.CDGroup:
                     ret += "CDGroup";
                     break;
-                case DataType.ReleaseTime:
+                case (int)BuffDataType.ReleaseTime:
                     ret += "ReleaseTime";
                     break;
-                case DataType.Description:
+                case (int)BuffDataType.Description:
                     ret += "Description";
                     break;
-                case DataType.Icon:
+                case (int)BuffDataType.Icon:
                     ret += "Icon";
                     break;
-                case DataType.TriggerLevel1:
+                case (int)BuffDataType.TriggerLevel1:
                     ret += "TriggerLevel1";
                     break;
-                case DataType.TriggerLevel2:
+                case (int)BuffDataType.TriggerLevel2:
                     ret += "TriggerLevel2";
                     break;
-                case DataType.TickTime:
+                case (int)BuffDataType.TickTime:
                     ret += "TickTime";
                     break;
-                case DataType.ChangeData:
+                case (int)BuffDataType.ChangeData:
                     ret += "ChangeData";
                     break;
-                case DataType.BuffTime:
+                case (int)BuffDataType.BuffTime:
                     ret += "BuffTime";
                     break;
-                case DataType.BuffType:
+                case (int)BuffDataType.BuffType:
                     ret += "BuffType";
                     break;
-                case DataType.DetachTriggerLevel1:
+                case (int)BuffDataType.DetachTriggerLevel1:
                     ret += "DetachTriggerLevel1";
                     break;
-                case DataType.DetachTriggerLevel2:
+                case (int)BuffDataType.DetachTriggerLevel2:
                     ret += "DetachTriggerLevel2";
                     break;
-                case DataType.BuffLevel:
+                case (int)BuffDataType.BuffLevel:
                     ret += "BuffLevel";
                     break;
-                case DataType.BuffGroup:
+                case (int)BuffDataType.BuffGroup:
                     ret += "BuffGroup";
                     break;
-                case DataType.IsBeneficial:
+                case (int)BuffDataType.IsBeneficial:
                     ret += "IsBeneficial";
                     break;
-                case DataType.DetachQualified:
+                case (int)BuffDataType.DetachQualified:
                     ret += "DetachQualified";
                     break;
-                case DataType.IsDeadDisappear:
+                case (int)BuffDataType.IsDeadDisappear:
                     ret += "IsDeadDisappear";
                     break;
-                case DataType.IsNotLethal:
+                case (int)BuffDataType.IsNotLethal:
                     ret += "IsNotLethal";
+                    break;
+                case (int)BuffDataType.HpScopeMin:
+                    ret += "HpScopeMin";
+                    break;
+                case (int)BuffDataType.HpScopeMax:
+                    ret += "HpScopeMax";
+                    break;
+                case (int)BuffDataType.DemageChange:
+                    ret += "DemageChange";
+                    break;
+                case (int)BuffDataType.TriggerProbability:
+                    ret += "TriggerProbability";
+                    break;
+                case (int)BuffDataType.IsCouldNotClear:
+                    ret += "IsCouldNotClear";
                     break;
                     
                 default:

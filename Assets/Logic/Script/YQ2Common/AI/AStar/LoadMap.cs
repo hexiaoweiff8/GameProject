@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 /// <summary>
 /// 该类创建在战场
@@ -66,9 +67,14 @@ public class LoadMap : MonoBehaviour
 
     //-------------------------私有属性-----------------------------
     /// <summary>
-    /// map数据
+    /// 地面map数据
     /// </summary>
-    private int[][] mapData = null;
+    private int[][] surfaceMapData = null;
+
+    /// <summary>
+    /// 空中map数据
+    /// </summary>
+    private int[][] airMapData = null;
 
     /// <summary>
     /// 地图宽度(X)
@@ -139,7 +145,7 @@ public class LoadMap : MonoBehaviour
     public void Init(int[][] map, int unitWidth)
     {
         // 设置本地数据
-        mapData = map;
+        surfaceMapData = map;
         this.unitWidth = unitWidth;
 
         // 验证数据
@@ -149,13 +155,25 @@ public class LoadMap : MonoBehaviour
             return;
         }
 
-        // TODO 初始化地图宽度长度
-        mapHeight = mapData.Length;
-        mapWidth = mapData[0].Length;
+        // 初始化地图宽度长度
+        mapHeight = surfaceMapData.Length;
+        mapWidth = surfaceMapData[0].Length;
+
+        // 初始化空中地图
+        airMapData = new int[mapHeight][];
+        for (var i = 0; i < airMapData.Length; i++)
+        {
+            airMapData[i] = new int[mapWidth];
+            var row = airMapData[i];
+            for (var j = 0; j < row.Length; j++)
+            {
+                row[j] = 0;
+            }
+        }
 
         // 初始化优化数据
-        halfMapWidth = mapWidth / 2.0f * this.unitWidth;
-        halfMapHight = mapHeight / 2.0f * this.unitWidth;
+        halfMapWidth = mapWidth * 0.5f * this.unitWidth;
+        halfMapHight = mapHeight * 0.5f * this.unitWidth;
 
         // 获得起始点
         Vector3 startPosition = MapPlane.transform.position;
@@ -180,12 +198,21 @@ public class LoadMap : MonoBehaviour
     }
 
     /// <summary>
-    /// 获取当前地图数据
+    /// 获取地面地图数据
     /// </summary>
     /// <returns></returns>
-    public int[][] GetMapData()
+    public int[][] GetSurfaceMapData()
     {
-        return mapData;
+        return surfaceMapData;
+    }
+
+    /// <summary>
+    /// 获取空中地图
+    /// </summary>
+    /// <returns></returns>
+    public int[][] GetAirMapData()
+    {
+        return airMapData;
     }
 
     /// <summary>
@@ -369,7 +396,7 @@ public class LoadMap : MonoBehaviour
     private bool ValidateData()
     {
 
-        if (mapData == null || MapPlane == null)
+        if (surfaceMapData == null || MapPlane == null)
         {
             return false;
         }

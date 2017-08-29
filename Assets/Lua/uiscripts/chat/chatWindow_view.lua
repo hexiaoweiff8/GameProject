@@ -44,7 +44,7 @@ function chatWindow_view:InitView(root)
     this.btn_shijie = this.panel.transform:FindChild("Window/left_bg/btn_shijie").gameObject
     this.btn_juntuan = this.panel.transform:FindChild("Window/left_bg/btn_juntuan").gameObject
 
-    this.btn_btn_shijie_sprite = this.panel.transform:FindChild("Window/left_bg/btn_shijie/Sprite").gameObject
+    this.btn_shijie_sprite = this.panel.transform:FindChild("Window/left_bg/btn_shijie/Sprite").gameObject
     this.btn_juntuan_sprite = this.panel.transform:FindChild("Window/left_bg/btn_juntuan/Sprite").gameObject
     this.backzezhao = this.panel.transform:FindChild("Window/backzezhao").gameObject
 
@@ -81,14 +81,14 @@ end
 --左边栏目先显示世界按钮的图片
 function chatWindow_view:ShowOneBtnSprite(type)
 
-    this.btn_btn_shijie_sprite:SetActive(false)
+    this.btn_shijie_sprite:SetActive(false)
     this.btn_juntuan_sprite:SetActive(false)
 
     this.worldscrollView.gameObject:SetActive(false)
     this.juntuanscrollView.gameObject:SetActive(false)
 
     if type == 0 then--世界
-        this.btn_btn_shijie_sprite:SetActive(true)
+        this.btn_shijie_sprite:SetActive(true)
         this.worldscrollView.gameObject:SetActive(true)
     else if type ==1 then--军团
         this.btn_juntuan_sprite:SetActive(true)

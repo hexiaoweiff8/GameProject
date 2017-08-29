@@ -45,16 +45,6 @@ function MSGID_10002(body)
 end
 
 
-function Message_Manager:SendPB_10003()
-    local c2gw = c2gw_pb:RegisterRole()
-    c2gw.userName = 'lgy'
-    local msg1 = c2gw:SerializeToString()
-    Message_Manager:createSendPBHeader(10003, msg1)
-end
-
-function MSGID_10003(body)
-
-end
 --================================================================
 --@Des 发送升级装备请求
 --@params id:装备唯一id,CallBack:服务器返回数据时调用
@@ -70,30 +60,6 @@ function Message_Manager:SendPB_10004(id,CallBack)
     end
 end
 
-
-function MSGID_10004(body)
-
-    local gw2c = gw2c_pb.EquipLvlup()
-    gw2c:ParseFromString(body)
-    --装备数据
-    local v = gw2c.equip  
-    local tempTB1 = {}
-    for k, v in ipairs(v.sndAttr) do    
-        local tempTB2 = {}
-        for k, v in ipairs(v.remake) do
-            tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
-        end
-        tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
-    end
-    
-    local value = equipM(v.id, v.eid, v.lv, v.rarity + 1, v.isBad, v.isLock, v.fst_attr, tempTB1)
-    local index, index2 = equipP.getIndexByID(v.id)
-    if index2 then
-        equipP.change_allEqList(index, index2, value)
-    else
-        equipP.change_nowEqList(index, value)
-    end
-end
 
 function Message_Manager:sendPB_EquipPlus(id)
     Event.AddListener("10004", MSGID_EquipPlus)
@@ -130,28 +96,6 @@ function Message_Manager:SendPB_10005(eid, isLock, CallBack)
     end
 end
 
-function MSGID_10005(body)
-    local gw2c = gw2c_pb.EquipLock()
-    gw2c:ParseFromString(body);
-    --装备数据
-    local v = gw2c.equip
-    local tempTB1 = {}
-    for k, v in ipairs(v.sndAttr) do
-        local tempTB2 = {}
-        for k, v in ipairs(v.remake) do
-            tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
-        end
-        tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
-    end
-    local value = equipM(v.id, v.eid, v.lv, v.rarity + 1, v.isBad, v.isLock, v.fst_attr, tempTB1)
-    local index, index2 = equipP.getIndexByID(v.id)
-    if index2 then
-        equipP.change_allEqList(index, index2, value)
-    else
-        equipP.change_nowEqList(index, value)
-    end
-end
-
 function Message_Manager:SendPB_lock(equipId, isLock)
     Event.AddListener("10005",MSGID_lock)
     local c2gw = c2gw_pb:EquipLock()
@@ -168,7 +112,6 @@ function MSGID_lock(body)
     Event.RemoveListener("10005", MSGID_lock)
 end
 
-
 ---
 ---装备修理
 ---
@@ -179,33 +122,6 @@ function Message_Manager:SendPB_10006(id)
     local msg1 = c2gw:SerializeToString()
     Message_Manager:createSendPBHeader(10006, msg1)
 end
-function MSGID_10006(body)
-
-    local gw2c = gw2c_pb.EquipRepair()
-    gw2c:ParseFromString(body);
-    --装备数据
-    local v = gw2c.equip
-    local tempTB1 = {}
-    for k, v in ipairs(v.sndAttr) do
-
-        local tempTB2 = {}
-        for k, v in ipairs(v.remake) do
-
-            tempTB2[k] = equipShuXingRemakeM(v.id, v.val)
-        end
-        tempTB1[k] = equipShuXingM(v.id, v.val, v.isRemake, tempTB2)
-    end
-
-    local value = equipM(v.id, v.eid, v.lv, v.rarity + 1, v.isBad, v.isLock, v.fst_attr, tempTB1)
-    local index, index2 = equipP.getIndexByID(v.id)
-    if index2 then
-        equipP.change_allEqList(index, index2, value)
-    else
-        equipP.change_nowEqList(index, value)
-    end
-end
-
-
 
 ---
 ---修理穿戴的所有装备
@@ -221,7 +137,6 @@ function Message_Manager:SendPB_EquipFixAll(equipList)
         Message_Manager:createSendPBHeader(10006, msg1)
     end
 end
-
 function MSGID_EquipFixAll(body)
     local gw2c = gw2c_pb.EquipRepair()
     gw2c:ParseFromString(body)
@@ -780,21 +695,40 @@ end
 function Message_Manager:SendPB_10036(PfItemlst,CallBack)
     local c2gw = c2gw_pb:SetCardPf()
     for i=1,6 do
-            table.insert(c2gw.lst,PfItemlst[i])
+        table.insert(c2gw.lst,PfItemlst[i])
     end
 
     for k=1,#c2gw.lst do
-
         print(tostring(c2gw.lst[k]))
-
     end
 
     local msg = c2gw:SerializeToString()
     Message_Manager:createSendPBHeader(10036,msg)
-
     if CallBack then
         Event.AddListener("10036",CallBack)
     end
+end
+
+--================================================================
+--@Des 将退役卡牌兑换为兵牌
+--@params 退役卡牌列表
+--================================================================
+function Message_Manager:SendPB_10040(CardToCoinItemLst,CallBack)
+    local c2gw = c2gw_pb:CardToCoin()
+    for i=1,#CardToCoinItemLst do
+        local CardToCoinItem = {}
+        CardToCoinItem =  c2gw.lst:add()
+        CardToCoinItem.cardId = CardToCoinItemLst[i]["cardId"]
+        CardToCoinItem.num = CardToCoinItemLst[i]["num"]
+    end
+
+    local msg = c2gw:SerializeToString()
+    Message_Manager:createSendPBHeader(10040,msg)
+
+    if CallBack then
+        Event.AddListener("10040",CallBack)
+    end
+
 end
 
 local _headerIDCounter = 0
@@ -803,7 +737,7 @@ function Message_Manager:createSendPBHeader(msgId, body)
     local header = header_pb.Header()
     header.ID = _headerIDCounter
     header.msgId = msgId
-    header.userId = 8003--8001
+    header.userId = 8005--8001
     header.version = '1.0.0'
     header.errno = 0
     header.ext = 0
@@ -825,7 +759,7 @@ function Message_Manager:createSendPBHeaderByUdp(msgId, body)
     local header = header_pb.Header()
     header.ID = 1
     header.msgId = msgId
-    header.userId = 8003--8001
+    header.userId = 8005--8001
     header.version = '1.0.0'
     header.errno = 0
     header.ext = 0
@@ -872,9 +806,10 @@ function Message_Manager:getAllData(gw2c)
     --初始化主界面model
     ui_main_model = require("uiscripts/main/ui_main_model")
     ui_main_model.AvoidWarCardTimestamp = gw2c.user.battle.avoid
-
+    --初始化编队界面的大营前锋信息
     wnd_biandui_model = require("uiscripts/biandui/wnd_biandui_model")
     wnd_biandui_model:SetArmyData(gw2c.user.battle)
+
 
 end
 --================================================================
@@ -1009,26 +944,6 @@ function Message_Manager:SendPB_10019()
     Event.AddListener("10019",MSGID_10019)
 end
 
-function Message_Manager:SendPB_10019(HCCallback)
-    printw("SendPB_10019")
-    Message_Manager:createSendPBHeader(10019)
-
-    local function msgid_10019(body)
-        print("监听到10019+HCCallback")
-        local gw2c = gw2c_pb.GetMailList()
-        gw2c:ParseFromString(body)
-        print("邮件列表大小:"..#gw2c.mails)
-        mail_model:insertData(gw2c.mails)
-        Event.RemoveListener("10019", msgid_10019)
-
-        if HCCallback ~= nil then
-            HCCallback(mail_model.new_mailNum)
-        end
-    end
-
-    Event.AddListener("10019", msgid_10019)
-end
-
 function MSGID_10019(body)
     print("监听到10019")
     local gw2c = gw2c_pb.GetMailList()
@@ -1037,7 +952,6 @@ function MSGID_10019(body)
     mail_model:insertData(gw2c.mails)
     Event.RemoveListener("10019", MSGID_10019)
 end
-
 
 --================================================================
 --10025 读取邮件
@@ -1106,12 +1020,28 @@ function MSGID_10020(body)
     print("监听到10020")
     local gw2c = gw2c_pb.GetMailReward()
     gw2c:ParseFromString(body)
-
-
-
     Event.RemoveListener("10020", MSGID_10020)
 end
 
+--================================================================
+--15003 推送任务成就等信息
+--返回包：gw2c.PushTask
+--tasks TaskItem repeat 任务信息
+--================================================================
+
+
+function MSGID_15003(body)
+    print("监听到15003")
+    local gw2c = gw2c_pb.PushTask()
+    gw2c:ParseFromString(body)
+    print("接收到任务成就等信息信息条数为："..#gw2c.tasks)
+    --for i = 1, #gw2c.tasks do
+    --    print("---id:"..gw2c.tasks[i].id.."---lv:"..gw2c.tasks[i].lv.."---val:"..gw2c.tasks[i].val);
+    --end
+    dailyMission_model:RefreshDailyMissionData(gw2c.tasks)
+    --print("每日任务数据更新完成")
+
+end
 
 
 --==============================--
@@ -1122,22 +1052,8 @@ end
 function Message_Manager:OnAddHandler()
     Event.AddListener("10001", MSGID_10001)
     Event.AddListener("10002", MSGID_10002)
-    Event.AddListener("10003", MSGID_10003)
-    --Event.AddListener("10004", MSGID_10004)
-    Event.AddListener("10005", MSGID_10005)
-    --Event.AddListener("10006", MSGID_10006)
-    --Event.AddListener("10007", MSGID_10007)
-    --Event.AddListener("10008", MSGID_10008)
-    --Event.AddListener("10009", MSGID_10009)
-    --Event.AddListener("10010", MSGID_10010)
-    --Event.AddListener("10011", MSGID_10011)
-    --Event.AddListener("10012", MSGID_10012)
-    --Event.AddListener("10013", MSGID_10013)
-    --Event.AddListener("10014", MSGID_10014)
-    --Event.AddListener("10015", MSGID_10015)
-    --Event.AddListener("10018", MSGID_10018)
-    Event.AddListener("35001",MSGID_35001)
-    -- Event.AddListener("errno10001", ERRNO_10001)
+    Event.AddListener("15003", MSGID_15003)--推送任务成就等信息监听
+    Event.AddListener("35001", MSGID_35001)
 end
 
 --==============================--
@@ -1146,24 +1062,10 @@ end
 --@return 
 --==============================--
 function Message_Manager:OnRemoveHandler()
-    --[[
     Event.RemoveListener("10001", MSGID_10001)
     Event.RemoveListener("10002", MSGID_10002)
-    Event.RemoveListener("10003", MSGID_10003)
-    Event.RemoveListener("10004", MSGID_10004)
-    Event.RemoveListener("10005", MSGID_10005)
-    Event.RemoveListener("10006", MSGID_10006)
-    Event.RemoveListener("10007", MSGID_10007)
-    Event.RemoveListener("10008", MSGID_10008)
-    Event.RemoveListener("10009", MSGID_10009)
-    Event.RemoveListener("10010", MSGID_10010)
-    Event.RemoveListener("10011", MSGID_10011)
-    Event.RemoveListener("10012", MSGID_10012)
-    Event.RemoveListener("10013", MSGID_10013)
-    Event.RemoveListener("10014", MSGID_10014)
-    Event.RemoveListener("10015", MSGID_10015)
-    --Event.RemoveListener("errno10001", ERRNO_10001)
- --]]
+    Event.RemoveListener("15003", MSGID_10001)
+    Event.RemoveListener("35001", MSGID_10002)
 end
 
 return Message_Manager

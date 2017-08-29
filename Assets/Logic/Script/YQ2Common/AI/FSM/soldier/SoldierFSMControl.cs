@@ -41,6 +41,16 @@ public class SoldierFSMControl{
         InitState(obj.ClusterData.AllData.MemberData.BehaviorType);
     }
 
+    /// <summary>
+    /// 启动状态机
+    /// </summary>
+    /// <param name="objId">单位ObjId</param>
+    public void StartFSM([NotNull] ObjectID objId)
+    {
+        StartFSM(DisplayerManager.Single.GetElementById(objId));
+    }
+
+
     public void UpdateFSM() //作为驱动源
     {
         if (_iSAwake) return;
@@ -85,7 +95,9 @@ public class SoldierFSMControl{
             foreach (var mapStateId in kv.Value)
             {
                 // 设置映射关系
-                keyStateInvoke.AddMappingTrigger(SoldierFSMFactory.GetTriggerByStateId(mapStateId), triggerFuncDic[SoldierFSMFactory.GetTriggerByStateId(mapStateId)]);
+                keyStateInvoke.AddMappingTrigger(SoldierFSMFactory.GetTriggerByStateId(mapStateId),
+                    triggerFuncDic[SoldierFSMFactory.GetTriggerByStateId(mapStateId)]);
+
             }
             // 添加状态
             fsm.AddState(keyStateInvoke);

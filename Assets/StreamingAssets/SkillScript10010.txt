@@ -1,0 +1,34 @@
+﻿SkillNum(10010)
+	Action
+        {
+//            CollisionDetection(0, 50, 1, 0, -1, 10, 0, 0, 101009, 1)
+     //       {
+
+//                If(1,0,IsMechanic,false_true)
+
+//                {
+
+//                    PointToObj(1,test/TrailPrj,10,0,10,1,10),
+//                    //Point(1,test/ExplordScope,1,0,3,10,1,10),
+
+//                }
+
+//            }
+            // 选择目标点
+            // TargetPointSelector(1,0,10,10)
+            Remain(1, 0, 10000, true)
+        }
+
+        [
+
+            CDTime({%2})
+
+            CDGroup({%2})
+	    IsActive({%9})
+            Icon({%9})
+
+            Description(Test啊{%0},测试{%1})
+
+	    SkillName({%9})
+            1,2,3,4,5,6,7,8,9,true
+]

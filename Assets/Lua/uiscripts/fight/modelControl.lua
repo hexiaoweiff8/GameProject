@@ -30,7 +30,7 @@ function ModelControl:CreateModel(id, index)
     for i = 0, modelList[index].childCount - 1 do
         modelList[index]:GetChild(i).eulerAngles = Vector3(0, 90, 0)
         ---设置模型半透明
-        Model:SetTransparent(modelList[index]:GetChild(i), 0.1)
+        Model:SetTransparent(modelList[index]:GetChild(i), 0.5)
     end
     AStarControl:setZhenxingInfo(modelList[index], id, index - 1)
     modelList[index].gameObject:SetActive(false)
@@ -93,9 +93,6 @@ end
 local enemyHistoryModelList = {}
 ---添加敌人模型
 function ModelControl:addEnemyModel(model)
-    if #enemyHistoryModelList == 5 then
-        table.remove(enemyHistoryModelList,1)
-    end
     table.insert(enemyHistoryModelList, model)
 end
 ---获取敌人模型
@@ -107,7 +104,7 @@ function ModelControl:getEnemyModel(Index)
     end
 end
 ---删除敌人模型
-function ModelControl:remove(Index)
+function ModelControl:removeEnemyModel(Index)
     if enemyHistoryModelList[Index] then
         table.remove(enemyHistoryModelList, Index)
     end
@@ -122,7 +119,7 @@ function ModelControl:createEnemyModel(id)
     local ZhenXingModel,unitList = Model:CreateFightZhenXing(id,4)
 
     AStarControl:setZhenxingInfo(ZhenXingModel, id, 4)
-    local ctPosition = Vector3(25 + math.random(40), 0, 10 + math.random(40))
+    local ctPosition = Vector3(10 + math.random(5), 0, 4 + math.random(10))
     ctPosition.x = AStarControl:getMapWidth() - ctPosition.x
     AStarControl:setZhangAi(ctPosition, 4)--前0-3个对应自己的4张卡牌，4为敌人序号
 
@@ -130,22 +127,33 @@ function ModelControl:createEnemyModel(id)
     for i = 1, #unitList do
         ---获取模型
         model = ZhenXingModel:GetChild(0).gameObject
+        ---设置材质
+        Model:SetOpaque(model)
         ---旋转
         model.transform.eulerAngles = Vector3(0, -90, 0)
         ---删除父物体
         model.transform.parent = nil
         ---激活模型
         model:GetComponent("Animation").enabled = true
-        model:GetComponent("RanderControl").enabled = true
         model:GetComponent("ClusterData").enabled = true
         model:GetComponent("TriggerRunner").enabled = true
-        local mt = model:GetComponent(typeof(RanderControl))
+        local mt = model:GetComponent("RanderControl")
+        mt.enabled = true
         mt.isEnemy = true
         mt:SyncData()
         unitList[i].ClusterData:Begin()
     end
     Object.Destroy(ZhenXingModel.gameObject)
     self:addEnemyModel(model.transform)
+end
+
+
+
+function ModelControl:OnDestroyDone()
+    modelList = {}
+    unitList = {}
+    enemyHistoryModelList = {}
+    ModelControl = nil
 end
 
 return ModelControl

@@ -1,16 +1,22 @@
 RemainNum(10000)
 Action
 {
-	HealthChange(11, 1, 1, 1, 1);
 }
 Enter
 {
-	Buff(1, 1, 1);
+	Buff(1, 1009, 1)
 }
 Out
 {
-	Buff(1, 1, 1);
+	DelBuff(1, 1009, 1)
 }
 [
-	1, 1, 1, , , , , , , 
+	1, 2, 3, true, , , , , , 
+	DuringTime({%1})
+	ActionTime({%1})
+	Range(10)
+	IsFollow({%3})
+	CouldActionOnAir({%3})
+	CouldActionOnSurface({%3})
+	CouldActionOnBuilding({%3})
 ]

@@ -51,6 +51,7 @@ public class EffectsFactory
     /// <param name="speed"></param>
     /// <param name="completeCallback">完成回调</param>
     /// <param name="effectLayer">特效所在渲染层</param>
+    /// <param name="rotate">x,y旋转量</param>
     /// <returns>特效对象</returns>
     public EffectBehaviorAbstract CreatePointEffect(string effectKey,
         Transform parent,
@@ -59,7 +60,8 @@ public class EffectsFactory
         float durTime,
         float speed,
         Action completeCallback = null,
-        int effectLayer = 0)
+        int effectLayer = 0,
+        Vector2 rotate = new Vector2())
     {
         EffectBehaviorAbstract result = null;
 
@@ -70,7 +72,8 @@ public class EffectsFactory
             durTime,
             speed,
             completeCallback,
-            effectLayer);
+            effectLayer,
+            rotate);
 
         return result;
     }
@@ -248,6 +251,11 @@ public class PointEffect : EffectBehaviorAbstract
     private int layer = 0;
 
     /// <summary>
+    /// x轴,y轴旋转
+    /// </summary>
+    private Vector2 rotate = Vector2.zero;
+
+    /// <summary>
     /// 创建点特效
     /// </summary>
     /// <param name="effectKey">特效key, 可以使路径, 或者AB包中对应的key</param>
@@ -257,7 +265,8 @@ public class PointEffect : EffectBehaviorAbstract
     /// <param name="durTime"></param>
     /// <param name="speed">TODO 特效播放速度</param>
     /// <param name="completeCallback">结束回调</param>
-    public PointEffect(string effectKey, Transform parent, Vector3 position, Vector3 scale, float durTime, float speed, Action completeCallback = null, int effectLayer = 0)
+    /// <param name="rotate">x,y旋转量</param>
+    public PointEffect(string effectKey, Transform parent, Vector3 position, Vector3 scale, float durTime, float speed, Action completeCallback = null, int effectLayer = 0, Vector2 rotate = new Vector2())
     {
         this.effectKey = effectKey;
         this.parent = parent;
@@ -267,6 +276,7 @@ public class PointEffect : EffectBehaviorAbstract
         this.speed = speed;
         this.completeCallback = completeCallback;
         this.layer = effectLayer;
+        this.rotate = rotate;
     }
 
     /// <summary>
@@ -275,17 +285,22 @@ public class PointEffect : EffectBehaviorAbstract
     public override void Begin()
     {
         // 加载特效预设
-        effectObject = PoolLoader.Instance().Load(effectKey, EffectsFactory.EffectPackName);
+        effectObject = PoolLoader.Instance().Load(effectKey, EffectsFactory.EffectPackName, parent);
         if (effectObject == null)
         {
             throw new Exception("特效为空, 加载失败:" + effectKey);
         }
         //effectObject = Instantiate(effectObject);
         // 设置数据
-        effectObject.transform.parent = parent;
         effectObject.transform.localScale = scale;
         effectObject.transform.position = position;
         effectObject.layer = layer;
+        // 单位旋转
+        if (rotate != Vector2.zero)
+        {
+            effectObject.transform.Rotate(Vector3.right, rotate.x);
+            effectObject.transform.Rotate(Vector3.up, rotate.y);
+        }
         // TODO 特效播放速度
         // 特效持续时间
         new Timer(durTime).OnCompleteCallback(() =>
@@ -295,7 +310,7 @@ public class PointEffect : EffectBehaviorAbstract
                 completeCallback();
             }
             // 回收对象
-            PoolLoader.Instance().CircleBack(effectKey, effectObject);
+            PoolLoader.Instance().CircleBack(effectObject);
             //Destroy();
         }).Start();
     }
@@ -427,14 +442,13 @@ public class PointToPointEffect : EffectBehaviorAbstract
     public override void Begin()
     {
         // 加载特效预设
-        effectObject = PoolLoader.Instance().Load(effectKey, EffectsFactory.EffectPackName);
+        effectObject = PoolLoader.Instance().Load(effectKey, EffectsFactory.EffectPackName, parent);
         if (effectObject == null)
         {
             throw new Exception("特效为空, 加载失败.");
         }
         //effectObject = Instantiate(effectObject);
         // 设置数据
-        effectObject.transform.parent = parent;
         effectObject.transform.localScale = scale;
         effectObject.transform.position = position;
         effectObject.layer = layer;
@@ -448,7 +462,7 @@ public class PointToPointEffect : EffectBehaviorAbstract
         {
             effectObject.RemoveComponents(typeof(Ballistic));
             // 回收单位
-            PoolLoader.Instance().CircleBack(effectKey, effectObject);
+            PoolLoader.Instance().CircleBack(effectObject);
         };
 
         // 运行完成
@@ -588,14 +602,13 @@ public class PointToTargetEffect : EffectBehaviorAbstract
     public override void Begin()
     {
         // 加载特效预设
-        effectObject = PoolLoader.Instance().Load(effectKey, EffectsFactory.EffectPackName);
+        effectObject = PoolLoader.Instance().Load(effectKey, EffectsFactory.EffectPackName, parent);
         if (effectObject == null)
         {
             throw new Exception("特效为空, 加载失败.");
         }
         //effectObject = Instantiate(effectObject);
         // 设置数据
-        effectObject.transform.parent = parent;
         effectObject.transform.localScale = scale;
         effectObject.transform.position = position;
         effectObject.layer = layer;
@@ -606,7 +619,7 @@ public class PointToTargetEffect : EffectBehaviorAbstract
         ballistic.OnKill = (ballistic1, target) =>
         {
             effectObject.RemoveComponents(typeof(Ballistic));
-            PoolLoader.Instance().CircleBack(effectKey, effectObject);
+            PoolLoader.Instance().CircleBack(effectObject);
         };
         // 运行完成
         ballistic.OnComplete = (a, b) =>
@@ -759,7 +772,6 @@ public class LinerEffect : EffectBehaviorAbstract
         this.effectKey = effectKey;
         this.parent = parent;
         this.receiveObj = receiveObj;
-        this.receiveObj = receiveObj;
         this.durTime = durTime;
         this.completeCallback = completeCallback;
         this.effectLayer = effectLayer;
@@ -773,12 +785,11 @@ public class LinerEffect : EffectBehaviorAbstract
     public override void Begin()
     {
         // 加载特效预设
-        effectObject = PoolLoader.Instance().Load(effectKey, EffectsFactory.EffectPackName);
+        effectObject = PoolLoader.Instance().Load(effectKey, EffectsFactory.EffectPackName, parent);
         if (effectObject == null)
         {
             throw new Exception("特效为空, 加载失败.");
         }
-        effectObject.transform.parent = parent;
         effectObject.transform.localScale = new Vector3(1, 1, 1);
         effectObject.transform.localPosition = Vector3.zero;
 
@@ -807,7 +818,7 @@ public class LinerEffect : EffectBehaviorAbstract
         // 定时关闭
         new Timer(durTime).OnCompleteCallback(() =>
         {
-            PoolLoader.Instance().CircleBack(effectKey, effectObject);
+            PoolLoader.Instance().CircleBack(effectObject);
         }).Start();
     }
 
@@ -832,7 +843,7 @@ public class LinerEffect : EffectBehaviorAbstract
     /// </summary>
     public override void Destroy()
     {
-        PoolLoader.Instance().CircleBack(effectKey, effectObject);
+        PoolLoader.Instance().CircleBack(effectObject);
     }
 }
 
@@ -886,6 +897,18 @@ public class ScopeEffect : EffectBehaviorAbstract
 /// </summary>
 public abstract class EffectBehaviorAbstract : IEffectsBehavior
 {
+    /// <summary>
+    /// 单位唯一自增ID
+    /// </summary>
+    public int AdditionId
+    {
+        get { return additionId++; }
+    }
+
+    /// <summary>
+    /// 单位唯一自增ID
+    /// </summary>
+    private static int additionId = 1024;
     /// <summary>
     /// 开始移动
     /// </summary>

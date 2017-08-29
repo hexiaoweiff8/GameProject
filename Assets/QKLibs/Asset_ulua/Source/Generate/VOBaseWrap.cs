@@ -27,15 +27,21 @@ public class VOBaseWrap
 		L.RegVar("Defence", get_Defence, set_Defence);
 		L.RegVar("BallisticsAngle", get_BallisticsAngle, set_BallisticsAngle);
 		L.RegVar("CritDamage", get_CritDamage, set_CritDamage);
+		L.RegVar("FixCritDemage", get_FixCritDemage, set_FixCritDemage);
 		L.RegVar("BulletType", get_BulletType, set_BulletType);
 		L.RegVar("BulletSpeed", get_BulletSpeed, set_BulletSpeed);
 		L.RegVar("AttackType", get_AttackType, set_AttackType);
 		L.RegVar("SightRange", get_SightRange, set_SightRange);
 		L.RegVar("IsHide", get_IsHide, set_IsHide);
+		L.RegVar("IsTaunt", get_IsTaunt, set_IsTaunt);
 		L.RegVar("IsMechanic", get_IsMechanic, set_IsMechanic);
 		L.RegVar("IsMelee", get_IsMelee, set_IsMelee);
 		L.RegVar("IsDambody", get_IsDambody, set_IsDambody);
 		L.RegVar("IsSummon", get_IsSummon, set_IsSummon);
+		L.RegVar("CouldMove", get_CouldMove, set_CouldMove);
+		L.RegVar("CouldNormalAttack", get_CouldNormalAttack, set_CouldNormalAttack);
+		L.RegVar("CouldReleaseSkill", get_CouldReleaseSkill, set_CouldReleaseSkill);
+		L.RegVar("IsAntiBuff", get_IsAntiBuff, set_IsAntiBuff);
 		L.RegVar("IsAntiHide", get_IsAntiHide, set_IsAntiHide);
 		L.RegVar("LifeTime", get_LifeTime, set_LifeTime);
 		L.RegVar("Skill1", get_Skill1, set_Skill1);
@@ -54,6 +60,7 @@ public class VOBaseWrap
 		L.RegVar("Hit", get_Hit, set_Hit);
 		L.RegVar("Dodge", get_Dodge, set_Dodge);
 		L.RegVar("Crit", get_Crit, set_Crit);
+		L.RegVar("FixCrit", get_FixCrit, set_FixCrit);
 		L.RegVar("AntiCrit", get_AntiCrit, set_AntiCrit);
 		L.RegVar("Armor", get_Armor, set_Armor);
 		L.RegVar("ArmyType", get_ArmyType, set_ArmyType);
@@ -430,6 +437,25 @@ public class VOBaseWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_FixCritDemage(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			float ret = obj.FixCritDemage;
+			LuaDLL.lua_pushnumber(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index FixCritDemage on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_BulletType(IntPtr L)
 	{
 		object o = null;
@@ -525,6 +551,25 @@ public class VOBaseWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsTaunt(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			bool ret = obj.IsTaunt;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsTaunt on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_IsMechanic(IntPtr L)
 	{
 		object o = null;
@@ -597,6 +642,82 @@ public class VOBaseWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsSummon on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_CouldMove(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			bool ret = obj.CouldMove;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index CouldMove on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_CouldNormalAttack(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			bool ret = obj.CouldNormalAttack;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index CouldNormalAttack on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_CouldReleaseSkill(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			bool ret = obj.CouldReleaseSkill;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index CouldReleaseSkill on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsAntiBuff(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			bool ret = obj.IsAntiBuff;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsAntiBuff on a nil value" : e.Message);
 		}
 	}
 
@@ -939,6 +1060,25 @@ public class VOBaseWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index Crit on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_FixCrit(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			float ret = obj.FixCrit;
+			LuaDLL.lua_pushnumber(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index FixCrit on a nil value" : e.Message);
 		}
 	}
 
@@ -1456,6 +1596,25 @@ public class VOBaseWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_FixCritDemage(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
+			obj.FixCritDemage = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index FixCritDemage on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_BulletType(IntPtr L)
 	{
 		object o = null;
@@ -1551,6 +1710,25 @@ public class VOBaseWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_IsTaunt(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
+			obj.IsTaunt = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsTaunt on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_IsMechanic(IntPtr L)
 	{
 		object o = null;
@@ -1623,6 +1801,82 @@ public class VOBaseWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsSummon on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_CouldMove(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
+			obj.CouldMove = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index CouldMove on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_CouldNormalAttack(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
+			obj.CouldNormalAttack = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index CouldNormalAttack on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_CouldReleaseSkill(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
+			obj.CouldReleaseSkill = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index CouldReleaseSkill on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_IsAntiBuff(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
+			obj.IsAntiBuff = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index IsAntiBuff on a nil value" : e.Message);
 		}
 	}
 
@@ -1965,6 +2219,25 @@ public class VOBaseWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index Crit on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_FixCrit(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			VOBase obj = (VOBase)o;
+			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
+			obj.FixCrit = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index FixCrit on a nil value" : e.Message);
 		}
 	}
 

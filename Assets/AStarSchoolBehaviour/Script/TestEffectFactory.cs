@@ -25,18 +25,15 @@ public class TestEffectFactory : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             // 创建固定点
-            //EffectsFactory.Single.CreatePointEffect("test/PointEffect", null,
-            //    new Vector3(10, 10, 10), new Vector3(3, 3, 3), 1, 1).Begin();
-
-            var testEffect = EffectsFactory.Single.CreateLinerEffect("linePrfb.prefab", null, GameObject.Find("AstarFight"), 3, null, 12);
-            testEffect.Begin();
+            EffectsFactory.Single.CreatePointEffect("test/PointEffect", null,
+                new Vector3(10, 10, 10), new Vector3(3, 3, 3), 1, 1).Begin();
         }
 
-        //// 鼠标右键
-        //if (Input.GetMouseButtonDown(1))
-        //{
-        //    EffectsFactory.Single.CreatePointToPointEffect("test/TrailPrj", null, new Vector3(0, 0, 0),
-        //        new Vector3(100, 0, 100), new Vector3(1, 1, 1), 100).Begin();
-        //}
+        // 鼠标右键
+        if (Input.GetMouseButtonDown(1))
+        {
+            EffectsFactory.Single.CreatePointToPointEffect("test/TrailPrj", null, new Vector3(0, 0, 0),
+                new Vector3(100, 0, 100), new Vector3(1, 1, 1), 100).Begin();
+        }
     }
 }

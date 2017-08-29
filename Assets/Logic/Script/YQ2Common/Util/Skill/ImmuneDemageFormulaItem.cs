@@ -2,6 +2,10 @@
 using UnityEngine;
 using System.Collections;
 
+
+/// <summary>
+/// 免疫伤害
+/// </summary>
 public class ImmuneDemageFormulaItem : AbstractFormulaItem {
 
     /// <summary>
@@ -10,7 +14,7 @@ public class ImmuneDemageFormulaItem : AbstractFormulaItem {
     public int DemageType {get; set; }
 
 
-/// <summary>
+    /// <summary>
     /// 初始化
     /// </summary>
     /// <param name="array">数据数组</param>
@@ -30,8 +34,8 @@ public class ImmuneDemageFormulaItem : AbstractFormulaItem {
         }
         // 是否等待完成,特效Key,目标位置,持续时间
         // 如果该项值是以%开头的则作为替换数据
-        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        var demageType = GetDataOrReplace<int>("DemageType", array, 1, ReplaceDic);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        var demageType = GetDataOrReplace<int>("DemageType", array, 1);
 
         FormulaType = formulaType;
         DemageType = demageType;
@@ -73,8 +77,8 @@ public class ImmuneDemageFormulaItem : AbstractFormulaItem {
 
         }, myFormulaType);
 
-      
-        if (myDemageType == (int)myTrigger.DemageType)
+
+        if (myDemageType == (int)myTrigger.DemageType || myDemageType == 3)
         {
             myTrigger.HealthChangeValue = 0;
         }

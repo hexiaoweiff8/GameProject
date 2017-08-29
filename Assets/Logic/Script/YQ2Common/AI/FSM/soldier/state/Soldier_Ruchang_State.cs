@@ -54,18 +54,21 @@ public class Soldier_Ruchang_State : SoldierFSMState
 
         CoroutineManage.Single.StartCoroutine(_waitFor(deployTime, () =>
         {
-            fsm.IsCanRun = true;
-            // 统计战斗数据
-            FightDataStatistical.Single.AddCostData(fsm.Display.ClusterData.AllData.ArmyTypeData);
-
-            // 抛出入场结束事件
-            SkillManager.Single.SetTriggerData(new TriggerData()
+            if (fsm.Display != null && fsm.Display.ClusterData != null)
             {
-                ReleaseMember = fsm.Display,
-                ReceiveMember = fsm.Display,
-                TypeLevel1 = TriggerLevel1.Fight,
-                TypeLevel2 = TriggerLevel2.EnterEnd
-            });
+                fsm.IsCanRun = true;
+                // 统计战斗数据
+                FightDataStatistical.Single.AddCostData(fsm.Display.ClusterData.AllData.ArmyTypeData);
+
+                // 抛出入场结束事件
+                SkillManager.Single.SetTriggerData(new TriggerData()
+                {
+                    ReleaseMember = fsm.Display,
+                    ReceiveMember = fsm.Display,
+                    TypeLevel1 = TriggerLevel1.Fight,
+                    TypeLevel2 = TriggerLevel2.EnterEnd
+                });
+            }
         }));
     }
 

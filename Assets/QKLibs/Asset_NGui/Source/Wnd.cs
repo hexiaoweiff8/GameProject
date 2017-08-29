@@ -149,15 +149,18 @@ public class Wnd : IDisposable
             UIWidget widget = m_wndObj.GetComponent<UIWidget>();
             if (widget)
             {
-                widget.SetAnchor((GameObject)null); //解除锚点
+                widget.SetAnchor((GameObject) null); //解除锚点
 
                 m_TweenStartScale = m_wndObj.transform.localScale;
                 m_TweenStartPos = m_wndObj.transform.localPosition;
                 m_TweenStartAlpha = m_wndObj.GetComponent<UIWidget>().alpha;
-            }
-            var t = 0f;
-            m_Tween = DOTween.To(() => t, (v) => { t = v; tweenShowHide(isShow, v); }, 1, duration).SetAutoKill(true).SetEase(Ease.Linear)
-                .OnComplete(() =>
+                var t = 0f;
+                m_Tween = DOTween.To(() => t, (v) =>
+                {
+                    t = v;
+                    tweenShowHide(isShow, v);
+                }, 1, duration).SetAutoKill(true).SetEase(Ease.Linear)
+                    .OnComplete(() =>
                     {
                         m_baffleObj.GetComponent<UIWidget>().depth = -99;
 
@@ -167,11 +170,24 @@ public class Wnd : IDisposable
                         }
                         else
                         {
-                            _DoHide(wt,depth);
+                            _DoHide(wt, depth);
                         }
                     }
-                );
-            m_Tween.SetUpdate(true);
+                    );
+                m_Tween.SetUpdate(true);
+            }
+            else
+            {
+                if (isShow)
+                {
+                    OnShowFinishEnd.Call(this);
+                }
+                else
+                {
+                    _DoHide(wt, depth);
+                }
+            }
+            
 
         }
         else//瞬间完成

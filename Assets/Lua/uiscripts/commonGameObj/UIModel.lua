@@ -3,34 +3,30 @@
 --- DateTime: 2017/7/8 17:21
 ---
 local class = require("common/middleclass")
-local UIModel = class("UIModel")
-local ani
-local aniTimer
+UIModel = class("UIModel")
 
 ---临时动画表
 local AniNameList = {
     "gongji",
-    "shengli",
-    "shibai",
     "yidong"
 }
----正在播放的动画index
-local aniIndex = 0
 ---模型的默认动画
 local defaultAni = "daiji"
-
 function UIModel:initialize(parent)
-    self.UIModel = GameObjectExtension.InstantiateFromPacket("commonU", "UIModel", parent).gameObject
+    self.UIModel = GameObjectExtension.InstantiateFromPacket("commonu", "UIModel", parent).gameObject
     self.playerModelTexture = self.UIModel.transform:Find("playerModelTexture").gameObject
     self.camera3D = self.UIModel.transform:Find("Camera3D").gameObject
+    self.aniTimer = nil
+    self.aniIndex = 0 ---正在播放的动画index
 end
 
 function UIModel:showCardModel(cardId)
+    self.cardId = cardId
     if self.modelToShow then
         Object.Destroy(self.modelToShow.gameObject)
         self.modelToShow = nil
-        if aniTimer then
-            aniTimer:Kill()
+        if self.aniTimer then
+            self.aniTimer:Kill()
         end
         --self.modelToShow.gameObject:SetActive(false)
     end
@@ -55,22 +51,22 @@ function UIModel:showCardModel(cardId)
     self.playerModelTexture:GetComponent(typeof(SpinWithMouse)).target = self.modelToShow
 
     ---获取模型动画组件
-    ani = self.modelToShow:GetComponent("Animation")
+    local ani = self.modelToShow:GetComponent("Animation")
     --播放默认动画
     ani:Play(defaultAni)
     --点击播放其他动画
     UIEventListener.Get(self.playerModelTexture.gameObject).onClick = function(go)
-        aniIndex = aniIndex + 1
-        if aniIndex > #AniNameList then
-            aniIndex = 1
+        self.aniIndex = self.aniIndex + 1
+        if self.aniIndex > #AniNameList then
+            self.aniIndex = 1
         end
-        ani:Play(AniNameList[aniIndex])
-        if aniTimer then
-            aniTimer:Kill()
+        ani:Play(AniNameList[self.aniIndex])
+        if self.aniTimer then
+            self.aniTimer:Kill()
         end
-        aniTimer = TimeUtil:CreateTimer(3, function ()
+        self.aniTimer = TimeUtil:CreateTimer(3, function ()
             ani:Play(defaultAni)
-            aniTimer:Kill()
+            self.aniTimer:Kill()
         end)
     end
 end
@@ -79,5 +75,16 @@ function UIModel:setDepth(depth)
     self.playerModelTexture:GetComponent("UITexture").depth = depth
 end
 
-
-return UIModel
+function UIModel:GetCurrentCardID()
+    return self.cardId
+end
+function UIModel:Destroy()
+    self.UIModel = nil
+    self.playerModelTexture = nil
+    self.camera3D = nil
+    if self.aniTimer then
+        self.aniTimer:Kill()
+    end
+    self.aniTimer = nil
+    self.aniIndex = nil
+end

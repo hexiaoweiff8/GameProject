@@ -72,6 +72,7 @@ public static class DelegateFactory
 		dict.Add(typeof(UITable.OnReposition), UITable_OnReposition);
 		dict.Add(typeof(UIInput.OnValidate), UIInput_OnValidate);
 		dict.Add(typeof(UIToggle.Validate), UIToggle_Validate);
+		dict.Add(typeof(UIPopupList.LegacyEvent), UIPopupList_LegacyEvent);
 		dict.Add(typeof(UIScrollView.OnDragNotification), UIScrollView_OnDragNotification);
 		dict.Add(typeof(UICamera.GetKeyStateFunc), UICamera_GetKeyStateFunc);
 		dict.Add(typeof(UICamera.GetAxisFunc), UICamera_GetAxisFunc);
@@ -145,6 +146,11 @@ public static class DelegateFactory
 		dict.Add(typeof(UIScrollViewAdapter.OnItemSelectedHandler), UIScrollViewAdapter_OnItemSelectedHandler);
 		dict.Add(typeof(UIScrollViewAdapter.OnListMovedHandler), UIScrollViewAdapter_OnListMovedHandler);
 		dict.Add(typeof(UIScrollViewItemBase.OnSelectedHandler), UIScrollViewItemBase_OnSelectedHandler);
+		dict.Add(typeof(System.Action<FightManager.HealthChangePacker>), System_Action_FightManager_HealthChangePacker);
+		dict.Add(typeof(System.Action<UnityEngine.GameObject,int,FightManager.MemberType>), System_Action_UnityEngine_GameObject_int_FightManager_MemberType);
+		dict.Add(typeof(UIPopupListExtended.OnDeleteItem), UIPopupListExtended_OnDeleteItem);
+		dict.Add(typeof(UIPopupListExtended.OnLoadIcon), UIPopupListExtended_OnLoadIcon);
+		dict.Add(typeof(System.Action<TriggerLevel1,TriggerLevel2,TriggerData>), System_Action_TriggerLevel1_TriggerLevel2_TriggerData);
 		dict.Add(typeof(LoopItemScrollView.DelegateHandler), LoopItemScrollView_DelegateHandler);
 		dict.Add(typeof(LoopGrid.DelegateHandler), LoopGrid_DelegateHandler);
 		dict.Add(typeof(UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode>), UnityEngine_Events_UnityAction_UnityEngine_SceneManagement_Scene_UnityEngine_SceneManagement_LoadSceneMode);
@@ -2897,6 +2903,53 @@ public static class DelegateFactory
 		{
 			UIToggle_Validate_Event target = new UIToggle_Validate_Event(func, self);
 			UIToggle.Validate d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UIPopupList_LegacyEvent_Event : LuaDelegate
+	{
+		public UIPopupList_LegacyEvent_Event(LuaFunction func) : base(func) { }
+		public UIPopupList_LegacyEvent_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(string param0)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(string param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UIPopupList_LegacyEvent(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UIPopupList.LegacyEvent fn = delegate(string param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UIPopupList_LegacyEvent_Event target = new UIPopupList_LegacyEvent_Event(func);
+			UIPopupList.LegacyEvent d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UIPopupList_LegacyEvent_Event target = new UIPopupList_LegacyEvent_Event(func, self);
+			UIPopupList.LegacyEvent d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}
@@ -6342,6 +6395,251 @@ public static class DelegateFactory
 		{
 			UIScrollViewItemBase_OnSelectedHandler_Event target = new UIScrollViewItemBase_OnSelectedHandler_Event(func, self);
 			UIScrollViewItemBase.OnSelectedHandler d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class System_Action_FightManager_HealthChangePacker_Event : LuaDelegate
+	{
+		public System_Action_FightManager_HealthChangePacker_Event(LuaFunction func) : base(func) { }
+		public System_Action_FightManager_HealthChangePacker_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(FightManager.HealthChangePacker param0)
+		{
+			func.BeginPCall();
+			func.PushObject(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(FightManager.HealthChangePacker param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.PushObject(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate System_Action_FightManager_HealthChangePacker(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			System.Action<FightManager.HealthChangePacker> fn = delegate(FightManager.HealthChangePacker param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			System_Action_FightManager_HealthChangePacker_Event target = new System_Action_FightManager_HealthChangePacker_Event(func);
+			System.Action<FightManager.HealthChangePacker> d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			System_Action_FightManager_HealthChangePacker_Event target = new System_Action_FightManager_HealthChangePacker_Event(func, self);
+			System.Action<FightManager.HealthChangePacker> d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class System_Action_UnityEngine_GameObject_int_FightManager_MemberType_Event : LuaDelegate
+	{
+		public System_Action_UnityEngine_GameObject_int_FightManager_MemberType_Event(LuaFunction func) : base(func) { }
+		public System_Action_UnityEngine_GameObject_int_FightManager_MemberType_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(UnityEngine.GameObject param0, int param1, FightManager.MemberType param2)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.Push(param1);
+			func.Push(param2);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(UnityEngine.GameObject param0, int param1, FightManager.MemberType param2)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.Push(param1);
+			func.Push(param2);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate System_Action_UnityEngine_GameObject_int_FightManager_MemberType(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			System.Action<UnityEngine.GameObject,int,FightManager.MemberType> fn = delegate(UnityEngine.GameObject param0, int param1, FightManager.MemberType param2) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			System_Action_UnityEngine_GameObject_int_FightManager_MemberType_Event target = new System_Action_UnityEngine_GameObject_int_FightManager_MemberType_Event(func);
+			System.Action<UnityEngine.GameObject,int,FightManager.MemberType> d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			System_Action_UnityEngine_GameObject_int_FightManager_MemberType_Event target = new System_Action_UnityEngine_GameObject_int_FightManager_MemberType_Event(func, self);
+			System.Action<UnityEngine.GameObject,int,FightManager.MemberType> d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UIPopupListExtended_OnDeleteItem_Event : LuaDelegate
+	{
+		public UIPopupListExtended_OnDeleteItem_Event(LuaFunction func) : base(func) { }
+		public UIPopupListExtended_OnDeleteItem_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(string param0)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(string param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UIPopupListExtended_OnDeleteItem(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UIPopupListExtended.OnDeleteItem fn = delegate(string param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UIPopupListExtended_OnDeleteItem_Event target = new UIPopupListExtended_OnDeleteItem_Event(func);
+			UIPopupListExtended.OnDeleteItem d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UIPopupListExtended_OnDeleteItem_Event target = new UIPopupListExtended_OnDeleteItem_Event(func, self);
+			UIPopupListExtended.OnDeleteItem d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UIPopupListExtended_OnLoadIcon_Event : LuaDelegate
+	{
+		public UIPopupListExtended_OnLoadIcon_Event(LuaFunction func) : base(func) { }
+		public UIPopupListExtended_OnLoadIcon_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(string param0, UISprite param1)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.Push(param1);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(string param0, UISprite param1)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.Push(param1);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UIPopupListExtended_OnLoadIcon(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UIPopupListExtended.OnLoadIcon fn = delegate(string param0, UISprite param1) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UIPopupListExtended_OnLoadIcon_Event target = new UIPopupListExtended_OnLoadIcon_Event(func);
+			UIPopupListExtended.OnLoadIcon d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UIPopupListExtended_OnLoadIcon_Event target = new UIPopupListExtended_OnLoadIcon_Event(func, self);
+			UIPopupListExtended.OnLoadIcon d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class System_Action_TriggerLevel1_TriggerLevel2_TriggerData_Event : LuaDelegate
+	{
+		public System_Action_TriggerLevel1_TriggerLevel2_TriggerData_Event(LuaFunction func) : base(func) { }
+		public System_Action_TriggerLevel1_TriggerLevel2_TriggerData_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(TriggerLevel1 param0, TriggerLevel2 param1, TriggerData param2)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.Push(param1);
+			func.PushObject(param2);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(TriggerLevel1 param0, TriggerLevel2 param1, TriggerData param2)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.Push(param1);
+			func.PushObject(param2);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate System_Action_TriggerLevel1_TriggerLevel2_TriggerData(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			System.Action<TriggerLevel1,TriggerLevel2,TriggerData> fn = delegate(TriggerLevel1 param0, TriggerLevel2 param1, TriggerData param2) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			System_Action_TriggerLevel1_TriggerLevel2_TriggerData_Event target = new System_Action_TriggerLevel1_TriggerLevel2_TriggerData_Event(func);
+			System.Action<TriggerLevel1,TriggerLevel2,TriggerData> d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			System_Action_TriggerLevel1_TriggerLevel2_TriggerData_Event target = new System_Action_TriggerLevel1_TriggerLevel2_TriggerData_Event(func, self);
+			System.Action<TriggerLevel1,TriggerLevel2,TriggerData> d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}

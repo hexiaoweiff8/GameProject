@@ -58,11 +58,11 @@ public class ChangeDataFormulaItem : AbstractFormulaItem
             throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
         }
 
-        FormulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
+        FormulaType = GetDataOrReplace<int>("FormulaType", array, 0);
         PropertyName = array[1];
-        Value = GetDataOrReplace<string>("Value", array, 2, ReplaceDic);
-        ChangeDataType = GetDataOrReplace<ChangeDataType>("ChangeDataType", array, 3, ReplaceDic);
-        ReceivePos = GetDataOrReplace<int>("ReceivePos", array, 4, ReplaceDic);
+        Value = GetDataOrReplace<string>("Value", array, 2);
+        ChangeDataType = GetDataOrReplace<ChangeDataType>("ChangeDataType", array, 3);
+        ReceivePos = GetDataOrReplace<int>("ReceivePos", array, 4);
 
         property = typeof (VOBase).GetProperty(PropertyName);
         if (property == null)

@@ -9,9 +9,8 @@ public class DeathFormulaItem : AbstractFormulaItem
 
       /// <summary>
     /// 特效出现位置
-    /// 0: 释放者位置
-    /// 1: 被释放者位置
-    /// 2: 目标点选择的位置
+    /// 0: 释放者
+    /// 1: 被释放者
     /// </summary>
     public int TargetPos { get;private set; }
 
@@ -36,9 +35,9 @@ public class DeathFormulaItem : AbstractFormulaItem
         }
         // 是否等待完成,特效Key,目标位置,持续时间
         // 如果该项值是以%开头的则作为替换数据
-        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0);
 
-        var targetPos = GetDataOrReplace<int>("TargetPos", array, 1, ReplaceDic);
+        var targetPos = GetDataOrReplace<int>("TargetPos", array, 1);
 
 
         FormulaType = formulaType;

@@ -30,42 +30,62 @@ public class PointToPositionScopeGeneralAttack : IGeneralAttack
     /// <param name="durTime">范围特效持续时间</param>
     /// <param name="taType">弹道类型</param>
     /// <param name="callback">完成回调</param>
+    /// <param name="callbackForEveryOne">每个单位被击回调</param>
     public PointToPositionScopeGeneralAttack(PositionObject attacker, 
-        string[] effectKey, 
+        //string[] effectKey, 
         Vector3 releasePos, 
         Vector3 targetPos, 
         float scopeRaduis, 
         float speed, 
-        float durTime, 
-        TrajectoryAlgorithmType taType, 
-        Action callback)
+        //float durTime, 
+        TrajectoryAlgorithmType taType,
+        Action callback,
+        Action<GameObject> callbackForEveryOne = null)
     {
         if (attacker == null)
         {
             //throw new Exception("攻击者集群数据为空");
             return;
         }
-        var key1 = effectKey[0];
-        var key2 = effectKey[1];
+        //var key1 = effectKey[0];
+        //var key2 = effectKey[1];
         // 范围伤害
         Action scopeDemage = () =>
         {
-            var positionScopeAttack = new PositionScopeGeneralAttack(attacker,
-                key2, 
-                targetPos, 
-                scopeRaduis,
-                durTime, 
-                callback);
-            positionScopeAttack.Begin();
+            if (attacker.AllData.EffectData.RangeEffectTime > 0)
+            {
+                var positionScopeAttack = new PositionScopeGeneralAttack(attacker,
+                    attacker.AllData.EffectData.RangeEffect,
+                    targetPos,
+                    scopeRaduis,
+                    attacker.AllData.EffectData.RangeEffectTime,
+                    callback,
+                    callbackForEveryOne);
+                positionScopeAttack.Begin();
+            }
         };
-        //if (callback != null)
-        //{
-        //    // 先调用伤害在调用回调
-        //    scopeDemage += callback;
-        //}
+
+        var effectData = attacker.AllData.EffectData;
+        var muzzleEffect = effectData.MuzzleFlashEffect;
+        var muzzleDurTime = effectData.MuzzleFlashEffectTime;
+        if (muzzleDurTime > 0)
+        {
+            // 对每个单位播受击特效
+            var muzzleAngle = Utils.GetAngleWithZ(attacker.gameObject.transform.forward);
+            // TODO 使用挂点
+            EffectsFactory.Single.CreatePointEffect(muzzleEffect,
+                ParentManager.Instance().GetParent(ParentManager.BallisticParent).transform,
+                attacker.gameObject.transform.position,
+                new Vector3(1, 1, 1),
+                muzzleDurTime,
+                0,
+                null,
+                Utils.EffectLayer,
+                new Vector2(0, muzzleAngle)).Begin();
+        }
 
         // 飞行轨迹
-        effect = EffectsFactory.Single.CreatePointToPointEffect(key1, 
+        effect = EffectsFactory.Single.CreatePointToPointEffect(attacker.AllData.EffectData.Bullet, 
             ParentManager.Instance().GetParent(ParentManager.BallisticParent).transform,
             releasePos, 
             targetPos, 

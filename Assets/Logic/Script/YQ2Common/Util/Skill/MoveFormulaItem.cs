@@ -13,12 +13,27 @@ public class MoveFormulaItem : AbstractFormulaItem
     /// <summary>
     /// 单位检测时间间隔
     /// </summary>
-    public float CheckTime = 0.05f;
+    public float CheckTime
+    {
+        get { return checkTime; }
+        private set { checkTime = value; }
+    }
 
     /// <summary>
     /// 超时时间
     /// </summary>
-    public float OutTime = 3f;
+    public float OutTime
+    {
+        get{return outTime;}
+        private set { outTime = value; }
+    }
+
+    /// <summary>
+    /// 被移动目标
+    /// 0: 自己
+    /// 1: 目标
+    /// </summary>
+    public int MoveTargetMember { get; set; }
 
     /// <summary>
     /// 目标点
@@ -37,6 +52,16 @@ public class MoveFormulaItem : AbstractFormulaItem
     /// 是否瞬间移动
     /// </summary>
     public bool IsBlink { get; private set; }
+
+    /// <summary>
+    /// 单位检测时间间隔
+    /// </summary>
+    public float checkTime = 0.05f;
+
+    /// <summary>
+    /// 超时时间
+    /// </summary>
+    public float outTime = 3f;
 
     ///// <summary>
     ///// 初始化
@@ -64,7 +89,7 @@ public class MoveFormulaItem : AbstractFormulaItem
         {
             throw new Exception("数据列表为空");
         }
-        var argsCount = 4;
+        var argsCount = 5;
         // 解析参数
         if (array.Length < argsCount)
         {
@@ -72,12 +97,14 @@ public class MoveFormulaItem : AbstractFormulaItem
         }
 
         // 如果该项值是以%开头的则作为替换数据
-        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        var targetPos = GetDataOrReplace<int>("TargetPos", array, 1, ReplaceDic);
-        var speed = GetDataOrReplace<float>("Speed", array, 2, ReplaceDic);
-        var isBlink = GetDataOrReplace<bool>("IsBlink", array, 3, ReplaceDic);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        var moveTargetMember = GetDataOrReplace<int>("MoveTargetMember", array, 1);
+        var targetPos = GetDataOrReplace<int>("TargetPos", array, 2);
+        var speed = GetDataOrReplace<float>("Speed", array, 3);
+        var isBlink = GetDataOrReplace<bool>("IsBlink", array, 4);
 
         FormulaType = formulaType;
+        MoveTargetMember = moveTargetMember;
         TargetPos = targetPos;
         Speed = speed;
         IsBlink = isBlink;
@@ -102,8 +129,7 @@ public class MoveFormulaItem : AbstractFormulaItem
         var myTargetPos = TargetPos;
         var mySpeed = Speed;
         var myIsBlink = IsBlink;
-        var member = paramsPacker.ReleaseMember;
-        var target = paramsPacker.ReceiverMenber;
+        var member = MoveTargetMember == 0 ? paramsPacker.ReleaseMember : paramsPacker.ReceiverMenber;
         var myFormulaType = FormulaType;
         // 最大移动次数(防溢出)
         var moveTime = 300;

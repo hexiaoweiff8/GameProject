@@ -31,7 +31,7 @@ end
 
 function dayilymissionUtil:GetMissionOneDataByID(missionID)
     if dayilymissionUtil:GetMissionData()[missionID] == nil then
-        print("--------没有数据ID为："..missionID.."的任务--------证明子链任务完成")
+        print("--------没有数据ID为："..missionID.."的任务--------证明子链任务完成或者存在无数据需要修正")
         return nil
     end
     local tb = {}

@@ -148,17 +148,7 @@ function chatBubble_controller:Update()
 
 end
 
-------心跳请求为了更新气泡的
---function chatBubble_controller:HeartForRefreshChatBubble()
---    if true then
---        timer = timer + Time.deltaTime
---        if timer >= 5  then
---            model:RefreshDate()
---            --chatBubble_controller:ShowNextNewContent()
---            timer = 0
---        end
---    end
---end
+
 
 function chatBubble_controller:Heartbeat_chat()--聊天心跳 当用户在聊天室界面每隔5分钟请求一次
     this.heartbeat_chat_timer = this.heartbeat_chat_timer + Time.deltaTime

@@ -13,39 +13,6 @@ public class LogicInit
 
         Application.targetFrameRate = 30;//限定帧率
 
-        m_logicInitProgress = 0;
-
-        List<string> packs = new List<string>();
-        // TODO 需要管理包加载
-        packs.Add("packets");
-        packs.Add("core");
-        packs.Add("sc_main");
-        packs.Add("tzbd_01");
-        packs.Add("tzbd_99");
-        packs.Add("uisound");
-        packs.Add("scene_main");
-        packs.Add("xuebaotujidui");
-        // 基地
-        packs.Add("jidi");
-        // 防御塔
-        packs.Add("turret");
-        // 特效(攻击特效)
-        packs.Add("attackeffect");
-        //注册常驻包
-        {
-            foreach (var curr in packs)
-                ResourceRefManage.Single.AddResidentPack(curr);
-        }
-
-        //装载内核包和主场景资源
-        {
-            PacketLoader loader = new PacketLoader();
-            loader.Start(PackType.Res, packs, null);
-
-            //等待资源装载完成
-            while (loader.Result == PacketLoader.ResultEnum.Loading)
-                yield return null;
-        }
         m_logicInitProgress = 0.3f;
         yield return null;
 
@@ -116,6 +83,46 @@ public class LogicInit
 
         m_logicInitProgress = 1.0f;
         yield return null;
+    }
+
+    /// <summary>
+    /// 携程加载依赖包
+    /// </summary>
+    /// <returns></returns>
+    public static IEnumerator CoLoadPackage()
+    {
+        List<string> packs = new List<string>();
+        // TODO 需要管理包加载
+        packs.Add("packets");
+        packs.Add("core");
+        packs.Add("sc_main");
+        packs.Add("tzbd_01");
+        packs.Add("tzbd_33");
+        packs.Add("xuebaotujidui");
+        packs.Add("skill");
+        // 基地
+        packs.Add("zhujidi");
+        // 防御塔
+        packs.Add("fangyuta");
+        // 特效(攻击特效)
+        packs.Add("attackeffect");
+        // 地图数据
+        packs.Add("mapdatapack");
+        //注册常驻包
+        {
+            foreach (var curr in packs)
+                ResourceRefManage.Single.AddResidentPack(curr);
+        }
+
+        //装载内核包和主场景资源
+        {
+            PacketLoader loader = new PacketLoader();
+            loader.Start(PackType.Res, packs, null);
+
+            //等待资源装载完成
+            while (loader.Result == PacketLoader.ResultEnum.Loading)
+                yield return null;
+        }
     }
 
     public static float LogicInitProgress

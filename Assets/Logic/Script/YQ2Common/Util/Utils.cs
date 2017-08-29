@@ -254,6 +254,16 @@ public class Utils
     /// </summary>
     public const int TurretBaseId = 220002000;
 
+    /// <summary>
+    /// 我方阵营材质后缀
+    /// </summary>
+    public const string MyCampTextureNameTrail = "_b_texture";
+
+    /// <summary>
+    /// 敌方阵营材质后缀
+    /// </summary>
+    public const string EnemyCampTextureNameTrail = "_r_texture";
+
     // ----------------------------BaseID---------------------------------
 
     // ----------------------------操作---------------------------------------
@@ -401,7 +411,7 @@ public class Utils
             planePosOffset.x - mapWidth * unitWidth * 0.5f
             //+ unitWidth * 0.5f 
             + num.x * unitWidth,
-            planePosOffset.y + unitWidth,
+            planePosOffset.y,
             planePosOffset.z - mapHight * unitWidth * 0.5f
             //+ unitWidth * 0.5f
             + num.y * unitWidth);
@@ -725,6 +735,20 @@ public class Utils
         var xOff = (point2.x - point1.x);
         var yOff = (point2.y - point2.y);
         return (float)Math.Sqrt(xOff * xOff + yOff * yOff);
+    }
+
+    /// <summary>
+    /// 计算两个向量角度
+    /// </summary>
+    /// <param name="vec"></param>
+    /// <returns></returns>
+    public static float GetAngleWithZ(Vector3 vec)
+    {
+        var result = Vector3.Angle(Vector3.forward, vec);
+
+        result *= (Vector3.Angle(Vector3.right, vec) >= 90 ? -1 : 1);
+
+        return result;
     }
 
     // ---------------------------文件操作----------------------------

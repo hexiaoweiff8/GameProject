@@ -2,7 +2,7 @@
 --- Created by Administrator.
 --- DateTime: 2017/8/2 16:57
 ---
-local CanNotArea = require("uiscripts/fight/CanNotArea")
+
 local cardAction = {}
 
 ---初始化数据

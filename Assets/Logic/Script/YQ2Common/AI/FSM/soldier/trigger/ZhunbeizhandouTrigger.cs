@@ -59,23 +59,14 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger
             // 行进追击切准备战斗
             case SoldierStateID.Xingjin:
             case SoldierStateID.ZhuiJi:
-                {
-                    return CheckChangeState(fsm);
-                }
+            {
+                return CheckChangeState(fsm);
+            }
             // 技能攻击/普通攻击切准备战斗
             case SoldierStateID.PutongGongji:
-            case SoldierStateID.JinengGongji:
-                {
-                    //// 如果有正在攻击目标则 不切换状态
-                    //// 判断是否有正在攻击的目标
-                    //if ((!fsm.IsCanInJinenggongji && !fsm.IsCanInPutonggongji) || fsm.TargetIsLoseEfficacy)
-                    //{
-                    //    // 可以切换
-                    //    return CheckChangeState(fsm);
-                    //}
-
-                    return false;
-                }
+            {
+                return false;
+            }
         }
         return false;
     }
@@ -87,27 +78,30 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger
     /// <returns></returns>
     public static bool CheckChangeState(SoldierFSMSystem fsm)
     {
-        var searchData = fsm.Display.ClusterData;
-
-        // 攻击范围内是否有敌人
-        var pos = new Vector2(fsm.Display.ClusterData.X, fsm.Display.ClusterData.Y);
-
-        if (CheckSkillRelease(fsm, searchData, pos))
+        // 检测是否可技能攻击与有可释放技能
+        if (CheckSkillRelease(fsm))
         {
             return true;
         }
-        return CheckNormalAttack(fsm, searchData, pos);
+        return CheckNormalAttack(fsm);
     }
 
     /// <summary>
     /// 检查技能释放
     /// </summary>
     /// <param name="fsm"></param>
-    /// <param name="searchData"></param>
-    /// <param name="checkPos"></param>
     /// <returns></returns>
-    public static bool CheckSkillRelease(SoldierFSMSystem fsm, PositionObject searchData, Vector2 checkPos)
+    public static bool CheckSkillRelease(SoldierFSMSystem fsm)
     {
+        var searchData = fsm.Display.ClusterData;
+        // 攻击范围内是否有敌人
+        var checkPos = new Vector2(fsm.Display.ClusterData.X, fsm.Display.ClusterData.Y);
+
+        // 不可释放技能
+        if (!searchData.AllData.MemberData.CouldReleaseSkill)
+        {
+            return false;
+        }
         var list = TargetSelecter.TargetFilter(searchData,
             ClusterManager.Single.CheckRange(checkPos, searchData.AllData.MemberData.SkillRange, searchData.AllData.MemberData.Camp, true));
 
@@ -133,11 +127,12 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger
     /// 检查普通攻击
     /// </summary>
     /// <param name="fsm"></param>
-    /// <param name="searchData"></param>
-    /// <param name="checkPos"></param>
     /// <returns></returns>
-    public static bool CheckNormalAttack(SoldierFSMSystem fsm, PositionObject searchData, Vector2 checkPos)
+    public static bool CheckNormalAttack(SoldierFSMSystem fsm)
     {
+        var searchData = fsm.Display.ClusterData;
+        // 攻击范围内是否有敌人
+        var checkPos = new Vector2(fsm.Display.ClusterData.X, fsm.Display.ClusterData.Y);
         // 目标选择器选择目标列表
         var list = TargetSelecter.TargetFilter(searchData,
             ClusterManager.Single.CheckRange(checkPos, searchData.AllData.MemberData.AttackRange, searchData.AllData.MemberData.Camp, true));
@@ -180,20 +175,21 @@ public class ZhunbeizhandouTrigger : SoldierFSMTrigger
                 // 是否为主动技能
                 // 技能没有在CD中
                 if (!skill.IsActive ||
-                    !CDTimer.Instance().IsInCD(skill.Num, fsm.Display.ClusterData.AllData.MemberData.ObjID.ID, skill.CDGroup))
+                    CDTimer.Instance().IsInCD(skill.Num, fsm.Display.ClusterData.AllData.MemberData.ObjID.ID, skill.CDGroup))
                 {
                     continue;
                 }
                 // 判断技能是否符合释放条件(范围内有适合的单位)
                 if (skill.WeightData != null)
                 {
-                    res = TargetSelecter.TargetFilter(skill.ReleaseMember.ClusterData, res);
+                    res = TargetSelecter.TargetFilter(skill.WeightData, skill.ReleaseMember.ClusterData, res);
                 }
 
                 if (res != null && res.Count > 0)
                 {
                     fsm.Skill = skill;
                     result = true;
+                    break;
                 }
             }
         }

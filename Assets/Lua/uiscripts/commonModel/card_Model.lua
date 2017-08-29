@@ -112,6 +112,19 @@ function cardModel:getCardNum(cardId)
         return nil
     end
 end
+---
+---获取某张卡牌的等级
+---cardId   卡牌Id
+---
+function cardModel:getCardLv(cardId)
+    if cardTbl[cardId] then
+        return cardTbl[cardId].lv
+    else
+        Debugger.LogWarning("卡牌不存在！！！！")
+        return nil
+    end
+end
+
 
 ---
 ---获取卡牌的购买次数
@@ -123,13 +136,19 @@ function cardModel:getCardBuy(cardId)
         return 0
     end
 end
+
 ---
 ---获取卡牌列表
 ---
 function cardModel:getCardTbl()
     return cardTbl
 end
-
+---
+---获取卡牌种类数量
+---
+function cardModel:getCardTblLength()
+    return cardTbl_Length
+end
 
 ---
 ---获取卡牌排序列表
@@ -138,10 +157,15 @@ function cardModel:getCardSortTbl()
     return cardSortTbl
 end
 
-
 ---
----获取卡牌数量
+---获取卡牌在排序列表中的次序
 ---
-function cardModel:getCardTblLength()
-    return cardTbl_Length
+function cardModel:getCardIndex(cardId)
+    for index,value in pairs(cardSortTbl) do
+        if value == cardId then
+            return index
+        end
+    end
+    printe("错误：卡牌不存在")
+    return nil
 end

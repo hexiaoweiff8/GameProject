@@ -32,6 +32,18 @@ public class SkillManager
     private static SkillManager single = null;
 
 
+
+    /// <summary>
+    /// 技能AB包名称
+    /// </summary>
+    public const string SkillPacketName = "skill";
+
+    /// <summary>
+    /// 运行类型
+    /// </summary>
+    public int RunType = 0;
+
+
     /// <summary>
     /// 是否暂停功能
     /// </summary>
@@ -58,7 +70,7 @@ public class SkillManager
     /// <summary>
     /// 事件缓存
     /// </summary>
-    private IList<TriggerData> tmpList= new List<TriggerData>();  
+    private IList<TriggerData> tmpList= new List<TriggerData>();
 
     ///// <summary>
     ///// 攻击者列表[被攻击者ID, 攻击者列表]
@@ -86,20 +98,21 @@ public class SkillManager
     /// 加载并创建技能实例
     /// </summary>
     /// <param name="skillNum">技能ID 必须为>0的整数</param>
+    /// <param name="skillLevel"></param>
     /// <returns>技能实例</returns>
-    public SkillInfo CreateSkillInfo(int skillNum)
+    public SkillInfo CreateSkillInfo(int skillNum, int skillLevel = 1)
     {
         return CreateSkillInfo(skillNum, null);
     }
 
     /// <summary>
     /// 加载并创建技能实例
-    /// TODO 需要判断当前运行状态, 并添加包加载方式
     /// </summary>
     /// <param name="skillNum">技能ID</param>
     /// <param name="skillHolder">技能持有单位</param>
+    /// <param name="skillLevel">技能等级</param>
     /// <returns>技能实例</returns>
-    public SkillInfo CreateSkillInfo(int skillNum, DisplayOwner skillHolder)
+    public SkillInfo CreateSkillInfo(int skillNum, DisplayOwner skillHolder, int skillLevel = 1)
     {
         SkillInfo result = null;
 
@@ -116,24 +129,49 @@ public class SkillManager
         }
         else
         {
-            // 检测文件是否存在
-            var file = new FileInfo(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "SkillScript" + skillNum + ".txt");
-            if (file.Exists)
+            // 从AB文件中加载
+            var skillTxt = GetSkillScript(skillNum, SkillManager.Single.RunType);
+            if (!string.IsNullOrEmpty(skillTxt))
             {
-                // 加载文件内容
-                var skillTxt = Utils.LoadFileInfo(file);
-                if (!string.IsNullOrEmpty(skillTxt))
-                {
-                    result = FormulaConstructor.SkillConstructor(skillTxt);
-                    // 将其放入缓存
-                    AddSkillInfo(result);
-                }
+                result = FormulaConstructor.SkillConstructor(skillTxt);
+                // 将其放入缓存
+                AddSkillInfo(result);
             }
         }
         result = CopySkillInfo(result);
         result.ReleaseMember = skillHolder;
+        result.ReplaceData(skillLevel);
         // 将技能实现放入实现列表
         skillInstanceDic.Add(result.AddtionId, result);
+        return result;
+    }
+
+    /// <summary>
+    /// 获取技能脚本
+    /// </summary>
+    /// <param name="skillNum"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public string GetSkillScript(int skillNum, int type = 0)
+    {
+        var result = "";
+        switch (type)
+        {
+            case 0:
+                result = PacketManage.Single.GetPacket(SkillPacketName).LoadString("SkillScript" + skillNum + ".txt");
+                break;
+            case 1:
+                var file =
+                    new FileInfo(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "SkillScript" +
+                                 skillNum + ".txt");
+                if (file.Exists)
+                {
+                    // 加载文件内容
+                    result = Utils.LoadFileInfo(file);
+                }
+                break;
+        }
+
         return result;
     }
 
@@ -205,6 +243,7 @@ public class SkillManager
                 Description = skillInfo.Description,
                 Icon = skillInfo.Icon,
                 ReleaseMember = skillInfo.ReleaseMember,
+                IntervalTime = skillInfo.IntervalTime,
                 ReleaseTime = skillInfo.ReleaseTime,
                 TickTime = skillInfo.TickTime,
                 TriggerLevel1 = skillInfo.TriggerLevel1,
@@ -213,7 +252,12 @@ public class SkillManager
                 DemageChange = skillInfo.DemageChange,
                 DemageChangeProbability = skillInfo.DemageChangeProbability,
                 DemageChangeTargetType = skillInfo.DemageChangeTargetType,
-                DemageChangeType = skillInfo.DemageChangeType
+                DemageChangeType = skillInfo.DemageChangeType,
+                IsActive = skillInfo.IsActive,
+                IsDone = skillInfo.IsDone,
+                ReplaceSourceDataDic = skillInfo.ReplaceSourceDataDic,
+                SkillName = skillInfo.SkillName
+                
             };
             result.AddActionFormulaItem(skillInfo.GetActionFormulaItem());
         }
@@ -256,8 +300,7 @@ public class SkillManager
         var skillInfo = skillbase as SkillInfo;
         if (skillInfo != null)
         {
-            var objId = skillInfo.ReleaseMember.ClusterData.AllData.MemberData.ObjID;
-            if (!CDTimer.Instance().IsInCD(skillInfo.Num, objId.ID, skillInfo.CDGroup))
+            if (!CDTimer.Instance().IsInCD(skillInfo.Num, skillInfo.ReleaseMember.ClusterData.AllData.MemberData.ObjID.ID, skillInfo.CDGroup))
             {
                 result = true;
             }
@@ -270,13 +313,25 @@ public class SkillManager
     /// 将一个技能设置为CD状态
     /// </summary>
     /// <param name="skillInfo">被CD技能</param>
-    private void SetSkillInCD(SkillInfo skillInfo)
+    public void SetSkillInCD(SkillInfo skillInfo)
     {
         if (skillInfo != null)
         {
-            var objId = skillInfo.ReleaseMember.ClusterData.AllData.MemberData.ObjID;
             // 技能CDGroup
-            CDTimer.Instance().SetInCD(skillInfo.Num, skillInfo.CDTime, objId.ID, skillInfo.CDGroup);
+            CDTimer.Instance().SetInCD(skillInfo.Num, skillInfo.CDTime, skillInfo.ReleaseMember.ClusterData.AllData.MemberData.ObjID.ID, skillInfo.CDGroup);
+        }
+    }
+
+    /// <summary>
+    /// 减少CD中的技能剩余时间
+    /// </summary>
+    /// <param name="skillInfo">被减少技能</param>
+    /// <param name="subTime">被减少时间</param>
+    public void SubSkillCD(SkillInfo skillInfo, float subTime)
+    {
+        if (skillInfo != null)
+        {
+            CDTimer.Instance().SubCD(skillInfo.Num, skillInfo.CDTime, subTime, skillInfo.ReleaseMember.ClusterData.AllData.MemberData.ObjID.ID);
         }
     }
 
@@ -296,7 +351,7 @@ public class SkillManager
         // 子级技能没有cd
         if (isSubSkill)
         {
-            DoFormula(skillBase.GetActionFormula(packer));
+            DoFormula(skillBase.GetActionFormula(packer), callback);
         }
         else
         {
@@ -432,9 +487,9 @@ public class SkillManager
 
             int r =  RandomPacker.Single.GetRangeI(0, 100);
 
-            Debug.Log("技能触发概率为  " + skill.TriggerProbability * 100);
+            //Debug.Log("技能触发概率为  " + skill.TriggerProbability * 100);
             // 生命值百分比
-            var hpPercent = skill.ReleaseMember.ClusterData.AllData.MemberData.CurrentHP*100/
+            var hpPercent = skill.ReleaseMember.ClusterData.AllData.MemberData.CurrentHP/
                             skill.ReleaseMember.ClusterData.AllData.MemberData.TotalHp;
 
             // 判断是否符合生命值
@@ -443,7 +498,7 @@ public class SkillManager
             if (skill.TriggerLevel1 == triggerData.TypeLevel1 &&
                 skill.TriggerLevel2 == triggerData.TypeLevel2 &&  r<=(skill.TriggerProbability*100) )
             {
-                Debug.Log("技能随机数为  " + r);
+                //Debug.Log("技能随机数为  " + r);
                 var paramsPacker = FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(skill,
                     triggerData.ReleaseMember,
                     triggerData.ReceiveMember);

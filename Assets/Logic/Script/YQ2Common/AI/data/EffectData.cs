@@ -49,6 +49,39 @@ public class EffectData
     /// </summary>
     public string GetHitByBombEffect { get; set; }
 
+
+
+    /// <summary>
+    /// 枪口火焰时间
+    /// </summary>
+    public float MuzzleFlashEffectTime { get; set; }
+
+    /// <summary>
+    /// 链接特效时间
+    /// </summary>
+    public float ChainEffectTime { get; set; }
+
+    /// <summary>
+    /// 范围效果时间
+    /// </summary>
+    public float RangeEffectTime { get; set; }
+
+    /// <summary>
+    /// 被子弹击中特效时间
+    /// </summary>
+    public float GetHitByBulletEffectTime { get; set; }
+
+    /// <summary>
+    /// 收到炸弹攻击特效时间
+    /// </summary>
+    public float GetHitByBombEffectTime { get; set; }
+
+    /// <summary>
+    /// 收到炸弹攻击特效时间
+    /// </summary>
+    public int BulletType { get; set; }
+
+
     /// <summary>
     /// 初始化
     /// </summary>
@@ -72,5 +105,13 @@ public class EffectData
         TrajectoryEffect = effect.Trajectory;
         GetHitByBulletEffect = effect.Gethit_Bullet;
         GetHitByBombEffect = effect.Gethit_Missile;
+
+        MuzzleFlashEffectTime = effect.FlashPlayTime;
+        ChainEffectTime = effect.ChainPlayTime;
+        RangeEffectTime = effect.RangePlayTime;
+        GetHitByBulletEffectTime = effect.Gethit_BulletPlayTime;
+        GetHitByBombEffectTime = effect.Gethit_MissilePlayTime;
+
+        BulletType = effect.BulletType;
     }
 }

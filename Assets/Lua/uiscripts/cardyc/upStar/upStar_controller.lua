@@ -1,21 +1,38 @@
 local upStar_controller = {}
-local view = require("uiscripts/cardyc/upStar/upStar_view")
-local data = require("uiscripts/cardyc/upStar/upStar_model")
-
-require("uiscripts/commonGameObj/cardhead")
-require("uiscripts/commonGameObj/skillItem")
+local view
+local data
 local cardhead_left
 local cardhead_right
 local success_cardhead_left
 local success_cardhead_right
 local skillItem 
 -----------------------------------升星部分---------------------------------
-local isInitUpStarLayer = false --是否初始化升星界面
-local isInitUpStarSLayer = false --是否初始化升星成功界面
-local isinitSkillItem = false --是否初始化升星界面的技能头像
+local isInitUpStarLayer --是否初始化升星界面
+local isInitUpStarSLayer --是否初始化升星成功界面
+local isinitSkillItem --是否初始化升星界面的技能头像
 function upStar_controller:init( args )
+    view = require("uiscripts/cardyc/upStar/upStar_view")
+    data = require("uiscripts/cardyc/upStar/upStar_model")
+    isInitUpStarLayer = false --是否初始化升星界面
+    isInitUpStarSLayer = false --是否初始化升星成功界面
+    isinitSkillItem = false --是否初始化升星界面的技能头像
     view:init_view(args)
     
+end
+
+function upStar_controller:OnDestroyDone()
+    Memory.free("uiscripts/cardyc/upStar/upStar_view")
+    Memory.free("uiscripts/cardyc/upStar/upStar_model")
+    view = nil
+    data = nil
+    cardhead_left = nil
+    cardhead_right = nil
+    success_cardhead_left = nil
+    success_cardhead_right = nil
+    skillItem = nil
+    isInitUpStarLayer = nil
+    isInitUpStarSLayer = nil
+    isinitSkillItem = nil
 end
 
 --显示升星界面
@@ -56,10 +73,10 @@ function upStar_controller:refresh_UpStar_Layer()
 
     view.upStarP_skillPanel:SetActive(false)
     if data.starLv <= 4 then
-        local skillId = skillUtil:getSkillIDByCard(data.cardId,data.cardLv,data.starLv + 1)
+        local skillId = cardUtil:getSkillID(data.cardId,data.starLv + 1)
         view.upStarP_skillPanel:SetActive(true)
-        view.upStarP_skillP_NameLab:GetComponent("UILabel").text = skillUtil:getskillNameByID(skillId) --解锁技能名
-        view.upStarP_skillP_skillDes:GetComponent("UILabel").text = skillUtil:getskillDesByID(skillId)
+        view.upStarP_skillP_NameLab:GetComponent("UILabel").text = skillUtil:getSkillName(skillId) --解锁技能名
+        view.upStarP_skillP_skillDes:GetComponent("UILabel").text = skillUtil:getSkillDescription(skillId,data.skill_Lv_Table[data.starLv + 1])
         if not isinitSkillItem then 
             skillItem = SkillItem(view.upStarP_skillP_skillInfo,Vector3(-230,-65,0))
             isinitSkillItem = true

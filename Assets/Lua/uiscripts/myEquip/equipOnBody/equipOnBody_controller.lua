@@ -3,8 +3,8 @@
 --- DateTime: 2017/6/30 17:37
 ---
 local equipOnBody_controller = {}
-local view = require("uiscripts/myEquip/equipOnBody/equipOnBody_view")
-local data = require("uiscripts/myEquip/equipOnBody/equipOnBody_model")
+local view
+local data
 
 ---
 ---正选中的已穿戴装备的index，默认为第一个装备 1
@@ -12,6 +12,11 @@ local data = require("uiscripts/myEquip/equipOnBody/equipOnBody_model")
 local _selectEquipType = 1
 local _equipsToShow = {}
 function equipOnBody_controller:init(equipController)
+
+    view = require("uiscripts/myEquip/equipOnBody/equipOnBody_view")
+    data = require("uiscripts/myEquip/equipOnBody/equipOnBody_model")
+    _selectEquipType = 1
+    _equipsToShow = {}
     view:init_view(equipController)
 
     ---
@@ -183,4 +188,13 @@ function equipOnBody_controller:getCurrentSelectEquipType()
     return _selectEquipType
 end
 
+
+function equipOnBody_controller:OnDestroyDone()
+    Memory.free("uiscripts/myEquip/equipOnBody/equipOnBody_view")
+    Memory.free("uiscripts/myEquip/equipOnBody/equipOnBody_model")
+    view = nil
+    data = nil
+    _selectEquipType = nil
+    _equipsToShow = nil
+end
 return equipOnBody_controller

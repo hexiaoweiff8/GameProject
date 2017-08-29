@@ -21,10 +21,12 @@ function ui_manager:reset()
     self._popup_back_sequence:clear()
     self._background_sequence:clear()
 end
-function ui_manager:ShowWB(wnd_base, duration, is_close_curPop)
+function ui_manager:ShowWB(wnd_base, duration, is_close_curPop, pre_wnd_base_id)
+
     if type(wnd_base) == "string" then
         wnd_base = _all_Reg_Wnd_list[wnd_base]
     end
+
     local wnd_base_id = wnd_base.wnd_base_id
     if self._shown_wnd_bases[wnd_base_id] ~= nil then
         return
@@ -34,14 +36,11 @@ function ui_manager:ShowWB(wnd_base, duration, is_close_curPop)
             self:DestroyWB(self._popup_back_sequence:peek())
         end
         self._popup_back_sequence:push(wnd_base)
-    elseif wnd_base.wnd_base_type == wnd_base_type.NORMAL or wnd_base.wnd_base_type == wnd_base_type.LOADING then
+    elseif wnd_base.wnd_base_type == wnd_base_type.LOADING then
         self:destroy_all_shown_pop()
         if self.current_wnd_base then
             self:DestroyWB(self.current_wnd_base)
             self.current_wnd_base = nil
-        end
-        if wnd_base.wnd_base_type == wnd_base_type.NORMAL then
-            self.current_wnd_base = wnd_base
         end
     end
 
@@ -53,6 +52,9 @@ function ui_manager:ShowWB(wnd_base, duration, is_close_curPop)
     wnd_base:Show(duration)
     ui_manager._all_wnd_bases[wnd_base_id] = wnd_base
     ui_manager._shown_wnd_bases[wnd_base_id] = wnd_base
+    if(pre_wnd_base_id ~= nil)then
+        wnd_base.pre_wnd_base_id = pre_wnd_base_id
+    end
 end
 function ui_manager:DestroyWB(wnd_base, duration, isPop)
     if type(wnd_base) == "string" then
@@ -68,11 +70,10 @@ function ui_manager:DestroyWB(wnd_base, duration, isPop)
             self._popup_back_sequence:pop()
         end
     else
-        if wnd_base.Resident == 1 then
-            wnd_base:Hide(duration)
-        else
-            wnd_base:Destroy(duration)
-        end
+        wnd_base:Destroy(duration)
+    end
+    if wnd_base.wnd_base_type == wnd_base_type.BACKGROUND then
+        --self._background_sequence[wnd_base.wnd_base_id] = nil
     end
     self._all_wnd_bases[wnd_base.wnd_base_id] = nil
     self._shown_wnd_bases[wnd_base.wnd_base_id] = nil

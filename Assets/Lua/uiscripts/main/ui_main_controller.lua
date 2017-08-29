@@ -1,4 +1,5 @@
 require('uiscripts/shop/timeUtil/TimeUtil')
+require 'uiscripts/main/wndUtil'
 require 'uiscripts/main/RefreshManager'
 --[[
 	ui_main_controller:
@@ -17,10 +18,17 @@ require 'uiscripts/main/RefreshManager'
 ui_main_controller = require("common/middleclass")("ui_main_controller",wnd_base)
 
 local this = ui_main_controller
+local cameraController = nil
+local instance = nil
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 --function def
 --■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 function ui_main_controller:OnShowDone()
+	require('uiscripts/shop/timeUtil/TimeUtil')
+	require 'uiscripts/main/wndUtil'
+	require 'uiscripts/main/RefreshManager'
+	
+	instance = self
 	this.view = require('uiscripts/main/ui_main_view')
 	this.model = require('uiscripts/main/ui_main_model')
 	this.playerInfoWidget = require('uiscripts/main/PlayerInfoWidget')
@@ -38,7 +46,6 @@ function ui_main_controller:OnShowDone()
 	this:initListener()
 	this.view:initCollider()
 	this:initAdditionalSystemItem()
-	this:toggleBar()
 	this:checkAvoidTime()
 
 	this:initMailRefreshTimer()
@@ -49,21 +56,65 @@ function ui_main_controller:OnShowDone()
 
 	-- UnityEngine.SceneManagement.SceneManager.LoadScene("testMainScene",UnityEngine.SceneManagement.LoadSceneMode.Additive)
 	-- SceneManager.LoadScene("testMainScene",UnityEngine.SceneManagement.LoadSceneMode.Additive)
+	local params = FightParameter.New()
+	params.sceneID = 33
+
+	SceneChanger.LoadScene(params,function()
+		printf("callback reg")
+		cameraController = getCameraControllerInstance()
+		this.regMainUIEventListener()
+	end)
+end
+
+function ui_main_controller:OnShowDoneEnd()
+	-- coroutine.start(function()
+	-- 	coroutine.wait(1)
+	-- 	cameraController = getCameraControllerInstance()
+	-- 	printw("getCameraControllerInstance end")
+	-- 	printw("regMainUIEventListener start")
+	-- 	this.regMainUIEventListener()
+	-- 	printw("regMainUIEventListener end")
+	-- end)
 end
 
 function ui_main_controller:OnDestroyDone()
-	this.AvoidTimer:Kill()
-	this.MailTimer:Kill()
+	-- this.AvoidTimer:Kill()
+	if this.MailTimer then
+		this.MailTimer:Kill()
+	end
+	this.removeMainUIEventListener()
+	Memory.free('uiscripts/main/ui_main_view')
+	Memory.free('uiscripts/main/ui_main_model')
+	Memory.free('uiscripts/main/ui_main_controller')
+	Memory.free('uiscripts/main/PlayerInfoWidget')
+	Memory.free('uiscripts/main/MobileInfoWidget')
+	Memory.free('uiscripts/main/mainSystemBar')
+	Memory.free('uiscripts/main/mainCurrencyBar')
+	Memory.free('uiscripts/main/wndUtil')
+	-- this.view = nil
+	-- this.model = nil
+	-- this.playerInfoWidget = nil
+	-- this.mobileInfoWidget = nil
+	-- this.mainSystemBar = nil
+	-- this.mainCurrencyBar = nil
+	-- this.AdditionalSystemBarItems = nil
+
+	ui_main_controller = nil
+	showWND = nil
+
+	printf("unload")
+	UnityEngine.SceneManagement.SceneManager.UnloadScene("testMainScene")
 end
 
 function ui_main_controller:initListener()
-	-- UIEventListener.Get(this.view.btn_battle).onClick = function()
-	-- 	if ui_manager._shown_wnd_bases[WNDTYPE.PVE] == nil then
-	-- 		ui_manager:ShowWB(WNDTYPE.PVE)
-	-- 	else
-	-- 		ui_manager._shown_wnd_bases[WNDTYPE.PVE]:Show()
-	-- 	end
-	-- end
+	UIEventListener.Get(this.view.btn_battle).onClick = function()
+		if ui_manager._shown_wnd_bases[WNDTYPE.Prefight] == nil then
+			ui_manager:ShowWB(WNDTYPE.Prefight)
+		else
+			ui_manager._shown_wnd_bases[WNDTYPE.Prefight]:Show()
+		end
+		instance:Destroy(0)
+	end
 end
 ----------------------------------------------------------------
 --★周边系统栏模块控制
@@ -114,6 +165,7 @@ function ui_main_controller:initAdditionalSystemItem()
 	UIEventListener.Get(this.view.Widget_AdditionalSystem).onClick = function()
 		this.toggleBar()
 	end
+	this.toggleBar()
 end
 --@Des 初始化邮件定时刷新计时器
 function ui_main_controller:initMailRefreshTimer()
@@ -159,15 +211,6 @@ function ui_main_controller:initMailRefreshTimer()
 	this.MailTimer = TimeUtil:CreateLoopTimer(Refresh_Interval,onTick,nil)
 end
 function ui_main_controller:attachListener(ID,pItem)
-
-	local function showWND(WNDTYPE_WndName)
-		if ui_manager._shown_wnd_bases[WNDTYPE_WndName] == nil then
-			ui_manager:ShowWB(WNDTYPE_WndName)
-		else
-			ui_manager._shown_wnd_bases[WNDTYPE_WndName]:Show()
-		end
-	end
-
 	UIEventListener.Get(pItem).onClick = function()
 		local function getEntrance(ID)
 			for i = 1,#this.model.local_AddtionalSystemBarData do
@@ -220,6 +263,34 @@ function ui_main_controller.playCloseAnime()
 			this.AdditionalSystemBarItems[i].transform:DOLocalMove(itemOutPosition,0.5,true)
 		end
 	end
+end
+----------------------------------------------------------------
+--★注册/删除 主界面UI,show/hide事件
+function getCameraControllerInstance()
+	printe("getCameraControllerInstance")
+	print(CameraController.MainSceneCamera)
+	print(CameraController.MainSceneCamera:GetComponent(typeof(CameraController)))
+	return CameraController.MainSceneCamera:GetComponent(typeof(CameraController))
+end
+function ui_main_controller.regMainUIEventListener()
+	printf("OnReg")
+	Event.AddListener(UIEventType.SHOW,this.HandleOnMainUIShow)
+	Event.AddListener(UIEventType.HIDE,this.HandleOnMainUIHide)
+	Event.AddListener(UIEventType.DESTROY,this.HandleOnMainUIHide)
+end
+function ui_main_controller.removeMainUIEventListener()
+	printf("OnRemove")
+	Event.RemoveListener(UIEventType.SHOW,this.HandleOnMainUIShow)
+	Event.RemoveListener(UIEventType.HIDE,this.HandleOnMainUIHide)
+	Event.RemoveListener(UIEventType.DESTROY,this.HandleOnMainUIHide)
+end
+function ui_main_controller.HandleOnMainUIShow(wnd_base_id)
+	printw("handle arg "..wnd_base_id)
+	cameraController:HandleOnWNDShowFinish(wnd_base_id)
+end
+function ui_main_controller.HandleOnMainUIHide(wnd_base_id)
+	printw("handle arg "..wnd_base_id)
+	cameraController:HandleOnWNDHide(wnd_base_id)
 end
 ----------------------------------------------------------------
 --★免战计时器模块控制

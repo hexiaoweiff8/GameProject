@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LuaInterface;
 using UnityEngine.UI;
+using Util;
 
 /// <summary>
 /// 技能效果测试
@@ -142,12 +143,18 @@ public class TestSkillEditor : MonoBehaviour
     private int counter = 0;
 
     /// <summary>
+    /// 技能释放次数
+    /// </summary>
+    private int skilActionCounter = 0;
+
+    /// <summary>
     /// 目标位置
     /// </summary>
     private Vector3 targetPos;
 
 	void Start ()
-	{
+    {
+        SkillManager.Single.RunType = 1;
         // 初始化集群管理器
 	    InitClusterManager();
         // 初始化列表
@@ -195,6 +202,35 @@ public class TestSkillEditor : MonoBehaviour
         {
             // 加载Skill
             var skill = SkillManager.Single.CreateSkillInfo(Convert.ToInt32(skillId), new DisplayOwner(workingObj.gameObject, workingObj));
+            Debug.Log(string.Format("Group:{1},\n" +
+                                    "Demagechange:{2}\n" +
+                                    "DemagePro:{3}\n" +
+                                    "DemageTargetType:{4}\n" +
+                                    "DemageChangeType:{5}\n" +
+                                    "IsActive:{6}\n" +
+                                    "IntervalTime:{7}\n" +
+                                    "Icon:{8}\n" +
+                                    "ReleaseTime:{9}\n" +
+                                    "TriggerLevel1:{10}\n" +
+                                    "TriggerLevel2:{11}\n" +
+                                    "TriggerProbability:{12}\n" +
+                                    "Description:{13}\n" +
+                                    "SkillName:{14}\n" +
+                                    "CDTime:{0}", skill.CDTime,
+                skill.CDGroup,
+                skill.DemageChange,
+                skill.DemageChangeProbability,
+                skill.DemageChangeTargetType,
+                skill.DemageChangeType,
+                skill.IsActive,
+                skill.IntervalTime,
+                skill.Icon,
+                skill.ReleaseTime,
+                skill.TriggerLevel1,
+                skill.TriggerLevel2,
+                skill.TriggerProbability,
+                skill.Description,
+                skill.SkillName));
             if (skill != null)
             {
                 // 挂载技能
@@ -216,8 +252,75 @@ public class TestSkillEditor : MonoBehaviour
             var buff = BuffManager.Single.CreateBuffInfo(Convert.ToInt32(buffId), new DisplayOwner(workingObj.gameObject, workingObj), new DisplayOwner(workingObj.gameObject, workingObj));
             if (buff != null)
             {
+                Debug.Log(string.Format("TickTime:{1},\n" +
+                                       "Demagechange:{2}\n" +
+                                       "DemagePro:{3}\n" +
+                                       "DemageTargetType:{4}\n" +
+                                       "DemageChangeType:{5}\n" +
+                                       "BuffType:{6}\n" +
+                                       "DetachTriggerLevel1:{7}\n" +
+                                       "Icon:{8}\n" +
+                                       "DetachTriggerLevel2:{9}\n" +
+                                       "TriggerLevel1:{10}\n" +
+                                       "TriggerLevel2:{11}\n" +
+                                       "TriggerProbability:{12}\n" +
+                                       "Description:{13}\n" +
+                                       "BuffLevel:{14}\n" +
+                                       "BuffTime:{0},\n" +
+                                        "BuffGroup:{15},\n" +
+                                        "IsBeneficial:{16}\n" +
+                                        "IsDeadDisappear:{17}\n" +
+                                        "IsNotLethal:{18}\n" +
+                                        "IsCouldNotClear:{19}\n" +
+                                        "HpScopeMin:{20},\n" +
+                                        "HpScopeMax:{21}\n" +
+                                        "DetachHpScopeMin:{22}\n" +
+                                        "DetachHpScopeMax:{23}", buff.BuffTime,
+                   buff.TickTime,
+                   buff.DemageChange,
+                   buff.DemageChangeProbability,
+                   buff.DemageChangeTargetType,
+                   buff.DemageChangeType,
+                   buff.BuffType,
+                   buff.DetachTriggerLevel1,
+                   buff.Icon,
+                   buff.DetachTriggerLevel2,
+                   buff.TriggerLevel1,
+                   buff.TriggerLevel2,
+                   buff.TriggerProbability,
+                   buff.Description,
+                   buff.BuffLevel,
+                   buff.BuffGroup,
+                   buff.IsBeneficial,
+                   buff.IsDeadDisappear,
+                   buff.IsNotLethal,
+                   buff.IsCouldNotClear,
+                   buff.HpScopeMin,
+                   buff.HpScopeMax,
+                   buff.DetachHpScopeMin,
+                   buff.DetachHpScopeMax));
                 // 挂载buff
                 BuffManager.Single.DoBuff(buff, BuffDoType.Attach, FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(buff.ReleaseMember, buff.ReceiveMember, buff, -1));
+
+                //var remain = RemainManager.Single.CreateRemainInfoForTest(10000, buff.ReleaseMember);
+
+                //Debug.Log(string.Format("DuringTime:{1},\n" +
+                //                        "ActionTime:{2}\n" +
+                //                        "Range:{3}\n" +
+                //                        "IsFollow:{4}\n" +
+                //                        "ActionCamp:{5}\n" +
+                //                        "CouldActionOnAir:{6}\n" +
+                //                        "CouldActionOnSurface:{7}\n" +
+                //                        "CouldActionOnBuilding:{8}\n"
+                //                        ,remain.DuringTime,
+                //    remain.DuringTime,
+                //    remain.ActionTime,
+                //    remain.Range,
+                //    remain.IsFollow,
+                //    remain.ActionCamp,
+                //    remain.CouldActionOnAir,
+                //    remain.CouldActionOnSurface,
+                //    remain.CouldActionOnBuilding));
             }
             else
             {
@@ -256,15 +359,59 @@ public class TestSkillEditor : MonoBehaviour
             Debug.Log("没有该Id技能技能:"+ selectedSkill);
             return;
         }
+        skill.IsDone = false;
+        skilActionCounter = 0;
 
-        // 触发被选中技能
-        SkillManager.Single.DoSkillInfo(
-            skill, 
-            FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(
-                new DisplayOwner(workingObj.gameObject, workingObj),
-                new DisplayOwner(targetObj.gameObject, targetObj), 
-                skill, 
-                -1));
+        if (skill.ReleaseTime > 1)
+        {
+
+            // 释放持续技能
+            var param = FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(
+            skill,
+            new DisplayOwner(workingObj.gameObject, workingObj, null),
+            new DisplayOwner(targetObj.gameObject, targetObj, null)
+            );
+            // 执行技能起始效果(Attach)
+            SkillManager.Single.DoFormula(skill.GetAttachFormula(param));
+            var skillTimer = new Timer(skill.IntervalTime, true);
+            skillTimer.OnCompleteCallback(() =>
+            {
+                    SkillManager.Single.DoSkillInfo(skill, param, skill.ReleaseTime > 1);
+                    Debug.Log("DoSkill");
+                    // 检测是否释放完毕
+                    if (skill.IsDone)
+                    {
+                        skillTimer.Kill();
+                    }
+
+                // 技能结束标记
+                // TODO 结束条件
+                // 时间, 距离, 死亡, 被位移, 切状态
+
+                skilActionCounter++;
+                if (skilActionCounter >= skill.ReleaseTime)
+                {
+                    // 退出
+                    skill.IsDone = true;
+                }
+            })
+                .OnKill(() =>
+                {
+                    // 执行技能结束效果(Detach)
+                    SkillManager.Single.DoFormula(skill.GetDetachFormula(param));
+                }).Start();
+        } 
+        else
+        {
+            // 触发单次
+            SkillManager.Single.DoSkillInfo(
+                skill,
+                FormulaParamsPackerFactroy.Single.GetFormulaParamsPacker(
+                    new DisplayOwner(workingObj.gameObject, workingObj),
+                    new DisplayOwner(targetObj.gameObject, targetObj),
+                    skill,
+                    -1));
+        }
     }
 
     /// <summary>
@@ -311,8 +458,16 @@ public class TestSkillEditor : MonoBehaviour
         var packPath = Application.dataPath + "\\Lua\\pk_tabs\\";
         lua.DoFile(Application.dataPath + "\\Lua\\framework\\classWC.lua");
         lua.DoFile(Application.dataPath + "\\Lua\\framework\\luacsv.lua");
-        var armyBaseData = lua.DoFile(packPath + "kezhi_c.lua");
-        SDataUtils.setData("kezhi_c", (LuaTable)((LuaTable)armyBaseData[0])["head"], (LuaTable)((LuaTable)armyBaseData[0])["body"]);
+        var kezhi = lua.DoFile(packPath + "kezhi_c.lua");
+        SDataUtils.setData("kezhi_c", (LuaTable)((LuaTable)kezhi[0])["head"], (LuaTable)((LuaTable)kezhi[0])["body"]);
+        var armyBaseData = lua.DoFile(packPath + "armybase_c.lua");
+        SDataUtils.setData("armybase_c", (LuaTable)((LuaTable)armyBaseData[0])["head"], (LuaTable)((LuaTable)armyBaseData[0])["body"]);
+        var constantData = lua.DoFile(packPath + "Constant.lua");
+        SDataUtils.setData("constant", (LuaTable)((LuaTable)constantData[0])["head"], (LuaTable)((LuaTable)constantData[0])["body"]);
+        var aimData = lua.DoFile(packPath + "armyaim_c.lua");
+        SDataUtils.setData("armyaim_c", (LuaTable)((LuaTable)aimData[0])["head"], (LuaTable)((LuaTable)aimData[0])["body"]);
+        var aoeData = lua.DoFile(packPath + "armyaoe_c.lua");
+        SDataUtils.setData("armyaoe_c", (LuaTable)((LuaTable)aoeData[0])["head"], (LuaTable)((LuaTable)aoeData[0])["body"]);
     }
 
     /// <summary>
@@ -453,12 +608,12 @@ public class TestSkillEditor : MonoBehaviour
             if (workingObj.AllData.MemberData.AttackType == Utils.BulletTypeNormal)
             {
                 normalGeneralAttack = GeneralAttackManager.Instance()
-                    .GetNormalGeneralAttack(workingObj, targetObj, "linePrfb.prefab",
+                    .GetNormalGeneralAttack(workingObj, targetObj, "jiguang1.prefab",
                         workingObj.transform.position + new Vector3(0, 10, 0),
                         targetObj.gameObject,
                         200,
                         TrajectoryAlgorithmType.Line,
-                        () =>
+                        (obj) =>
                         {
                             //Debug.Log("普通攻击");
 
@@ -632,6 +787,7 @@ public class TestSkillEditor : MonoBehaviour
         }
     }
 
+
     /// <summary>
     /// 输出log
     /// </summary>
@@ -666,6 +822,7 @@ public class TestSkillEditor : MonoBehaviour
             AttackType = 1,
             Attack1 = 10,
             ArmyType = 1,
+            GeneralType = 1
         };
         school.RotateSpeed = 10;
         // 随机位置
@@ -704,12 +861,12 @@ public class TestSkillEditor : MonoBehaviour
         school.PushTarget(targetPos);
         // 挂载TriggerRunner
         var triggerRunner = schoolItem.AddComponent<TriggerRunner>();
-        triggerRunner.Display = new DisplayOwner(schoolItem, school, null, schoolItem.AddComponent<RanderControl>());
+        triggerRunner.Display = new DisplayOwner(schoolItem, school, schoolItem.AddComponent<RanderControl>());
 
         // 单位放入集群管理器
         ClusterManager.Single.Add(school);
         DisplayerManager.Single.AddElement(objId, triggerRunner.Display);
-        // 单位放入成员列表
+        // 单位放入成员列表 
         memberList.Add(school);
         // 设置活动目标为最新创建目标
         workingObj = school;
@@ -759,7 +916,8 @@ public class TestSkillEditor : MonoBehaviour
             {
                 "ui_fightU",
                 "xuebaotujidui",
-                "attackeffect"
+                "attackeffect",
+                "skill"
             }, (isDone) =>
             {
                 if (isDone)

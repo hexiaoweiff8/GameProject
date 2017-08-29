@@ -96,7 +96,7 @@ public class TestBallistic : MonoBehaviour {
                     // 发射, 挂载弹道脚本
                     var ballistic = BallisticFactory.Single.CreateBallistic(ballisticItem, FirePoint, FireDirection,
                         hit.point,
-                        FirePower, 3, HasGravity, Gravity, trajectoryType: TrajectoryAlgorithmType.Sine); //ballisticItem.AddComponent<Ballistic>();
+                        FirePower, 3, HasGravity, Gravity, trajectoryType: TrajectoryAlgorithmType.Parabola); //ballisticItem.AddComponent<Ballistic>();
                     //ballistic.Direction = FireDirection * FirePower;
                     //ballistic.BallisticArriveTarget = new BallisticArriveTargetForPosition(new Vector3(20, 0, 20));
                     ballistic.OnComplete = (a, b) =>

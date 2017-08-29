@@ -41,6 +41,11 @@ public static class FormulaConstructor
         { "ShareDamage",typeof(ShareDamageFormulaItem)},
         { "ImmuneDemage",typeof(ImmuneDemageFormulaItem)},
         { "Liner",typeof(LinerFormulaItem)},
+        { "For",typeof(ForFormulaItem)},
+        { "SubCD",typeof(SubCDFormulaItem)},
+        { "DelBuff",typeof(DelBuffFormulaItem)},
+        
+        
     };
 
 
@@ -765,8 +770,6 @@ public static class FormulaConstructor
     /// </summary>
     /// <param name="type">行为类型名称</param>
     /// <param name="args">行为</param>
-    /// <param name="startPos">施法者位置</param>
-    /// <param name="targetPos">目标位置</param>
     /// TODO 封装施法者与目标对象
     /// <returns></returns>
     private static IFormulaItem GetFormula(string type, string args)
@@ -859,31 +862,36 @@ public static class FormulaConstructor
         var length = end - start - 1;
         if (end > 0 && start > 0)
         {
+            var strVal = line.Substring(start + 1, length).Trim();
             var symbol = line.Substring(0, start).Trim();
             switch (symbol)
             {
                 case "CDTime":
                 {
-                    skillInfo.CDTime = Convert.ToSingle(line.Substring(start + 1, length).Trim());
+                    skillInfo.CDTime = skillInfo.GetDataOrReplace<float>("CDTime", strVal);
+                    //skillInfo.CDTime = Convert.ToSingle(line.Substring(start + 1, length).Trim());
                 }
                     break;
                 case "CDGroup":
                 {
-                    skillInfo.CDGroup = Convert.ToInt32(line.Substring(start + 1, length).Trim());
+                    skillInfo.CDGroup = skillInfo.GetDataOrReplace<int>("CDGroup", strVal);
                 }
-                break;
+                    break;
                 case "ChangeData":
                 {
                     // 使用反射获得数据
-                    skillInfo.ChangeData = new VOBase();
+                    if (skillInfo.ChangeData == null)
+                    {
+                        skillInfo.ChangeData = new VOBase();
+                    }
                     // 获取值
-                    var values = line.Substring(start + 1, end - start - 1).Split(',');
+                    var values = strVal.Split(',');
                     // 属性名称
                     var propertyName = values[0];
                     // 属性值
                     var propertyValue = values[1];
                     // 属性值类型
-                    var propertyType = (ChangeDataType)Enum.Parse(typeof(ChangeDataType), values[2]);
+                    var propertyType = (ChangeDataType) Enum.Parse(typeof (ChangeDataType), values[2]);
                     // 反射获取类中的属性
                     var property = skillInfo.ChangeData.GetType().GetProperty(propertyName);
                     FieldInfo field = null;
@@ -896,15 +904,16 @@ public static class FormulaConstructor
                         }
                     }
                     // 如果该属性不可以被控制报错
-                    if ((property == null || !property.GetCustomAttributes(typeof(SkillAddition), false).Any())
-                        && (field == null || !field.GetCustomAttributes(typeof(SkillAddition), true).Any()))
+                    if ((property == null || !property.GetCustomAttributes(typeof (SkillAddition), false).Any())
+                        && (field == null || !field.GetCustomAttributes(typeof (SkillAddition), true).Any()))
                     {
                         throw new Exception("该属性不可被技能控制:" + propertyName);
                     }
                     // 设置属性值
                     if (property != null)
                     {
-                        property.SetValue(skillInfo.ChangeData, Convert.ChangeType(propertyValue, property.PropertyType), null);
+                        property.SetValue(skillInfo.ChangeData, Convert.ChangeType(propertyValue, property.PropertyType),
+                            null);
                     }
                     if (field != null)
                     {
@@ -913,83 +922,92 @@ public static class FormulaConstructor
                     // 设置该属性的附加类型
                     skillInfo.ChangeDataTypeDic.Add(propertyName, propertyType);
                 }
-                break;
+                    break;
                 case "DemageChange":
                 {
                     // 解析数据
-                    var values = line.Substring(start + 1, end - start - 1).Split(',');
-                    // 类型 (0:伤害增强/1:伤害减免)
-                    var type = Convert.ToInt32(values[0].Trim());
-                    // 伤害增强/减免值(百分比, 1为100%)
-                    var demageVal = Convert.ToSingle(values[1].Trim());
-                    // 产生伤害增强/减免概率(百分比, 1为100%)
-                    var probability = Convert.ToSingle(values[2].Trim());
-                    // 目标/来源类型
-                    var targetType = (DemageAdditionOrReductionTargetType)Enum.Parse(typeof(DemageAdditionOrReductionTargetType), values[3].Trim());
+                    var values = strVal.Split(',');
+                    //// 类型 (0:伤害增强/1:伤害减免)
+                    //var type = Convert.ToInt32(values[0].Trim());
+                    //// 伤害增强/减免值(百分比, 1为100%)
+                    //var demageVal = Convert.ToSingle(values[1].Trim());
+                    //// 产生伤害增强/减免概率(百分比, 1为100%)
+                    //var probability = Convert.ToSingle(values[2].Trim());
+                    //// 目标/来源类型
+                    //var targetType = (DemageAdditionOrReductionTargetType)Enum.Parse(typeof(DemageAdditionOrReductionTargetType), values[3].Trim());
 
-                    skillInfo.DemageChangeType = type;
-                    skillInfo.DemageChange = demageVal;
-                    skillInfo.DemageChangeProbability = probability;
-                    skillInfo.DemageChangeTargetType = targetType;
+                    skillInfo.DemageChangeType = skillInfo.GetDataOrReplace<int>("DemageChangeType", values[0].Trim());
+                    skillInfo.DemageChange = skillInfo.GetDataOrReplace<float>("DemageChange", values[1].Trim());
+                    skillInfo.DemageChangeProbability = skillInfo.GetDataOrReplace<float>("DemageChangeProbability",
+                        values[2].Trim());
+                    skillInfo.DemageChangeTargetType =
+                        skillInfo.GetDataOrReplace<DemageAdditionOrReductionTargetType>("DemageChangeTargetType",
+                            values[3].Trim());
+                    ;
                 }
-                break;
+                    break;
                 case "IsActive":
                 {
-                    var values = line.Substring(start + 1, length).Trim().Split(',');
+                    var values = strVal.Split(',');
                     if (values.Length == 2)
                     {
-                        skillInfo.IsActive = Convert.ToBoolean(values[0].Trim());
-                        skillInfo.WeightData = new SelectWeightData(SData_armyaim_c.Single.GetDataOfID(Convert.ToInt32(values[1].Trim())));
+                        skillInfo.IsActive = skillInfo.GetDataOrReplace<bool>("IsActive", values[0].Trim());
+                        skillInfo.WeightData =
+                            new SelectWeightData(SData_armyaim_c.Single.GetDataOfID(Convert.ToInt32(values[1].Trim())));
                     }
                     else
                     {
-                        skillInfo.IsActive = Convert.ToBoolean(values[0].Trim());
+                        skillInfo.IsActive = skillInfo.GetDataOrReplace<bool>("IsActive", values[0].Trim());
                     }
                 }
-                break;
+                    break;
                 case "IntervalTime":
                 {
-                    skillInfo.IntervalTime = Convert.ToSingle(line.Substring(start + 1, length).Trim());
+                    skillInfo.IntervalTime = skillInfo.GetDataOrReplace<float>("IntervalTime", strVal);
                 }
-                break;
+                    break;
                 case "ReleaseTime":
                 {
-                    skillInfo.ReleaseTime = Convert.ToInt32(line.Substring(start + 1, length).Trim());
+                    skillInfo.ReleaseTime = skillInfo.GetDataOrReplace<int>("ReleaseTime", strVal);
                 }
                     break;
                 case "TriggerLevel1":
                 {
                     // 技能触发事件level1
-                    var triggerType = (TriggerLevel1)Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
-                    skillInfo.TriggerLevel1 = triggerType;
+                    skillInfo.TriggerLevel1 = skillInfo.GetDataOrReplace<TriggerLevel1>("TriggerLevel1", strVal);
                 }
                     break;
                 case "TriggerLevel2":
                 {
                     // 技能触发事件level2
-                    var triggerType = (TriggerLevel2)Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
-                    skillInfo.TriggerLevel2 = triggerType;
+                    skillInfo.TriggerLevel2 = skillInfo.GetDataOrReplace<TriggerLevel2>("TriggerLevel2", strVal);
                 }
-                break;
+                    break;
 
                 case "TriggerProbability":
-                {      
-                        //技能触发概率
-                        float triggerProbability = Convert.ToSingle(line.Substring(start + 1, end - start - 1).Trim());
-                        skillInfo.TriggerProbability = triggerProbability;
-                    }
+                {
+                    //技能触发概率
+                    skillInfo.TriggerProbability = skillInfo.GetDataOrReplace<float>("TriggerProbability", strVal);
+                }
                     break;
 
                 case "Description":
                 {
-                    skillInfo.Description = line.Substring(start + 1, end - start - 1).Trim();
+                    skillInfo.Description = skillInfo.GetDataOrReplace<string>("Description", strVal);
                 }
                     break;
                 case "Icon":
                 {
-                    skillInfo.Icon = line.Substring(start + 1, end - start - 1).Trim();
+                    skillInfo.Icon = skillInfo.GetDataOrReplace<string>("Icon", strVal);
                 }
                     break;
+                case "SkillName":
+                {
+                    skillInfo.SkillName = skillInfo.GetDataOrReplace<string>("SkillName", strVal);
+                }
+                    break;
+
+
             }
         }
         else if (start < 0 && end < 0)
@@ -1028,86 +1046,79 @@ public static class FormulaConstructor
         if (end > 0 && start > 0)
         {
             var symbol = line.Substring(0, start).Trim();
+            var strVal = line.Substring(start + 1, length).Trim();
             switch (symbol)
             {
                 case "BuffTime":
-                    {
-                        buffInfo.BuffTime = Convert.ToSingle(line.Substring(start + 1, length).Trim());
-                    }
+                {
+                    buffInfo.BuffTime = buffInfo.GetDataOrReplace<float>("BuffTime", strVal);
+                }
                     break;
                 case "TickTime":
                     {
-                        buffInfo.TickTime = Convert.ToSingle(line.Substring(start + 1, length).Trim());
+                        buffInfo.TickTime = buffInfo.GetDataOrReplace<float>("TickTime", strVal);
                     }
                     break;
                 case "BuffType":
                     {
-                        var buffType = (BuffType)Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
-                        buffInfo.BuffType = buffType;
+                        buffInfo.BuffType = buffInfo.GetDataOrReplace<BuffType>("BuffType", strVal);
                     }
                     break;
                 case "TriggerLevel1":
                     {
                         // 技能触发事件level1
-                        var triggerType = (TriggerLevel1)Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
-                        buffInfo.TriggerLevel1 = triggerType;
+                        buffInfo.TriggerLevel1 = buffInfo.GetDataOrReplace<TriggerLevel1>("TriggerLevel1", strVal);
                     }
                     break;
                 case "TriggerLevel2":
                     {
                         // 技能触发事件level2
-                        var values = line.Substring(start + 1, end - start - 1).Trim().Split(',');
-                        var triggerType = (TriggerLevel2)Convert.ToInt32(values[0]);
-                        buffInfo.TriggerLevel2 = triggerType;
-                        if (values.Length > 1)
-                        {
-                            // 血量范围
-                        }
+                        buffInfo.TriggerLevel2 = buffInfo.GetDataOrReplace<TriggerLevel2>("TriggerLevel2", strVal);
                     }
                     break;
                 case "TriggerProbability":
                     {
                         //BUFF触发概率
-                        float triggerProbability = Convert.ToSingle(line.Substring(start + 1, end - start - 1).Trim());
-                        buffInfo.TriggerProbability = triggerProbability;
+                        buffInfo.TriggerProbability = buffInfo.GetDataOrReplace<float>("TriggerProbability", strVal);
                     }
                     break;
 
                 case "DetachTriggerLevel1":
                     {
                         // buff Detach触发条件level1
-                        var triggerType = (TriggerLevel1)Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
-                        buffInfo.DetachTriggerLevel1 = triggerType;
+                        buffInfo.DetachTriggerLevel1 = buffInfo.GetDataOrReplace<TriggerLevel1>("DetachTriggerLevel1", strVal);
                     }
                     break;
                 case "DetachTriggerLevel2":
                     {
                         // buff Detach触发条件level2
-                        var triggerType = (TriggerLevel2)Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
-                        buffInfo.DetachTriggerLevel2 = triggerType;
+                        buffInfo.DetachTriggerLevel2 = buffInfo.GetDataOrReplace<TriggerLevel2>("DetachTriggerLevel2", strVal);
                     }
                     break;
                 case "BuffLevel":
                     {
                         // buff优先级
-                        buffInfo.BuffLevel = Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
+                        buffInfo.BuffLevel = buffInfo.GetDataOrReplace<int>("BuffLevel", strVal);
                     }
                     break;
                 case "BuffGroup":
                     {
                         // buff组
-                        buffInfo.BuffGroup = Convert.ToInt32(line.Substring(start + 1, end - start - 1).Trim());
+                        buffInfo.BuffGroup = buffInfo.GetDataOrReplace<int>("BuffGroup", strVal);
                     }
                     break;
                 case "IsBeneficial":
                     {
-                        buffInfo.IsBeneficial = Convert.ToBoolean(line.Substring(start + 1, end - start - 1).Trim());
+                        buffInfo.IsBeneficial = buffInfo.GetDataOrReplace<bool>("IsBeneficial", strVal);
                     }
                     break;
                 case "ChangeData":
                     {
                         // 使用反射获得数据
-                        buffInfo.ChangeData = new VOBase();
+                        if (buffInfo.ChangeData == null)
+                        {
+                            buffInfo.ChangeData = new VOBase();
+                        }
                         // 获取值
                         var values = line.Substring(start + 1, end - start - 1).Split(',');
                         // 属性名称
@@ -1148,26 +1159,26 @@ public static class FormulaConstructor
                 case "DemageChange":
                     {
                         // 解析数据
-                        var values = line.Substring(start + 1, end - start - 1).Split(',');
+                        var values = strVal.Split(',');
                         // 类型 (0:伤害增强/1:伤害减免)
-                        var type = Convert.ToInt32(values[0].Trim());
-                        // 伤害增强/减免值(百分比, 1为100%)
-                        var demageVal = Convert.ToSingle(values[1].Trim());
-                        // 产生伤害增强/减免概率(百分比, 1为100%)
-                        var probability = Convert.ToSingle(values[2].Trim());
-                        // 目标/来源类型
-                        var targetType = (DemageAdditionOrReductionTargetType)Enum.Parse(typeof(DemageAdditionOrReductionTargetType), values[3].Trim());
+                        //var type = Convert.ToInt32(values[0].Trim());
+                        //// 伤害增强/减免值(百分比, 1为100%)
+                        //var demageVal = Convert.ToSingle(values[1].Trim());
+                        //// 产生伤害增强/减免概率(百分比, 1为100%)
+                        //var probability = Convert.ToSingle(values[2].Trim());
+                        //// 目标/来源类型
+                        //var targetType = (DemageAdditionOrReductionTargetType)Enum.Parse(typeof(DemageAdditionOrReductionTargetType), values[3].Trim());
 
-                        buffInfo.DemageChangeType = type;
-                        buffInfo.DemageChange = demageVal;
-                        buffInfo.DemageChangeProbability = probability;
-                        buffInfo.DemageChangeTargetType = targetType;
+                        buffInfo.DemageChangeType = buffInfo.GetDataOrReplace<int>("DemageChangeType", values[0].Trim());
+                        buffInfo.DemageChange = buffInfo.GetDataOrReplace<float>("DemageChange", values[1].Trim());
+                        buffInfo.DemageChangeProbability = buffInfo.GetDataOrReplace<float>("DemageChangeProbability", values[2].Trim());
+                        buffInfo.DemageChangeTargetType = buffInfo.GetDataOrReplace<DemageAdditionOrReductionTargetType>("DemageChangeTargetType", values[3].Trim());
                     }
                     break;
                 case "DetachQualified":
                     {
                         // buff的Detach条件
-                        var param = line.Substring(start + 1, end - start - 1).Trim().Split(',');
+                        var param = strVal.Split(',');
                         var key = param[0];
                         var op = param[1];
                         var value = param[2];
@@ -1179,33 +1190,59 @@ public static class FormulaConstructor
                 case "IsDeadDisappear":
                     {
                         // buff存在状态
-                        buffInfo.IsDeadDisappear = Convert.ToBoolean(line.Substring(start + 1, end - start - 1).Trim());
+                        buffInfo.IsDeadDisappear = buffInfo.GetDataOrReplace<bool>("IsDeadDisappear", strVal);
                     }
                     break;
                 case "IsNotLethal":
                     {
                         // buff是否不致死
-                        buffInfo.IsNotLethal = Convert.ToBoolean(line.Substring(start + 1, end - start - 1).Trim());
+                        buffInfo.IsNotLethal = buffInfo.GetDataOrReplace<bool>("IsNotLethal", strVal);
                     }
                     break;
                 case "IsCouldNotClear":
                     {
                         // buff是否不可清除
-                        buffInfo.IsCouldNotClear = Convert.ToBoolean(line.Substring(start + 1, end - start - 1).Trim());
+                        buffInfo.IsCouldNotClear = buffInfo.GetDataOrReplace<bool>("IsCouldNotClear", strVal);
                     }
                     break;
                 case "Description":
                     {
                         // buff说明
-                        buffInfo.Description = line.Substring(start + 1, end - start - 1).Trim();
+                        buffInfo.Description = buffInfo.GetDataOrReplace<string>("Description", strVal);
                     }
                     break;
                 case "Icon":
                     {
                         // buff Icon
-                        buffInfo.Icon = line.Substring(start + 1, end - start - 1).Trim();
+                        buffInfo.Icon = buffInfo.GetDataOrReplace<string>("Icon", strVal);
                     }
                     break;
+                case "HpScopeMax":
+                    {
+                        // 触发Action生命上限
+                        buffInfo.HpScopeMax = buffInfo.GetDataOrReplace<float>("HpScopeMax", strVal);
+                    }
+                    break;
+                case "HpScopeMin":
+                    {
+                        // 触发Action生命下限
+                        buffInfo.HpScopeMin = buffInfo.GetDataOrReplace<float>("HpScopeMin", strVal);
+                    }
+                    break;
+                case "DetachHpScopeMax":
+                    {
+                        // 触发Detach生命上限
+                        buffInfo.DetachHpScopeMax = buffInfo.GetDataOrReplace<float>("DetachHpScopeMax", strVal);
+                    }
+                    break;
+                case "DetachHpScopeMin":
+                    {
+                        // 触发Detah生命下限
+                        buffInfo.DetachHpScopeMin = buffInfo.GetDataOrReplace<float>("DetachHpScopeMin", strVal);
+                    }
+                    break;
+
+                    
             }
         }
         else if (start < 0 && end < 0)
@@ -1243,55 +1280,57 @@ public static class FormulaConstructor
         var length = end - start - 1;
         if (end > 0 && start > 0)
         {
+            var strVal = line.Substring(start + 1, length).Trim();
             var symbol = line.Substring(0, start).Trim();
             switch (symbol)
             {
                 // 总持续时间
                 case "DuringTime":
                 {
-                    remainInfo.DuringTime = Convert.ToSingle(line.Substring(start + 1, length).Trim());
+
+                    remainInfo.DuringTime = remainInfo.GetDataOrReplace<float>("DuringTime", strVal);
                 }
                     break;
                 // 作用时间间隔
                 case "ActionTime":
                 {
-                    remainInfo.ActionTime = Convert.ToSingle(line.Substring(start + 1, length).Trim());
+                    remainInfo.ActionTime = remainInfo.GetDataOrReplace<float>("ActionTime", strVal);
                 }
                     break;
                 // 作用范围
                 case "Range":
                 {
-                    remainInfo.Range = Convert.ToInt32(line.Substring(start + 1, length).Trim());
+                    remainInfo.Range = remainInfo.GetDataOrReplace<float>("Range", strVal);
                 }
                     break;
                 // 是否跟随
                 case "IsFollow":
                 {
-                    remainInfo.IsFollow = Convert.ToBoolean(line.Substring(start + 1, length).Trim());
+                    remainInfo.IsFollow = remainInfo.GetDataOrReplace<bool>("IsFollow", strVal);
                 }
                     break;
                 // 作用阵营
                 case "ActionCamp":
                 {
-                    remainInfo.ActionCamp = Convert.ToInt32(line.Substring(start + 1, length).Trim());
+                    remainInfo.ActionCamp = remainInfo.GetDataOrReplace<int>("ActionCamp", strVal);
                 }
                     break;
                 // 是否可以作用到空中单位
                 case "CouldActionOnAir":
                 {
-                    remainInfo.CouldActionOnAir = Convert.ToBoolean(line.Substring(start + 1, length).Trim());
+                    remainInfo.CouldActionOnAir = remainInfo.GetDataOrReplace<bool>("CouldActionOnAir", strVal);
                 }
                     break;
                 // 是否可以作用到地面单位
                 case "CouldActionOnSurface":
                 {
-                    remainInfo.CouldActionOnSurface = Convert.ToBoolean(line.Substring(start + 1, length).Trim());
+                    remainInfo.CouldActionOnSurface = remainInfo.GetDataOrReplace<bool>("CouldActionOnSurface", strVal);
                 }
                     break;
                 // 是否可以作用到建筑
                 case "CouldActionOnBuilding":
                 {
-                    remainInfo.CouldActionOnBuilding = Convert.ToBoolean(line.Substring(start + 1, length).Trim());
+                    remainInfo.CouldActionOnBuilding = remainInfo.GetDataOrReplace<bool>("CouldActionOnBuilding", strVal);
                 }
                     break;
             }
@@ -1384,6 +1423,9 @@ public enum TriggerLevel2
     Hit = 9,                    // 命中时
     BeAttack = 10,              // 被攻击时
     BeCure = 11,                // 被治疗时
+    BeHurt = 21,                // 被伤害时
+    BeNormalAttackHurt = 22,    // 被伤普通攻击害时
+    BeSkillHurt = 23,           // 被伤技能害时
     Absorption = 12,            // 伤害吸收时
     Dodge = 13,                 // 闪避时
     Enter = 14,                 // 入场时

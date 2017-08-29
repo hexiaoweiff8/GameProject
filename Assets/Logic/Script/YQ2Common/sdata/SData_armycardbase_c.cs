@@ -34,6 +34,7 @@ public class SData_armycardbase_c : MonoEX.Singleton<SData_armycardbase_c>
 					case "Type": dif.Type = (string)o22; break;
 					case "BasePrice": dif.BasePrice = (int)(double)o22; break;
 					case "UpPrice": dif.UpPrice = (int)(double)o22; break;
+					case "ExchangeCoin": dif.ExchangeCoin = (short)(double)o22; break;
                 }
             });
             if (Data.ContainsKey(dif.ArmyCardID))
@@ -118,4 +119,8 @@ public struct armycardbase_cInfo
 	 ///成长系数
 	 /// </summary>
 	public int UpPrice;
+	 /// <summary>
+	 ///兑换兵牌
+	 /// </summary>
+	public short ExchangeCoin;
 }

@@ -39,6 +39,7 @@ public class RemainScriptEditor : BaseScriptEditor
     void OnGUI()
     {
         Refresh();
+        scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(640), GUILayout.Height(800));
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.BeginVertical("box", GUILayout.Width(400), GUILayout.Height(400));
         #region ScrollView - Script Content
@@ -103,6 +104,7 @@ public class RemainScriptEditor : BaseScriptEditor
         GUI.color = Color.yellow;
 
         // 获取的实例
+        RemainTriggerScriptEditor.WinType = 3;
         RemainTriggerScriptEditor.GetIns();
 
         if (GUILayout.Button("子级左括号"))
@@ -125,6 +127,10 @@ public class RemainScriptEditor : BaseScriptEditor
         {
             RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Point, this.position);
         }
+        if (GUILayout.Button("连线特效"))
+        {
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Liner, this.position);
+        }
         if (GUILayout.Button("范围碰撞检测"))
         {
             RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.CollisionDetection, this.position);
@@ -141,6 +147,14 @@ public class RemainScriptEditor : BaseScriptEditor
         {
             RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Buff, this.position);
         }
+        if (GUILayout.Button("清除Buff"))
+        {
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.CleanBuff, this.position);
+        }
+        if (GUILayout.Button("删除指定Buff"))
+        {
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.DelBuff, this.position);
+        }
         if (GUILayout.Button("Skill"))
         {
             RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Skill, this.position);
@@ -153,17 +167,61 @@ public class RemainScriptEditor : BaseScriptEditor
         {
             RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.HealthChange, this.position);
         }
+        if (GUILayout.Button("秒杀"))
+        {
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Death, this.position);
+        }
         if (GUILayout.Button("伤害吸收"))
         {
             RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.ResistDemage, this.position);
+        }
+        if (GUILayout.Button("免疫伤害"))
+        {
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.ImmuneDemage, this.position);
+        }
+        if (GUILayout.Button("免疫致死"))
+        {
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.ImmuneDeath, this.position);
+        }
+        if (GUILayout.Button("受到伤害上限"))
+        {
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.UpperLimit, this.position);
+        }
+        if (GUILayout.Button("吸血"))
+        {
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.LifeDrain, this.position);
+        }
+        if (GUILayout.Button("分担伤害"))
+        {
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.ShareDamage, this.position);
         }
         if (GUILayout.Button("移动"))
         {
             RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Move, this.position);
         }
+        if (GUILayout.Button("范围持续技"))
+        {
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Remain, this.position);
+        }
         if (GUILayout.Button("目标点选择"))
         {
             RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.TargetPointSelector, this.position);
+        }
+        if (GUILayout.Button("清除攻击目标"))
+        {
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.CleanTarget, this.position);
+        }
+        if (GUILayout.Button("循环"))
+        {
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.For, this.position);
+        }
+        if (GUILayout.Button("减技能CD"))
+        {
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.SubCD, this.position);
+        }
+        if (GUILayout.Button("召唤"))
+        {
+            RemainTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Summoned, this.position);
         }
         GUI.color = Color.white;
         EditorGUILayout.EndVertical();
@@ -176,39 +234,39 @@ public class RemainScriptEditor : BaseScriptEditor
 
         if (GUILayout.Button("Remain等级数据"))
         {
-            RemainTriggerScriptEditor.ShowDataScriptWindow(this, DataType.LevelData, this.position);
+            RemainTriggerScriptEditor.ShowDataScriptWindow(this, (int)RemainDataType.LevelData, this.position);
         }
         if (GUILayout.Button("作用范围"))
         {
-            RemainTriggerScriptEditor.ShowDataScriptWindow(this, DataType.Range, this.position);
+            RemainTriggerScriptEditor.ShowDataScriptWindow(this, (int)RemainDataType.Range, this.position);
         }
         if (GUILayout.Button("作用总时间"))
         {
-            RemainTriggerScriptEditor.ShowDataScriptWindow(this, DataType.DuringTime, this.position);
+            RemainTriggerScriptEditor.ShowDataScriptWindow(this, (int)RemainDataType.DuringTime, this.position);
         }
         if (GUILayout.Button("Action时间间隔"))
         {
-            RemainTriggerScriptEditor.ShowDataScriptWindow(this, DataType.TickTime, this.position);
+            RemainTriggerScriptEditor.ShowDataScriptWindow(this, (int)RemainDataType.ActionTime, this.position);
         }
         if (GUILayout.Button("是否跟随释放者"))
         {
-            RemainTriggerScriptEditor.ShowDataScriptWindow(this, DataType.IsFollow, this.position);
+            RemainTriggerScriptEditor.ShowDataScriptWindow(this, (int)RemainDataType.IsFollow, this.position);
         }
         if (GUILayout.Button("作用阵营"))
         {
-            RemainTriggerScriptEditor.ShowDataScriptWindow(this, DataType.ActionCamp, this.position);
+            RemainTriggerScriptEditor.ShowDataScriptWindow(this, (int)RemainDataType.ActionCamp, this.position);
         }
         if (GUILayout.Button("是否可以作用到空中单位"))
         {
-            RemainTriggerScriptEditor.ShowDataScriptWindow(this, DataType.CouldActionOnAir, this.position);
+            RemainTriggerScriptEditor.ShowDataScriptWindow(this, (int)RemainDataType.CouldActionOnAir, this.position);
         }
         if (GUILayout.Button("是否可以作用到地面单位"))
         {
-            RemainTriggerScriptEditor.ShowDataScriptWindow(this, DataType.CouldActionOnSurface, this.position);
+            RemainTriggerScriptEditor.ShowDataScriptWindow(this, (int)RemainDataType.CouldActionOnSurface, this.position);
         }
         if (GUILayout.Button("是否可以作用到建筑单位"))
         {
-            RemainTriggerScriptEditor.ShowDataScriptWindow(this, DataType.CouldActionOnBuilding, this.position);
+            RemainTriggerScriptEditor.ShowDataScriptWindow(this, (int)RemainDataType.CouldActionOnBuilding, this.position);
         }
 
         EditorGUILayout.EndVertical();
@@ -217,6 +275,7 @@ public class RemainScriptEditor : BaseScriptEditor
 
         EditorGUILayout.EndVertical();
         EditorGUILayout.EndHorizontal();
+        EditorGUILayout.EndScrollView();
     }
 
     /// <summary>
@@ -283,4 +342,22 @@ public class RemainScriptEditor : BaseScriptEditor
         Debug.Log("保存成功");
     }
 
+}
+
+/// <summary>
+/// 技能数据类型
+/// </summary>
+public enum RemainDataType
+{
+    LevelData = 0,      // 技能等级数据
+
+    // ------------Remain特有----------
+    Range = 1,              // 作用范围
+    DuringTime = 2,         // 作用总时间
+    ActionTime = 3,
+    IsFollow = 4,           // 是否跟随释放者
+    ActionCamp = 5,         // 作用阵营
+    CouldActionOnAir = 6,   // 是否可以作用到空中单位
+    CouldActionOnSurface = 7,   // 是否可以作用到地面单位
+    CouldActionOnBuilding = 8,   // 是否可以作用到建筑单位
 }

@@ -149,7 +149,6 @@ public class DataManager : MonoEX.Singleton<DataManager>
     /// 创建基地
     /// </summary>
     /// <param name="jidiVo">基地数据</param>
-    /// <param name="camp">基地阵营</param>
     /// <param name="otherParam">其他参数</param>
     /// <returns></returns>
     private DisplayOwner CreateBase(JiDiVO jidiVo, CreateActorParam otherParam)
@@ -164,37 +163,32 @@ public class DataManager : MonoEX.Singleton<DataManager>
         jidiVo.SetSoldierData(baseConfig);
 
         // 创建基地模型
-        // 从AB包中加载
-        // TODO 修改加载来源, 统一位置
-        var baseObj = GameObjectExtension.InstantiateFromPacket("jidi", "zhujidi_model", null);
+        // 通过对象池创建角色
+        var baseObj = DisplayerManager.Single.CreateAvatar(jidiVo);
+        baseObj.transform.position = new Vector3(otherParam.X, 0, otherParam.Y);
 
         // 设置父级
         ParentManager.Instance().SetParent(baseObj, ParentManager.BuildingParent);
-        var mesh = baseObj.GetComponentInChildren<SkinnedMeshRenderer>();
-        Texture texture = null;
         switch (jidiVo.Camp)
         {
             case Utils.MyCamp:
                 _myJidiDict.Add(jidiVo.ObjID.ID, jidiVo);
                 // 旋转角度
                 baseObj.transform.Rotate(new Vector3(0, 90, 0));
-                texture = PacketManage.Single.GetPacket("jidi").Load("zhujidi_b_texture") as Texture;
                 break;
             case Utils.EnemyCamp:
                 _enemyJidiDict.Add(jidiVo.ObjID.ID, jidiVo);
                 // 旋转角度
                 baseObj.transform.Rotate(new Vector3(0, -90, 0));
-                var obj = PacketManage.Single.GetPacket("jidi").Load("zhujidi_r_texture");
-                texture = obj as Texture;
                 break;
         }
-        mesh.material.mainTexture = texture;
+
         // 获取距离地面高度
         var height = SData_Constant.Single.GetDataOfID(Utils.SurfaceTypeConstantId).Value;
         baseObj.transform.position = new Vector3(otherParam.X, height, otherParam.Y);
 
         // TODO 添加BuildingClusterData
-        var cluster = baseObj.AddComponent<ClusterData>();
+        var cluster = baseObj.AddComponent<FixtureData>();
         // 设置在地面上
         cluster.Height = SData_Constant.Single.GetDataOfID(Utils.SurfaceTypeConstantId).Value;
         cluster.CollisionGroup = Utils.SurfaceCollisionGroup;
@@ -202,8 +196,9 @@ public class DataManager : MonoEX.Singleton<DataManager>
         cluster.X = otherParam.X;
         cluster.Y = otherParam.Y;
         cluster.StopMove();
-        cluster.Diameter *= ClusterManager.Single.UnitWidth;
-        // ClusterManager.Single.Add(cluster);
+
+        // 保存基地位置
+        FightManager.Single.SetMemberPos(jidiVo.Camp, FightManager.MemberType.Base, new Vector3(cluster.X, cluster.Height, cluster.Y));
 
         // 创建外层持有类
         result = new DisplayOwner(baseObj, cluster);
@@ -211,13 +206,9 @@ public class DataManager : MonoEX.Singleton<DataManager>
 
         // 创建RanderControl
         var randerControl = baseObj.AddComponent<RanderControl>();
+        randerControl.PosObj = cluster;
         result.RanderControl = randerControl;
         randerControl.Begin();
-        //// 创建MFAModelRander
-        //var mfaModelRander = myBase.GetComponent<MFAModelRender>();
-        //mfaModelRander.ObjId = cluster.MemberData.ObjID;
-
-        //displayOwner.MFAModelRender = mfaModelRander;
 
         // 创建事件检查器
         var triggerRunner = baseObj.AddComponent<TriggerRunner>();
@@ -245,15 +236,13 @@ public class DataManager : MonoEX.Singleton<DataManager>
         var turretConfig = SData_armybase_c.Single.GetDataOfID(Utils.TurretBaseId + otherParam.Level);
         turretVo.SetSoldierData(turretConfig);
 
-        // 从AB包中加载模型
-        // TODO 修改加载来源, 统一位置
-        var turretObj = GameObjectExtension.InstantiateFromPacket("turret", "TurretModel", null);
+        //通过对象池创建角色
+        var turretObj = DisplayerManager.Single.CreateAvatar(turretVo);
+        turretObj.transform.position = new Vector3(otherParam.X, 0, otherParam.Y);
 
         // 设置父级
         ParentManager.Instance().SetParent(turretObj, ParentManager.BuildingParent);
 
-        var mesh = turretObj.GetComponentInChildren<SkinnedMeshRenderer>();
-        Texture texture = null;
         // 区分阵营加载不同皮肤
         switch (turretVo.Camp)
         {
@@ -263,8 +252,6 @@ public class DataManager : MonoEX.Singleton<DataManager>
                 _myTurretDict.Add(turretVo.ObjID.ID, turretVo);
                 // 旋转角度
                 turretObj.transform.Rotate(new Vector3(0, 90, 0));
-                // 更换皮肤
-                texture = PacketManage.Single.GetPacket("turret").Load("FY_lan") as Texture;
                 break;
             case Utils.EnemyCamp:
                 // 敌方阵营
@@ -272,37 +259,39 @@ public class DataManager : MonoEX.Singleton<DataManager>
                 _enemyTurretDict.Add(turretVo.ObjID.ID, turretVo);
                 // 旋转角度
                 turretObj.transform.Rotate(new Vector3(0, -90, 0));
-                // 更换皮肤
-                texture = PacketManage.Single.GetPacket("turret").Load("FY_hong") as Texture;
                 break;
         }
-        mesh.material.mainTexture = texture;
 
         // 设置位置
         var height = SData_Constant.Single.GetDataOfID(Utils.SurfaceTypeConstantId).Value;
         turretObj.transform.position = new Vector3(otherParam.X, height, otherParam.Y);
-
         // 添加ClusterData
         // TODO 添加BuildingClusterData
-        var cluster = turretObj.AddComponent<ClusterData>();
+        var cluster = turretObj.AddComponent<FixtureData>();
         // 设置在地面上
         cluster.Height = SData_Constant.Single.GetDataOfID(Utils.SurfaceTypeConstantId).Value;
         cluster.CollisionGroup = Utils.SurfaceCollisionGroup;
         cluster.AllData.MemberData = turretVo;
         cluster.X = otherParam.X;
         cluster.Y = otherParam.Y;
-        cluster.Diameter *= ClusterManager.Single.UnitWidth;
         cluster.StopMove();
 
-        // 添加至ClusterManager中
-        // ClusterManager.Single.Add(cluster);
+
+        // 设置目标选择权重数据
+        var aimData = SData_armyaim_c.Single.GetDataOfID(turretVo.ArmyID);
+        cluster.AllData.SelectWeightData = new SelectWeightData(aimData);
 
         // 创建外层持有类
         result = new DisplayOwner(turretObj, cluster);
         DisplayerManager.Single.AddElement(turretVo.ObjID, result);
 
+        // 加载单位Effect数据
+        var effectData = SData_effect_c.Single.GetDataOfID(turretVo.ArmyID);
+        cluster.AllData.EffectData = new EffectData(effectData);
+
         // 创建RanderControl
         var randerControl = turretObj.AddComponent<RanderControl>();
+        randerControl.PosObj = cluster;
         result.RanderControl = randerControl;
         // 启动RanderControl
         randerControl.Begin();
@@ -373,19 +362,19 @@ public class DataManager : MonoEX.Singleton<DataManager>
 
         //var display = DP_FightPrefabManage.InstantiateAvatar(param);
         //通过对象池创建角色
-        var display = DisplayerManager.Single.CreateAvatar(soldier.Name, param);
+        var display = DisplayerManager.Single.CreateAvatar(soldier);
         display.transform.position = new Vector3(param.X, 0, param.Y);
         // 设置父级
         ParentManager.Instance().SetParent(display, ParentManager.ClusterParent);
 
         // 创建渲染器
-        var mfa = display.GetComponent<MFAModelRender>();
-        mfa.ObjId = soldier.ObjID;
+//        var mfa = display.GetComponent<MFAModelRender>();
+//        mfa.ObjId = soldier.ObjID;
 
         // 创建集群数据
         var cluster = display.AddComponent<ClusterData>();
         cluster.SetDataValue(soldier);
-        mfa.Cluster = cluster;
+//        mfa.Cluster = cluster;
 
         // 设置空地高度
         switch (soldier.GeneralType)
@@ -404,17 +393,18 @@ public class DataManager : MonoEX.Singleton<DataManager>
         }
         //Debug.Log("类型: " + soldier.GeneralType + "高度: " + mfa.Cluster.Height);
         // 添加至ClusterManager中
-        cluster.Diameter *= ClusterManager.Single.UnitWidth;
+        //cluster.Diameter *= ClusterManager.Single.UnitWidth;
         cluster.StopMove();
         // ClusterManager.Single.Add(mfa.Cluster);
 
 
         // 创建外层持有类
-        var displayOwner = new DisplayOwner(display, cluster, mfa);
+        var displayOwner = new DisplayOwner(display, cluster);
         DisplayerManager.Single.AddElement(soldier.ObjID, displayOwner);
 
         // 创建RanderControl
         var randerControl = display.AddComponent<RanderControl>();
+        randerControl.PosObj = cluster;
         displayOwner.RanderControl = randerControl;
 
         // 挂载事件处理器
@@ -439,6 +429,7 @@ public class DataManager : MonoEX.Singleton<DataManager>
         // 加载单位
         var armyTypeData = SData_UnitFightData_c.Single.GetDataOfID(soldier.ArmyID);
         cluster.AllData.ArmyTypeData = new ArmyTypeData(armyTypeData);
+        cluster.AllData.ArmyTypeData.Camp = (short) soldier.Camp;
 
         // 加载并设置技能
         displayOwner.ClusterData.AllData.SkillInfoList = SkillManager.Single.CreateSkillInfoList(new List<int>()
@@ -597,13 +588,13 @@ public class DataManager : MonoEX.Singleton<DataManager>
         fix.AllData.MemberData = new VOBase()
         {
             ObjID = new ObjectID(ObjectID.ObjectType.NPCObstacle),
-            SpaceSet = 1 * unitWidth,
+            SpaceSet = 1,
         };
         fix.transform.localScale = new Vector3(unitWidth, unitWidth, unitWidth);
         fix.transform.position = Utils.NumToPosition(offsetPos, new Vector2(otherParam.X, otherParam.Y), unitWidth, mapWidth, mapHeight);
         fix.X = otherParam.X * unitWidth - mapWidth * unitWidth * 0.5f + offsetPos.x;
         fix.Y = otherParam.Y * unitWidth - mapHeight * unitWidth * 0.5f + offsetPos.z;
-        fix.Diameter = 1 * unitWidth;
+        fix.Diameter = 1;
 
         var result = new DisplayOwner(fixItem, fix);
 
@@ -686,5 +677,25 @@ public class DataManager : MonoEX.Singleton<DataManager>
                 DeleteEnemyObstacle(objId.ID);
                 break;
         }
+    }
+
+
+
+    /// <summary>
+    /// 清理数据
+    /// </summary>
+    public void Clear()
+    {
+        _mySoldiersDict.Clear();
+        _enemySoldiersDict.Clear();
+        _myJidiDict.Clear();
+        _enemyJidiDict.Clear();
+        _myTurretDict.Clear();
+        _enemyTurretDict.Clear();
+        _myTankDict.Clear();
+        _enemyTankDict.Clear();
+        _myObstacleDict.Clear();
+        _enemyObstacleDict.Clear();
+        _npcObstacleDict.Clear();
     }
 }

@@ -26,6 +26,7 @@ function redDotControl:getRD_UPSTAR(cardId)
     else 
         redDotFlag.RD_UPSTAR = false
     end
+    Memory.free("uiscripts/cardyc/upStar/upStar_model")
 end
 
 
@@ -36,6 +37,7 @@ function redDotControl:getRD_UPLEVEL(cardIndex)
     else 
         redDotFlag.RD_UPLEVEL = false
     end
+    Memory.free("uiscripts/cardyc/upLevel/upLevel_model")
 end
 
 function redDotControl:getRD_INFORMATION(cardIndex)
@@ -50,6 +52,7 @@ function redDotControl:getRD_INFORMATION(cardIndex)
     else 
         redDotFlag.RD_INFORMATION = false
     end
+    Memory.free("uiscripts/cardyc/information/information_model")
 end
 
 function redDotControl:getRD_SKILL(cardIndex)
@@ -61,7 +64,8 @@ function redDotControl:getRD_SKILL(cardIndex)
             redDotFlag.RD_SKILL = true
             redDotFlag.RD_SKILLITEMS[i] = true
         end
-    end    
+    end
+    Memory.free("uiscripts/cardyc/upSkill/upSkill_model")
 end
 
 function redDotControl:getRD_SOLDIER(cardIndex)
@@ -71,6 +75,7 @@ function redDotControl:getRD_SOLDIER(cardIndex)
     else 
         redDotFlag.RD_SOLDIER = false
     end
+    Memory.free("uiscripts/cardyc/upSoldier/upSoldier_model")
 end
 
 
@@ -83,7 +88,8 @@ function redDotControl:getRD_SYNERGY(cardIndex)
             redDotFlag.RD_SYNERGY = true
             redDotFlag.RD_SYNERGYITEMS[i] = true
         end
-    end    
+    end
+    Memory.free("uiscripts/cardyc/upSynergy/upSynergy_model")
 end
 
 
@@ -119,6 +125,7 @@ function redDotControl:mainCall()
     return 0
 end
 
-
+function redDotControl:OnDestroyDone()
+end
 
 return redDotControl

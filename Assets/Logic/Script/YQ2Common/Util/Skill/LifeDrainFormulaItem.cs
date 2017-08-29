@@ -42,9 +42,9 @@ public class LifeDrainFormulaItem : AbstractFormulaItem
             throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
         }
 
-        FormulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        DrainType = GetDataOrReplace<DrainType>("DrainType", array, 1, ReplaceDic);
-        DrainValue = GetDataOrReplace<float>("DrainValue", array, 2, ReplaceDic);
+        FormulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        DrainType = GetDataOrReplace<DrainType>("DrainType", array, 1);
+        DrainValue = GetDataOrReplace<float>("DrainValue", array, 2);
     }
 
     /// <summary>

@@ -18,7 +18,7 @@ public class Util_TimerWrap
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("IsPause", get_IsPause, null);
 		L.RegVar("IsLoop", get_IsLoop, null);
-		L.RegVar("LoopTime", get_LoopTime, null);
+		L.RegVar("LoopTime", get_LoopTime, set_LoopTime);
 		L.RegVar("OutTime", get_OutTime, null);
 		L.RegVar("StartTime", get_StartTime, null);
 		L.RegVar("TimesUpDo", get_TimesUpDo, set_TimesUpDo);
@@ -371,6 +371,25 @@ public class Util_TimerWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index StopTime on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_LoopTime(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			Util.Timer obj = (Util.Timer)o;
+			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
+			obj.LoopTime = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index LoopTime on a nil value" : e.Message);
 		}
 	}
 

@@ -157,7 +157,8 @@ public class BallisticFactory
 
         // 移动方法
         result.Move = TrajectoryAlgorithm.Single.GetAlgorithm(trajectoryType);
-
+        // 起始时运动一次, 防止出现一帧原始模型状态
+        result.Move(result, result.BallisticArriveTarget);
         return result;
     }
 
@@ -532,7 +533,7 @@ public class TrajectoryAlgorithm
 
                             // X,Z向目标移动
                             // xz平面向量
-                            var targetPosWithoutY = new Vector2(tmpTargetPos.x, tmpTargetPos.z);
+                            var targetPosWithoutY = Utils.WithOutY(tmpTargetPos);
                             var theta = Math.Acos(Vector2.Dot(targetPosWithoutY.normalized, targetDir.z < 0 ? Vector2.left : Vector2.right));
                             // 计算位移比例
                             var xOffsetProportion = (float)Math.Cos(theta + (targetDir.z < 0 ? Math.PI : 0));
@@ -566,7 +567,7 @@ public class TrajectoryAlgorithm
                             // X,Z轴震荡
 
                             // 设置新位置
-                            ballistic.Position = nowPos;
+                            ballistic.Position = nowPos + ballistic.StartPos;
                             // 累加已飞行时间
                             ballistic.PassedTime += Time.deltaTime;
 

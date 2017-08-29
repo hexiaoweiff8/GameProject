@@ -21,7 +21,7 @@ public class LinerFormulaItem : AbstractFormulaItem
     /// 1: 接受单位位置
     /// 2: 目标点选择的位置
     /// </summary>
-    public int ReleasePos = 0;
+    public int ReleasePos { get; private set; }
 
     /// <summary>
     /// 接受特效位置
@@ -30,12 +30,26 @@ public class LinerFormulaItem : AbstractFormulaItem
     /// 2: 目标点选择的位置
     /// 3: 接收单位(Obj跟随)
     /// </summary>
-    public int ReceivePos = 1;
+    public int ReceivePos
+    {
+        get { return receivePos; }
+        set { receivePos = value; }
+    }
 
     /// <summary>
     /// 持续时间
     /// </summary>
     public float DurTime { get; private set; }
+
+
+    /// <summary>
+    /// 接受特效位置
+    /// 0: 释放特效单位位置
+    /// 1: 接受单位位置(默认)
+    /// 2: 目标点选择的位置
+    /// 3: 接收单位(Obj跟随)
+    /// </summary>
+    private int receivePos = 1;
 
 
 
@@ -50,18 +64,18 @@ public class LinerFormulaItem : AbstractFormulaItem
             throw new Exception("数据列表为空");
         }
 
-        var argsCount = 3;
+        var argsCount = 5;
         // 解析参数
         if (array.Length < argsCount)
         {
             throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
         }
 
-        FormulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        EffectKey = GetDataOrReplace<string>("EffectKey", array, 1, ReplaceDic);
-        ReleasePos = GetDataOrReplace<int>("ReleasePos", array, 2, ReplaceDic);
-        ReceivePos = GetDataOrReplace<int>("ReceivePos", array, 3, ReplaceDic);
-        DurTime = GetDataOrReplace<float>("DurTime", array, 4, ReplaceDic);
+        FormulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        EffectKey = GetDataOrReplace<string>("EffectKey", array, 1);
+        ReleasePos = GetDataOrReplace<int>("ReleasePos", array, 2);
+        ReceivePos = GetDataOrReplace<int>("ReceivePos", array, 3);
+        DurTime = GetDataOrReplace<float>("DurTime", array, 4);
 
     }
 
@@ -98,6 +112,7 @@ public class LinerFormulaItem : AbstractFormulaItem
             if (ReceivePos == 3)
             {
                 effect = EffectsFactory.Single.CreateLinerEffect(EffectKey,
+                    // TODO 应该使用挂点
                     paramsPacker.ReleaseMember.ClusterData.transform
                     , paramsPacker.ReceiverMenber.ClusterData.gameObject
                     , DurTime, callback, Utils.EffectLayer);

@@ -95,15 +95,15 @@ public class PointFormulaItem : AbstractFormulaItem
         }
         // 是否等待完成,特效Key,目标位置,持续时间
         // 如果该项值是以%开头的则作为替换数据
-        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        var effectKey = GetDataOrReplace<string>("EffectKey", array, 1, ReplaceDic);
-        var targetPos = GetDataOrReplace<int>("TargetPos", array, 2, ReplaceDic);
-        //var speed = GetDataOrReplace<float>("Speed", array, 3, ReplaceDic);
-        var durTime = GetDataOrReplace<float>("DurTime", array, 3, ReplaceDic);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        var effectKey = GetDataOrReplace<string>("EffectKey", array, 1);
+        var targetPos = GetDataOrReplace<int>("TargetPos", array, 2);
+        //var speed = GetDataOrReplace<float>("Speed", array, 3);
+        var durTime = GetDataOrReplace<float>("DurTime", array, 3);
 
-        var scaleX = GetDataOrReplace<float>("ScaleX", array, 4, ReplaceDic);
-        var scaleY = GetDataOrReplace<float>("ScaleY", array, 5, ReplaceDic);
-        var scaleZ = GetDataOrReplace<float>("ScaleZ", array, 6, ReplaceDic);
+        var scaleX = GetDataOrReplace<float>("ScaleX", array, 4);
+        var scaleY = GetDataOrReplace<float>("ScaleY", array, 5);
+        var scaleZ = GetDataOrReplace<float>("ScaleZ", array, 6);
 
         FormulaType = formulaType;
         EffectKey = effectKey;

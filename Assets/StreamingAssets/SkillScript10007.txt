@@ -5,14 +5,12 @@ SkillNum(10007)
         }
 	Action
 	{
-            HealthChange(1,0,0,0,1)
-	}
-	Detach
-	{
-	
+            PointToObj(1,linePrfb.prefab,10,0,10,1,10)
 	}
 
         [
-            TriggerLevel1(3)
-            TriggerLevel2(9)
+	    IsActive(true)
+	    ReleaseTime(10)
+	    IntervalTime(0.5)
+	    CDTime(20)
         ]

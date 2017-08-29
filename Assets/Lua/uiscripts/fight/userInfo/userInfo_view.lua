@@ -14,6 +14,12 @@ function userInfo_view:initView(arg)
     self.enemyGameInfo = view.transform:Find("enemyInfo").gameObject
     self.MyHP = self.myGameInfo.transform:Find("bloodBG/hp_fg").gameObject
     self.MyAnimHP = self.myGameInfo.transform:Find("bloodBG/hp_anim").gameObject
+    self.MyHPSp = self.MyHP:GetComponent("UISprite")
+    self.MyAnimHPSp = self.MyAnimHP:GetComponent("UISprite")
+    self.EnenmyHP = self.enemyGameInfo.transform:Find("bloodBG/hp_fg").gameObject
+    self.EnenmyAnimHP = self.enemyGameInfo.transform:Find("bloodBG/hp_anim").gameObject
+    self.EnenmyHPSp = self.EnenmyHP:GetComponent("UISprite")
+    self.EnenmyAnimHPSp = self.EnenmyAnimHP:GetComponent("UISprite")
     self.BeHitTips = self.myGameInfo.transform:Find("beHitTips").gameObject
     self.lowBloodTips = view.transform:Find("lowBloodTips").gameObject
 end

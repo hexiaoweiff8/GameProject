@@ -104,14 +104,22 @@ public class AstarFight : MonoBehaviour
     /// </summary>
     public int ItemCount = 1;
 
-
+    /// <summary>
+    /// 地图障碍层
+    /// </summary>
     private int[][] mapInfoData;
+
+    /// <summary>
+    /// 地图建筑层
+    /// </summary>
+    private int[][] mapInfoBuildingData;
 
 
     /// <summary>
     /// 4个触摸+敌方 5个物体父物体
     /// </summary>
     private readonly Transform[] parentArray = new Transform[5];
+
     /// <summary>
     /// 4个触摸+敌方 5个物体宽高
     /// </summary>
@@ -123,7 +131,11 @@ public class AstarFight : MonoBehaviour
     /// </summary>
     private readonly int[][] zhenxingArray = new int[5][];
 
-    
+    /// <summary>
+    /// 4个触摸+敌方 5个兵种类型列表
+    /// </summary>
+    private readonly int[] generalTypeArray = new int[5];
+
     /// <summary>
     /// 当前关卡所有换算了宽高的阵型字典
     /// </summary>
@@ -244,7 +256,7 @@ public class AstarFight : MonoBehaviour
         // 加载障碍曾
         mapInfoData = obMapInfo;
         // 加载建筑层
-        var mapInfoBuildingData = buildingMapInfo;
+        mapInfoBuildingData = buildingMapInfo;
 
         MapWidth = mapInfoData[0].Length;
         MapHeight = mapInfoData.Length;
@@ -264,6 +276,14 @@ public class AstarFight : MonoBehaviour
         // 初始化集群管理
         var loadMapPos = LoadMap.GetLeftBottom();
         ClusterManager.Single.Init(loadMapPos.x, loadMapPos.z, MapWidth, MapHeight, UnitWidth, mapInfoData);
+
+    }
+
+    /// <summary>
+    /// 分析地图
+    /// </summary>
+    public void AnalysisMap()
+    {
         // 解析地图障碍层
         MapManager.Instance().AnalysisMap(mapInfoData);
         // 创建建筑层, 并传入基地等级
@@ -288,6 +308,8 @@ public class AstarFight : MonoBehaviour
         ClusterManager.Single.ClearAll();
         // 清理本地缓存
         mapInfoData = null;
+
+        mapInfoBuildingData = null;
         //TargetX = 0;
         //TargetY = 0;
     }
@@ -303,6 +325,8 @@ public class AstarFight : MonoBehaviour
     /// <returns>最优的可下兵的点</returns>
     public void isZhangAi(Vector3 mapPosition, int index)
     {
+        //模型的真实坐标
+        Vector3 realPosition = new Vector3(0, 0, 0);
         //触摸点所对应格子坐标
         int[] gridPosition = new int[2];
         if (index == 4)//如果为敌人
@@ -312,8 +336,24 @@ public class AstarFight : MonoBehaviour
         }
         else
         {
+
+            switch (generalTypeArray[index])
+            {
+                // 空中单位高度
+                case Utils.GeneralTypeAir:
+                    realPosition.y = mapPosition.y + SData_Constant.Single.GetDataOfID(Utils.AirTypeConstantId).Value;
+                    break;
+                // 地面单位高度
+                case Utils.GeneralTypeBuilding:
+                case Utils.GeneralTypeSurface:
+                    realPosition.y = mapPosition.y + SData_Constant.Single.GetDataOfID(Utils.SurfaceTypeConstantId).Value;
+                    break;
+            }
+
             mapPosition += zhenxingCenternOffsetArray[index];
-            gridPosition = Utils.PositionToNum(LoadMap.MapPlane.transform.position, mapPosition, UnitWidth, MapWidth, MapHeight);
+            realPosition.x = mapPosition.x;
+            realPosition.z = mapPosition.z;
+            gridPosition = Utils.PositionToNum(LoadMap.MapPlane.transform.position, realPosition, UnitWidth, MapWidth, MapHeight);
         }
         int tempCount = 0, tempCount2 = 0;
         int an = zhenxingArray[index].Length;
@@ -445,8 +485,11 @@ public class AstarFight : MonoBehaviour
                     }
 
                     //根据计算出来的各个格子位置设置lua传来的物体所有子物体位置
-                    parentArray[index].GetChild(tempCount++).position = Utils.NumToPosition(LoadMap.transform.position,
-                        new Vector2(tempList2[tempInt2], tempList2[tempInt2 + 1]), UnitWidth, MapWidth, MapHeight);
+                    Vector3 posXZ = Utils.NumToPosition(LoadMap.transform.position,
+                        new Vector2(tempList2[tempInt2], tempList2[tempInt2 + 1]), UnitWidth , MapWidth, MapHeight);
+                    //设置子模型的高度
+                    Vector3 posY = new Vector3(0, realPosition.y, 0);
+                    parentArray[index].GetChild(tempCount++).localPosition = posXZ + posY;
                     if (tempCount < an)//如果不是阵型中最后一个物体
                     {
                         //把自己所占格子加入列表,用来给阵型中其他的物体做重叠判断
@@ -792,8 +835,11 @@ public class AstarFight : MonoBehaviour
                                 tempMinY = tempIntMaxY;
                             }
                             //取物体宽高最右上的点（可以尝试取中点或最左下的点）
-                            t[i] = a2[a2.Length - 2] + tempIntMaxX;
-                            t[i + 1] = a2[a2.Length - 1] + tempIntMaxY;
+                            //t[i] = a2[a2.Length - 2] + tempIntMaxX;
+                            //t[i + 1] = a2[a2.Length - 1] + tempIntMaxY;
+                            //取物体宽高最中点（可以尝试取中点或最左下的点）
+                            t[i] = a2[a2.Length/2 - 3] + tempIntMaxX;
+                            t[i + 1] = a2[a2.Length / 2 - 2] + tempIntMaxY;
                         }
                         allZhenxingList[_cardID] = t;
                         allCenternOffset[_cardID] = new Vector3((tempMaxX + tempMinX - _width) * UnitWidth / 2f, 0, (tempMaxY + tempMinY - _width) * UnitWidth / 2f);
@@ -835,6 +881,7 @@ public class AstarFight : MonoBehaviour
         zhenxingArray[index] = allZhenxingList[cardID];
         zhenxingCenternOffsetArray[index] = allCenternOffset[cardID];
         int armyID = int.Parse(string.Format("{0}{1:D3}", SData_armycardbase_c.Single.GetDataOfID(cardID).ArmyID, 1));
+        generalTypeArray[index] = (int)SData_armybase_c.Single.GetDataOfID(armyID).GeneralType;
         widthHeightArray[index] = new[] { (int)Math.Ceiling(SData_armybase_c.Single.GetDataOfID(armyID).SpaceSet), (int)SData_armybase_c.Single.GetDataOfID(armyID).SpaceSet };
         parentArray[index] = go;
         if (index == 4)
@@ -883,40 +930,6 @@ public class AstarFight : MonoBehaviour
     {
         maxX = (int)((X - LoadMap.MapPlane.transform.position.x) / UnitWidth + MapWidth / 2f);
     }
-
-    ///// <summary>
-    ///// 物体寻路
-    ///// </summary>
-    ///// <param name="data"></param>
-    ///// <param name="isEnemy">是否为地方阵营</param>
-    ///// <param name="displayOwner"></param>
-    //internal void toXunLu(ClusterData data, bool isEnemy, DisplayOwner displayOwner)
-    //{
-    //    var go = displayOwner.GameObj;
-    //    if (go == null)
-    //    {
-    //        throw new Exception("显示对象的GameObj引用为空. 请检查创建过程.");
-    //    }
-    //    //把物体当前世界坐标转换为格子坐标
-    //    int[] a = Utils.PositionToNum(LoadMap.MapPlane.transform.position, go.transform.position, UnitWidth, MapWidth, MapHeight);
-    //    var path = AStarPathFinding.SearchRoad(mapInfoData, a[0], a[1], !isEnemy ? TargetX : 1, a[1], (int)data.Diameter, (int)data.Diameter, IsJumpPoint);
-
-
-    //    ClusterData clusterData = data;
-    //    //clusterData.RotateSpeed = 10;
-    //    //clusterData.RotateWeight = 1;
-    //    //clusterData.MaxSpeed = clusterData.AllData.MemberData.MoveSpeed;
-    //    //clusterData.Diameter *= ClusterManager.Single.UnitWidth;
-    //    if (path != null && path.Count > 0)
-    //    {
-    //        clusterData.PushTargetList(Utils.NumToPostionByList(LoadMap.MapPlane.transform.position, path, UnitWidth, MapWidth, MapHeight));
-    //    }
-    //    // 默认出事状态不行进
-    //    clusterData.Stop();
-    //    //ClusterManager.Single.Add(clusterData);
-    //    // 外层对象持有ClusterData引用
-    //    //displayOwner.ClusterData = clusterData;
-    //}
 
 
     public void OnDestroy()

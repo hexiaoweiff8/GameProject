@@ -90,6 +90,11 @@ public class YQ2CameraCtrl : MonoBehaviour
         m_Camera_Overall_Xrotate = cameraData.Camera_Overall_Xrotate;
 
         uf = GetComponent<UIFollow>();
+
+        // 设置相机初始位置
+        transform.position = new Vector3(transform.position.x, transform.position.y + m_Camera_Overall_Yoffset, transform.position.z + m_Camera_Overall_Zoffset);
+        transform.Rotate(Vector3.up, m_Camera_Overall_Yrotate);
+        transform.Rotate(Vector3.right, m_Camera_Overall_Xrotate);
     }
 
     /// <summary>

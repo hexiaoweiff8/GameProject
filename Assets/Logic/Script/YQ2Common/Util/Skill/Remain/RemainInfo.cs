@@ -14,22 +14,22 @@ public class RemainInfo : AbilityBase
     /// <summary>
     /// 作用范围半径
     /// </summary>
-    public float Range = 0;
+    public float Range { get; set; }
 
     /// <summary>
     /// 作用时间(地面持续技能使用)
     /// </summary>
-    public float DuringTime = -1;
+    public float DuringTime { get { return duringTime; } set { duringTime = value; } }
 
     /// <summary>
     /// 作用时间间隔
     /// </summary>
-    public float ActionTime = 0.1f;
+    public float ActionTime { get { return actionTime; } set { actionTime = value; } }
 
     /// <summary>
     /// 是否跟随
     /// </summary>
-    public bool IsFollow = true;
+    public bool IsFollow { get; set; }
 
     /// <summary>
     /// 产生效果的阵营
@@ -37,37 +37,37 @@ public class RemainInfo : AbilityBase
     /// 1:对我方阵营造成效果
     /// 2:对敌方阵营造成效果
     /// </summary>
-    public int ActionCamp = Utils.MyCamp;
+    public int ActionCamp { get; set; }
 
     /// <summary>
     /// 是否可以作用到空中单位上
     /// </summary>
-    public bool CouldActionOnAir = true;
+    public bool CouldActionOnAir { get; set; }
 
     /// <summary>
     /// 是否可以作用到地面单位上
     /// </summary>
-    public bool CouldActionOnSurface = true;
+    public bool CouldActionOnSurface { get; set; }
 
     /// <summary>
     /// 是否可以作用在建筑上
     /// </summary>
-    public bool CouldActionOnBuilding = false;
+    public bool CouldActionOnBuilding { get; set; }
 
     /// <summary>
     /// 是否包含Action行为
     /// </summary>
-    public bool HasActionFormula = false;
+    public bool HasActionFormula { get; set; }
 
     /// <summary>
     /// 是否包含Enter行为
     /// </summary>
-    public bool HasAttachFormula = false;
+    public bool HasAttachFormula { get; set; }
 
     /// <summary>
     /// 是否包含out行为
     /// </summary>
-    public bool HasDetachFormula = false;
+    public bool HasDetachFormula { get; set; }
 
     /// <summary>
     /// 范围技能位置(固定位置时使用, IsFollow = false)
@@ -101,6 +101,17 @@ public class RemainInfo : AbilityBase
     /// 是否一结束
     /// </summary>
     private bool isDone = false;
+
+    /// <summary>
+    /// 持续时间
+    /// 小于0则无限时间
+    /// </summary>
+    private float duringTime = -1;
+
+    /// <summary>
+    /// 执行间隔
+    /// </summary>
+    private float actionTime = -1;
 
 
     // ----------------------------公共方法---------------------------
@@ -169,6 +180,7 @@ public class RemainInfo : AbilityBase
                 // 该目标不能选择
                 memberList.RemoveAt(i);
                 i--;
+                continue;
             }
             switch (ActionCamp)
             {
@@ -180,6 +192,7 @@ public class RemainInfo : AbilityBase
                         // 该目标不能选择
                         memberList.RemoveAt(i);
                         i--;
+                        continue;
                     }
                 }
                     break;
@@ -192,6 +205,7 @@ public class RemainInfo : AbilityBase
                         // 该目标不能选择
                         memberList.RemoveAt(i);
                         i--;
+                        continue;
                     }
                 }
                     break;

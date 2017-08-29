@@ -21,6 +21,11 @@ public class HealthChangeFormulaItem : AbstractFormulaItem
     public HealthChangeType HealthChangeType { get; set; }
 
     /// <summary>
+    /// 生命值变更类型
+    /// </summary>
+    public HealthChangeCalculationType CalculationType { get; set; }
+
+    /// <summary>
     /// 生命值变更目标
     /// 0: 自己
     /// 1: 目标
@@ -30,7 +35,12 @@ public class HealthChangeFormulaItem : AbstractFormulaItem
     /// <summary>
     /// 生命值变动量
     /// </summary>
-    public float Value { get; set; }
+    public FormulaItemValueComputer Value { get; set; }
+
+    /// <summary>
+    /// 生命值变更系数
+    /// </summary>
+    public FormulaItemValueComputer Coefficient { get; set; }
 
     /// <summary>
     /// 初始化
@@ -48,18 +58,20 @@ public class HealthChangeFormulaItem : AbstractFormulaItem
         {
             throw new Exception("数据列表为空");
         }
-        var argsCount = 5;
+        var argsCount = 7;
         // 解析参数
         if (array.Length < argsCount)
         {
             throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
         }
         // 是否等待完成,特效Key,速度,飞行轨迹
-        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        var healthChangeType = GetDataOrReplace<HealthChangeType>("HealthChangeType", array, 1, ReplaceDic);
-        var demageOrCure = GetDataOrReplace<DemageOrCure>("DemageOrCure", array, 2, ReplaceDic);
-        var healthChangeTarget = GetDataOrReplace<int>("HealthChangeTarget", array, 3, ReplaceDic);
-        var value = GetDataOrReplace<float>("Value", array, 4, ReplaceDic);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        var healthChangeType = GetDataOrReplace<HealthChangeType>("HealthChangeType", array, 1);
+        var demageOrCure = GetDataOrReplace<DemageOrCure>("DemageOrCure", array, 2);
+        var healthChangeTarget = GetDataOrReplace<int>("HealthChangeTarget", array, 3);
+        var value = GetDataOrReplace<FormulaItemValueComputer>("Value", array, 4);
+        var coefficient = GetDataOrReplace<FormulaItemValueComputer>("Coefficient", array, 5);
+        var calculationType = GetDataOrReplace<HealthChangeCalculationType>("CalculationType", array, 6);
 
 
         FormulaType = formulaType;
@@ -67,6 +79,8 @@ public class HealthChangeFormulaItem : AbstractFormulaItem
         DemageOrCure = demageOrCure;
         HealthChangeTarget = healthChangeTarget;
         Value = value;
+        CalculationType = calculationType;
+        Coefficient = coefficient;
     }
 
 
@@ -101,11 +115,13 @@ public class HealthChangeFormulaItem : AbstractFormulaItem
 
         // 替换数据
         ReplaceData(paramsPacker);
+
         // 数据本地化
         var myFormulaType = FormulaType;
         var myHealthChageType = HealthChangeType;
         var myDemageOrCure = DemageOrCure;
-        var myValue = Value;
+        var myValue = Value.GetValue();
+        var myCoefficient = Coefficient.GetValue();
         var myHealthChangeTarget = HealthChangeTarget;
         var targetDisPlayOwner = myHealthChangeTarget == 0 ? paramsPacker.ReleaseMember : paramsPacker.ReceiverMenber;
         var myIsNotLethal = paramsPacker.IsNotLethal;
@@ -118,9 +134,24 @@ public class HealthChangeFormulaItem : AbstractFormulaItem
             {
                 return;
             }
+
             // 计算伤害/治疗量
-            var changeValue = HurtResult.GetHurtForSkill(targetDisPlayOwner, myDemageOrCure, myHealthChageType, myValue);
-            // targetDisPlayOwner.ClusterData.AllData.MemberData.CurrentHP += changeValue;
+            var changeValue = 0f;
+            // 区分伤害类型, 固定伤害, 计算伤害
+            switch (CalculationType)
+            {
+                case HealthChangeCalculationType.Fix:
+                    changeValue = myValue;
+                    break;
+
+                case HealthChangeCalculationType.Calculation:
+                    changeValue = HurtResult.GetHurtForSkill(paramsPacker.ReleaseMember, targetDisPlayOwner,
+                        myDemageOrCure, myHealthChageType, myValue);
+                    break;
+            }
+            // 伤害系数
+            changeValue *= myCoefficient;
+
             // 创建伤害/治疗事件
             SkillManager.Single.SetTriggerData(new TriggerData()
             {
@@ -137,6 +168,7 @@ public class HealthChangeFormulaItem : AbstractFormulaItem
 
         return result;
     }
+
 }
 
 /// <summary>
@@ -174,4 +206,13 @@ public enum HealthChangeType
 {
     Fixed = 0,          // 固定值
     Percentage = 1,     // 百分比
+}
+
+/// <summary>
+/// 生命值变更计算类型
+/// </summary>
+public enum HealthChangeCalculationType
+{
+    Fix = 0,        // 固定变更
+    Calculation = 1,// 计算变更
 }

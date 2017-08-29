@@ -33,18 +33,28 @@ public class NormalGeneralAttack : IGeneralAttack
         GameObject targetObj, 
         float speed, 
         TrajectoryAlgorithmType taType, 
-        Action callback)
+        Action<GameObject> callback)
     {
         if (attacker == null || beAttackMember == null)
         {
             //throw new Exception("被攻击者或攻击者数据为空");
             return;
         }
+        // 特效数据
+        var effectData = beAttackMember.AllData.EffectData;
         Action demage = () =>
         {
 
             var attackerDisplayOwner = DisplayerManager.Single.GetElementByPositionObject(attacker);
             var beAttackerDisplayOwner = DisplayerManager.Single.GetElementByPositionObject(beAttackMember);
+
+            if (beAttackerDisplayOwner == null
+                || attackerDisplayOwner == null
+                || null == beAttackerDisplayOwner.ClusterData
+                || null == beAttackerDisplayOwner.RanderControl)
+            {
+                return;
+            }
             // 判断是否命中
             var isMiss = HurtResult.AdjustIsMiss(attackerDisplayOwner, beAttackerDisplayOwner);
             if (!isMiss)
@@ -52,21 +62,17 @@ public class NormalGeneralAttack : IGeneralAttack
                 // 计算伤害
                 // TODO 伤害计算加入Buff与技能的计算
                 var hurt = HurtResult.GetHurt(attackerDisplayOwner, beAttackerDisplayOwner);
-                if (null != beAttackerDisplayOwner &&
-                    null != beAttackerDisplayOwner.ClusterData &&
-                    null != beAttackerDisplayOwner.RanderControl)
+                // 记录被击触发 记录扣血 伤害结算时结算
+                SkillManager.Single.SetTriggerData(new TriggerData()
                 {
-                    // 记录被击触发 记录扣血 伤害结算时结算
-                    SkillManager.Single.SetTriggerData(new TriggerData()
-                    {
-                        HealthChangeValue = hurt,
-                        ReceiveMember = attackerDisplayOwner,
-                        ReleaseMember = beAttackerDisplayOwner,
-                        TypeLevel1 = TriggerLevel1.Fight,
-                        TypeLevel2 = TriggerLevel2.BeAttack,
-                        DemageType = DemageType.NormalAttackDemage
-                    });
-                }
+                    HealthChangeValue = hurt,
+                    ReceiveMember = attackerDisplayOwner,
+                    ReleaseMember = beAttackerDisplayOwner,
+                    TypeLevel1 = TriggerLevel1.Fight,
+                    TypeLevel2 = TriggerLevel2.BeAttack,
+                    DemageType = DemageType.NormalAttackDemage,
+                    IsCrit = HurtResult.IsCrit
+                });
                 // 命中时检测技能
                 SkillManager.Single.SetTriggerData(new TriggerData()
                 {
@@ -78,10 +84,41 @@ public class NormalGeneralAttack : IGeneralAttack
                     TypeLevel2 = TriggerLevel2.Hit,
                     DemageType = DemageType.NormalAttackDemage
                 });
+
+                var getHitEffect = effectData.GetHitByBulletEffect;
+                var getHitDurTime = 0f;
+                // 分辨特效类型
+                switch (effectData.BulletType)
+                {
+                    case 1:
+                        getHitEffect = effectData.GetHitByBulletEffect;
+                        getHitDurTime = effectData.GetHitByBulletEffectTime;
+                        break;
+
+                    case 2:
+                        getHitEffect = effectData.GetHitByBombEffect;
+                        getHitDurTime = effectData.GetHitByBombEffectTime;
+                        break;
+                }
+                if (getHitDurTime > 0)
+                {
+                    // 对每个单位播受击特效
+                    // 计算旋转角度
+                    var beAttackAngle = Utils.GetAngleWithZ(attacker.gameObject.transform.forward) + 180;
+                    // TODO 使用挂点
+                    EffectsFactory.Single.CreatePointEffect(getHitEffect,
+                        ParentManager.Instance().GetParent(ParentManager.BallisticParent).transform,
+                        beAttackMember.gameObject.transform.position,
+                        new Vector3(1, 1, 1),
+                        getHitDurTime,
+                        0,
+                        null,
+                        Utils.EffectLayer,
+                        new Vector2(0, beAttackAngle)).Begin();
+                }
             }
             else
             {
-                // TODO 播放miss特效
                 // 闪避时事件
                 SkillManager.Single.SetTriggerData(new TriggerData()
                 {
@@ -90,21 +127,52 @@ public class NormalGeneralAttack : IGeneralAttack
                     TypeLevel1 = TriggerLevel1.Fight,
                     TypeLevel2 = TriggerLevel2.Dodge
                 });
+                var beAttackVOBase = beAttackerDisplayOwner.ClusterData.AllData.MemberData;
+                // 抛出miss事件
+                FightManager.Single.DoHealthChangeAction(beAttackerDisplayOwner.GameObj, beAttackVOBase.TotalHp,
+                    beAttackVOBase.CurrentHP, 0f, FightManager.HurtType.Miss, beAttackVOBase.ObjID.ObjType);
+
             }
         };
 
-        if (callback == null)
+        // 枪口火焰
+        var muzzleEffect = effectData.MuzzleFlashEffect;
+        var muzzleDurTime = effectData.MuzzleFlashEffectTime;
+        if (muzzleDurTime > 0)
         {
-            callback = () => { };
+            // 对每个单位播枪口火焰特效
+            // 计算角度
+            var muzzleAngle = Utils.GetAngleWithZ(attacker.gameObject.transform.forward);
+            // TODO 使用挂点
+            EffectsFactory.Single.CreatePointEffect(muzzleEffect,
+                ParentManager.Instance().GetParent(ParentManager.BallisticParent).transform,
+                attacker.gameObject.transform.position,
+                new Vector3(1, 1, 1),
+                muzzleDurTime,
+                0,
+                null,
+                Utils.EffectLayer,
+                new Vector2(0, muzzleAngle)).Begin();
         }
-        effect = EffectsFactory.Single.CreatePointToObjEffect(effectKey, 
+
+
+        Action action = () =>
+        {
+            if (callback != null && beAttackMember)
+            {
+                callback(beAttackMember.gameObject);
+            }
+        };
+
+        
+        effect = EffectsFactory.Single.CreatePointToObjEffect(effectKey,
             ParentManager.Instance().GetParent(ParentManager.BallisticParent).transform,
-            releasePos, 
-            targetObj, 
-            new Vector3(1, 1, 1), 
-            speed, 
-            taType, 
-            demage + callback, 
+            releasePos,
+            targetObj,
+            new Vector3(1, 1, 1),
+            speed,
+            taType,
+            demage + action,
             Utils.EffectLayer);
 
     }

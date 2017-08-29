@@ -47,10 +47,9 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
     {
         get
         {
-            // TODO 变大变小
             if (collisionGraphics == null)
             {
-                collisionGraphics = new CircleGraphics(new Vector2(transform.position.x, transform.position.z), allData.MemberData.SpaceSet * 0.5f);
+                collisionGraphics = new CircleGraphics(new Vector2(transform.position.x, transform.position.z), allData.MemberData.SpaceSet * 0.5f * ClusterManager.Single.UnitWidth);
             }
             collisionGraphics.Postion = new Vector2(transform.position.x, transform.position.z);
             return collisionGraphics;
@@ -109,7 +108,7 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
         {
             AllData.MemberData.SpaceSet = value < 0 ? 1 : value;
             // 更新图形空间值
-            CollisionGraphics.SetGraphicsSpaceSet(MyCollisionGraphics, value * 0.5f);
+            CollisionGraphics.SetGraphicsSpaceSet(MyCollisionGraphics, value * 0.5f, ClusterManager.Single.UnitWidth);
         }
     }
 
@@ -336,6 +335,15 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
     public void ContinueMove()
     {
         isMoving = true;
+    }
+
+    /// <summary>
+    /// 转向目标(延Y轴旋转)
+    /// </summary>
+    /// <param name="target">目标点</param>
+    public void RotateToWithoutYAxis(Vector3 target)
+    {
+        transform.LookAt(new Vector3(target.x, transform.position.y, target.z));
     }
 
     /// <summary>

@@ -43,6 +43,7 @@ end
 
 function wnd_qiandao_controller:initListener()
     UIEventListener.Get(this.view.CloseBtn).onClick = function()
+        this.view.qiandao_res_panel:GetComponent("UIScrollView"):ResetPosition()
         instance:Hide(0)
     end
 
@@ -51,7 +52,6 @@ function wnd_qiandao_controller:initListener()
             this:PressCtr(go,isPressed)
         end
     end
-
 end
 
 ----签到到第几天的控制------
@@ -62,18 +62,30 @@ function wnd_qiandao_controller:qiandao_res_Ctrl()
     this.dis = 0
     this.finish = false
 
-    print("玩家没有签到之前的签到状态是-----"..this.model.serv_qiandaoInfo["isSigned"])
-    print("玩家没有签到之前的累计签到天数是-----"..this.model.serv_qiandaoInfo["days"])
-    for index = 1,this.model.serv_qiandaoInfo["days"] do
+    print("玩家没有签到之前的签到状态是-----"..userModel:getUserRoleTbl().sign["isSigned"])
+    print("玩家没有签到之前的累计签到天数是-----"..userModel:getUserRoleTbl().sign["days"])
+    for index = 1,userModel:getUserRoleTbl().sign["days"] do
         local go = this.view.qiandao_res_list[index].transform:Find("qiandao_res_quality/qiandao_res_icon/qiandao_res_blackbg").gameObject
         go:SetActive(true)
     end
-    this.view.QiandaoData.QiandaoCishu:GetComponent("UILabel").text = this.model.serv_qiandaoInfo["days"].."次"
+    this.view.QiandaoData.QiandaoCishu:GetComponent("UILabel").text = userModel:getUserRoleTbl().sign["days"].."次"
 
-    if(this.model.serv_qiandaoInfo["isSigned"] == 0) then
-        this:getSlidingdistance(this.model.serv_qiandaoInfo["days"]+1)
+    if(userModel:getUserRoleTbl().sign["isSigned"] == 0) then
+        this:getSlidingdistance(userModel:getUserRoleTbl().sign["days"]+1)
     else
-        this:getSlidingdistance(this.model.serv_qiandaoInfo["days"])
+        this:getSlidingdistance(userModel:getUserRoleTbl().sign["days"])
+    end
+end
+
+function wnd_qiandao_controller:OnReOpenDone()
+    this.finish = false
+    this.Slidingdistance = 0
+    this.dis = 0
+
+    if(userModel:getUserRoleTbl().sign["isSigned"] == 0) then
+        this:getSlidingdistance(userModel:getUserRoleTbl().sign["days"]+1)
+    else
+        this:getSlidingdistance(userModel:getUserRoleTbl().sign["days"])
     end
 end
 
@@ -84,20 +96,17 @@ function wnd_qiandao_controller:PressCtr(go,isPressed)
     --this.OnPressTimer = TimeUtil:CreateTimer(5,OnComplete)
     --然后判断是否进行了长按，如果是长按则进行回调，回调为展示TIPS，传入相关信息。
     self.obj = go
-
     for index = 1,#this.view.qiandao_res_list do
-
         if(self.obj.transform.parent.name == this.view.qiandao_res_list[index].name) then
             print("我按到了谁-----"..this.view.qiandao_res_list[index].name)
             print("index是多少---"..index)
             godata = this.model.local_checkin[index]
 
-            if(this.model.serv_qiandaoInfo["isSigned"] == 0 and index == this.model.serv_qiandaoInfo["days"]+1) then
+            if(userModel:getUserRoleTbl().sign["isSigned"] == 0 and index == userModel:getUserRoleTbl().sign["days"]+1) then
                 this.resneedbesign = true
             else
                 this.resneedbesign = false
             end
-
         end
     end
 
@@ -106,24 +115,25 @@ function wnd_qiandao_controller:PressCtr(go,isPressed)
         if(this.resneedbesign) then
             return
         end
-        if godata["AwardType"] == 'item' then
-            ui_tips_item.Show(require('uiscripts/cangku/wnd_cangku_model'):getLocalItemDataRefByItemID(tonumber(godata["ID"])),
-            Vector3.zero)
-            --this._bTipsIsShow = true
-            this.tipsshow = true
-        elseif godata["AwardType"] == 'equip' then
-            -- DONE: 显示装备Tips
-            ui_tips_equip.Show(require('uiscripts/commonModel/equip_Model'):getLocalEquipmentRefByEquipID(tonumber(godata["ID"])),
-            Vector3.zero)
-            --this._bTipsIsShow = true
-            this.tipsshow = true
-        elseif godata["AwardType"] == 'card' then
-            -- DONE: 显示卡牌Tips
-            --this._bTipsIsShow = true
-            this.tipsshow = false
-        elseif godata["AwardType"] == "currency" then
-            this.tipsshow = false
-        end
+        --TODO:showTIPS待修复
+        --if godata["AwardType"] == 'item' then
+        --    ui_tips_item.Show(require('uiscripts/cangku/wnd_cangku_model'):getLocalItemDataRefByItemID(tonumber(godata["ID"])),
+        --    Vector3.zero)
+        --    --this._bTipsIsShow = true
+        --    this.tipsshow = true
+        --elseif godata["AwardType"] == 'equip' then
+        --    -- DONE: 显示装备Tips
+        --    ui_tips_equip.Show(require('uiscripts/commonModel/equip_Model'):getLocalEquipmentRefByEquipID(tonumber(godata["ID"])),
+        --    Vector3.zero)
+        --    --this._bTipsIsShow = true
+        --    this.tipsshow = true
+        --elseif godata["AwardType"] == 'card' then
+        --    -- DONE: 显示卡牌Tips
+        --    --this._bTipsIsShow = true
+        --    this.tipsshow = false
+        --elseif godata["AwardType"] == "currency" then
+        --    this.tipsshow = false
+        --end
         print("已经完成了计时!!")
     end
     --this.OnPressTimer:Start()
@@ -144,13 +154,14 @@ function wnd_qiandao_controller:PressCtr(go,isPressed)
             return
         end
         if(this.tipsshow) then
-            if ui_tips_item.bIsShowing then
-                ui_tips_item.Hide()
-            elseif ui_tips_equip.bIsShowing then
-                ui_tips_equip.Hide()
-            end
-            -- ui_tips_equip.Hide()
-            this.tipsshow = false
+            --TODO:showTIPS待修复
+            --if ui_tips_item.bIsShowing then
+            --    ui_tips_item.Hide()
+            --elseif ui_tips_equip.bIsShowing then
+            --    ui_tips_equip.Hide()
+            --end
+            ---- ui_tips_equip.Hide()
+            --this.tipsshow = false
         end
         print("我的手抬起来了！")
     end
@@ -227,30 +238,29 @@ end
 
 function wnd_qiandao_controller:QidandaoCtr(item)
 
-    --local on_10030_rec = function(body)
-    --    print("on_10030_rec call")
-    --    Event.RemoveListener("10030", on_10030_rec)
-    --    --   UIToast.Show("已接收到来自服务器的签到信息.",nil,UIToast.ShowType.Queue)
-    --    local gw2c = gw2c_pb.SignIn()
-    --    gw2c:ParseFromString(body)
-    --    ----   this:updateServData(gw2c.currency,nil)
-    --    print("服务器交互后的签到状态是-----"..gw2c.sign["isSigned"])
-    --    print("服务器交互后的累计签到天数是-----"..gw2c.sign["days"])
-    --    if(gw2c.sign["isSigned"]) then
-    --        this.view.QiandaoData.QiandaoCishu:GetComponent("UILabel").text = (gw2c.sign["days"]).."次"
-    --        local go = item.transform:Find("qiandao_res_icon/qiandao_res_blackbg").gameObject
-    --        go:SetActive(true)
-    --        this:updatalocaldata(gw2c)
-    ---------需要更新本地的签到信息---------
-    --    end
-    --end
+    local on_10030_rec = function(body)
+        print("on_10030_rec call")
+        Event.RemoveListener("10030", on_10030_rec)
+        --   UIToast.Show("已接收到来自服务器的签到信息.",nil,UIToast.ShowType.Queue)
+        local gw2c = gw2c_pb.SignIn()
+        gw2c:ParseFromString(body)
+        ----   this:updateServData(gw2c.currency,nil)
+        print("服务器交互后的签到状态是-----"..gw2c.sign["isSigned"])
+        print("服务器交互后的累计签到天数是-----"..gw2c.sign["days"])
+        userModel:setSign(gw2c.sign)
+
+        if(gw2c.sign["isSigned"]) then
+            this.view.QiandaoData.QiandaoCishu:GetComponent("UILabel").text = (gw2c.sign["days"]).."次"
+            local go = item.transform:Find("qiandao_res_icon/qiandao_res_blackbg").gameObject
+            go:SetActive(true)
+            this:updatalocaldata(gw2c)
+        end
+    end
+    --
     --Message_Manager:SendPB_10030(on_10030_rec)
-
-
-    local go = item.transform:Find("qiandao_res_icon/qiandao_res_blackbg").gameObject
-    go:SetActive(true)
-    this.model.serv_qiandaoInfo["isSigned"] = 1
-
+    --local go = item.transform:Find("qiandao_res_icon/qiandao_res_blackbg").gameObject
+    --go:SetActive(true)
+    --userModel:getUserRoleTbl().sign["isSigned"] = 1
 end
 
 
@@ -259,22 +269,17 @@ function wnd_qiandao_controller:updatalocaldata(SignIn) --将签到奖励添加�
     if(SignIn.card~=nil) then
         cardModel:addCards(SignIn.card)
     end
-
     if(SignIn.equip~=nil) then
         for k,v in pairs(SignIn.equip) do
             require("uiscripts/commonModel/equip_Model"):addEquipData(v)
         end
     end
-
     if(SignIn.currency~=nil) then
         currencyModel:addCoin(SignIn.currency)
     end
-
     if(SignIn.item~=nil) then
         itemModel:addItems(SignIn.item)
     end
-
-    
 end
 
 

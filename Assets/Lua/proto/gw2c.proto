@@ -166,4 +166,22 @@ message SetCardGf {
     required Battle battle          =1;
 }
 
+message PushTask {
+    repeated TaskItem tasks         =1;
+}
 
+message BattleRole {
+    required int32 lv               =1;
+    repeated Card card              =2;
+    repeated Equip equip            =3;
+    repeated Sci sci                =4;
+}
+
+message EnterPvp {
+    required BattleRole peer        =1;
+}
+
+message CardToCoin {
+    repeated Card lst               =1;
+    required Currency currency      =2;
+}

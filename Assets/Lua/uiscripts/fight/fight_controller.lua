@@ -5,69 +5,76 @@
 local class = require("common/middleclass")
 local fight_controller = class("fight_controller", wnd_base)
 
-local _view = require("uiscripts/fight/fight_view")
-local _data = require("uiscripts/fight/fight_model")
-local restCard = require("uiscripts/fight/restCard/restCard_controller")
-local skill = require("uiscripts/fight/skill/skill_controller")
-local userInfo = require("uiscripts/fight/userInfo/userInfo_controller")
-local cardInHand = require("uiscripts/fight/cardInHand/cardInHand_controller")
-local power = require("uiscripts/fight/power/power_controller")
-local enemyCard = require("uiscripts/fight/enemyCard/enemyCard_controller")
-local qianFengModel = require("uiscripts/fight/QianFengModel")
+local _view
+local _data
+local restCard
+local skill
+local userInfo
+local cardInHand
+local power
+local enemyCard
+local _isPause
 
-require("uiscripts/fight/touchControl")
-require("uiscripts/fight/modelControl")
-require("uiscripts/fight/AStarControl")
-local CanNotArea = require("uiscripts/fight/CanNotArea")
-require("uiscripts/commonGameObj/Model")
-function Onfs()
-    ui_manager:ShowWB(WNDTYPE.ui_fight)
-end
-local _isPause = false
+local FPSFrames
+local FPSTime
+
 function fight_controller:OnShowDone()
+
+
+    _view = require("uiscripts/fight/fight_view")
+    _data = require("uiscripts/fight/fight_model")
+    restCard = require("uiscripts/fight/restCard/restCard_controller")
+    skill = require("uiscripts/fight/skill/skill_controller")
+    userInfo = require("uiscripts/fight/userInfo/userInfo_controller")
+    cardInHand = require("uiscripts/fight/cardInHand/cardInHand_controller")
+    power = require("uiscripts/fight/power/power_controller")
+    enemyCard = require("uiscripts/fight/enemyCard/enemyCard_controller")
+    require("uiscripts/fight/QianFengModel")
+    require("uiscripts/fight/touchControl")
+    require("uiscripts/fight/modelControl")
+    require("uiscripts/fight/AStarControl")
+    require("uiscripts/fight/CanNotArea")
+    require("uiscripts/commonGameObj/Model")
+    _isPause = false
+    FPSFrames = 0
+    FPSTime = 0
     ---
     ---初始化view和数据
     ---
     _view:init(self)
     _data:getDatas()
 
-    local fun = function()--开场还没加载到所以用协程
-        while not CanNotArea.cannotRect do
-            coroutine.wait(0.1)
-            CanNotArea:Init()
-            if CanNotArea.cannotRect then
-                local maxDropX = CanNotArea:GetMaxDropX()
-                AStarControl:Init(maxDropX)
-                Model:setZhenXingData(_data.AllCardIDtb, _data.AllCardLeveltb)
-                qianFengModel:Init(_data.QianFengCard)
-                qianFengModel:Start()
-                ---
-                ---初始化各部分显示
-                ---
-                restCard:Init(self)
-                skill:Init(self)
-                userInfo:Init(self)
-                cardInHand:Init(self)
-                power:Init(self)
-                enemyCard:Init(self)
-                self:initJumpButton()
-                ---开始游戏倒计时
-                self:StartTimer()
-            end
-        end
-    end
-    coroutine.start(fun)
+    CanNotArea:Init()
+    local maxDropX = CanNotArea:GetMaxDropX()
+    AStarControl:Init(maxDropX)
+    Model:setZhenXingData(_data.AllCardIDtb, _data.AllCardLeveltb)
+    QianFengModel:Init(_data.QianFengCard)
+    QianFengModel:Start()
+    ---
+    ---初始化各部分显示
+    ---
+    restCard:Init(self)
+    skill:Init(self)
+    userInfo:Init(self)
+    cardInHand:Init(self)
+    power:Init(self)
+    enemyCard:Init(self)
+
+    FightManager.Single:AnalysisMap()
+
+    self:initJumpButton()
+    ---开始游戏倒计时
+    self:StartTimer()
 
     self:initPause()
-    ui_manager:DestroyWB(WNDTYPE.Prefight)
 end
 
 ---初始化跳转按钮
 function fight_controller:initJumpButton()
 
     ---双方主基地
-    self.myMainBuild = GameObject.Find("/BuildingParent").transform:GetChild(3)
-    self.myFirstSoldier = GameObject.Find("/BuildingParent").transform:GetChild(2)
+    self.myMainBuild = GameObject.Find("/BuildingParent").transform:GetChild(2)
+    self.myFirstSoldier = GameObject.Find("/BuildingParent").transform:GetChild(3)
     UIEventListener.Get(_view.jumpToMyMain).onPress = function (go, args)
         if args then
             if self.myMainBuild then
@@ -110,13 +117,13 @@ end
 
 
 function fight_controller:Update()
+
     if not CanNotArea.cannotRect then
         return
     end
     if _isPause then
         return
     end
-
     ---
     ---刷新UI中的基地血条
     ---
@@ -126,20 +133,31 @@ function fight_controller:Update()
     ---
     ---控制跳转我的主基地按钮的显隐
     ---
-    local myMainBuild_UIPosition = _data:UIWorldPosition_From_3DWorldPosition(_view.nowWorldCamera,self.myMainBuild.position)
-    if myMainBuild_UIPosition.x < -2 then
-        _view.jumpToMyMain:SetActive(true)
+    local myMainBuild_UIPosition = _view.nowWorldCamera:WorldToScreenPoint(self.myMainBuild.position)
+
+    if myMainBuild_UIPosition.x < UnityEngine.Screen.width/7 then
+        if not _view.jumpToMyMain.activeSelf then
+            _view.jumpToMyMain:SetActive(true)
+        end
     else
-        _view.jumpToMyMain:SetActive(false)
+        if _view.jumpToMyMain.activeSelf then
+            _view.jumpToMyMain:SetActive(false)
+            _view.UIFollow:Stop()
+        end
     end
     ---
     ---控制跳转我的排头兵按钮的显隐
     ---
-    local myFirstSoldier_UIPosition = _data:UIWorldPosition_From_3DWorldPosition(_view.nowWorldCamera,self.myFirstSoldier.position)
-    if myFirstSoldier_UIPosition.x > 2 then
-        _view.jumpToFirst:SetActive(true)
+    local myFirstSoldier_UIPosition = _view.nowWorldCamera:WorldToScreenPoint(self.myFirstSoldier.position)
+    if myFirstSoldier_UIPosition.x > UnityEngine.Screen.width*6/7 then
+        if not _view.jumpToFirst.activeSelf then
+            _view.jumpToFirst:SetActive(true)
+        end
     else
-        _view.jumpToFirst:SetActive(false)
+        if _view.jumpToFirst.activeSelf then
+            _view.jumpToFirst:SetActive(false)
+            _view.UIFollow:Stop()
+        end
     end
 
 
@@ -148,10 +166,10 @@ function fight_controller:Update()
     for k,_ in pairs(touchTable) do
         local touchPosition = TouchControl:getTouchPoint(k)
         if touchPosition then
-            local tempX = _view.nowUICamera:ScreenToWorldPoint(touchPosition).x / Const.urlc
-            if tempX < -550 then
+            local tempX = touchPosition.x
+            if tempX < UnityEngine.Screen.width/10 then
                 _view.BoxScrollObject:MoveTo(_view.PTZCameraTf.position - Vector3(10, 0, 0))
-            elseif tempX > 550 then
+            elseif tempX > UnityEngine.Screen.width*9/10 then
                 _view.BoxScrollObject:MoveTo(_view.PTZCameraTf.position + Vector3(10, 0, 0))
             end
         end
@@ -159,51 +177,26 @@ function fight_controller:Update()
 
     ---我的费增长
     if _data.nowFei < _data.allFei then
-        _data.nowFei = _data.nowFei + 10
+        _data.nowFei = _data.nowFei + Const.FEI_GROW_SPEED * Time.deltaTime
     else
         _data.nowFei = _data.allFei
     end
     power:refreshMyPower()
     cardInHand:refreshCardCD()
 
-    ---敌人费增长
-    if _data.enemyNowFei < _data.enemyAllFei then
-        _data.enemyNowFei = _data.enemyNowFei + 10
-    else
-        _data.enemyNowFei = _data.enemyAllFei
+    enemyCard:Update()
+
+
+
+    ---计算FPS
+    FPSFrames = FPSFrames + 1
+    FPSTime = FPSTime + Time.deltaTime
+    if FPSTime >= 1 then
+        _view.FPSLable:GetComponent("UILabel").text = string.format("fps:%3d",FPSFrames/FPSTime)
     end
-    enemyCard:AIDropCard()
-
-
-
-    ---测试数据---
-    if Input.GetKeyDown(UnityEngine.KeyCode.F1) then
-        _view.TEST_ENEMYINFO:SetActive(not _view.TEST_ENEMYINFO.activeSelf)
-    end
-    if _data.enemyNextCard then
-        _view.TEST_ENEMYINFO:GetComponent("UILabel").text =
-        string.format("敌人剩余卡数：%d\n敌人总能量：%d\n等待卡ID：%d\n所需能量：%d",
-        _data.enemyCardNum,_data.enemyNowFei,_data.enemyNextCard.id,_data.enemyNextCard.TrainCost)
-    else
-        _view.TEST_ENEMYINFO:GetComponent("UILabel").text =
-        string.format("敌人剩余卡数：%d\n",_data.enemyCardNum)
-    end
-
 end
 
-
-
-
----敌人下兵逻辑
-function ENEMY_DROP_CARD()
-    ModelControl:createEnemyModel(_data.enemyNextCard.id)
-    _data.enemyNowFei = _data.enemyNowFei - _data.enemyNextCard.TrainCost
-    _data:refreshEnemyCard()
-end
----自己下兵
-function DROP_CARD(cardIndex)
-    ModelControl:ActiveModel(cardIndex)
-    _data.nowFei = _data.nowFei - cardUtil:getTrainCost(_data.nowHandpaiKutb[cardIndex].id)
+function fight_controller:nextCard(cardIndex)
     _data:refreshMyCards(cardIndex)
     -- 延迟1秒刷新显示
     local t = TimeTicker()
@@ -212,6 +205,13 @@ function DROP_CARD(cardIndex)
         cardInHand:Refresh(cardIndex)
         restCard:Refresh()
     end
+end
+
+---自己下兵
+function DROP_CARD(cardIndex)
+    ModelControl:ActiveModel(cardIndex)
+    _data.nowFei = _data.nowFei - cardUtil:getTrainCost(_data.nowHandpaiKutb[cardIndex].id)
+    fight_controller:nextCard(cardIndex)
 end
 ---回收卡牌
 function RECOVERY_CARD(cardIndex)
@@ -245,16 +245,57 @@ end
 ---添加和移除事件监听
 function fight_controller:OnAddHandler()
     Event.AddListener(GameEventType.HUIFUZANTING, HUIFUZANTING)
-    Event.AddListener(GameEventType.ENEMY_DROP_CARD, ENEMY_DROP_CARD)
     Event.AddListener(GameEventType.DROP_CARD, DROP_CARD)
     Event.AddListener(GameEventType.RECOVERY_CARD, RECOVERY_CARD)
 
 end
 function fight_controller:OnRemoveHandler()
     Event.RemoveListener(GameEventType.HUIFUZANTING, HUIFUZANTING)
-    Event.RemoveListener(GameEventType.ENEMY_DROP_CARD, ENEMY_DROP_CARD)
     Event.RemoveListener(GameEventType.DROP_CARD, DROP_CARD)
     Event.RemoveListener(GameEventType.RECOVERY_CARD, RECOVERY_CARD)
+end
+
+
+function fight_controller:OnHideDone()
+    print("OnHideDone")
+end
+function fight_controller:OnDestroyDone()
+    restCard:OnDestroyDone()
+    skill:OnDestroyDone()
+    userInfo:OnDestroyDone()
+    cardInHand:OnDestroyDone()
+    power:OnDestroyDone()
+    enemyCard:OnDestroyDone()
+    AStarControl:OnDestroyDone()
+    CanNotArea:OnDestroyDone()
+    ModelControl:OnDestroyDone()
+    QianFengModel:OnDestroyDone()
+    TouchControl:OnDestroyDone()
+    _view = nil
+    _data = nil
+    restCard = nil
+    skill = nil
+    userInfo = nil
+    cardInHand = nil
+    power = nil
+    enemyCard = nil
+    _isPause = nil
+    Memory.free("uiscripts/fight/fight_view")
+    Memory.free("uiscripts/fight/fight_model")
+    Memory.free("uiscripts/fight/restCard/restCard_controller")
+    Memory.free("uiscripts/fight/skill/skill_controller")
+    Memory.free("uiscripts/fight/userInfo/userInfo_controller")
+    Memory.free("uiscripts/fight/cardInHand/cardInHand_controller")
+    Memory.free("uiscripts/fight/power/power_controller")
+    Memory.free("uiscripts/fight/enemyCard/enemyCard_controller")
+    Memory.free("uiscripts/fight/QianFengModel")
+    Memory.free("uiscripts/fight/touchControl")
+    Memory.free("uiscripts/fight/modelControl")
+    Memory.free("uiscripts/fight/AStarControl")
+    Memory.free("uiscripts/fight/CanNotArea")
+    Memory.free("uiscripts/commonGameObj/Model")
+    Memory.free("uiscripts/fight/fight_controller")
+    fight_controller = nil
 end
 
 return fight_controller

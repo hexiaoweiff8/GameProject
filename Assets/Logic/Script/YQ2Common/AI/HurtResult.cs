@@ -4,6 +4,13 @@ using System.Collections;
 
 public class HurtResult
 {
+
+    /// <summary>
+    /// 是否暴击
+    /// </summary>
+    public static bool IsCrit { get; private set; }
+
+
     /// <summary>
     /// 普通战斗伤害结算
     /// </summary>
@@ -38,67 +45,43 @@ public class HurtResult
          * （1+Max（-40%，（进攻方伤害加成-防守方免伤加成）））+
          * 攻守双方技能绝对值加成和
          **/
-        // 计算伤害加成与概率
-        if (active.ClusterData.AllData.SkillInfoList != null && active.ClusterData.AllData.SkillInfoList.Count > 0)
+        if (baojixishu > 1)
         {
-            foreach (var skill in active.ClusterData.AllData.SkillInfoList)
-            {
-                if (skill.IsActive || skill.DemageChangeType != 0)
-                {
-                    continue;
-                }
-                shanghaijiacheng += GetDemageChange(skill, target);
-            }
+            IsCrit = true;
         }
-        if (active.ClusterData.AllData.BuffInfoList != null && active.ClusterData.AllData.BuffInfoList.Count > 0)
+        else
         {
-            foreach (var buff in active.ClusterData.AllData.BuffInfoList)
-            {
-                shanghaijiacheng += GetDemageChange(buff, target);
-            }
+            IsCrit = false;
         }
 
-        // 计算减免加成与概率
-        if (target.ClusterData.AllData.SkillInfoList != null && target.ClusterData.AllData.SkillInfoList.Count > 0)
-        {
-            foreach (var skill in target.ClusterData.AllData.SkillInfoList)
-            {
-                if (skill.IsActive)
-                {
-                    continue;
-                }
-                mianyijiacheng += GetDemageChange(skill, target);
-            }
-        }
-        if (target.ClusterData.AllData.BuffInfoList != null && target.ClusterData.AllData.BuffInfoList.Count > 0)
-        {
-            foreach (var buff in target.ClusterData.AllData.BuffInfoList)
-            {
-                mianyijiacheng += GetDemageChange(buff, target);
-            }
-        }
+        // 计算增伤
+        shanghaijiacheng = GetDemageUpper(active, target);
 
-        // 遍历技能(附加伤害类型)(百分比类型)
-
-        // 根据两方类型, 判断是否有伤害增强/减免
+        // 计算减伤
+        mianyijiacheng = GetDemageLower(active, target);
 
 
         var hurt = huoli*(1 - jianshanglv)*baojixishu*kezhixishu*
-                   (1 + Mathf.Max(-0.4f,(shanghaijiacheng - mianyijiacheng))) + jinengjiacheng;
+                   (1 + Mathf.Max(-0.8f,(shanghaijiacheng - mianyijiacheng))) + jinengjiacheng;
         return hurt;
     }
 
     /// <summary>
     /// 计算技能伤害/治疗
     /// </summary>
+    /// <param name="member"></param>
     /// <param name="target">技能目标</param>
     /// <param name="type">伤害或治疗</param>
     /// <param name="unitType">伤害/治疗值类型</param>
     /// <param name="value">具体值, 必须大于等于0</param>
     /// <returns>伤害/治疗具体量</returns>
-    public static float GetHurtForSkill(DisplayOwner target, DemageOrCure type, HealthChangeType unitType, float value)
+    public static float GetHurtForSkill(DisplayOwner member, DisplayOwner target, DemageOrCure type, HealthChangeType unitType, float value)
     {
-        if (target == null || target.ClusterData == null || target.ClusterData.AllData.MemberData == null)
+        if (member == null
+            || member.ClusterData == null
+            || target == null
+            || target.ClusterData == null
+            || target.ClusterData.AllData.MemberData == null)
         {
             throw new Exception("目标对象为空.");
         }
@@ -106,11 +89,34 @@ public class HurtResult
         {
             throw new Exception("伤害/治疗值不能为负数.");
         }
-        var result = value;
-        if (unitType == HealthChangeType.Percentage)
-        {
-            result = target.ClusterData.AllData.MemberData.TotalHp*value;
-        }
+        var zhanqianJueduizhi = member.ClusterData.AllData.MemberData.Attack1;
+        var zhandouJueduizhiAdd = 0.0f;
+        var zhanqianBaifenbiAdd = 0.0f;
+        var zhandouBaifenbiAdd = 0.0f;
+
+        // 伤害能力
+        var huoli = (zhanqianJueduizhi + zhandouJueduizhiAdd) * (1 + zhanqianBaifenbiAdd + zhandouBaifenbiAdd);
+        // 减伤
+        var jianshanglv = AdjustJianshang(member, target);
+        // 克制关系
+        var kezhixishu = AdjustKezhi(member, target);
+        //if (unitType == HealthChangeType.Percentage)
+        //{
+        //    result = target.ClusterData.AllData.MemberData.TotalHp*value;
+        //}
+
+        var shanghaijiacheng = 0.0f;
+        var mianyijiacheng = 0.0f;
+        var jinengjiacheng = 0.0f;
+
+        // 计算增伤
+        shanghaijiacheng = GetDemageUpper(member, target);
+
+        // 计算减伤
+        mianyijiacheng = GetDemageLower(member, target);
+
+        var result = huoli * (1 - jianshanglv) * kezhixishu *
+                   (1 + Mathf.Max(-0.8f, (shanghaijiacheng - mianyijiacheng))) + jinengjiacheng;
 
         return result;
     }
@@ -179,10 +185,13 @@ public class HurtResult
         var chazhi = Mathf.Max(0, gongjiBaoji*(1 + gongjiBaojiAdd) - fangshouFangbao*(1 + fangshouFangbaoAdd));
 
         //暴击伤害系数=战前百分比加成和+战斗中百分比加成和
-        var beforeFight = 0.0f;
-        var inFight = 0.0f;
-        // TODO 包装随机
-        //var ran = new QKRandom((int)DateTime.Now.Ticks);
+        var beforeFight = 0f;
+        // 暴击伤害值
+        var inFight = RandomPacker.Single.GetRangeI(0, 1000) <= active.ClusterData.AllData.MemberData.FixCrit*1000
+            ? active.ClusterData.AllData.MemberData.FixCritDemage
+            : active.ClusterData.AllData.MemberData.CritDamage;
+
+
         return RandomPacker.Single.GetRangeI(0, 1000) <= chazhi * 1000 ? (beforeFight + inFight) : 1;
     }
 
@@ -255,6 +264,69 @@ public class HurtResult
         return 1.0f;
     }
 
+
+    /// <summary>
+    /// 获取增伤
+    /// </summary>
+    /// <param name="active"></param>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    private static float GetDemageUpper(DisplayOwner active, DisplayOwner target)
+    {
+        var result = 0f;
+        // 计算伤害加成与概率
+        if (active.ClusterData.AllData.SkillInfoList != null && active.ClusterData.AllData.SkillInfoList.Count > 0)
+        {
+            foreach (var skill in active.ClusterData.AllData.SkillInfoList)
+            {
+                if (skill.IsActive || skill.DemageChangeType != 0)
+                {
+                    continue;
+                }
+                result += GetDemageChange(skill, target);
+            }
+        }
+        if (active.ClusterData.AllData.BuffInfoList != null && active.ClusterData.AllData.BuffInfoList.Count > 0)
+        {
+            foreach (var buff in active.ClusterData.AllData.BuffInfoList)
+            {
+                result += GetDemageChange(buff, target);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 获取减伤
+    /// </summary>
+    /// <param name="active"></param>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    private static float GetDemageLower(DisplayOwner active, DisplayOwner target)
+    {
+        var result = 0f;
+        // 计算减免加成与概率
+        if (target.ClusterData.AllData.SkillInfoList != null && target.ClusterData.AllData.SkillInfoList.Count > 0)
+        {
+            foreach (var skill in target.ClusterData.AllData.SkillInfoList)
+            {
+                if (skill.IsActive)
+                {
+                    continue;
+                }
+                result += GetDemageChange(skill, target);
+            }
+        }
+        if (target.ClusterData.AllData.BuffInfoList != null && target.ClusterData.AllData.BuffInfoList.Count > 0)
+        {
+            foreach (var buff in target.ClusterData.AllData.BuffInfoList)
+            {
+                result += GetDemageChange(buff, target);
+            }
+        }
+        return result;
+    }
 
 
     /// <summary>
@@ -345,6 +417,18 @@ public class HurtResult
                 break;
             case DemageAdditionOrReductionTargetType.Melee:
                 if (data.IsMelee)
+                {
+                    result = true;
+                }
+                break;
+            case DemageAdditionOrReductionTargetType.NotMechanics:
+                if (!data.IsMechanic)
+                {
+                    result = true;
+                }
+                break;
+            case DemageAdditionOrReductionTargetType.NotMelee:
+                if (!data.IsMelee)
                 {
                     result = true;
                 }

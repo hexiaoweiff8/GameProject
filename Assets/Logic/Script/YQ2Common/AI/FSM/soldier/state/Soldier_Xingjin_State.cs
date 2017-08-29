@@ -19,35 +19,34 @@ public class Soldier_Xingjin_State : SoldierFSMState
     /// </summary>
     private DisplayOwner targetDisplay = null;
 
+    /// <summary>
+    /// 上一帧是否可移动
+    /// </summary>
+    private bool couldMoveLastTime = false;
+
     public override void Init()
     {
         StateID = SoldierStateID.Xingjin;
     }
+
+
     /// <summary>
-    /// 初始化血条和寻路 士兵开始行走
+    /// 初始化寻路 士兵开始行走
     /// </summary>
     /// <param name="fsm"></param>
     public override void DoBeforeEntering(SoldierFSMSystem fsm)
     {
-        //Debug.Log("行进:" + fsm.Display.GameObj.name);
         base.DoBeforeEntering(fsm);
-        fsm.Display.ClusterData.ContinueMove();
         clusterData = fsm.Display.ClusterData as ClusterData;
-        clusterData.ContinueMove();
-
-        // 切换动作
-        SwitchAnim(fsm, SoldierAnimConst.XINGJIN, WrapMode.Loop);
-
-        // TODO 重巡路条件
-        // 重新寻路
-        ReFindPath();
     }
+
     public override void DoBeforeLeaving(SoldierFSMSystem fsm)
     {
-        //Debug.Log("行进结束:" + fsm.Display.GameObj.name);
         base.DoBeforeLeaving(fsm);
         fsm.IsCanRun = false;
+        couldMoveLastTime = false;
     }
+
 
     public override void Action(SoldierFSMSystem fsm)
     {
@@ -57,6 +56,58 @@ public class Soldier_Xingjin_State : SoldierFSMState
         {
             ReFindPath();
         }
+
+        // TODO 检测是否可移动
+        var memberData = fsm.Display.ClusterData.AllData.MemberData;
+        if (memberData.CouldMove)
+        {
+            // 如果能移动, 上一帧是否不可移动, 是则切换移动
+            if (!couldMoveLastTime)
+            {
+                StartMove(fsm);
+                couldMoveLastTime = true;
+            }
+        }
+        // 不能移动则停止移动但不切状态
+        else
+        {
+            // 
+            if (couldMoveLastTime)
+            {
+                StopMove(fsm);
+                couldMoveLastTime = false;
+            }
+        }
+
+    }
+
+
+    /// <summary>
+    /// 初始化血条和寻路 士兵开始行走
+    /// </summary>
+    /// <param name="fsm"></param>
+    private void StartMove(SoldierFSMSystem fsm)
+    {
+
+        fsm.Display.ClusterData.ContinueMove();
+
+        // 切换动作
+        SwitchAnim(fsm, SoldierAnimConst.XINGJIN, WrapMode.Loop);
+
+        // TODO 重巡路条件
+        // 重新寻路
+        ReFindPath();
+    }
+
+    /// <summary>
+    /// 停止移动
+    /// </summary>
+    /// <param name="fsm"></param>
+    private void StopMove(SoldierFSMSystem fsm)
+    {
+        fsm.Display.ClusterData.StopMove();
+        // 切换动作
+        SwitchAnim(fsm, SoldierAnimConst.DAIJI, WrapMode.Loop);
     }
 
 
@@ -64,7 +115,6 @@ public class Soldier_Xingjin_State : SoldierFSMState
     /// <summary>
     /// 重巡路径
     /// </summary>
-    /// <param name="fsm"></param>
     private void ReFindPath()
     {
         //Debug.Log("重新寻路");
@@ -74,8 +124,20 @@ public class Soldier_Xingjin_State : SoldierFSMState
         // 取最近的对方建筑
         var buildingList = DisplayerManager.Single.GetBuildingByType(GetTypeArray(clusterData.AllData.MemberData.ObjID.ObjType));
 
+        // TODO 区分地面与空中
+
+        int[][] mapData = null;
         // 当前地图数据
-        var mapData = LoadMap.Single.GetMapData();
+        switch (clusterData.AllData.MemberData.GeneralType)
+        {
+            case Utils.GeneralTypeAir:
+                mapData = LoadMap.Single.GetAirMapData();
+                break;
+            case Utils.GeneralTypeSurface:
+                mapData = LoadMap.Single.GetSurfaceMapData();
+                break;
+
+        }
         // 当前单位位置映射
         var startPos = Utils.PositionToNum(LoadMap.Single.MapPlane.transform.position, clusterData.transform.position, ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth, ClusterManager.Single.MapHeight);
         // 当前目标位置映射

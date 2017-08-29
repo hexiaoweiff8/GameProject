@@ -39,6 +39,7 @@ public class BuffScriptEditor : BaseScriptEditor
     void OnGUI()
     {
         Refresh();
+        scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(640), GUILayout.Height(800));
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.BeginVertical("box", GUILayout.Width(400), GUILayout.Height(400));
         #region ScrollView - Script Content
@@ -103,6 +104,7 @@ public class BuffScriptEditor : BaseScriptEditor
         GUI.color = Color.yellow;
 
         // 获取的实例
+        BuffTriggerScriptEditor.WinType = 2;
         BuffTriggerScriptEditor.GetIns();
 
         if (GUILayout.Button("子级左括号"))
@@ -125,6 +127,10 @@ public class BuffScriptEditor : BaseScriptEditor
         {
             BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Point, this.position);
         }
+        if (GUILayout.Button("连线特效"))
+        {
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Liner, this.position);
+        }
         if (GUILayout.Button("范围碰撞检测"))
         {
             BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.CollisionDetection, this.position);
@@ -141,6 +147,14 @@ public class BuffScriptEditor : BaseScriptEditor
         {
             BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Buff, this.position);
         }
+        if (GUILayout.Button("清除Buff"))
+        {
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.CleanBuff, this.position);
+        }
+        if (GUILayout.Button("删除指定Buff"))
+        {
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.DelBuff, this.position);
+        }
         if (GUILayout.Button("Skill"))
         {
             BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Skill, this.position);
@@ -153,9 +167,33 @@ public class BuffScriptEditor : BaseScriptEditor
         {
             BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.HealthChange, this.position);
         }
+        if (GUILayout.Button("秒杀"))
+        {
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Death, this.position);
+        }
         if (GUILayout.Button("伤害吸收"))
         {
             BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.ResistDemage, this.position);
+        }
+        if (GUILayout.Button("免疫伤害"))
+        {
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.ImmuneDemage, this.position);
+        }
+        if (GUILayout.Button("免疫致死"))
+        {
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.ImmuneDeath, this.position);
+        }
+        if (GUILayout.Button("受到伤害上限"))
+        {
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.UpperLimit, this.position);
+        }
+        if (GUILayout.Button("吸血"))
+        {
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.LifeDrain, this.position);
+        }
+        if (GUILayout.Button("分担伤害"))
+        {
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.ShareDamage, this.position);
         }
         if (GUILayout.Button("移动"))
         {
@@ -169,6 +207,22 @@ public class BuffScriptEditor : BaseScriptEditor
         {
             BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.TargetPointSelector, this.position);
         }
+        if (GUILayout.Button("清除攻击目标"))
+        {
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.CleanTarget, this.position);
+        }
+        if (GUILayout.Button("循环"))
+        {
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.For, this.position);
+        }
+        if (GUILayout.Button("减技能CD"))
+        {
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.SubCD, this.position);
+        }
+        if (GUILayout.Button("召唤"))
+        {
+            BuffTriggerScriptEditor.ShowTriggerScriptWindow(this, TriggerType.Summoned, this.position);
+        }
         
         GUI.color = Color.white;
         EditorGUILayout.EndVertical();
@@ -181,83 +235,103 @@ public class BuffScriptEditor : BaseScriptEditor
 
         if (GUILayout.Button("Buff等级数据"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.LevelData, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.LevelData, this.position);
         }
         if (GUILayout.Button("BuffCD值"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.CDTime, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.CDTime, this.position);
         }
         if (GUILayout.Button("BuffCD组"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.CDGroup, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.CDGroup, this.position);
         }
         if (GUILayout.Button("Buff可释放次数"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.ReleaseTime, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.ReleaseTime, this.position);
         }
         if (GUILayout.Button("Buff描述"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.Description, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.Description, this.position);
         }
         if (GUILayout.Button("数据修正"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.ChangeData, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.ChangeData, this.position);
         }
         if (GUILayout.Button("BuffIcon路径"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.Icon, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.Icon, this.position);
         }
         if (GUILayout.Button("Buff持续时间"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.BuffTime, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.BuffTime, this.position);
         }
         if (GUILayout.Button("Buff TickTime"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.TickTime, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.TickTime, this.position);
         }
         if (GUILayout.Button("Buff类型"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.BuffType, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.BuffType, this.position);
         }
         if (GUILayout.Button("Buff触发事件1"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.TriggerLevel1, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.TriggerLevel1, this.position);
         }
         if (GUILayout.Button("Buff触发事件2"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.TriggerLevel2, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.TriggerLevel2, this.position);
+        }
+        if (GUILayout.Button("Buff触发概率"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.TriggerProbability, this.position);
         }
         if (GUILayout.Button("Buff Detach触发事件1"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.DetachTriggerLevel1, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.DetachTriggerLevel1, this.position);
         }
         if (GUILayout.Button("Buff Detach触发事件2"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.DetachTriggerLevel2, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.DetachTriggerLevel2, this.position);
         }
         if (GUILayout.Button("Buff优先级"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.BuffLevel, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.BuffLevel, this.position);
         }
         if (GUILayout.Button("Buff所在互斥组"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.BuffGroup, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.BuffGroup, this.position);
         }
         if (GUILayout.Button("Buff是否有益"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.IsBeneficial, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.IsBeneficial, this.position);
         }
         if (GUILayout.Button("Buff Detach 条件"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.DetachQualified, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.DetachQualified, this.position);
         }
         if (GUILayout.Button("Buff是否死亡消失"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.IsDeadDisappear, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.IsDeadDisappear, this.position);
         }
         if (GUILayout.Button("Buff是否不致死"))
         {
-            BuffTriggerScriptEditor.ShowDataScriptWindow(this, DataType.IsNotLethal, this.position);
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.IsNotLethal, this.position);
+        }
+        if (GUILayout.Button("生命值区间下限(触发条件)"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.HpScopeMin, this.position);
+        }
+        if (GUILayout.Button("生命值区间上限(触发条件)"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.HpScopeMax, this.position);
+        }
+        if (GUILayout.Button("伤害增强/减免"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.DemageChange, this.position);
+        }
+        if (GUILayout.Button("是否不可被技能清除"))
+        {
+            BuffTriggerScriptEditor.ShowDataScriptWindow(this, (int)BuffDataType.IsCouldNotClear, this.position);
         }
 
         EditorGUILayout.EndVertical();
@@ -266,6 +340,7 @@ public class BuffScriptEditor : BaseScriptEditor
 
         EditorGUILayout.EndVertical();
         EditorGUILayout.EndHorizontal();
+        EditorGUILayout.EndScrollView();
     }
 
 
@@ -389,4 +464,37 @@ public class BuffScriptEditor : BaseScriptEditor
         }
         return ret;
     }
+}
+
+
+/// <summary>
+/// 技能数据类型
+/// </summary>
+public enum BuffDataType
+{
+    LevelData = 0,      // 技能等级数据
+    CDTime = 1,         // 技能CD时间
+    CDGroup = 2,        // 技能CD组
+    ReleaseTime = 3,    // 技能可释放次数(持续技能用)
+    Description = 4,    // 技能描述
+    Icon = 5,           // 技能Icon
+    TriggerLevel1 = 6,
+    TriggerLevel2 = 7,
+    TickTime = 8,
+    ChangeData = 9,
+    BuffTime = 10,
+    BuffType = 11,
+    DetachTriggerLevel1 = 12,
+    DetachTriggerLevel2 = 13,
+    BuffLevel = 14,
+    BuffGroup = 15,
+    IsBeneficial = 16,
+    DetachQualified = 17,
+    IsDeadDisappear = 18,
+    IsNotLethal = 19,
+    HpScopeMin = 20,        // 生命值区间下限(触发条件)
+    HpScopeMax = 21,        // 生命值区间上限(触发条件)
+    TriggerProbability = 22,// 触发概率
+    DemageChange = 23,      // 伤害增强/减免
+    IsCouldNotClear = 24,      // 是否可被技能清除
 }

@@ -1,5 +1,5 @@
 ui_playerInfo = {
-	cPARENT = "UIRoot/FlyRoot",
+	cPARENT = "UIRoot/BackGroundRoot/ui_main_panel/ui_main",
 	-- 1136x640分辨率相对坐标
 	cLocalPosition = Vector3(-408,271,0),
 	-- 是否已经初始化
@@ -14,7 +14,7 @@ function ui_playerInfo.initView()
 	m.root.transform.localPosition = m.cLocalPosition
 	m.root.name = "Widget_PlayerInfo"
 	m.playerName = m.root.transform:Find("PlayerName").gameObject:GetComponent(typeof(UILabel))
-	m.vipLevel = m.root.transform:Find("VIPLevel").gameObject:GetComponent(typeof(UILabel))
+	-- m.vipLevel = m.root.transform:Find("VIPLevel").gameObject:GetComponent(typeof(UILabel))
 	m.playerLevel = m.root.transform:Find("PlayerLevel").gameObject:GetComponent(typeof(UILabel))
 	m.playerLevelProcess = m.root.transform:Find("PlayerLevelProcess").gameObject:GetComponent(typeof(UIProgressBar))
 
@@ -25,7 +25,7 @@ end
 function ui_playerInfo.updatePlayerInfo()
 	local userTbl = userModel:getUserRoleTbl()
 	-- m.vipLevel.text = "VIP "..userTbl.vipLv
-	m.playerLevel.text = "LV "..userTbl.lv
+	-- m.playerLevel.text = "LV "..userTbl.lv
 	m.playerLevelProcess.value = userModel:getNextLevelExpProcess()
 end
 ----------------------------------------------------------------

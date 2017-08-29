@@ -127,7 +127,6 @@ function chatWindow_controller:btn_send_call()
     end
 
 
-    --print(#subtlecodeUtil:GetTable().mData.body)]]--
     --敏感字符的检查和替换
     str = chatWindow_controller:chaekSensitive(str)
     --敏感字符的检查和替换
@@ -156,8 +155,6 @@ function chatWindow_controller:btn_send_call()
 
     model.lastTime = td.time
     model.isNoPeopleChat = true
-    --Table表从新排版
-    --view.worldTable:GetComponent("UITable"):Reposition()
 
     view.input_label.text = "再此输入文字 (36字)"
     view.input_com.value = ""
@@ -229,13 +226,7 @@ function chatWindow_controller:Update()
     if model.newWorldRecordList ~= nil and #model.newWorldRecordList >0 then
         this.pushDataToScrollViewFormNewRecrdList()
     end
-    --if  not this.testUDPGet and this.gameObject.activeSelf then
-    --    this.timer001 = this.timer001 + Time.deltaTime
-    --    if this.timer001 >= 5 then
-    --        this.testUdp()
-    --        this.testUDPGet = true
-    --    end
-    --end
+
 
     if model.isNoPeopleChat then
         --upTime_timer = upTime_timer + Time.deltaTime
@@ -368,49 +359,7 @@ function chatWindow_controller:pushDataToScrollViewFormOldRecrdList()
     model.oldWorldRecordList = {}
 end
 
-function chatWindow_controller:testUdp()
-    local socket = require "socket"
 
-    local address = "192.168.1.88"
-    local port = 9999
-    local udp = socket.udp()
-
-    udp:settimeout(0)
-    udp:setpeername(address, port)
-
-    require "proto/chat_pb"
-    require "proto/header_pb"
-    --组装message
-    local chat = chat_pb:EnterChat()
-    chat.token = 'chattoken'
-    local msg1 = chat:SerializeToString()
-    --Message_Manager:createSendPBHeader(10001, msg1)
-    local header = header_pb.Header()
-    header.ID = 1
-    header.msgId = 30001
-    header.userId = 8002--8001
-    header.version = '1.0.0'
-    header.errno = 0
-    header.ext = 0
-    if msg1 then
-        header.body = msg1
-    end
-    local msg2 = header:SerializeToString()
-    local buffer = ByteBuffer()
-    buffer:WriteBuffer(msg2)
-
-
-    --udp:send(buffer:ReadString())
-    networkMgr:SendMessageByUDP(buffer:ToBytes())
-    --组装message
-
-    --udp:sendto("udp-test", address, port)
-    --udp:send("udp-test0n")
-    --udp:send("udp-test1n")
-    --udp:send("udp-test2n")
-
-    print("tank you")
-end
 
 function chatWindow_controller:Heartbeat_chat()--聊天心跳 当用户在聊天室界面每隔5分钟请求一次
     chatBubble_controller.heartbeat_chat_timer = chatBubble_controller.heartbeat_chat_timer + Time.deltaTime

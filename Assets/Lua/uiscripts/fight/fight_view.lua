@@ -9,7 +9,7 @@ local view
 function fight_view:init(arg)
     view = arg
     self.time_txt = view.transform:Find("basic/time_bg/txt"):GetComponent("UILabel")
-    --self.myBloodBar = view.transform:Find("defence_widget1/bg/hp_fg"):GetComponent("UISprite")
+    self.FPSLable = view.transform:Find("basic/FPS").gameObject
 
     ---已准备好的卡牌
     -- 装载ui卡牌的panel
@@ -60,9 +60,6 @@ function fight_view:init(arg)
     self.jumpToFirst = view.transform:Find("btn_first").gameObject
 
 
-    ---测试UI
-    self.TEST_ENEMYINFO = view.transform:Find("TEST_ENEMYINFO").gameObject
-    self.TEST_ENEMYINFO:SetActive(false)
 end
 
 return fight_view

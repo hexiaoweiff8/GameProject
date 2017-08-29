@@ -1,8 +1,10 @@
 local restCard_controller = {}
-local _view = require("uiscripts/fight/restCard/restCard_view")
-local _data = require("uiscripts/fight/restCard/restCard_model")
+local _view
+local _data
 
 function restCard_controller:Init(view)
+    _view = require("uiscripts/fight/restCard/restCard_view")
+    _data = require("uiscripts/fight/restCard/restCard_model")
     _view:initView(view)
 
     self:AddListener()
@@ -94,5 +96,10 @@ function restCard_controller:AddListener()
 
 end
 
-
+function restCard_controller:OnDestroyDone()
+    _view = nil
+    _data = nil
+    Memory.free("uiscripts/fight/restCard/restCard_view")
+    Memory.free("uiscripts/fight/restCard/restCard_model")
+end
 return restCard_controller

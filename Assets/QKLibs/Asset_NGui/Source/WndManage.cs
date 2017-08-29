@@ -34,6 +34,7 @@ public class WndManage
             string wndname = curr.Key;
             Wnd wnd = m_wndInstances[wndname];
             DestroyWnd(wnd);
+            DestroyWnd(wndname, 0);
         }
         m_wndLastHideTime.Clear();
     }
@@ -391,6 +392,7 @@ public class WndManage
         }
 
         m_coIsRuning = false;
+
     }
 
     bool m_coIsRuning = false;
@@ -418,7 +420,16 @@ public class WndManage
 
     public void LogicInit_Go()
     {
+        LogicInitPackage();
         CoroutineManage.Single.StartCoroutine(LogicInit.InitLogic());
+    }
+
+    /// <summary>
+    /// 加载依赖资源包
+    /// </summary>
+    public void LogicInitPackage()
+    {
+        CoroutineManage.Single.StartCoroutine(LogicInit.CoLoadPackage());
     }
     public float LogicInit_GetInitProgress()
     {

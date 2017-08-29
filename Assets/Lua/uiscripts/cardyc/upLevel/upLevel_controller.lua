@@ -1,14 +1,20 @@
 local upLevel_controller = {}
-local view = require("uiscripts/cardyc/upLevel/upLevel_view")
-local data = require("uiscripts/cardyc/upLevel/upLevel_model")
-
-require("uiscripts/commonGameObj/cardhead")
-
-
+local view
+local data
 local cardhead
-local isInitUpLvLayer = false  --是否初始化升级界面
+local isInitUpLvLayer  --是否初始化升级界面
 function upLevel_controller:init( args )
+    view = require("uiscripts/cardyc/upLevel/upLevel_view")
+    data = require("uiscripts/cardyc/upLevel/upLevel_model")
+    isInitUpLvLayer = false  --是否初始化升级界面
     view:init_view(args)
+end
+function upLevel_controller:OnDestroyDone()
+    Memory.free("uiscripts/cardyc/upLevel/upLevel_view")
+    Memory.free("uiscripts/cardyc/upLevel/upLevel_model")
+    view = nil
+    data = nil
+    isInitUpLvLayer = nil
 end
 --点击主界面升级按钮
 function upLevel_controller:show_UpLevel_Layer()

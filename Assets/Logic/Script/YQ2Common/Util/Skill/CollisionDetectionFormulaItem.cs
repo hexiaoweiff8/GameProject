@@ -35,13 +35,19 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
     /// 可选参数
     /// 权重选择数据Id 
     /// </summary>
-    public int TargetSelectDataId = -1;
+    public int TargetSelectDataId
+    {
+        get { return targetSelectDataId; }
+        private set { targetSelectDataId = value; } }
 
-    /// <summary>
-    /// 可选参数
-    /// 循环次数
-    /// </summary>
-    public int RepeatTime = 1;
+    ///// <summary>
+    ///// 可选参数
+    ///// 循环次数
+    ///// </summary>
+    //public int RepeatTime {
+    //    get { return repeatTime; }
+    //    set { repeatTime = value; }
+    //}
 
     /// <summary>
     /// 参数1
@@ -60,26 +66,18 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
     /// </summary>
     public float Arg3 { get; private set; }
 
+    /// <summary>
+    /// 是否跟随当前单位的方向
+    /// </summary>
+    public bool IsFollowDir { get; private set; }
+
 
     /// <summary>
-    /// 初始化碰撞检测
+    /// 可选参数
+    /// 权重选择数据Id 
     /// </summary>
-    /// <param name="formulaType">行为单元类型(0: 不等待, 1: 等待)</param>
-    /// <param name="targetCount">目标数量</param>
-    /// <param name="receivePos">接收技能方(0: 放技能方, 1: 目标方)</param>
-    /// <param name="targetCamps">目标阵营</param>
-    /// <param name="scopeType">范围类型</param>
-    /// <param name="scopeParams">范围参数</param>
-    public CollisionDetectionFormulaItem(int formulaType, int targetCount, int receivePos, TargetCampsType targetCamps, GraphicType scopeType, float[] scopeParams)
-    {
-        FormulaType = formulaType;
-        TargetCount = targetCount;
-        ReceivePos = receivePos;
-        TargetCamps = targetCamps;
-        ScopeType = scopeType;
-        //ScopeParams = scopeParams;
-        //SkillNum = skillNum;
-    }
+    private int targetSelectDataId = -1;
+
 
     /// <summary>
     /// 初始化
@@ -98,7 +96,7 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
         {
             throw new Exception("数据列表为空");
         }
-        var argsCount = 10;
+        var argsCount = 9;
         // 解析参数
         if (array.Length < argsCount)
         {
@@ -108,19 +106,19 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
         // 目标阵营(-1:都触发, 0: 己方, 1: 非己方),
         // 范围大小(方 第一个宽, 第二个长, 第三个旋转角度, 圆的就取第一个值当半径, 扇形第一个半径, 第二个开口角度, 第三个旋转角度有更多的参数都放进来)
         // 如果该项值是以%开头的则作为替换数据
-        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        var targetCount = GetDataOrReplace<int>("TargetCount", array, 1, ReplaceDic);
-        var receivePos = GetDataOrReplace<int>("ReceivePos", array, 2, ReplaceDic);
-        var scopeType = GetDataOrReplace<GraphicType>("ScopeType", array, 3, ReplaceDic);
-        var targetTypeCamps = GetDataOrReplace<TargetCampsType>("TargetCamps", array, 4, ReplaceDic);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        var targetCount = GetDataOrReplace<int>("TargetCount", array, 1);
+        var receivePos = GetDataOrReplace<int>("ReceivePos", array, 2);
+        var scopeType = GetDataOrReplace<GraphicType>("ScopeType", array, 3);
+        var targetTypeCamps = GetDataOrReplace<TargetCampsType>("TargetCamps", array, 4);
 
         // 可选参数
-        var arg1 = GetDataOrReplace<float>("Arg1", array, 5, ReplaceDic);
-        var arg2 = GetDataOrReplace<float>("Arg2", array, 6, ReplaceDic);
-        var arg3 = GetDataOrReplace<float>("Arg3", array, 7, ReplaceDic);
+        var arg1 = GetDataOrReplace<float>("Arg1", array, 5);
+        var arg2 = GetDataOrReplace<float>("Arg2", array, 6);
+        var arg3 = GetDataOrReplace<float>("Arg3", array, 7);
 
-        var targetSelectDataId = GetDataOrReplace<int>("TargetSelectDataId", array, 8, ReplaceDic);
-        var repeatTime = GetDataOrReplace<int>("RepeatTime", array, 9, ReplaceDic);
+        var targetSelectDataId = GetDataOrReplace<int>("TargetSelectDataId", array, 8);
+        var isFollowDir = GetDataOrReplace<bool>("IsFollowDir", array, 9);
 
 
         FormulaType = formulaType;
@@ -132,7 +130,7 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
         Arg2 = arg2;
         Arg3 = arg3;
         TargetSelectDataId = targetSelectDataId;
-        RepeatTime = repeatTime;
+        IsFollowDir = isFollowDir;
     }
 
     /// <summary>
@@ -154,30 +152,12 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
         var myReceivePos = ReceivePos;
         var myTargetCamps = TargetCamps;
         var clusterData = paramsPacker.ReleaseMember.ClusterData;
-        //var selecterData = clusterData.MemberData;
         var myFormulaType = FormulaType;
         var myScopeType = ScopeType;
         var myTargetCount = TargetCount;
-        var myRepeatTime = RepeatTime;
+        var myIsFollowDir = IsFollowDir;
+
         // 目标权重筛选数据
-
-        //var targetSelectData = new SelectWeightData();
-        //// 选择目标测试数据
-        //targetSelectData.AirWeight = -1;
-        //targetSelectData.BuildWeight = 100;
-        //targetSelectData.SurfaceWeight = 100;
-
-        //targetSelectData.HumanWeight = 10;
-        //targetSelectData.OrcWeight = 10;
-        //targetSelectData.OmnicWeight = 10;
-
-        //targetSelectData.HideWeight = -1;
-        //targetSelectData.TauntWeight = 1000;
-
-        //targetSelectData.HealthMaxWeight = 0;
-        //targetSelectData.HealthMinWeight = 10;
-        //targetSelectData.DistanceMaxWeight = 0;
-        //targetSelectData.DistanceMinWeight = 10;
         var targetSelectData = TargetSelectDataId > 0 ? new SelectWeightData(SData_armyaim_c.Single.GetDataOfID(TargetSelectDataId)) : null;
 
         result = new Formula((callback, scope) =>
@@ -185,7 +165,12 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
             // 检测范围
             ICollisionGraphics graphics = null;
 
-            var pos = Utils.V3ToV2WithouY(GetPosByType(myReceivePos, paramsPacker, scope));;//Utils.V3ToV2WithouY(myReceivePos == 0 ? paramsPacker.StartPos : paramsPacker.TargetPos);
+            var pos = Utils.V3ToV2WithouY(GetPosByType(myReceivePos, paramsPacker, scope));
+            var plusAngle = 0f;
+            if (myIsFollowDir)
+            {
+                plusAngle = Utils.GetAngleWithZ(clusterData.Direction);
+            }
             // 获取图形对象
             switch (myScopeType)
             {
@@ -196,18 +181,18 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
 
                 case GraphicType.Rect:
                     // 矩形
-                    graphics = new RectGraphics(pos, Arg1, Arg2, Arg3);
+                    graphics = new RectGraphics(pos, Arg1, Arg2, Arg3 + plusAngle);
                     break;
 
                 case GraphicType.Sector:
                     // 扇形
-                    graphics = new SectorGraphics(pos, Arg3, Arg1, Arg2);
+                    graphics = new SectorGraphics(pos, Arg3 + plusAngle, Arg1, Arg2);
                     break;
             }
 
             // 获取周围单位DisplayOwner列表
-            var packerList = FormulaParamsPackerFactroy.Single.GetFormulaParamsPackerList(graphics, 
-                paramsPacker.StartPos, 
+            var packerList = FormulaParamsPackerFactroy.Single.GetFormulaParamsPackerList(graphics,
+                paramsPacker.StartPos,
                 myTargetCamps,
                 paramsPacker.Skill,
                 paramsPacker.TargetMaxCount);
@@ -216,42 +201,43 @@ public class CollisionDetectionFormulaItem : AbstractFormulaItem
             if (targetSelectData != null)
             {
                 packerList = TargetSelecter.TargetFilter(targetSelectData, clusterData, packerList);
-            }
 
-            // 重复次数
-            var repeatedCount = 0;
-            // 对他们释放技能(技能编号)
-            if (packerList != null)
-            {
-                var counter = 0;
-                foreach (var packer in packerList)
+                // 对他们释放技能(技能编号)
+                if (packerList != null)
                 {
-                    // 如果设置了数量上限, 并且超过数量上限则跳出
-                    if (myTargetCount > 0 && counter >= myTargetCount)
+                    var counter = 0;
+                    var completeCount = 0;
+                    var allCount = packerList.Count;
+                    foreach (var packer in packerList)
                     {
-                        break;
-                    }
-                    // 执行子行为链
-                    if (SubFormulaItem != null)
-                    {
-                        var subSkill = new SkillInfo(packer.SkillNum);
-                        FormulaParamsPackerFactroy.Single.CopyPackerData(paramsPacker, packer);
-                        subSkill.DataList = packer.DataList;
-                        subSkill.AddActionFormulaItem(SubFormulaItem);
-                        //subSkill.GetFormula(packer);
-                        SkillManager.Single.DoSkillInfo(subSkill, packer, true, () =>
+                        // 如果设置了数量上限, 并且超过数量上限则跳出
+                        if (myTargetCount > 0 && counter >= myTargetCount)
                         {
-                            repeatedCount++;
-                            if (repeatedCount >= myRepeatTime)
+                            break;
+                        }
+                        // 执行子行为链
+                        if (SubFormulaItem != null)
+                        {
+                            var subSkill = new SkillInfo(packer.SkillNum);
+                            FormulaParamsPackerFactroy.Single.CopyPackerData(paramsPacker, packer);
+                            subSkill.DataList = packer.DataList;
+                            subSkill.AddActionFormulaItem(SubFormulaItem);
+                            //subSkill.GetFormula(packer);
+                            SkillManager.Single.DoSkillInfo(subSkill, packer, true, () =>
                             {
                                 // 执行完成, 回调
-                                callback();
-                            }
-                        });
+                                completeCount++;
+                                if (completeCount >= myTargetCount || completeCount >= allCount)
+                                {
+                                    callback();
+                                }
+                            });
+                        }
+                        counter++;
                     }
-                    counter++;
                 }
             }
+
 
         }, myFormulaType);
         

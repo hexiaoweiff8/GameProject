@@ -43,6 +43,15 @@ function wnd_shop_controller:OnShowDone()
 	-- 获取刷新卡数量
 	this.view.Refresh.lRefreshCardCount.text = require('uiscripts/cangku/wnd_cangku_model'):getServItemCountByItemID(470009)
 end
+function wnd_shop_controller:OnDestroyDone()
+	printw("shop OnDestroyDone")
+
+	this.ShopRefreshTimer:Kill()
+	this.model.serv_ShopCacheData = nil
+
+	Memory.free('uiscripts/shop/wnd_shop_view')
+	Memory.free('uiscripts/shop/wnd_shop_controller')
+end
 ----------------------------------------------------------------
 --★DebugTimer
 function wnd_shop_controller:showDebugTimer()

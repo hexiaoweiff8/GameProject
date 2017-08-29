@@ -1,6 +1,5 @@
 /// <summary>
 /// 选择目标权重抽象类
-/// TODO 改成接口, 不适用抽象类
 /// </summary>
 public interface ISelectWeightDataHolder
 {
@@ -32,8 +31,51 @@ public class SelectWeightData
     /// </summary>
     public float BuildWeight { get; set; }
 
+    /// <summary>
+    /// 阵营选择权重
+    /// 0全选
+    /// 1己方
+    /// 2敌方
+    /// </summary>
+    public int CampWeight { get; set; }
 
-    // ----------------------------权重选择 Level1-----------------------------
+    /// <summary>
+    /// 生命值选择范围类型
+    /// 0:百分比
+    /// 1:绝对值
+    /// </summary>
+    public int HpScopeType { get; set; }
+
+    /// <summary>
+    /// 生命值选择范围最大值
+    /// -1则该值无效
+    /// </summary>
+    public float HpScopeMaxValue { get; set; }
+
+    /// <summary>
+    /// 生命值选择范围最小值
+    /// -1则该值无效
+    /// </summary>
+    public float HpScopeMinValue { get; set; }
+
+    /// <summary>
+    /// 身上有Debuff时
+    /// 0: 不作为条件
+    /// 1: 身上必须有负面buff
+    /// -1:身上必须没有负面buff
+    /// </summary>
+    public int DeBuffWeight { get; set; }
+
+    /// <summary>
+    /// 身上有正面buff时
+    /// 0: 不作为条件
+    /// 1: 身上必须有正面buff
+    /// -1:身上必须没有正面buff
+    /// </summary>
+    public int BuffWeight { get; set; }
+
+
+    // ----------------------------权重选择 Level2-----------------------------
 
     /// <summary>
     /// 人族权重
@@ -155,5 +197,8 @@ public class SelectWeightData
         HealthMaxWeight = armyaim.HealthMax;
         DistanceMinWeight = armyaim.RangeMin;
         DistanceMaxWeight = armyaim.RangeMax;
+
+        HpScopeMaxValue = -1;
+        HpScopeMinValue = -1;
     }
 }

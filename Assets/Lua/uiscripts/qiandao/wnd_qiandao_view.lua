@@ -45,6 +45,9 @@ function wnd_qiandao_view:AddcolliderforRes()
         collider.isTrigger = true
         collider.center = Vector3.zero
         collider.size = Vector3(collider.gameObject:GetComponent(typeof(UIWidget)).localSize.x,collider.gameObject:GetComponent(typeof(UIWidget)).localSize.y,0)
+
+        uidragsv = this.qiandao_res_list[i].transform:Find("qiandao_res_quality").gameObject:AddComponent(typeof(UIDragScrollView))
+        uidragsv.scrollView = this.qiandao_res_panel:GetComponent("UIScrollView")
     end
 end
 

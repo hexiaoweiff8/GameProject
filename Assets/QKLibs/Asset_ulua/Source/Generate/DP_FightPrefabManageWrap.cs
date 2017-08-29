@@ -10,7 +10,6 @@ public class DP_FightPrefabManageWrap
 		L.RegFunction("Init", Init);
 		L.RegFunction("InstantiateObject3D", InstantiateObject3D);
 		L.RegFunction("ReLoad3DObjects", ReLoad3DObjects);
-		L.RegFunction("InstantiateAvatar", InstantiateAvatar);
 		L.RegFunction("CreateMat", CreateMat);
 		L.RegFunction("New", _CreateDP_FightPrefabManage);
 		L.RegFunction("__tostring", ToLua.op_ToString);
@@ -82,23 +81,6 @@ public class DP_FightPrefabManageWrap
 			ToLua.CheckArgsCount(L, 0);
 			DP_FightPrefabManage.ReLoad3DObjects();
 			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int InstantiateAvatar(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 1);
-			CreateActorParam arg0 = (CreateActorParam)ToLua.CheckObject(L, 1, typeof(CreateActorParam));
-			UnityEngine.GameObject o = DP_FightPrefabManage.InstantiateAvatar(arg0);
-			ToLua.Push(L, o);
-			return 1;
 		}
 		catch(Exception e)
 		{

@@ -5,7 +5,7 @@
 
 
 local class = require("common/middleclass")
-local SuitProps = class("SuitProps")
+SuitProps = class("SuitProps")
 
 SuitProps.SUIT_PROP_PIVOT ={
     TOP_CENTER = 0,
@@ -26,9 +26,9 @@ end
 function SuitProps:addSuitAttrObj(index)
     if index > #self.suitAttr_lab then
         if self.pivot == self.SUIT_PROP_PIVOT.TOP_CENTER then
-            self.suitAttr_lab[index] = GameObjectExtension.InstantiateFromPacket("commonU", "suitAttr_TopCenter", self.parent).gameObject
+            self.suitAttr_lab[index] = GameObjectExtension.InstantiateFromPacket("commonu", "suitAttr_TopCenter", self.parent).gameObject
         elseif self.pivot == self.SUIT_PROP_PIVOT.TOP_LEFT then
-            self.suitAttr_lab[index] = GameObjectExtension.InstantiateFromPacket("commonU", "suitAttr_TopLeft", self.parent).gameObject
+            self.suitAttr_lab[index] = GameObjectExtension.InstantiateFromPacket("commonu", "suitAttr_TopLeft", self.parent).gameObject
         end
 
         self.suitAttr_actNum[index] =  self.suitAttr_lab[index].transform:Find("actNum").gameObject
@@ -44,7 +44,7 @@ function SuitProps:initSuitAttrs(suitID)
         self.SuitEffectStr[i] = self.suitAttrList[i].str
         self.SuitEffectActNUm[i] = self.suitAttrList[i].actNum
     end
-end
+end 
 
 ---刷新显示
 function SuitProps:Refresh(suitID)
@@ -86,5 +86,15 @@ end
 function SuitProps:getHeight()
     return self.height
 end
+
+function SuitProps:Destroy()
+    self.parent = nil
+    self.pivot = nil
+    self.suitID = nil
+    self.suitAttr_lab = nil
+    self.suitAttr_actNum = nil
+    self.height = nil
+end
+
 return SuitProps
 

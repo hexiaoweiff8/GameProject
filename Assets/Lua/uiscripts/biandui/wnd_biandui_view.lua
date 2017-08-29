@@ -40,6 +40,8 @@ require("uiscripts/commonGameObj/Model")
 function wnd_biandui_view:initview(root)
     self = root
 
+    this.biandui = self.transform
+
     this.biandui_btn["BackBtn"] = self.transform:Find("ui_biandui_btn/btn_back").gameObject
     this.biandui_btn["CardBtn"] = self.transform:Find("ui_biandui_btn/btn_card").gameObject
     this.biandui_btn["LeftDragBtn"] = self.transform:Find("ui_biandui_btn/btn_left").gameObject
@@ -80,9 +82,14 @@ function wnd_biandui_view:initview(root)
     this.daying_item_panel_col = self.transform:Find("daying_item_panel_col").gameObject
     this.card_item_panel_col = self.transform:Find("card_item_panel_col").gameObject
 
-    this.daying_bingli_label = self.transform:Find("daying_panel/daying/daying_bingli_label").gameObject
+    this.btn_zhanshu = self.transform:Find("ui_biandui_btn/btn_card").gameObject
+
+    this.tishi_bg = this.card_clone_panel.transform:Find("tishi_bg").gameObject
+    this.tishi_ok = this.tishi_bg.transform:Find("btn_ok").gameObject
+    this.tishi_back = this.tishi_bg.transform:Find("btn_back").gameObject
 
     -----静态文本-----
+    this.daying_bingli_label = self.transform:Find("daying_panel/daying/daying_bingli_label").gameObject
     this.daying_bingli_fg = self.transform:Find("daying_panel/daying/daying_bingli_fg").gameObject
     this.pjbingli_label = self.transform:Find("bingli_frame/pjbingli_label").gameObject
     this.zongbingli_label = self.transform:Find("bingli_frame/zongbingli_label").gameObject
@@ -90,6 +97,8 @@ function wnd_biandui_view:initview(root)
     this.qianfeng_bingli_label = self.transform:Find("qianfeng_panel/qianfeng/qianfeng_bingli_label").gameObject
     this.qianfeng_bingli_fg = self.transform:Find("qianfeng_panel/qianfeng/qianfeng_bingli_fg").gameObject
     this.card_label = self.transform:Find("ui_biandui_btn/btn_card/card_label").gameObject
+    this.select_card_info_label = self.transform:Find("select_card_panel/select_card_bg/select_card_info/select_card_info_label").gameObject
+    this.select_card_add_label = self.transform:Find("select_card_panel/select_card_bg/select_card_add/select_card_add_label").gameObject
     -------------------
 
     ----技能按钮------
@@ -114,11 +123,6 @@ function wnd_biandui_view:initview(root)
     this.myclonetexture:Create()
     this.CloneCamera:GetComponent(typeof(UnityEngine.Camera)).targetTexture = this.myclonetexture
     this.CloneTexture:GetComponent(typeof(UITexture)).mainTexture = this.myclonetexture
-
-
-
-
-
 
     ---高亮位置外部碰撞体---
     this.pos_col = {}

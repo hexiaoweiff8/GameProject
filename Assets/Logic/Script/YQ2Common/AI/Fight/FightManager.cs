@@ -50,6 +50,28 @@ public class FightManager
     private int[][] mapInfoData;
 
 
+    /// <summary>
+    /// 受伤回调
+    /// 参数: 被击单位Obj, 伤害值, 伤害类型
+    /// </summary>
+    private Action<HealthChangePacker> healthChangeAction = null;
+
+    /// <summary>
+    /// 单位死亡事件
+    /// </summary>
+    private Action<GameObject, int, MemberType> memberDeadAction = null;
+
+    /// <summary>
+    /// 游戏结束回调
+    /// 参数: 胜利阵营
+    /// </summary>
+    private Action<int> endGameAction = null;
+
+    /// <summary>
+    /// 单位位置-阵营字典
+    /// </summary>
+    private Dictionary<int, Dictionary<MemberType, Vector3>> memberPosDic = new Dictionary<int, Dictionary<MemberType, Vector3>>(); 
+
 
 
 
@@ -122,12 +144,26 @@ public class FightManager
     }
 
     /// <summary>
+    /// 解析地图
+    /// </summary>
+    public void AnalysisMap()
+    {
+        AstarFight.Instance.AnalysisMap();
+    }
+
+    /// <summary>
     /// 结束战斗
     /// </summary>
     public void EndFight()
     {
         // 结束流程
         // 清理数据
+        FightDataStatistical.Single.Clear();
+        FightDataSyncer.Single.Clear();
+        PoolLoader.Instance().Clear();
+        DisplayerManager.Single.Clear();
+        DataManager.Single.Clear();
+        ClusterManager.Single.ClearAll();
     }
 
     // 战斗关卡
@@ -203,9 +239,247 @@ public class FightManager
         ClusterManager.Single.ClearAll();
         // 清理本地缓存
         mapInfoData = null;
+        memberPosDic.Clear();
+    }
+
+    // ----------------------战斗位置相关------------------------
+
+
+    /// <summary>
+    /// 设置单位位置
+    /// </summary>
+    /// <param name="camp">阵营</param>
+    /// <param name="memberType">单位类型</param>
+    /// <param name="pos">基地位置</param>
+    public void SetMemberPos(int camp, MemberType memberType, Vector3 pos)
+    {
+        if (memberPosDic.ContainsKey(camp))
+        {
+            if (memberPosDic[camp].ContainsKey(memberType))
+            {
+                memberPosDic[camp][memberType] = pos;
+            }
+            else
+            {
+                memberPosDic[camp].Add(memberType, pos);
+            }
+        }
+        else
+        {
+            memberPosDic.Add(camp, new Dictionary<MemberType, Vector3>()
+            {
+                {memberType, pos}
+            });
+        }
+    }
+
+    /// <summary>
+    /// 获取单位位置
+    /// </summary>
+    /// <param name="camp">单位阵营</param>
+    /// <param name="memberType">单位类型</param>
+    public Vector3 GetPos(int camp, MemberType memberType)
+    {
+        Vector3 result = Vector3.zero;
+        if (memberPosDic.ContainsKey(camp) && memberPosDic[camp].ContainsKey(memberType))
+        {
+            result = memberPosDic[camp][memberType];
+        }
+        return result;
+    }
+
+    ///// <summary>
+    ///// 获取排头兵位置
+    ///// </summary>
+    ///// <param name="camp">阵营</param>
+    ///// <returns>排头兵位置</returns>
+    //public Vector3 GetFirstSoldierPos(int camp)
+    //{
+    //    Vector3 result = Vector3.zero;
+    //}
+
+
+    // ----------------------战斗抛事件相关----------------------
+
+    /// <summary>
+    /// 伤害类型
+    /// </summary>
+    /// <param name="obj">被变更单位</param>
+    /// <param name="currentHp">当前血量</param>
+    /// <param name="changeValue">变更血量</param>
+    /// <param name="type">生命变更类型</param>
+    /// <param name="totalHp">总血量</param>
+    /// <param name="objType">单位类型</param>
+    public void DoHealthChangeAction(GameObject obj, float totalHp, float currentHp, float changeValue, HurtType type, ObjectID.ObjectType objType)
+    {
+        if (healthChangeAction != null)
+        {
+            healthChangeAction(new HealthChangePacker(obj, totalHp, currentHp, changeValue, type, objType));
+        }
+    }
+
+    /// <summary>
+    /// 胜利阵营
+    /// </summary>
+    /// <param name="fieldCamp">失败方阵营</param>
+    public void DoEndGameAction(int fieldCamp)
+    {
+        if (endGameAction != null)
+        {
+            endGameAction(fieldCamp);
+        }
+    }
+
+    /// <summary>
+    /// 单位死亡事件
+    /// </summary>
+    /// <param name="obj">死亡单位对象</param>
+    /// <param name="camp">死亡单位阵营</param>
+    /// <param name="memberType">单位类型</param>
+    public void DoMemberDeadAction(GameObject obj, int camp, MemberType memberType)
+    {
+        if (memberDeadAction != null)
+        {
+            memberDeadAction(obj, camp, memberType);
+        }
+    }
+
+    /// <summary>
+    /// 设置收到伤害事件
+    /// </summary>
+    /// <param name="action"></param>
+    public void SetHealthChangeAction(Action<HealthChangePacker> action)
+    {
+        healthChangeAction = action;
+    }
+
+    /// <summary>
+    /// 设置游戏结束事件
+    /// </summary>
+    /// <param name="action"></param>
+    public void SetEndGameAction(Action<int> action)
+    {
+        endGameAction = action;
+    }
+
+    /// <summary>
+    /// 设置单位死亡事件
+    /// </summary>
+    /// <param name="action"></param>
+    public void SetMemberDeadAction(Action<GameObject, int, MemberType> action)
+    {
+        memberDeadAction = action;
     }
 
 
+
+    /// <summary>
+    /// 获取伤害类型
+    /// </summary>
+    /// <param name="trigger"></param>
+    /// <returns></returns>
+    public static HurtType GetDemageHurtType(TriggerData trigger)
+    {
+        // 转换伤害类型
+        var hurtType = HurtType.NormalAttack;
+        if (trigger.IsCrit)
+        {
+            hurtType = HurtType.Crit;
+        }
+        else
+        {
+            switch (trigger.DemageType)
+            {
+                case DemageType.NormalAttackDemage:
+                    hurtType = HurtType.NormalAttack;
+                    break;
+                case DemageType.SkillAttackDemage:
+                    hurtType = HurtType.SkillAttack;
+                    break;
+            }
+        }
+
+        return hurtType;
+    }
+
+    /// <summary>
+    /// 抛出伤害类型
+    /// </summary>
+    public enum HurtType
+    {
+        NormalAttack = 0,
+        SkillAttack = 1,
+        Cure = 2,
+        Crit = 3,
+        Miss = 4
+    }
+
+    /// <summary>
+    /// 单位类型
+    /// </summary>
+    public enum MemberType
+    {
+        Base = 1,
+        Turret = 2,
+        Soldier = 3,
+        Tank = 4,
+    }
+
+    /// <summary>
+    /// 生命值变更时间包装类
+    /// </summary>
+    public class HealthChangePacker
+    {
+        /// <summary>
+        /// 单位
+        /// </summary>
+        public GameObject GameObj { get; private set; }
+
+        /// <summary>
+        /// 总血量
+        /// </summary>
+        public float TotalHp { get; private set; }
+
+        /// <summary>
+        /// 当前血量
+        /// </summary>
+        public float CurrentHp { get; private set; }
+
+        /// <summary>
+        /// 变更量
+        /// </summary>
+        public float ChangeValue { get; private set; }
+
+        /// <summary>
+        /// 生命值变更类型
+        /// </summary>
+        public HurtType HurtType { get; private set; }
+
+        /// <summary>
+        /// 单位类型
+        /// </summary>
+        public ObjectID.ObjectType ObjType { get; private set; }
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="gameObj"></param>
+        /// <param name="totalHp"></param>
+        /// <param name="currentHp"></param>
+        /// <param name="changeValue"></param>
+        /// <param name="hurtType"></param>
+        /// <param name="objType"></param>
+        public HealthChangePacker(GameObject gameObj, float totalHp, float currentHp, float changeValue,
+            HurtType hurtType, ObjectID.ObjectType objType)
+        {
+            GameObj = gameObj;
+            TotalHp = totalHp;
+            CurrentHp = currentHp;
+            ChangeValue = changeValue;
+            HurtType = hurtType;
+            ObjType = objType;
+        }
+    }
 }
 
 
@@ -289,6 +563,7 @@ public class FightDataStatistical
     /// </summary>
     /// <returns></returns>
     public int GetCostData(int camp, 
+        int armyId = -1,
         int armyType = -1, 
         int generalType = -1,
         int isAntiAir = -1,
@@ -302,6 +577,10 @@ public class FightDataStatistical
         var result = 0;
 
         var list = costDataList.Where(cost => cost.Camp == camp);
+        if (armyId >= 0)
+        {
+            list = list.Where(cost => cost.ArmyId == armyId);
+        }
         // 查询种族
         if (armyType >=  0)
         {

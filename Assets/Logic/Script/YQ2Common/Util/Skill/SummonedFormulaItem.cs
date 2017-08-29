@@ -52,11 +52,11 @@ public class SummonedFormulaItem : AbstractFormulaItem
         // 是否等待完成,特效Key,目标位置,持续时间
         // 如果该项值是以%开头的则作为替换数据
 
-        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        var targetPos = GetDataOrReplace<int>("TargetPos", array, 1, ReplaceDic);
-        var unitType = GetDataOrReplace<int>("UnitType", array, 2, ReplaceDic);
-        var unitID = GetDataOrReplace<int>("UnitID", array, 3, ReplaceDic);
-        var level = GetDataOrReplace<int>("Level", array, 4, ReplaceDic);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        var targetPos = GetDataOrReplace<int>("TargetPos", array, 1);
+        var unitType = GetDataOrReplace<int>("UnitType", array, 2);
+        var unitID = GetDataOrReplace<int>("UnitID", array, 3);
+        var level = GetDataOrReplace<int>("Level", array, 4);
 
 
         FormulaType = formulaType;

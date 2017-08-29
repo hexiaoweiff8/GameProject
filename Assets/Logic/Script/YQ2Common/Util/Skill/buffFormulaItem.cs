@@ -40,9 +40,9 @@ public class BuffFormulaItem : AbstractFormulaItem
             throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
         }
 
-        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        var buffNum = GetDataOrReplace<int>("BuffNum", array, 1, ReplaceDic);
-        var buffTarget = GetDataOrReplace<int>("BuffTarget", array, 2, ReplaceDic);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        var buffNum = GetDataOrReplace<int>("BuffNum", array, 1);
+        var buffTarget = GetDataOrReplace<int>("BuffTarget", array, 2);
 
         FormulaType = formulaType;
         BuffNum = buffNum;
@@ -87,8 +87,6 @@ public class BuffFormulaItem : AbstractFormulaItem
         var targetDisplayOwner = myBuffTarget == 0 ? paramsPacker.ReleaseMember : paramsPacker.ReceiverMenber;
         // 创建新buff
         var buffInfo = BuffManager.Single.CreateBuffInfo(myBuffNum, targetDisplayOwner, paramsPacker.ReleaseMember);
-
-        // 写入数据
 
 
         // buff 的释放者

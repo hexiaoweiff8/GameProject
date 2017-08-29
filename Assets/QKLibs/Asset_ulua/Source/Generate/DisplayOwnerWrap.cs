@@ -13,7 +13,6 @@ public class DisplayOwnerWrap
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("GameObj", get_GameObj, set_GameObj);
 		L.RegVar("ClusterData", get_ClusterData, set_ClusterData);
-		L.RegVar("MFAModelRender", get_MFAModelRender, set_MFAModelRender);
 		L.RegVar("RanderControl", get_RanderControl, set_RanderControl);
 		L.EndClass();
 	}
@@ -33,22 +32,12 @@ public class DisplayOwnerWrap
 				ToLua.PushObject(L, obj);
 				return 1;
 			}
-			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.GameObject), typeof(PositionObject), typeof(MFAModelRender)))
+			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.GameObject), typeof(PositionObject), typeof(RanderControl)))
 			{
 				UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 1, typeof(UnityEngine.GameObject));
 				PositionObject arg1 = (PositionObject)ToLua.CheckUnityObject(L, 2, typeof(PositionObject));
-				MFAModelRender arg2 = (MFAModelRender)ToLua.CheckUnityObject(L, 3, typeof(MFAModelRender));
+				RanderControl arg2 = (RanderControl)ToLua.CheckUnityObject(L, 3, typeof(RanderControl));
 				DisplayOwner obj = new DisplayOwner(arg0, arg1, arg2);
-				ToLua.PushObject(L, obj);
-				return 1;
-			}
-			else if (count == 4 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.GameObject), typeof(PositionObject), typeof(MFAModelRender), typeof(RanderControl)))
-			{
-				UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 1, typeof(UnityEngine.GameObject));
-				PositionObject arg1 = (PositionObject)ToLua.CheckUnityObject(L, 2, typeof(PositionObject));
-				MFAModelRender arg2 = (MFAModelRender)ToLua.CheckUnityObject(L, 3, typeof(MFAModelRender));
-				RanderControl arg3 = (RanderControl)ToLua.CheckUnityObject(L, 4, typeof(RanderControl));
-				DisplayOwner obj = new DisplayOwner(arg0, arg1, arg2, arg3);
 				ToLua.PushObject(L, obj);
 				return 1;
 			}
@@ -134,25 +123,6 @@ public class DisplayOwnerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_MFAModelRender(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			DisplayOwner obj = (DisplayOwner)o;
-			MFAModelRender ret = obj.MFAModelRender;
-			ToLua.Push(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MFAModelRender on a nil value" : e.Message);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_RanderControl(IntPtr L)
 	{
 		object o = null;
@@ -206,25 +176,6 @@ public class DisplayOwnerWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index ClusterData on a nil value" : e.Message);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_MFAModelRender(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			DisplayOwner obj = (DisplayOwner)o;
-			MFAModelRender arg0 = (MFAModelRender)ToLua.CheckUnityObject(L, 2, typeof(MFAModelRender));
-			obj.MFAModelRender = arg0;
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index MFAModelRender on a nil value" : e.Message);
 		}
 	}
 

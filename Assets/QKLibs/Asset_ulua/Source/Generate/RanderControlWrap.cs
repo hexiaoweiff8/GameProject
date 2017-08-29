@@ -22,7 +22,7 @@ public class RanderControlWrap
 		L.RegVar("Head", get_Head, set_Head);
 		L.RegVar("isEnemy", get_isEnemy, set_isEnemy);
 		L.RegVar("isSetShader", get_isSetShader, set_isSetShader);
-		L.RegVar("ModelRander", get_ModelRander, set_ModelRander);
+		L.RegVar("PosObj", get_PosObj, set_PosObj);
 		L.EndClass();
 	}
 
@@ -273,7 +273,7 @@ public class RanderControlWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_ModelRander(IntPtr L)
+	static int get_PosObj(IntPtr L)
 	{
 		object o = null;
 
@@ -281,13 +281,13 @@ public class RanderControlWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			RanderControl obj = (RanderControl)o;
-			MFAModelRender ret = obj.ModelRander;
+			PositionObject ret = obj.PosObj;
 			ToLua.Push(L, ret);
 			return 1;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index ModelRander on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index PosObj on a nil value" : e.Message);
 		}
 	}
 
@@ -406,7 +406,7 @@ public class RanderControlWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_ModelRander(IntPtr L)
+	static int set_PosObj(IntPtr L)
 	{
 		object o = null;
 
@@ -414,13 +414,13 @@ public class RanderControlWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			RanderControl obj = (RanderControl)o;
-			MFAModelRender arg0 = (MFAModelRender)ToLua.CheckUnityObject(L, 2, typeof(MFAModelRender));
-			obj.ModelRander = arg0;
+			PositionObject arg0 = (PositionObject)ToLua.CheckUnityObject(L, 2, typeof(PositionObject));
+			obj.PosObj = arg0;
 			return 0;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index ModelRander on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index PosObj on a nil value" : e.Message);
 		}
 	}
 }

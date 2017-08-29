@@ -11,6 +11,8 @@ using UnityEngine;
 /// </summary>
 public abstract class BaseTriggerScriptEditor : EditorWindow
 {
+
+    public static int WinType = -1;
     /// <summary>
     /// 单例
     /// </summary>
@@ -44,7 +46,7 @@ public abstract class BaseTriggerScriptEditor : EditorWindow
     /// <summary>
     /// 数据类型
     /// </summary>
-    protected DataType DataType = DataType.LevelData;
+    protected int MyDataType = 0;
 
 
     protected BaseScriptEditor scriptEditor;
@@ -82,13 +84,13 @@ public abstract class BaseTriggerScriptEditor : EditorWindow
     /// <param name="scriptEditor"></param>
     /// <param name="dataType"></param>
     /// <param name="pos"></param> 
-    public static void ShowDataScriptWindow(BaseScriptEditor scriptEditor, DataType dataType, Rect pos)
+    public static void ShowDataScriptWindow(BaseScriptEditor scriptEditor, int dataType, Rect pos)
     {
         var window = TriggerScriptEditor;
         window.InitParams();
         window.scriptEditor = scriptEditor;
         window.ParamsType = 2;
-        window.DataType = dataType;
+        window.MyDataType = dataType;
         window.Params = new string[DataParamTitles[(int)dataType].Count];
 
         float width = 500;
@@ -113,7 +115,18 @@ public abstract class BaseTriggerScriptEditor : EditorWindow
 
     public static void GetIns()
     {
-        TriggerScriptEditor = new BuffTriggerScriptEditor();
+        switch (WinType)
+        {
+            case 1:
+                TriggerScriptEditor = new SkillTriggerScriptEditor();
+                break;
+            case 2:
+                TriggerScriptEditor = new BuffTriggerScriptEditor();
+                break;
+            case 3:
+                TriggerScriptEditor = new RemainTriggerScriptEditor();
+                break;
+        }
     }
 
 }
@@ -143,49 +156,19 @@ public enum TriggerType
     Skill = 12,
     If = 13,
     ResistDemage = 14,
-    Remain = 15,        // 挂载光环
-    TargetPointSelector = 16, // 目标点选择
-}
-
-/// <summary>
-/// 技能数据类型
-/// </summary>
-public enum DataType
-{
-    LevelData = 0,      // 技能等级数据
-    CDTime = 1,         // 技能CD时间
-    CDGroup = 2,        // 技能CD组
-    ReleaseTime = 3,    // 技能可释放次数
-    Description = 4,    // 技能描述
-    Icon = 5,           // 技能Icon
-    TriggerLevel1 = 6,
-    TriggerLevel2 = 7,
-    TickTime = 8,
-    ChangeData = 9,
-
-
-    // -----------buff特有---------
-    BuffTime = 10,
-    BuffType = 11,
-    DetachTriggerLevel1 = 12,
-    DetachTriggerLevel2 = 13,
-    BuffLevel = 14,
-    BuffGroup = 15,
-    IsBeneficial = 16,
-    DetachQualified = 17,
-    IsDeadDisappear = 18,
-    IsNotLethal = 19,
-
-    // ------------Remain特有----------
-    Range = 10,              // 作用范围
-    DuringTime = 11,         // 作用总时间
-    IsFollow = 12,           // 是否跟随释放者
-    ActionCamp = 13,         // 作用阵营
-    CouldActionOnAir = 14,   // 是否可以作用到空中单位
-    CouldActionOnSurface = 15,   // 是否可以作用到地面单位
-    CouldActionOnBuilding = 16,   // 是否可以作用到建筑单位
-
-
-    // -----------Skill特有------------
-    IsActive = 10,           // 是否为主动技能
+    Remain = 15,                // 挂载光环
+    TargetPointSelector = 16,   // 目标点选择
+    CleanBuff = 17,             // 清除buff
+    CleanTarget = 18,           // 清除当前目标
+    Death = 19,                 // 秒杀效果
+    For = 20,                   // 循环
+    ImmuneDemage = 21,          // 免疫伤害
+    ImmuneDeath = 22,           // 免疫致死伤害
+    LifeDrain = 23,             // 吸血
+    Liner = 24,                 // 连线特效
+    ShareDamage = 25,           // 分担伤害
+    SubCD = 26,                 // 减CD
+    Summoned = 27,              // 召唤
+    UpperLimit = 28,            // 伤害上限
+    DelBuff = 29,               // 删除buff
 }

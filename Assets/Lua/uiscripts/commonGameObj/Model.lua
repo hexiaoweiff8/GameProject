@@ -44,14 +44,8 @@ end
 ---创建一个UI模型
 ---
 function Model:CreateUIModel(cardId)
-    local ArmyID = sdata_armycardbase_data:GetFieldV("ArmyID", cardId)
-    local paramTab = CreateActorParam(sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_CmType, ArmyID),
-    sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_ColorMat, ArmyID) == 1,
-    sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_FlagColorIdx, ArmyID),
-    sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_MeshPackName, ArmyID),
-    sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_TexturePackName, ArmyID),
-    sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_IsHero, ArmyID) == 1, tonumber(ArmyID .. "001"), cardId)
-    local model = DP_FightPrefabManage.InstantiateAvatar(paramTab)
+    local packName, prefrabName = cardUtil:GetCreateModelParams(cardId,cardModel:getCardLv(cardId))
+    local model = GameObjectExtension.InstantiateModelFromPacket(packName, prefrabName, nil).gameObject
     ---关闭自动播放动画
     model:GetComponent("Animation").wrapMode = UnityEngine.WrapMode.Loop
     model:GetComponent("Animation"):Stop()
@@ -88,22 +82,17 @@ function Model:CreateFightUnit(cardId,ObjectType)
         ObjectType = 3
     end
     local ArmyID = sdata_armycardbase_data:GetFieldV("ArmyID", cardId)
-    local paramTab = CreateActorParam(sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_CmType, ArmyID),
-    sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_ColorMat, ArmyID) == 1,
-    sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_FlagColorIdx, ArmyID),
-    sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_MeshPackName, ArmyID),
-    sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_TexturePackName, ArmyID),
-    sdata_soldierRender_data:GetV(sdata_soldierRender_data.I_IsHero, ArmyID) == 1, tonumber(ArmyID .. "001"), cardId)
-
+    local paramTab = CreateActorParam.New(tonumber(ArmyID .. "001"))
     local unit = FightUnitFactory.CreateUnit(ObjectType, paramTab)
     local tempMod = unit.GameObj.transform
-    tempMod:GetComponent(typeof(MFAModelRender)).speedScale = 0
-    tempMod:GetComponent(typeof(UnityEngine.MeshRenderer)).material.shader = PacketManage.Single:GetPacket("rom_share"):Load("Transparent_Colored_Gray.shader", FileSystem.RES_LOCATION.auto)
 
     tempMod:GetComponent("Animation").enabled = false
     tempMod:GetComponent("RanderControl").enabled = false
     tempMod:GetComponent("ClusterData").enabled = false
     tempMod:GetComponent("TriggerRunner").enabled = false
+
+    ShadowObj.ObjAddShadow(tempMod)
+
 
     return unit
 end
@@ -179,9 +168,10 @@ function Model:SetTransparent(model,alpha)
     for i = 1, model.transform.childCount do
         local SkinnedMeshRenderer = model.transform:GetChild(i-1):GetComponent("SkinnedMeshRenderer")
         if SkinnedMeshRenderer then
-            SkinnedMeshRenderer.material.shader = UnityEngine.Shader.Find("Standard")
-            SkinnedMeshRenderer.material.color = UnityEngine.Color.New(1,1,1,alpha)
-            self:SetMaterialRenderingMode (SkinnedMeshRenderer.material,RenderingMode.Transparent)
+            SkinnedMeshRenderer.material.shader = UnityEngine.Shader.Find("Legacy Shaders/Transparent/Diffuse")
+            --SkinnedMeshRenderer.material.shader = UnityEngine.Shader.Find("Standard")
+            SkinnedMeshRenderer.material.color = UnityEngine.Color.New(0.7,0.7,0.7,alpha)
+            --self:SetMaterialRenderingMode (SkinnedMeshRenderer.material,RenderingMode.Transparent)
         end
     end
 end
@@ -190,9 +180,10 @@ function Model:SetOpaque(model)
     for i = 1, model.transform.childCount do
         local SkinnedMeshRenderer = model.transform:GetChild(i-1):GetComponent("SkinnedMeshRenderer")
         if SkinnedMeshRenderer then
-            SkinnedMeshRenderer.material.shader = UnityEngine.Shader.Find("Standard")
-            SkinnedMeshRenderer.material.color = UnityEngine.Color.New(1,1,1,1)
-            self:SetMaterialRenderingMode (SkinnedMeshRenderer.material,RenderingMode.Opaque)
+            SkinnedMeshRenderer.material.shader = UnityEngine.Shader.Find("Legacy Shaders/Self-Illumin/Diffuse")
+            --SkinnedMeshRenderer.material.shader = UnityEngine.Shader.Find("Standard")
+            SkinnedMeshRenderer.material.color = UnityEngine.Color.New(0.7,0.7,0.7,1)
+            --self:SetMaterialRenderingMode (SkinnedMeshRenderer.material,RenderingMode.Opaque)
         end
     end
 end

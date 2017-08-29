@@ -4,9 +4,11 @@
 ---
 
 local skill_controller = {}
-local _view = require("uiscripts/fight/skill/skill_view")
-local _data = require("uiscripts/fight/skill/skill_model")
+local _view
+local _data
 function skill_controller:Init(view)
+    _view = require("uiscripts/fight/skill/skill_view")
+    _data = require("uiscripts/fight/skill/skill_model")
     _view:initView(view)
     local i = 100
     for var = 1, Const.FIGHT_SKILLNUM do
@@ -21,4 +23,11 @@ function skill_controller:Init(view)
 
 end
 
+
+function skill_controller:OnDestroyDone()
+    _view = nil
+    _data = nil
+    Memory.free("uiscripts/fight/skill/skill_view")
+    Memory.free("uiscripts/fight/skill/skill_model")
+end
 return skill_controller

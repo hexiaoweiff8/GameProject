@@ -45,12 +45,12 @@ public class Soldier_Zhuiji_State : SoldierFSMState
         targetPos = fsm.EnemyTarget.ClusterData.transform.position;
 
         // 切换动作
-        var myself = fsm.Display.RanderControl;
-        myself.ModelRander.SetClip("run".GetHashCode());
+        //var myself = fsm.Display.RanderControl;
+        //myself.ModelRander.SetClip("run".GetHashCode());
 
         ReFindPath(fsm);
         // 单位转向目标
-        if (clusterData != null)
+        if (clusterData != null && fsm.EnemyTarget != null && fsm.EnemyTarget.ClusterData != null)
         {
             clusterData.RotateToWithoutYAxis(fsm.EnemyTarget.ClusterData.transform.position);
         }
@@ -105,7 +105,7 @@ public class Soldier_Zhuiji_State : SoldierFSMState
         var targetClusterData = fsm.EnemyTarget.ClusterData;
         // 判断目标点与当前目标的距离
         var distance = (Utils.WithOutY(targetPos) - Utils.WithOutY(targetClusterData.transform.position)).magnitude;
-        var minDistance = clusterData.Diameter*ClusterManager.Single.UnitWidth*0.5f +
+        var minDistance = clusterData.Diameter * ClusterManager.Single.UnitWidth * 0.5f +
                           targetClusterData.Diameter * ClusterManager.Single.UnitWidth * 0.5f;
 
         return distance > minDistance;
@@ -120,7 +120,18 @@ public class Soldier_Zhuiji_State : SoldierFSMState
         //Debug.Log("");
         // 重新寻路设置目标点
         // 当前地图数据
-        var mapData = LoadMap.Single.GetMapData();
+        int[][] mapData = null;
+        // 当前地图数据
+        switch (clusterData.AllData.MemberData.GeneralType)
+        {
+            case Utils.GeneralTypeAir:
+                mapData = LoadMap.Single.GetAirMapData();
+                break;
+            case Utils.GeneralTypeSurface:
+                mapData = LoadMap.Single.GetSurfaceMapData();
+                break;
+
+        }
         // 当前单位位置映射
         var startPos = Utils.PositionToNum(LoadMap.Single.MapPlane.transform.position, clusterData.transform.position, ClusterManager.Single.UnitWidth, ClusterManager.Single.MapWidth, ClusterManager.Single.MapHeight);
         // 当前目标位置映射
@@ -176,7 +187,8 @@ public class Soldier_Zhuiji_State : SoldierFSMState
         if (list != null && list.Count > 0)
         {
             var closeObj = list[0];
-            var closeDistance = GetDistance(clusterData, closeObj);
+            if (closeObj == null) { }
+            var closeDistance = float.MaxValue;
             foreach (var item in list)
             {
                 if (!(item is ClusterData))
@@ -192,6 +204,7 @@ public class Soldier_Zhuiji_State : SoldierFSMState
             }
             // 有变更
             if (fsm.EnemyTarget == null ||
+                fsm.EnemyTarget.ClusterData == null ||
                 !closeObj.AllData.MemberData.ObjID.Equals(fsm.EnemyTarget.ClusterData.AllData.MemberData.ObjID))
             {
                 //Debug.Log("变更目标.");
@@ -209,7 +222,7 @@ public class Soldier_Zhuiji_State : SoldierFSMState
     /// <returns></returns>
     private float GetDistance(PositionObject obj1, PositionObject obj2)
     {
-        var result = 0f;
+        var result = float.MaxValue;
         if (obj1 != null && obj2 != null)
         {
             result = (new Vector2(obj1.X, obj1.Y) - new Vector2(obj2.X, obj2.Y)).magnitude;

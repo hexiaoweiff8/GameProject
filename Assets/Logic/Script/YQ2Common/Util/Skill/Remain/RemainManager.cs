@@ -100,15 +100,15 @@ public class RemainManager
     }
 
 
-
     /// <summary>
     /// 加载Remain类
     /// 如果缓存中没有就从文件照片那个加载
     /// </summary>
     /// <param name="remainId">RemainID</param>
     /// <param name="release">Remain的释放者</param>
+    /// <param name="level">Remain等级</param>
     /// <returns></returns>
-    public RemainInfo CreateRemainInfo(int remainId, DisplayOwner release)
+    public RemainInfo CreateRemainInfo(int remainId, DisplayOwner release, int level = 1)
     {
         RemainInfo result = null;
 
@@ -123,24 +123,13 @@ public class RemainManager
             }
             else
             {
-                // TODO 加载文件从包中加载 检测文件是否存在
-                var file =
-                    new FileInfo(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "RemainScript" +
-                                 remainId + ".txt");
-                if (file.Exists)
+                // 加载文件内容
+                var buffTxt = GetRemainScript(remainId, SkillManager.Single.RunType);
+                if (!string.IsNullOrEmpty(buffTxt))
                 {
-                    // 加载文件内容
-                    var buffTxt = Utils.LoadFileInfo(file);
-                    if (!string.IsNullOrEmpty(buffTxt))
-                    {
-                        result = FormulaConstructor.RemainConstructor(buffTxt);
-                        // 将其放入缓存
-                        AddRemainInfo(result);
-                    }
-                }
-                else
-                {
-                    Debug.LogError("ID为:" + remainId + "的buff不存在.");
+                    result = FormulaConstructor.RemainConstructor(buffTxt);
+                    // 将其放入缓存
+                    AddRemainInfo(result);
                 }
             }
         }
@@ -151,12 +140,42 @@ public class RemainManager
         }
 
         result = CopyRemainInfo(result);
+        result.ReplaceData(level);
         // 将实现放入实现列表
         remainInstanceDic.Add(result.AddtionId, result);
         result.ReleaseMember = release;
         return result;
     }
 
+
+    /// <summary>
+    /// 获取技能脚本
+    /// </summary>
+    /// <param name="remainNum"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public string GetRemainScript(int remainNum, int type = 0)
+    {
+        var result = "";
+        switch (type)
+        {
+            case 0:
+                result = PacketManage.Single.GetPacket(SkillManager.SkillPacketName).LoadString("RemainScript" + remainNum + ".txt");
+                break;
+            case 1:
+                var file =
+                    new FileInfo(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "RemainScript" +
+                                 remainNum + ".txt");
+                if (file.Exists)
+                {
+                    // 加载文件内容
+                    result = Utils.LoadFileInfo(file);
+                }
+                break;
+        }
+
+        return result;
+    }
 
 
 
@@ -182,7 +201,8 @@ public class RemainManager
             HasAttachFormula = remainInfo.HasAttachFormula,
             HasDetachFormula = remainInfo.HasDetachFormula,
             IsFollow = remainInfo.IsFollow,
-            Range = remainInfo.Range
+            Range = remainInfo.Range,
+            ReplaceSourceDataDic = remainInfo.ReplaceSourceDataDic
         };
         result.AddActionFormulaItem(remainInfo.GetActionFormulaItem());
         result.AddAttachFormulaItem(remainInfo.GetAttachFormulaItem());

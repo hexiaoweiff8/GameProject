@@ -52,6 +52,11 @@ public class SkillInfo : SkillBase
     public string Icon { get; set; }
 
     /// <summary>
+    /// 技能名称
+    /// </summary>
+    public string SkillName { get; set; }
+
+    /// <summary>
     /// 技能附加行为
     /// </summary>
     private List<IFormulaItem> subFormulaItems = new List<IFormulaItem>(); 

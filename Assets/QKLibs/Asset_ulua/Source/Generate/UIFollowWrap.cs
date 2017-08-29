@@ -7,6 +7,7 @@ public class UIFollowWrap
 	public static void Register(LuaState L)
 	{
 		L.BeginClass(typeof(UIFollow), typeof(UnityEngine.MonoBehaviour));
+		L.RegFunction("Stop", Stop);
 		L.RegFunction("ResetPosition", ResetPosition);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
@@ -16,6 +17,22 @@ public class UIFollowWrap
 		L.RegVar("smoothTime", get_smoothTime, set_smoothTime);
 		L.RegVar("Target", get_Target, set_Target);
 		L.EndClass();
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Stop(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIFollow obj = (UIFollow)ToLua.CheckObject(L, 1, typeof(UIFollow));
+			obj.Stop();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]

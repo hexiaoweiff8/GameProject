@@ -1,5 +1,5 @@
 local class = require("common/middleclass")
-local tabsControl = class("tabsControl")
+TabsControl = class("TabsControl")
 
 local tabButtonTable = {}
 local tabPanelTabel = {}
@@ -11,7 +11,7 @@ local currentTabIndex = 0
     若需要切换显示，tabButtons与tabPanels需数量相等，一一对应
     若不需要切换显示，tabPanels传入nil即可
 ]]
-function tabsControl:initialize( tabButtons, tabPanels, func )
+function TabsControl:initialize( tabButtons, tabPanels, func )
     -- 按钮不存在，结束运行
     if #tabButtons == 0 then 
         return 
@@ -48,7 +48,7 @@ function tabsControl:initialize( tabButtons, tabPanels, func )
 end
 
 --切换到相应的界面，
-function tabsControl:changeTabTo(tableIndex)
+function TabsControl:changeTabTo(tableIndex)
 
     if tableIndex == currentTabIndex then 
         return 
@@ -78,9 +78,7 @@ end
 
 
 --外部获取当前显示的Index
-function tabsControl:getCurrentPanelIndex()
+function TabsControl:getCurrentPanelIndex()
     -- body
     return currentTabIndex
 end
-
-return tabsControl

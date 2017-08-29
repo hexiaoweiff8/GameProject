@@ -51,8 +51,8 @@ end
 
 function SkillItem:refresh(skillId, skillLv, starLv, index)
 
-    self.skillItem_imgSp.transform:GetComponent("UISprite").spriteName = skillUtil:getskillIconByID(skillId)
-    self.skillItem_name_Lab.transform:GetComponent("UILabel").text = skillUtil:getskillNameByID(skillId)   --解锁技能名
+    self.skillItem_imgSp.transform:GetComponent("UISprite").spriteName = skillUtil:getSkillIcon(skillId)
+    self.skillItem_name_Lab.transform:GetComponent("UILabel").text = skillUtil:getSkillName(skillId)   --解锁技能名
     
     --通过红点的状态判断技能图标的显示状态
     if not self.skillItem_redDot  then 

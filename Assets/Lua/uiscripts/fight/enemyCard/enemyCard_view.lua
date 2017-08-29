@@ -16,6 +16,17 @@ function enemyCard_view:initView(view)
     self.PTZCameraTf = GameObject.Find("/PTZCamera").transform
     -- 相机跟随UIFollow
     self.UIFollow = self.PTZCameraTf:GetComponent(typeof(UIFollow))
+
+    ---测试UI
+
+    self.AITEST = view.transform:Find("test").gameObject
+    self.AIINFO = view.transform:Find("test/tip/scrollView/AIINFO").gameObject
+    self.PLAYERINFO = view.transform:Find("test/tip/scrollView/PLAYERINFO").gameObject
+    self.console = view.transform:Find("test/console/scrollView/cons").gameObject
+    self.result = view.transform:Find("test/result/scrollView/cons").gameObject
+
+
+    self.AITEST:SetActive(false)
 end
 
 return enemyCard_view

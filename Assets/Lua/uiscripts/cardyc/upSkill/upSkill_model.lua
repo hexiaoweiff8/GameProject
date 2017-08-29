@@ -9,7 +9,7 @@ upSkill_model.skill_ID_Table = {}
 --初始化当前卡牌技能ID表
 function upSkill_model:init_skillIDTable()
     for i=1,5 do
-        local skillid = skillUtil:getSkillIDByCard(self.cardId, self.cardLv, i)
+        local skillid = cardUtil:getSkillID(self.cardId, i)
         self.skill_ID_Table[i] = skillid
     end
 end

@@ -51,32 +51,32 @@ public class DP_FightPrefabManage
         //scene_mainPacket.Load("spotlight") as GameObject
         Object3D_Prefabs["spotlight"] = PacketManage.Single.GetPacket("spotlight").Load("spotlight") as GameObject;
     }
-    /// <summary>
-    /// 创建模型 沿用重构以前的名字 为了兼容lua里现成的调用
-    /// </summary>
-    /// <param name="param"></param>
-    /// <returns></returns>
-    public static GameObject InstantiateAvatar(CreateActorParam param)
-    {
+    ///// <summary>
+    ///// 创建模型 沿用重构以前的名字 为了兼容lua里现成的调用
+    ///// </summary>
+    ///// <param name="param"></param>
+    ///// <returns></returns>
+    //public static GameObject InstantiateAvatar(CreateActorParam param)
+    //{
         
-        var config = SData_armybase_c.Single.GetDataOfID(param.SoldierID);
-        var modelname = config.Prefab + "@model";
-        GameObject obj = GameObjectExtension.InstantiateFromPacket(config.Pack, modelname, null);
-        var render = obj.AddComponent<MFAModelRender>();
-        render.MeshPackName = param.MeshPackName;//包名
-        render.TexturePackName = param.TexturePackName;
+    //    var config = SData_armybase_c.Single.GetDataOfID(param.SoldierID);
+    //    var modelname = config.Prefab + "@model";
+    //    GameObject obj = GameObjectExtension.InstantiateFromPacket(config.Pack, modelname, null);
+    //    //var render = obj.AddComponent<MFAModelRender>();
+    //    //render.MeshPackName = param.MeshPackName;//包名
+    //    //render.TexturePackName = config.Texture;
 
-        GameObject head = new GameObject();
-        head.transform.parent = obj.transform;
-        head.name = "head";
-        head.transform.position = new Vector3(0,22,0);
-        head.transform.localScale = Vector3.one;
+    //    //GameObject head = new GameObject();
+    //    //head.transform.parent = obj.transform;
+    //    //head.name = "head";
+    //    //head.transform.position = new Vector3(0,22,0);
+    //    //head.transform.localScale = Vector3.one;
 
-        //modelRender.flagColor = ColorTab[FlagColorIdx];//标志色
-        //GameObject obj = GameObjectExtension.InstantiateFromPacket("jidi", "zhujidi_model", null);
+    //    //modelRender.flagColor = ColorTab[FlagColorIdx];//标志色
+    //    //GameObject obj = GameObjectExtension.InstantiateFromPacket("jidi", "zhujidi_model", null);
  
-        return obj;
-    }
+    //    return obj;
+    //}
 
     public static Material CreateMat(
         //ModleMaskColor maskColor,

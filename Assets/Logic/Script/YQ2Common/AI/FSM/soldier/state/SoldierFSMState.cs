@@ -112,10 +112,11 @@ public abstract class SoldierFSMState
             }
         }
     }
+
     /// <summary>
     /// 模型切换动作 往往配合状态切换
     /// </summary>
-    public void SwitchAnim(SoldierFSMSystem fsm, string aniName,WrapMode mode)
+    public void SwitchAnim(SoldierFSMSystem fsm, string aniName, WrapMode mode)
     {
         var myself = fsm.Display.RanderControl;
         myself.PlayAni(aniName, mode);

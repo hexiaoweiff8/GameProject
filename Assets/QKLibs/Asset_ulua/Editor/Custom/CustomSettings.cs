@@ -30,6 +30,7 @@ public static class CustomSettings
         typeof(UnityEngine.RenderSettings),
         typeof(UnityEngine.QualitySettings),
         typeof(UnityEngine.GL),
+        typeof(UnityEngine.SystemInfo),
         typeof(LuaHelper),
     };
 
@@ -58,7 +59,6 @@ public static class CustomSettings
         //-------------------------------------------------------------------        
                 
         _GT(typeof (Debugger)).SetNameSpace(null),
-
 #if true
 //#if USING_DOTWEENING
         _GT(typeof (DG.Tweening.DOTween)),
@@ -209,7 +209,9 @@ public static class CustomSettings
         _GT(typeof (UIGrid)),
         _GT(typeof (UITable)),
         _GT(typeof (UIInput)),
+        _GT(typeof (UIInput.InputType)),
         _GT(typeof (UIToggle)),
+        _GT(typeof (UIPopupList)),
         _GT(typeof (UITexture)),
         _GT(typeof (UIScrollView)),
         _GT(typeof (UICamera)),
@@ -268,9 +270,19 @@ public static class CustomSettings
         _GT(typeof (UI_Equip_Item)),
         _GT(typeof (UIDragScrollView)),
         _GT(typeof (UIToast)),
+        _GT(typeof (UIToast.ShowType)),
         _GT(typeof (SceneChanger)),
         _GT(typeof (FightManager)),
         _GT(typeof (MapManager.MapDataParamsPacker)),
+        _GT(typeof (UIPopupListExtended)),
+        //_GT(typeof (OnDeleteItem)),
+        //_GT(typeof (OnLoadIcon)),
+        _GT(typeof (LoadMap)),
+        _GT(typeof (SkillManager)),
+        _GT(typeof (SkillInfo)),
+        _GT(typeof (AbilityBase)),
+        _GT(typeof (FightDataStatistical)),
+
 
         #region 姚毅添加
         _GT(typeof(ChatBubbleAni)),
@@ -281,9 +293,15 @@ public static class CustomSettings
         _GT(typeof(MailItem)),
         _GT(typeof(MailLoopGrid)),
         _GT(typeof(WordFilter)),//敏感词过滤工具
+        _GT(typeof(ShadowObj)),
         #endregion
         _GT(typeof(UnityEngine.SceneManagement.SceneManager)),
         _GT(typeof(UnityEngine.SceneManagement.LoadSceneMode)),
+        _GT(typeof(UnityEngine.PlayerPrefs)),
+        _GT(typeof(UnityEngine.SystemInfo)),
+
+        _GT(typeof(CameraController)),
+        _GT(typeof(FightParameter)),
     };
 
 

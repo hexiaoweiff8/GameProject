@@ -16,18 +16,20 @@ public class TargetPointSelectorFormulaItem : AbstractFormulaItem
     /// 2: 相对于目标点找目标点(找了一次相对于改点再找)
     /// 3: 相对两人的位置(施法者向接受者的方向, 角度无效)
     /// 4: 相对两人的位置(接受者向示范者的方向, 角度无效)
+    /// 5: 我方基地位置
+    /// 6: 敌方基地位置
     /// </summary>
-    public int RelativeTo = 0;
+    public int RelativeTo { get; private set; }
 
     /// <summary>
     /// 距离
     /// </summary>
-    public float Distance = 0;
+    public FormulaItemValueComputer Distance { get; private set; }
 
     /// <summary>
     /// 角度(- +180度)
     /// </summary>
-    public float Angle = 0;
+    public float Angle { get; private set; }
 
 
 
@@ -50,10 +52,10 @@ public class TargetPointSelectorFormulaItem : AbstractFormulaItem
             throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
         }
 
-        FormulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        RelativeTo = GetDataOrReplace<int>("RelativeTo", array, 1, ReplaceDic);
-        Distance = GetDataOrReplace<float>("Distance", array, 2, ReplaceDic);
-        Angle = GetDataOrReplace<float>("Angle", array, 3, ReplaceDic);
+        FormulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        RelativeTo = GetDataOrReplace<int>("RelativeTo", array, 1);
+        Distance = GetDataOrReplace<FormulaItemValueComputer>("Distance", array, 2);
+        Angle = GetDataOrReplace<float>("Angle", array, 3);
 
     }
 
@@ -77,7 +79,7 @@ public class TargetPointSelectorFormulaItem : AbstractFormulaItem
         // 数据本地化
         var myFormulaType = FormulaType;
         var myRelativeTo = RelativeTo;
-        var myDistance = Distance;
+        var myDistance = Distance.GetValue();
         var myAngle = Angle;
 
         // 自己位置
@@ -179,6 +181,33 @@ public class TargetPointSelectorFormulaItem : AbstractFormulaItem
                     posY = newPos.y;
                 }
                     break;
+                case (int)RelativeToType.MyBase:
+                    {
+                        // 计算目标到我这个方向的距离
+                        var myBasePos = Utils.V3ToV2WithouY(FightManager.Single.GetPos(Utils.MyCamp, FightManager.MemberType.Base));
+                        var dir = myBasePos - targetPos;
+                        if (dir == Vector2.zero)
+                        {
+                            dir = Vector2.up;
+                        }
+                        var newPos = mySelfPos + dir.normalized * myDistance;
+                        posX = newPos.x;
+                        posY = newPos.y;
+                    }
+                    break;
+                case (int)RelativeToType.EnemyBase:
+                    {
+                        // 计算目标到我这个方向的距离
+                        var dir = mySelfPos - targetPos;
+                        if (dir == Vector2.zero)
+                        {
+                            dir = Vector2.up;
+                        }
+                        var newPos = mySelfPos + dir.normalized * myDistance;
+                        posX = newPos.x;
+                        posY = newPos.y;
+                    }
+                    break;
             }
 
             // 保存位置点
@@ -191,21 +220,23 @@ public class TargetPointSelectorFormulaItem : AbstractFormulaItem
 
         return result;
     }
-}
 
-/// <summary>
-/// 相对类型
-/// 0: 相对于自己找目标点(自己)
-/// 1: 相对于目标找目标点(目标单位)
-/// 2: 相对于目标点找目标点(找了一次相对于改点再找)
-/// 3: 相对两人的位置(施法者向接受者的方向, 角度无效)
-/// 4: 相对两人的位置(接受者向示范者的方向, 角度无效)
-/// </summary>
-public enum RelativeToType
-{
-    MySelf = 0,
-    Target = 1,
-    TargetPoint = 2,
-    MeToTarget = 3,
-    TargetToMe =4
+    /// <summary>
+    /// 相对类型
+    /// 0: 相对于自己找目标点(自己)
+    /// 1: 相对于目标找目标点(目标单位)
+    /// 2: 相对于目标点找目标点(找了一次相对于改点再找)
+    /// 3: 相对两人的位置(施法者向接受者的方向, 角度无效)
+    /// 4: 相对两人的位置(接受者向示范者的方向, 角度无效)
+    /// </summary>
+    public enum RelativeToType
+    {
+        MySelf = 0,
+        Target = 1,
+        TargetPoint = 2,
+        MeToTarget = 3,
+        TargetToMe = 4,
+        MyBase = 5,
+        EnemyBase = 6
+    }
 }

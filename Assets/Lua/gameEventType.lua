@@ -6,5 +6,9 @@ GameEventType = {
     EXCHANGEZHUANGBEI = '105', --交换左右侧装备
     DROP_CARD = '106',  --放下卡牌
     RECOVERY_CARD = '107',   --回收卡牌
-    ENEMY_DROP_CARD = '108'     --敌人出牌
+}
+UIEventType = {
+	SHOW = "0x01",
+	HIDE = "0x02",
+	DESTROY = "0x03",
 }

@@ -20,13 +20,18 @@ public class SData_effect_c : MonoEX.Singleton<SData_effect_c>
 				{
 					case "ArmyID": dif.ArmyID = (int)(double)o22; break;
 					case "MuzzleFlash": dif.MuzzleFlash = (string)o22; break;
+					case "FlashPlayTime": dif.FlashPlayTime = (float)(double)o22; break;
 					case "Bullet": dif.Bullet = (string)o22; break;
+					case "BulletType": dif.BulletType = (short)(double)o22; break;
 					case "Chain": dif.Chain = (string)o22; break;
+					case "ChainPlayTime": dif.ChainPlayTime = (float)(double)o22; break;
 					case "Range": dif.Range = (string)o22; break;
-					case "Duration": dif.Duration = (float)(double)o22; break;
+					case "RangePlayTime": dif.RangePlayTime = (float)(double)o22; break;
 					case "Trajectory": dif.Trajectory = (string)o22; break;
 					case "Gethit_Bullet": dif.Gethit_Bullet = (string)o22; break;
+					case "Gethit_BulletPlayTime": dif.Gethit_BulletPlayTime = (float)(double)o22; break;
 					case "Gethit_Missile": dif.Gethit_Missile = (string)o22; break;
+					case "Gethit_MissilePlayTime": dif.Gethit_MissilePlayTime = (float)(double)o22; break;
                 }
             });
             if (Data.ContainsKey(dif.ArmyID))
@@ -56,21 +61,33 @@ public struct effect_cInfo
 	 /// </summary>
 	public string MuzzleFlash;
 	 /// <summary>
+	 ///火焰播放时间
+	 /// </summary>
+	public float FlashPlayTime;
+	 /// <summary>
 	 ///子弹
 	 /// </summary>
 	public string Bullet;
+	 /// <summary>
+	 ///子弹类型
+	 /// </summary>
+	public short BulletType;
 	 /// <summary>
 	 ///链状特效
 	 /// </summary>
 	public string Chain;
 	 /// <summary>
+	 ///链状特效播放时间
+	 /// </summary>
+	public float ChainPlayTime;
+	 /// <summary>
 	 ///范围效果
 	 /// </summary>
 	public string Range;
 	 /// <summary>
-	 ///持续时间
+	 ///范围效果播放时间
 	 /// </summary>
-	public float Duration;
+	public float RangePlayTime;
 	 /// <summary>
 	 ///特效轨迹
 	 /// </summary>
@@ -80,7 +97,15 @@ public struct effect_cInfo
 	 /// </summary>
 	public string Gethit_Bullet;
 	 /// <summary>
+	 ///受击子弹播放时间
+	 /// </summary>
+	public float Gethit_BulletPlayTime;
+	 /// <summary>
 	 ///受击导弹
 	 /// </summary>
 	public string Gethit_Missile;
+	 /// <summary>
+	 ///受击导弹播放时间
+	 /// </summary>
+	public float Gethit_MissilePlayTime;
 }

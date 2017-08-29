@@ -54,17 +54,9 @@ function fight_model:getDatas()
 
 ---自定义能量值---
     --总费
-    self.allFei = 1000
+    self.allFei = Const.MAX_FEI
     --当前费
-    self.nowFei = 500
-    --敌人总费
-    self.enemyAllFei = 1000
-    --敌人当前费
-    self.enemyNowFei = 900
-
-
-
-
+    self.nowFei = Const.START_FEI
 
 end
 ---获取游戏中要用到的所有卡牌信息
@@ -109,9 +101,15 @@ function fight_model:initAllCardsTbl()
         if cardTbl[cardId] and num > 0 then
             card.id = cardId
             card.num = num
-            card.lv = cardTbl[cardId].lv
-            card.starLv = cardTbl[cardId].star
-            card.rarity = cardTbl[cardId].rlv
+            if cardTbl[cardId] then
+                card.lv = cardTbl[cardId].lv
+                card.starLv = cardTbl[cardId].star
+                card.rarity = cardTbl[cardId].rlv
+            else
+                card.lv = 1
+                card.starLv = 1
+                card.rarity = 1
+            end
             card.TrainCost = cardUtil:getTrainCost(card.id)
             table.insert(self.paiKutb, card)
         else
@@ -131,9 +129,15 @@ function fight_model:initAllCardsTbl()
         if cardId ~= 0 and cardTbl[cardId]  then
             card.id = cardId
             card.num = 1
-            card.lv = cardTbl[cardId].lv
-            card.starLv = cardTbl[cardId].star
-            card.rarity = cardTbl[cardId].rlv
+            if cardTbl[cardId] then
+                card.lv = cardTbl[cardId].lv
+                card.starLv = cardTbl[cardId].star
+                card.rarity = cardTbl[cardId].rlv
+            else
+                card.lv = 1
+                card.starLv = 1
+                card.rarity = 1
+            end
             card.TrainCost = cardUtil:getTrainCost(card.id)
             table.insert(self.QianFengPaiKutb, card)
         else
@@ -155,14 +159,19 @@ function fight_model:initAllCardsTbl()
 
             card.id = value[1]
             card.num = value[2]
-            card.lv = cardTbl[value[1]].lv
-            card.starLv = cardTbl[value[1]].star
-            card.rarity = cardTbl[value[1]].rlv
+            if cardTbl[value[1]] then
+                card.lv = cardTbl[value[1]].lv
+                card.starLv = cardTbl[value[1]].star
+                card.rarity = cardTbl[value[1]].rlv
+            else
+                card.lv = 1
+                card.starLv = 1
+                card.rarity = 1
+            end
             card.TrainCost = cardUtil:getTrainCost(card.id)
             table.insert(self.enemyPaiKutb, card)
 
-            ---测试数据---
-            self.enemyCardNum = self.enemyCardNum + value[2]
+
         else
             Debugger.LogWarning(value[1].." 卡牌不存在！！！")
         end
@@ -195,7 +204,6 @@ function fight_model:initHandCards()
 
     --获取下一张牌
     self.nextCard = self:getNextCard()
-    self.enemyNextCard = self:getEnemyNextCard()
 end
 
 ---
@@ -232,42 +240,6 @@ function fight_model:getNextCard()
     end
 end
 
----
----刷新敌人下一张牌
----
-function fight_model:refreshEnemyCard(cardIndex)
-    --获取下一张牌
-    self.enemyNextCard = self:getEnemyNextCard()
-end
----
----获取敌人下一张牌下一张
----
-function fight_model:getEnemyNextCard()
-    --打乱敌人牌库
 
-    table.upset(self.enemyPaiKutb)
-    local nextCard
-    --判断盘库是否有牌
-    if #self.enemyPaiKutb >= 1 and self.enemyPaiKutb[1].num > 0 then
-        nextCard = self.enemyPaiKutb[1]
-        self.enemyPaiKutb[1].num = self.enemyPaiKutb[1].num - 1
-        if self.enemyPaiKutb[1].num == 0 then
-            table.remove(self.enemyPaiKutb, 1)
-        end
-        self.enemyCardNum = self.enemyCardNum - 1
-        return nextCard
-    else
-        return nil
-    end
-end
-
-
-
----从3D场景的世界坐标获取ui界面的世界坐标
-function fight_model:UIWorldPosition_From_3DWorldPosition(_3DWorldCamera, _3DWorldPosition)
-    local screenPoint = _3DWorldCamera:WorldToScreenPoint(_3DWorldPosition)
-    local worldPoint = UICamera.currentCamera:ScreenToWorldPoint(screenPoint)
-    return worldPoint
-end
 
 return fight_model

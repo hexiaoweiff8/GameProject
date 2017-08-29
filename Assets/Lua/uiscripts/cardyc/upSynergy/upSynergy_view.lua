@@ -11,7 +11,7 @@ function upSynergy_view:init_view(arg)
 end
 
 function upSynergy_view:init_upSynergyPanel()
-    self.upSynergyP = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "xtupLayer",  self.gameObject)
+    self.upSynergyP = GameObjectExtension.InstantiateFromPacket("ui_cardyc", "xtupLayer",  view.gameObject)
     self.upSynergyP_title = self.upSynergyP.transform:Find("title_Lab").gameObject
 
     self.upSynergyP_cardNameL = self.upSynergyP.transform:Find("xtLab").gameObject

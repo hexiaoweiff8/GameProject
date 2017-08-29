@@ -18,6 +18,7 @@ public class WndManageWrap
 		L.RegFunction("_GetWnd", _GetWnd);
 		L.RegFunction("_OnWndHide", _OnWndHide);
 		L.RegFunction("LogicInit_Go", LogicInit_Go);
+		L.RegFunction("LogicInitPackage", LogicInitPackage);
 		L.RegFunction("LogicInit_GetInitProgress", LogicInit_GetInitProgress);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("OnWndDestroy", get_OnWndDestroy, set_OnWndDestroy);
@@ -234,6 +235,22 @@ public class WndManageWrap
 			ToLua.CheckArgsCount(L, 1);
 			WndManage obj = (WndManage)ToLua.CheckObject(L, 1, typeof(WndManage));
 			obj.LogicInit_Go();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int LogicInitPackage(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			WndManage obj = (WndManage)ToLua.CheckObject(L, 1, typeof(WndManage));
+			obj.LogicInitPackage();
 			return 0;
 		}
 		catch(Exception e)

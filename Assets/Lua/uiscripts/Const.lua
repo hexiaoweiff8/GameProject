@@ -18,8 +18,6 @@ Const = class("Const")
 
 
     Const.CARDYC_INFORMATION_PROP_NUM = 8
-    -- UIRoot的locationScale
-    Const.urlc = GameObject.Find("/UIRoot").transform.localScale.x
     Const.CARD_PROP_NAME_TO_STRING_ID =
     {
         ["HP"] = 20801,
@@ -98,4 +96,12 @@ Const = class("Const")
         [5] = Vector3(-300,0,-100),
         [6] = Vector3(-100,0,-100),
     }
+
+    Const.MAX_FEI = 100
+    Const.START_FEI = 60
+    Const.FEI_GROW_SPEED = 5
+
+
+    Const.COSTUNIT = 10
+
 return Const

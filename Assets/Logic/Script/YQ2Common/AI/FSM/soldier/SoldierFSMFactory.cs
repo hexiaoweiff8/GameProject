@@ -50,32 +50,38 @@ public class SoldierFSMFactory
                     {
                         SoldierStateID.SiWang,
                         SoldierStateID.Zhunbeizhandou,
-                        SoldierStateID.ZhuiJi
+                        SoldierStateID.ZhuiJi,
+                        SoldierStateID.DaiJi,
                     }},
                     {SoldierStateID.Zhunbeizhandou, new List<SoldierStateID>()
                     {
                         SoldierStateID.SiWang,
                         SoldierStateID.JinengGongji,
-                        SoldierStateID.PutongGongji
+                        SoldierStateID.PutongGongji,
                     }},
                     {SoldierStateID.SiWang, new List<SoldierStateID>()},
                     {SoldierStateID.PutongGongji, new List<SoldierStateID>()
                     {
                         SoldierStateID.SiWang,
-                        SoldierStateID.Zhunbeizhandou,
-                        SoldierStateID.Xingjin
+                        SoldierStateID.DaiJi,
+                        SoldierStateID.Zhunbeizhandou
                     }},
                     {SoldierStateID.JinengGongji, new List<SoldierStateID>()
                     {
                         SoldierStateID.SiWang,
-                        SoldierStateID.Zhunbeizhandou,
-                        SoldierStateID.Xingjin
+                        SoldierStateID.DaiJi,
                     }},
                     {SoldierStateID.ZhuiJi, new List<SoldierStateID>()
                     {
                         SoldierStateID.SiWang,
                         SoldierStateID.Zhunbeizhandou,
-                        SoldierStateID.Xingjin
+                        SoldierStateID.DaiJi,
+                    }},
+                    {SoldierStateID.DaiJi, new List<SoldierStateID>()
+                    {
+                        SoldierStateID.SiWang,
+                        SoldierStateID.Zhunbeizhandou,
+                        SoldierStateID.Xingjin,
                     }},
                 };
             }
@@ -88,6 +94,7 @@ public class SoldierFSMFactory
                     {SoldierStateID.RuChang, new List<SoldierStateID>()
                     {
                         SoldierStateID.SiWang,
+                        SoldierStateID.DaiJi,
                         SoldierStateID.Zhunbeizhandou,
                     }},
                     {SoldierStateID.Zhunbeizhandou, new List<SoldierStateID>()
@@ -96,6 +103,12 @@ public class SoldierFSMFactory
                         SoldierStateID.PutongGongji
                     }},
                     {SoldierStateID.PutongGongji, new List<SoldierStateID>()
+                    {
+                        SoldierStateID.SiWang,
+                        SoldierStateID.Zhunbeizhandou,
+                        SoldierStateID.DaiJi,
+                    }},
+                    {SoldierStateID.DaiJi, new List<SoldierStateID>()
                     {
                         SoldierStateID.SiWang,
                         SoldierStateID.Zhunbeizhandou,
@@ -110,6 +123,11 @@ public class SoldierFSMFactory
                 result = new Dictionary<SoldierStateID, List<SoldierStateID>>()
                 {
                     {SoldierStateID.RuChang, new List<SoldierStateID>()
+                    {
+                        SoldierStateID.DaiJi,
+                        SoldierStateID.SiWang,
+                    }},
+                    {SoldierStateID.DaiJi, new List<SoldierStateID>()
                     {
                         SoldierStateID.SiWang,
                     }},
@@ -194,6 +212,8 @@ public class SoldierFSMFactory
                 return SoldierStateID.SiWang;
             case SoldierTriggerID.ZhuiJi:
                 return SoldierStateID.ZhuiJi;
+            case SoldierTriggerID.DaiJi:
+                return SoldierStateID.DaiJi;
         }
         return SoldierStateID.NullState;
     }
@@ -221,6 +241,8 @@ public class SoldierFSMFactory
                 return SoldierTriggerID.SiWang;
             case SoldierStateID.ZhuiJi:
                 return SoldierTriggerID.ZhuiJi;
+            case SoldierStateID.DaiJi:
+                return SoldierTriggerID.DaiJi;
         }
         return SoldierTriggerID.NullTri;
     }
@@ -248,6 +270,8 @@ public class SoldierFSMFactory
                 return typeof(Soldier_Siwang_State);
             case SoldierStateID.ZhuiJi:
                 return typeof(Soldier_Zhuiji_State);
+            case SoldierStateID.DaiJi:
+                return typeof(Soldier_Daiji_State);
         }
         return typeof(Soldier_Ruchang_State);
     }
@@ -275,6 +299,8 @@ public class SoldierFSMFactory
                 return typeof(SiwangTrigger);
             case SoldierTriggerID.ZhuiJi:
                 return typeof(ZhuiJiTrigger);
+            case SoldierTriggerID.DaiJi:
+                return typeof(DaiJiTrigger);
         }
         return typeof(RuChangTrigger);
     }

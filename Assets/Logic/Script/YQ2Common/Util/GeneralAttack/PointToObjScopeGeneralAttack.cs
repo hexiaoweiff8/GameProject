@@ -24,6 +24,7 @@ public class PointToObjScopeGeneralAttack : IGeneralAttack
     /// <param name="durTime">范围特效持续时间</param>
     /// <param name="taType">子弹飞行轨迹</param>
     /// <param name="callback">攻击结束回调</param>
+    /// <param name="callbackForEveryOne">每个单位被击回调</param>
     public PointToObjScopeGeneralAttack(PositionObject attacker, 
         string[] effectKey, 
         Vector3 releasePos, 
@@ -31,8 +32,9 @@ public class PointToObjScopeGeneralAttack : IGeneralAttack
         float scopeRaduis, 
         float speed, 
         float durTime, 
-        TrajectoryAlgorithmType taType, 
-        Action callback)
+        TrajectoryAlgorithmType taType,
+        Action callback,
+        Action<GameObject> callbackForEveryOne = null)
     {
         if (attacker == null)
         {
@@ -45,14 +47,28 @@ public class PointToObjScopeGeneralAttack : IGeneralAttack
         Action scopeDemage = () =>
         {
             var positionScopeAttack = new PositionScopeGeneralAttack(attacker, key2, targetObj.transform.position, scopeRaduis,
-                durTime, callback);
+                durTime, callback, callbackForEveryOne);
             positionScopeAttack.Begin();
         };
-        //if (callback != null)
-        //{
-        //    // 先调用伤害在调用回调
-        //    scopeDemage += callback;
-        //}
+
+        var effectData = attacker.AllData.EffectData;
+        var muzzleEffect = effectData.MuzzleFlashEffect;
+        var muzzleDurTime = effectData.MuzzleFlashEffectTime;
+        if (muzzleDurTime > 0)
+        {
+            // 对每个单位播受击特效
+            var muzzleAngle = Utils.GetAngleWithZ(attacker.gameObject.transform.forward);
+            // TODO 使用挂点
+            EffectsFactory.Single.CreatePointEffect(muzzleEffect,
+                ParentManager.Instance().GetParent(ParentManager.BallisticParent).transform,
+                attacker.gameObject.transform.position,
+                new Vector3(1, 1, 1),
+                muzzleDurTime,
+                0,
+                null,
+                Utils.EffectLayer,
+                new Vector2(0, muzzleAngle)).Begin();
+        }
 
         // 飞行轨迹
         effect = EffectsFactory.Single.CreatePointToObjEffect(key1, 

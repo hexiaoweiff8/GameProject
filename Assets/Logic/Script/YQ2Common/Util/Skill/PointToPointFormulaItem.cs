@@ -29,7 +29,7 @@ public class PointToPointFormulaItem : AbstractFormulaItem
     /// 1: 接受单位位置
     /// 2: 目标点选择的位置
     /// </summary>
-    public int ReleasePos = 0;
+    public int ReleasePos { get; private set; }
 
     /// <summary>
     /// 接受特效位置
@@ -37,7 +37,7 @@ public class PointToPointFormulaItem : AbstractFormulaItem
     /// 1: 接受单位位置(默认)
     /// 2: 目标点选择的位置
     /// </summary>
-    public int ReceivePos = 1;
+    public int ReceivePos { get; private set; }
 
     /// <summary>
     /// X轴缩放
@@ -105,17 +105,17 @@ public class PointToPointFormulaItem : AbstractFormulaItem
             throw new Exception("参数数量错误.需求参数数量:" + argsCount + " 实际数量:" + array.Length);
         }
         // 是否等待完成,特效Key,释放位置(0放技能方, 1目标方),命中位置(0放技能方, 1目标方),速度,飞行轨迹, 缩放
-        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0, ReplaceDic);
-        var effectKey = GetDataOrReplace<string>("EffectKey", array, 1, ReplaceDic);
-        var releasePosArg = GetDataOrReplace<int>("ReleasePos", array, 2, ReplaceDic);
-        var receivePosArg = GetDataOrReplace<int>("ReceivePos", array, 3, ReplaceDic);
-        var speed = GetDataOrReplace<float>("Speed", array, 4, ReplaceDic);
-        var flyType = GetDataOrReplace<TrajectoryAlgorithmType>("FlyType", array, 5, ReplaceDic);
+        var formulaType = GetDataOrReplace<int>("FormulaType", array, 0);
+        var effectKey = GetDataOrReplace<string>("EffectKey", array, 1);
+        var releasePosArg = GetDataOrReplace<int>("ReleasePos", array, 2);
+        var receivePosArg = GetDataOrReplace<int>("ReceivePos", array, 3);
+        var speed = GetDataOrReplace<float>("Speed", array, 4);
+        var flyType = GetDataOrReplace<TrajectoryAlgorithmType>("FlyType", array, 5);
 
 
-        var scaleX = GetDataOrReplace<float>("ScaleX", array, 6, ReplaceDic);
-        var scaleY = GetDataOrReplace<float>("ScaleY", array, 7, ReplaceDic);
-        var scaleZ = GetDataOrReplace<float>("ScaleZ", array, 8, ReplaceDic);
+        var scaleX = GetDataOrReplace<float>("ScaleX", array, 6);
+        var scaleY = GetDataOrReplace<float>("ScaleY", array, 7);
+        var scaleZ = GetDataOrReplace<float>("ScaleZ", array, 8);
 
 
         FormulaType = formulaType;

@@ -21,6 +21,7 @@ public class UtilsWrap
 		L.RegFunction("GetVerticalTestLine", GetVerticalTestLine);
 		L.RegFunction("GetDistancePointToLine", GetDistancePointToLine);
 		L.RegFunction("GetDistancePointToPoint", GetDistancePointToPoint);
+		L.RegFunction("GetAngleWithZ", GetAngleWithZ);
 		L.RegFunction("CreateOrOpenFile", CreateOrOpenFile);
 		L.RegFunction("LoadFileInfo", LoadFileInfo);
 		L.RegFunction("LoadFileRotate", LoadFileRotate);
@@ -74,6 +75,8 @@ public class UtilsWrap
 		L.RegConstant("TurretArmyType", 5);
 		L.RegConstant("BaseBaseId", 220001000);
 		L.RegConstant("TurretBaseId", 220002000);
+		L.RegVar("MyCampTextureNameTrail", get_MyCampTextureNameTrail, null);
+		L.RegVar("EnemyCampTextureNameTrail", get_EnemyCampTextureNameTrail, null);
 		L.RegConstant("AngleToPi", 0.0174532923847437);
 		L.RegConstant("PiToAngle", 57.2957801818848);
 		L.RegConstant("TicksTimeToSecond", 10000000);
@@ -377,6 +380,23 @@ public class UtilsWrap
 			UnityEngine.Vector2 arg0 = ToLua.ToVector2(L, 1);
 			UnityEngine.Vector2 arg1 = ToLua.ToVector2(L, 2);
 			float o = Utils.GetDistancePointToPoint(arg0, arg1);
+			LuaDLL.lua_pushnumber(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetAngleWithZ(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 1);
+			float o = Utils.GetAngleWithZ(arg0);
 			LuaDLL.lua_pushnumber(L, o);
 			return 1;
 		}
@@ -692,6 +712,34 @@ public class UtilsWrap
 			Utils obj = (Utils)ToLua.CheckObject(L, 1, typeof(Utils));
 			obj.StopMove();
 			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_MyCampTextureNameTrail(IntPtr L)
+	{
+		try
+		{
+			LuaDLL.lua_pushstring(L, Utils.MyCampTextureNameTrail);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_EnemyCampTextureNameTrail(IntPtr L)
+	{
+		try
+		{
+			LuaDLL.lua_pushstring(L, Utils.EnemyCampTextureNameTrail);
+			return 1;
 		}
 		catch(Exception e)
 		{

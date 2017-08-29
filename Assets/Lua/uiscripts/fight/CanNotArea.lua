@@ -2,7 +2,7 @@
 --- Created by Administrator.
 --- DateTime: 2017/8/8 15:13
 ---
-local CanNotArea = {}
+CanNotArea = {}
 
 ---初始化不可下兵区域
 function CanNotArea:Init()
@@ -27,4 +27,9 @@ function CanNotArea:Hide()
     self.cannotArea:SetActive(false)
 end
 
+function CanNotArea:OnDestroyDone()
+    CanNotArea = nil
+    self.cannotRect = nil
+    self.cannotArea = nil
+end
 return CanNotArea

@@ -123,6 +123,18 @@ public static class GameObjectExtension
     }
 
 
+    /// <summary>
+    /// 实例化模型对象
+    /// </summary>
+    /// <param name="packName">包名</param>
+    /// <param name="preObjName">预设名</param>
+    /// <param name="parent">预设父级</param>
+    /// <returns></returns>
+    public static GameObject InstantiateModelFromPacket(string packName, string preObjName, GameObject parent)
+    {
+        return InstantiateFromPacket(packName, preObjName + "@model.prefab", parent);
+    }
+
 
     //public static INGui NGui = null;
 

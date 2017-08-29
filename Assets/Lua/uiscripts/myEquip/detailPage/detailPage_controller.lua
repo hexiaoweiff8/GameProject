@@ -4,16 +4,13 @@
 ---
 
 local detailPage_controller = {}
-local view = require("uiscripts/myEquip/detailPage/detailPage_view")
-local data = require("uiscripts/myEquip/detailPage/detailPage_model")
-local EquipDetail = require("uiscripts/commonGameObj/equipDetail/equipDetail_controller")
-
----
----装备信息显示界面
----
-local rightPanelDetail
+local view
+local data
+local rightPanelDetail---装备信息显示界面
 
 function detailPage_controller:init(equipController)
+    view = require("uiscripts/myEquip/detailPage/detailPage_view")
+    data = require("uiscripts/myEquip/detailPage/detailPage_model")
     view:init_view(equipController)
     view.rightDetail:SetActive(false)
 end
@@ -58,4 +55,20 @@ function detailPage_controller:setListenerToBtnChange(func)
     end
 end
 
+
+---
+---界面销毁回调
+---
+function detailPage_controller:OnDestroyDone()
+
+    Memory.free("uiscripts/myEquip/detailPage/detailPage_view")
+    Memory.free("uiscripts/myEquip/detailPage/detailPage_model")
+    view = nil
+    data = nil
+    if rightPanelDetail then
+        rightPanelDetail:Destroy()
+    end
+    rightPanelDetail = nil
+    detailPage_controller = nil
+end
 return detailPage_controller
