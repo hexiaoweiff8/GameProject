@@ -92,6 +92,7 @@ public static class LuaBinder
 		MailLoopGridWrap.Register(L);
 		WordFilterWrap.Register(L);
 		ShadowObjWrap.Register(L);
+		PTZCameraWrap.Register(L);
 		CameraControllerWrap.Register(L);
 		FightParameterWrap.Register(L);
 		UIRectWrap.Register(L);
@@ -282,6 +283,9 @@ public static class LuaBinder
 		L.EndModule();
 		L.BeginModule("UIToast");
 		UIToast_ShowTypeWrap.Register(L);
+		L.EndModule();
+		L.BeginModule("FightManager");
+		FightManager_MemberTypeWrap.Register(L);
 		L.EndModule();
 		L.BeginModule("MapManager");
 		MapManager_MapDataParamsPackerWrap.Register(L);

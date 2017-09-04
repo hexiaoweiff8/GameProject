@@ -3,30 +3,7 @@
 --- DateTime: 2017/8/4 16:00
 ---
 
-
 Model = {}
-
----渲染模式
-local RenderingMode = {
-    Opaque = 1,
-    Cutout = 2,
-    Fade = 3,
-    Transparent = 4,
-
-}
-local BlendMode = {
-    Zero = 0,
-    One = 1,
-    DstColor = 2,
-    SrcColor = 3,
-    OneMinusDstColor = 4,
-    SrcAlpha = 5,
-    OneMinusSrcColor = 6,
-    DstAlpha = 7,
-    OneMinusDstAlpha = 8,
-    SrcAlphaSaturate = 9,
-    OneMinusSrcAlpha = 10
-}
 ---阵型数据数组
 local ZhenXingDataList
 ---
@@ -34,8 +11,8 @@ local ZhenXingDataList
 ---cardIdTbl    要显示的模型对应的卡牌ID
 ---cardLvTbl    卡牌对应的等级
 ---
-function Model:setZhenXingData(cardIdTbl, cardLvTbl)
-    ZhenXingDataList = AstarFight.setAllZhenxingList(cardIdTbl, cardLvTbl)
+function Model:setZhenXingData(cardIdTbl)
+    ZhenXingDataList = AstarFight.setAllZhenxingList(cardIdTbl)
 end
 
 
@@ -93,7 +70,6 @@ function Model:CreateFightUnit(cardId,ObjectType)
 
     ShadowObj.ObjAddShadow(tempMod)
 
-
     return unit
 end
 ---创建已排好阵型的战斗模型组
@@ -125,53 +101,13 @@ function Model:DestroyFightZhenXing(ZhenXing, unitList)
     Object.Destroy(ZhenXing.gameObject)
 end
 
-
----设置渲染模式
-function Model:SetMaterialRenderingMode (material,renderingMode)
-    if renderingMode == RenderingMode.Opaque then
-        material:SetInt ("_SrcBlend", BlendMode.One)
-        material:SetInt ("_DstBlend", BlendMode.Zero)
-        material:SetInt ("_ZWrite", 1)
-        material:DisableKeyword ("_ALPHATEST_ON")
-        material:DisableKeyword ("_ALPHABLEND_ON")
-        material:DisableKeyword ("_ALPHAPREMULTIPLY_ON")
-        material.renderQueue = -1
-    elseif renderingMode == RenderingMode.Cutout then
-        material:SetInt ("_SrcBlend", BlendMode.One)
-        material:SetInt ("_DstBlend", BlendMode.Zero)
-        material:SetInt ("_ZWrite", 1)
-        material:EnableKeyword ("_ALPHATEST_ON")
-        material:DisableKeyword ("_ALPHABLEND_ON")
-        material:DisableKeyword ("_ALPHAPREMULTIPLY_ON")
-        material.renderQueue = 2450
-    elseif renderingMode == RenderingMode.Fade then
-        material:SetInt ("_SrcBlend", BlendMode.SrcAlpha)
-        material:SetInt ("_DstBlend", BlendMode.OneMinusSrcAlpha)
-        material:SetInt ("_ZWrite", 0)
-        material:DisableKeyword ("_ALPHATEST_ON")
-        material:EnableKeyword ("_ALPHABLEND_ON")
-        material:DisableKeyword ("_ALPHAPREMULTIPLY_ON")
-        material.renderQueue = 3000
-    elseif renderingMode == RenderingMode.Transparent then
-        material:SetInt ("_SrcBlend", BlendMode.One)
-        material:SetInt ("_DstBlend", BlendMode.OneMinusSrcAlpha)
-        material:SetInt ("_ZWrite", 0)
-        material:DisableKeyword ("_ALPHATEST_ON")
-        material:DisableKeyword ("_ALPHABLEND_ON")
-        material:EnableKeyword ("_ALPHAPREMULTIPLY_ON")
-        material.renderQueue = 3000
-    end
-
-end
 ---设置模型透明
 function Model:SetTransparent(model,alpha)
     for i = 1, model.transform.childCount do
         local SkinnedMeshRenderer = model.transform:GetChild(i-1):GetComponent("SkinnedMeshRenderer")
         if SkinnedMeshRenderer then
             SkinnedMeshRenderer.material.shader = UnityEngine.Shader.Find("Legacy Shaders/Transparent/Diffuse")
-            --SkinnedMeshRenderer.material.shader = UnityEngine.Shader.Find("Standard")
             SkinnedMeshRenderer.material.color = UnityEngine.Color.New(0.7,0.7,0.7,alpha)
-            --self:SetMaterialRenderingMode (SkinnedMeshRenderer.material,RenderingMode.Transparent)
         end
     end
 end
@@ -181,9 +117,7 @@ function Model:SetOpaque(model)
         local SkinnedMeshRenderer = model.transform:GetChild(i-1):GetComponent("SkinnedMeshRenderer")
         if SkinnedMeshRenderer then
             SkinnedMeshRenderer.material.shader = UnityEngine.Shader.Find("Legacy Shaders/Self-Illumin/Diffuse")
-            --SkinnedMeshRenderer.material.shader = UnityEngine.Shader.Find("Standard")
             SkinnedMeshRenderer.material.color = UnityEngine.Color.New(0.7,0.7,0.7,1)
-            --self:SetMaterialRenderingMode (SkinnedMeshRenderer.material,RenderingMode.Opaque)
         end
     end
 end

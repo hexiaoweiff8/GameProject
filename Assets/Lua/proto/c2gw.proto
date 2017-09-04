@@ -180,8 +180,14 @@ message CardToCoinItem {
     required int32 num          =2;
 }
 
+
 message CardToCoin {
     repeated CardToCoinItem lst =1;
+}
+
+
+message ExitPvp {
+    required int32 result       =1;
 }
 
 

@@ -213,7 +213,7 @@ public class FightManager
         UnitWidth = (int)SData_Constant.Single.GetDataOfID(Utils.UnitWidthId).Value;
         LoadMap.Single.Init(mapInfoData, UnitWidth);
         // 初始化集群管理
-        var loadMapPos = LoadMap.Single.GetLeftBottom();
+        var loadMapPos = LoadMap.Single.GetCenter();
         ClusterManager.Single.Init(loadMapPos.x, loadMapPos.z, MapWidth, MapHeight, UnitWidth, mapInfoData);
         // 解析地图障碍层
         MapManager.Instance().AnalysisMap(mapInfoData);

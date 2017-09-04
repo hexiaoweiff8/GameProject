@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEditor;
+using UnityEngine;
 
 namespace DeveloperConsole.CommandFramework
 {
@@ -81,7 +82,6 @@ namespace DeveloperConsole.CommandFramework
         {
             return Tools.CallMethod("userModel", "getUserInfo")[0].ToString();
         }
-
         [CommandEntryMethod("smail", "给当前用户发送不带奖励的邮件")]
         public static string SendMail()
         {
@@ -118,6 +118,19 @@ namespace DeveloperConsole.CommandFramework
                          @"""way"":""GM""}";
             UnityEngine.Debug.Log(url + postData);
             return ServerUtil.Post(url, postData);
+        }
+
+        [CommandEntryMethod("sync", "重新连接服务器获取数据")]
+        public static string RegetData()
+        {
+            return Tools.CallMethod("ConsoleUtil", "regetData")[0].ToString();
+        }
+
+        [CommandEntryMethod("clrlogin", "清除登录缓存")]
+        public static string ClearLoginCache()
+        {
+            UnityEngine.PlayerPrefs.SetString("UserLoginCache","");
+            return "UnityEngine.PlayerPrefs.SetString('UserLoginCache','');\nDone.";
         }
     }
 }

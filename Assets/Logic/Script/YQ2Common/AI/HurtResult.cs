@@ -73,9 +73,10 @@ public class HurtResult
     /// <param name="target">技能目标</param>
     /// <param name="type">伤害或治疗</param>
     /// <param name="unitType">伤害/治疗值类型</param>
+    /// <param name="calculationType">计算类型</param>
     /// <param name="value">具体值, 必须大于等于0</param>
     /// <returns>伤害/治疗具体量</returns>
-    public static float GetHurtForSkill(DisplayOwner member, DisplayOwner target, DemageOrCure type, HealthChangeType unitType, float value)
+    public static float GetHurtForSkill(DisplayOwner member, DisplayOwner target, DemageOrCure type, HealthChangeType unitType, HealthChangeCalculationType calculationType, float value)
     {
         if (member == null
             || member.ClusterData == null
@@ -89,35 +90,48 @@ public class HurtResult
         {
             throw new Exception("伤害/治疗值不能为负数.");
         }
-        var zhanqianJueduizhi = member.ClusterData.AllData.MemberData.Attack1;
-        var zhandouJueduizhiAdd = 0.0f;
-        var zhanqianBaifenbiAdd = 0.0f;
-        var zhandouBaifenbiAdd = 0.0f;
+        var result = 0f;
+        // 区分伤害类型
+        switch (calculationType)
+        {
+            case HealthChangeCalculationType.Fix:
+            {
+                var zhanqianJueduizhi = member.ClusterData.AllData.MemberData.Attack1;
+                var zhandouJueduizhiAdd = 0.0f;
+                var zhanqianBaifenbiAdd = 0.0f;
+                var zhandouBaifenbiAdd = 0.0f;
 
-        // 伤害能力
-        var huoli = (zhanqianJueduizhi + zhandouJueduizhiAdd) * (1 + zhanqianBaifenbiAdd + zhandouBaifenbiAdd);
-        // 减伤
-        var jianshanglv = AdjustJianshang(member, target);
-        // 克制关系
-        var kezhixishu = AdjustKezhi(member, target);
-        //if (unitType == HealthChangeType.Percentage)
-        //{
-        //    result = target.ClusterData.AllData.MemberData.TotalHp*value;
-        //}
+                // 伤害能力
+                var huoli = (zhanqianJueduizhi + zhandouJueduizhiAdd) * (1 + zhanqianBaifenbiAdd + zhandouBaifenbiAdd);
+                // 减伤
+                var jianshanglv = AdjustJianshang(member, target);
+                // 克制关系
+                var kezhixishu = AdjustKezhi(member, target);
+                //if (unitType == HealthChangeType.Percentage)
+                //{
+                //    result = target.ClusterData.AllData.MemberData.TotalHp*value;
+                //}
 
-        var shanghaijiacheng = 0.0f;
-        var mianyijiacheng = 0.0f;
-        var jinengjiacheng = 0.0f;
+                var shanghaijiacheng = 0.0f;
+                var mianyijiacheng = 0.0f;
+                var jinengjiacheng = 0.0f;
 
-        // 计算增伤
-        shanghaijiacheng = GetDemageUpper(member, target);
+                // 计算增伤
+                shanghaijiacheng = GetDemageUpper(member, target);
 
-        // 计算减伤
-        mianyijiacheng = GetDemageLower(member, target);
+                // 计算减伤
+                mianyijiacheng = GetDemageLower(member, target);
 
-        var result = huoli * (1 - jianshanglv) * kezhixishu *
-                   (1 + Mathf.Max(-0.8f, (shanghaijiacheng - mianyijiacheng))) + jinengjiacheng;
+                result = huoli * (1 - jianshanglv) * kezhixishu *
+                           (1 + Mathf.Max(-0.8f, (shanghaijiacheng - mianyijiacheng))) + jinengjiacheng;
 
+            }
+                break;
+            case HealthChangeCalculationType.Calculation:
+
+                break;
+        }
+        
         return result;
     }
 

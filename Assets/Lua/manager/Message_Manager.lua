@@ -710,6 +710,22 @@ function Message_Manager:SendPB_10036(PfItemlst,CallBack)
 end
 
 --================================================================
+--@Des 进入PVP
+--================================================================
+function Message_Manager:SendPB_EnterPvp()
+    Message_Manager:createSendPBHeader(10037)
+    Event.AddListener("10037",MSGID_EnterPvp)
+end
+function MSGID_EnterPvp(body)
+    local gw2c = gw2c_pb.EnterPvp()
+    gw2c:ParseFromString(body)
+    BattleRoleModel:InitCurBattleRole(gw2c.peer)
+    Event.RemoveListener("10037", MSGID_EnterPvp)
+end
+
+
+
+--================================================================
 --@Des 将退役卡牌兑换为兵牌
 --@params 退役卡牌列表
 --================================================================
@@ -927,9 +943,9 @@ function MSGID_35001(body)
     local time = chat.rec.time
     --print(rid..username..content ..time)
     --传输数据前，前端先过滤敏感词确保安全
-        if true then --确保不是系统消息
-            content = chatWindow_controller:chaekSensitive(content)
-        end
+    if true then --确保不是系统消息
+        content = chatWindow_controller:chaekSensitive(content)
+    end
     chat_model:inserDate(rid, username, content, time)
 end
 --================================================================

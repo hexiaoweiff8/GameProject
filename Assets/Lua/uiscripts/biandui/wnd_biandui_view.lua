@@ -35,8 +35,6 @@ wnd_biandui_view = {
 }
 
 local this = wnd_biandui_view
-
-require("uiscripts/commonGameObj/Model")
 function wnd_biandui_view:initview(root)
     self = root
 

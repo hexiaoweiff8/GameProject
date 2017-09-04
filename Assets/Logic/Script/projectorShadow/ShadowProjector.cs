@@ -29,12 +29,15 @@ public class ShadowProjector : MonoBehaviour
     public List<Renderer> _shadowCasterList = new List<Renderer>();
     //public List<BoxCollider> _boxCasterList = new List<BoxCollider>();
     private BoxCollider _boundsCollider;
-    public float boundsOffset = 1;//边界偏移，
+    public float boundsOffset = 2;//边界偏移，
     public Shader shadowReplaceShader;
 
     void Awake()
     {
         instence = this;
+        //shadowReplaceShader = Resources.Load<Shader>("Shader/ProjectorShader/ShadowReplace");
+        //this.GetComponent<Projector>().material = Resources.Load<Material>("Shader/ProjectorShader/ShadowProjector");
+        //Debug.Log("加载阴影替换ShadowReplace成功！！！！！！！");
     }
 
 	void Start () 
@@ -50,20 +53,15 @@ public class ShadowProjector : MonoBehaviour
             _lightCamera.clearFlags = CameraClearFlags.SolidColor;
             _lightCamera.backgroundColor = new Color(0,0,0,0);
             _shadowTex = new RenderTexture(Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32);
+            Debug.Log("屏幕长宽为:" + Screen.width + "*" + Screen.height);
             _shadowTex.filterMode = FilterMode.Bilinear;
             _lightCamera.targetTexture = _shadowTex;
             _lightCamera.SetReplacementShader(shadowReplaceShader, "RenderType");
             _projector.material.SetTexture("_ShadowTex", _shadowTex);
-            _projector.ignoreLayers = LayerMask.GetMask("Scenery");
+
+            _projector.ignoreLayers = LayerMask.GetMask("Default","TransparentFX","Ignore Raycast","Water","UI","Scenery","Avatar","Arrows","Effects","PhotoStudio","Quad","3DUI","QKPassUI");
         }
-         //GameObject plane = GameObject.Find("Plane");
-         //foreach (Transform trans in plane.transform)
-         //{
-         //    if (trans.gameObject.layer == LayerMask.NameToLayer("Shadow"))
-         //    {
-         //        _shadowCasterList.Add(trans.gameObject.GetComponent<Renderer>());
-         //    }
-         //}
+        Debug.Log("图层设置成功！！！！！！！！！！");
 
         _boundsCollider = new GameObject("Test use to show bounds").AddComponent<BoxCollider>();
 	}

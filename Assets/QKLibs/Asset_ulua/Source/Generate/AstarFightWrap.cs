@@ -11,10 +11,8 @@ public class AstarFightWrap
 		L.RegFunction("AnalysisMap", AnalysisMap);
 		L.RegFunction("Clear", Clear);
 		L.RegFunction("isZhangAi", isZhangAi);
-		L.RegFunction("isQianFengZhangAi", isQianFengZhangAi);
 		L.RegFunction("setAllZhenxingList", setAllZhenxingList);
 		L.RegFunction("setZhenxingInfo", setZhenxingInfo);
-		L.RegFunction("setQianFengInfo", setQianFengInfo);
 		L.RegFunction("getNum", getNum);
 		L.RegFunction("setMaxX", setMaxX);
 		L.RegFunction("OnDestroy", OnDestroy);
@@ -103,32 +101,13 @@ public class AstarFightWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int isQianFengZhangAi(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 3);
-			AstarFight obj = (AstarFight)ToLua.CheckObject(L, 1, typeof(AstarFight));
-			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 2);
-			int arg1 = (int)LuaDLL.luaL_checknumber(L, 3);
-			obj.isQianFengZhangAi(arg0, arg1);
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int setAllZhenxingList(IntPtr L)
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 2);
+			ToLua.CheckArgsCount(L, 1);
 			int[] arg0 = ToLua.CheckNumberArray<int>(L, 1);
-			int[] arg1 = ToLua.CheckNumberArray<int>(L, 2);
-			System.Collections.Generic.Dictionary<int,int[]> o = AstarFight.setAllZhenxingList(arg0, arg1);
+			System.Collections.Generic.Dictionary<int,int[]> o = AstarFight.setAllZhenxingList(arg0);
 			ToLua.PushObject(L, o);
 			return 1;
 		}
@@ -149,25 +128,6 @@ public class AstarFightWrap
 			int arg1 = (int)LuaDLL.luaL_checknumber(L, 3);
 			int arg2 = (int)LuaDLL.luaL_checknumber(L, 4);
 			obj.setZhenxingInfo(arg0, arg1, arg2);
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int setQianFengInfo(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 4);
-			AstarFight obj = (AstarFight)ToLua.CheckObject(L, 1, typeof(AstarFight));
-			UnityEngine.Transform arg0 = (UnityEngine.Transform)ToLua.CheckUnityObject(L, 2, typeof(UnityEngine.Transform));
-			int arg1 = (int)LuaDLL.luaL_checknumber(L, 3);
-			int arg2 = (int)LuaDLL.luaL_checknumber(L, 4);
-			obj.setQianFengInfo(arg0, arg1, arg2);
 			return 0;
 		}
 		catch(Exception e)

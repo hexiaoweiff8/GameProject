@@ -42,7 +42,7 @@ public static class CustomSettings
         _DT(typeof(System.Predicate<int>)),
         _DT(typeof(System.Action<int>)),
         _DT(typeof(DG.Tweening.TweenCallback)),
-        _DT(typeof(System.Comparison<int>)),
+        _DT(typeof(System.Comparison<int>))
     };
 
     //在这里添加你要导出注册到lua的类型列表
@@ -229,7 +229,7 @@ public static class CustomSettings
         _GT(typeof (DP_FightPrefabManage)),
         _GT(typeof (RuntimePlatform)),
         _GT(typeof (EasyTouch)),
-        _GT(typeof (BaseFinger)),
+        _GT(typeof (BaseFinger)),   
         _GT(typeof (UIBasicSprite.Flip)),
         _GT(typeof (MFAModelRender)),
         _GT(typeof (BoxScrollObject)),
@@ -273,6 +273,7 @@ public static class CustomSettings
         _GT(typeof (UIToast.ShowType)),
         _GT(typeof (SceneChanger)),
         _GT(typeof (FightManager)),
+        _GT(typeof (FightManager.MemberType)),
         _GT(typeof (MapManager.MapDataParamsPacker)),
         _GT(typeof (UIPopupListExtended)),
         //_GT(typeof (OnDeleteItem)),
@@ -293,7 +294,8 @@ public static class CustomSettings
         _GT(typeof(MailItem)),
         _GT(typeof(MailLoopGrid)),
         _GT(typeof(WordFilter)),//敏感词过滤工具
-        _GT(typeof(ShadowObj)),
+        _GT(typeof(ShadowObj)),//阴影物体
+        _GT(typeof(PTZCamera)),//添加PTZ相机管理
         #endregion
         _GT(typeof(UnityEngine.SceneManagement.SceneManager)),
         _GT(typeof(UnityEngine.SceneManagement.LoadSceneMode)),

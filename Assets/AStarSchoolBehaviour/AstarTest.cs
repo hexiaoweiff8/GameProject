@@ -113,7 +113,7 @@ public class AstarTest : MonoBehaviour
         TriggerTicker.Single.Start();
         // 设定帧数
         Application.targetFrameRate = 60;
-        var loadMapPos = LoadMap.GetLeftBottom();
+        var loadMapPos = LoadMap.GetCenter();
         ClusterManager.Single.Init(loadMapPos.x + LoadMap.MapWidth * LoadMap.UnitWidth, loadMapPos.z + LoadMap.MapHeight * LoadMap.UnitWidth, MapWidth, MapHeight, UnitWidth, null);
 
         // 启动显示管理器
@@ -516,9 +516,9 @@ public class AstarTest : MonoBehaviour
                 var path = AStarPathFinding.SearchRoad(mapInfoData, lastTimeTargetX, lastTimeTargetY, posOnMap[0], posOnMap[1], DiameterX, DiameterY, IsJumpPoint);
                 // 根据path放地标, 使用组队寻路跟随过去
                 //StartCoroutine(Step(path));
-                
-                var loadMapPos = LoadMap.GetLeftBottom();
-                ClusterManager.Single.Init(loadMapPos.x + LoadMap.MapWidth * LoadMap.UnitWidth * 0.5f, loadMapPos.z + LoadMap.MapHeight * UnitWidth * 0.5f, MapWidth, MapHeight, UnitWidth, mapInfoData);
+
+                var loadMapPos = LoadMap.GetCenter();
+                ClusterManager.Single.Init(loadMapPos.x, loadMapPos.z, MapWidth, MapHeight, UnitWidth, mapInfoData);
                 //LoadMap.RefreshMap();
                 StartMoving(path, mapInfoData, lastTimeTargetX, lastTimeTargetY);
 
@@ -534,6 +534,7 @@ public class AstarTest : MonoBehaviour
             //    var testEffect = EffectsFactory.Single.CreateLinerEffect("linePrfb.prefab", null, new Vector3(0,0,0), new Vector3(100, 0, 100), 3, null, 12);
             //    testEffect.Begin();
             //}
+            Debug.Log(Profiler.GetMonoUsedSize() + "/" + Profiler.GetTotalAllocatedMemory());
         }
 
         if (Input.GetMouseButtonDown(2))
@@ -623,7 +624,6 @@ public class AstarTest : MonoBehaviour
         //    Debug.Log("cost:" + FightDataStatistical.Single.GetCostData(1));
         //}
 
-
         // 绘制关闭列表
         DrawCloseMap(AStarPathFinding.closePathMap);
     }
@@ -638,7 +638,7 @@ public class AstarTest : MonoBehaviour
             if (item is ClusterData)
             {
                 // 打印血量
-                Debug.Log(item.AllData.MemberData.CurrentHP);
+                Debug.Log(item.Quality);
             }
         }
     }
@@ -653,7 +653,8 @@ public class AstarTest : MonoBehaviour
         //var mapInfoData = DeCodeInfo(mapInfoStr);
         var mapInfoData = MapManager.Instance().GetMapInfoById(1, 1);
         LoadMap.Init(mapInfoData, UnitWidth);
-        ClusterManager.Single.Init(-MapWidth * 0.5f, -MapHeight * 0.5f, MapWidth, MapHeight, UnitWidth, mapInfoData);
+        var pos = LoadMap.Single.GetCenter();
+        ClusterManager.Single.Init(pos.x, pos.z, MapWidth, MapHeight, UnitWidth, mapInfoData);
         MapWidth = mapInfoData[0].Length;
         MapHeight = mapInfoData.Length;
         return mapInfoData;

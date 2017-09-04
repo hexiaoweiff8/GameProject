@@ -33,6 +33,7 @@ end
 
 function wnd_zhanshu_controller:OnReOpenDone()
     this.model:initModel()
+
     for k,v in pairs(this.model.CardDataList) do
         for a,b in pairs(this.CardItemList) do
             if( v["ArmyCardID"] == b["Data"]["ArmyCardID"]) then
@@ -57,6 +58,34 @@ function wnd_zhanshu_controller:OnReOpenDone()
                     this:SetCardJindu(b["Data"]["CardNum"], b["Data"]["StarCost"], b["Pic"].transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_pic").gameObject)
                 end
             end
+        end
+    end
+
+
+    for _,v in pairs(this.model.CardDataList) do
+        local ishave = false
+        for _,k in pairs(this.CardItemList) do
+            if(v["ArmyCardID"] == k["Data"]["ArmyCardID"]) then
+                ishave = true
+            end
+        end
+        if(not ishave) then
+            local CardData = {}
+            CardData = v
+            local go = nil
+            go =  GameObjectExtension.InstantiateFromPreobj(this.view.carditem,this.view.cardGrid)
+            this:SetCardPic(go, CardData,false)
+            go:SetActive(true)
+            local CardItem = {}
+            CardItem["Data"] = CardData
+            CardItem["Pic"] = go
+            table.insert(this.CardItemList,CardItem)
+            this.view.cardGrid:GetComponent("UIGrid"):Reposition()
+            --绑定动画
+            --TODO:测试一下动画绑定事件
+            this:KillAllToggleAnime()
+            this:BindingAll()
+            this:StartAllToggleAnime()
         end
     end
 end
@@ -95,6 +124,8 @@ function wnd_zhanshu_controller:InitData()
 end
 
 function wnd_zhanshu_controller:InitCardItemList()
+    this.view.cardGrid:GetComponent("UIGrid").enabled = true
+
     if(#this.model.CardDataList == 0) then
         return
     end
@@ -109,7 +140,7 @@ function wnd_zhanshu_controller:InitCardItemList()
         else
             go =  GameObjectExtension.InstantiateFromPreobj(this.view.carditem,this.view.cardGrid)
         end
-        this:SetCardPic(go, CardData)
+        this:SetCardPic(go, CardData,false)
         go:SetActive(true)
         local CardItem = {}
         CardItem["Data"] = CardData
@@ -117,11 +148,17 @@ function wnd_zhanshu_controller:InitCardItemList()
         table.insert(this.CardItemList,CardItem)
     end
 
-    this.view.cardGrid:GetComponent("UIGrid"):Reposition()
-    this:ShowCardInfo(this.CardItemList[1]["Pic"].transform:Find("card_bg/card_icon").gameObject)
-    this.ShowItemData = this.CardItemList[1]["Data"]
-    --this:BindingToggleAnime(this.view.cardinfo_item.transform:Find("card_jindu_frame/card_ns_widget").gameObject:GetComponent(typeof(UIWidget)))
+    this:ReSetCardList()
 
+    for i=1,#this.CardItemList do
+        if(this.CardItemList[i]["Data"]["Active"] == true) then
+            this:ShowCardInfo(this.CardItemList[i]["Pic"].transform:Find("card_bg/card_icon").gameObject)
+            this.ShowItemData = this.CardItemList[i]["Data"]
+            break
+        end
+    end
+
+    --this:BindingToggleAnime(this.view.cardinfo_item.transform:Find("card_jindu_frame/card_ns_widget").gameObject:GetComponent(typeof(UIWidget)))
     this:BindingAll()
     this:StartAllToggleAnime()
 end
@@ -182,7 +219,6 @@ function wnd_zhanshu_controller:InitListener()
     UIEventListener.Get(this.view.xiangqing_bg).onClick = function()
         this:GOtoCardYc(this.ShowItemData["ArmyCardID"])
     end
-
 end
 ---------------------------------------------
 
@@ -208,21 +244,29 @@ function wnd_zhanshu_controller:ChangeCard(go,isPressed)
         ctype = 2
     end
 
-    for i=1,#this.CardItemList do
-        if(ctype ==0 )then
+    if(ctype == 0) then
+        for i=1,#this.CardItemList do
             this.CardItemList[i]["Pic"]:SetActive(true)
-            this.CardItemList[i]["Pic"].transform:SetAsLastSibling()
-        else
+        end
+        this:ReSetCardList()
+    else
+        for i=1,#this.CardItemList do
             if( this.CardItemList[i]["Data"]["ArmyType"] == ctype) then
                 this.CardItemList[i]["Pic"]:SetActive(true)
-            else
+                if(this.CardItemList[i]["Data"]["Active"] == false) then
+                    this.CardItemList[i]["Pic"].transform:SetAsLastSibling()
+                end
+            end
+        end
+
+        for i=1,#this.CardItemList do
+            if(this.CardItemList[i]["Data"]["ArmyType"] ~= ctype) then
                 this.CardItemList[i]["Pic"]:SetActive(false)
                 this.CardItemList[i]["Pic"].transform:SetAsLastSibling()
             end
         end
+        this.view.cardGrid:GetComponent("UIGrid"):Reposition()
     end
-
-    this.view.cardGrid:GetComponent("UIGrid"):Reposition()
     this.view.cardpanel:GetComponent(typeof(UIScrollView)):ResetPosition()
 end
 
@@ -251,7 +295,19 @@ function wnd_zhanshu_controller:ShowCardInfo(go)
             CardData = v["Data"]
         end
     end
-    this:SetCardPic(this.view.cardinfo_item, CardData)
+
+    if(CardData["Active"] == false) then
+        this.view.cardinfo_item.transform:Find("card_jindu_frame/card_ns_widget").gameObject.transform.localPosition = Vector3(9999,9999,0)
+        this.view.xiangqing_bg:SetActive(false)
+        this.view.weijihuo_bg:SetActive(true)
+    else
+        this.view.cardinfo_item.transform:Find("card_jindu_frame/card_ns_widget").gameObject.transform.localPosition = Vector3(0,0,0)
+        this.view.xiangqing_bg:SetActive(true)
+        this.view.weijihuo_bg:SetActive(false)
+    end
+
+
+    this:SetCardPic(this.view.cardinfo_item, CardData,true)
     this.view.cardinfo_item:SetActive(true)
     this.view.cardinfo_characteristic:GetComponent(typeof(UILabel)).text = CardData["Des"]
 
@@ -335,6 +391,7 @@ function wnd_zhanshu_controller:AddCloneCardToTuiyi(go,TouchPosition)
                 CardData = v["Data"]
                 if(CardData["CardNum"] == 0 ) then
                     --如果没有卡牌就返回
+                    print("返回喽！")
                     return
                 end
             end
@@ -372,22 +429,61 @@ end
 ------------------------------------
 
 ---------工具部分-------------------------
---@Des 设置卡牌图片
-function wnd_zhanshu_controller:SetCardPic(go,CardData)
-    go.transform.name = tostring(CardData["ArmyCardID"])
-    go.transform:Find("card_bg/card_icon"):GetComponent(typeof(UISprite)).spriteName = CardData["IconID"]
-    go.transform:Find("card_name/card_name_label"):GetComponent(typeof(UILabel)).text = CardData["Name"]
-    go.transform:Find("card_bg/lv_frame/lv_bg/lv_label"):GetComponent(typeof(UILabel)).text = "LV."..tostring(CardData["Level"])
+function wnd_zhanshu_controller:ReSetCardList()
 
-    if(go.transform:Find("card_jindu_frame/card_ns_widget/card_ns_icon"):GetComponent("UISprite").spriteName =="duihuanshangdian_tubiao_keshengkapai") then
-        go.transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_label").gameObject:GetComponent("UILabel").text = tostring(CardData["CardNum"]).."/"..tostring(CardData["UseLimitCost"])
-        this:SetCardJindu(CardData["CardNum"], CardData["UseLimitCost"], go.transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_pic").gameObject)
-    else
-        go.transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_label").gameObject:GetComponent("UILabel").text = tostring(CardData["CardNum"]).."/"..tostring(CardData["StarCost"])
-        this:SetCardJindu(CardData["CardNum"], CardData["StarCost"], go.transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_pic").gameObject)
+    for i=1,#this.CardItemList do
+        if(this.CardItemList[i]["Data"]["Active"] == true) then
+            this.CardItemList[i]["Pic"].transform:SetAsLastSibling()
+        end
     end
 
-    this:SetStar(go,CardData["Star"],1)
+    for i=1,#this.CardItemList do
+        if(this.CardItemList[i]["Data"]["Active"] == false) then
+            this.CardItemList[i]["Pic"].transform:SetAsLastSibling()
+        end
+    end
+
+    this.view.cardGrid:GetComponent("UIGrid"):Reposition()
+
+end
+
+
+
+
+--@Des 设置卡牌图片
+function wnd_zhanshu_controller:SetCardPic(go,CardData,isShowInfo)
+    if(CardData["Active"] == true) then
+        if(not isShowInfo) then
+            if(go.transform:Find("card_weijihuo").gameObject.activeSelf) then
+                go.transform:Find("card_weijihuo").gameObject:SetActive(false)
+            end
+        end
+        go.transform.name = tostring(CardData["ArmyCardID"])
+        go.transform:Find("card_bg/card_icon"):GetComponent(typeof(UISprite)).spriteName = CardData["IconID"]
+        go.transform:Find("card_name/card_name_label"):GetComponent(typeof(UILabel)).text = CardData["Name"]
+        go.transform:Find("card_bg/lv_frame/lv_bg/lv_label"):GetComponent(typeof(UILabel)).text = "LV."..tostring(CardData["Level"])
+        if(go.transform:Find("card_jindu_frame/card_ns_widget").gameObject.activeSelf == false) then
+            go.transform:Find("card_jindu_frame/card_ns_widget").gameObject:SetActive(true)
+        end
+        if(go.transform:Find("card_jindu_frame/card_ns_widget/card_ns_icon"):GetComponent("UISprite").spriteName =="duihuanshangdian_tubiao_keshengkapai") then
+            go.transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_label").gameObject:GetComponent("UILabel").text = tostring(CardData["CardNum"]).."/"..tostring(CardData["UseLimitCost"])
+            this:SetCardJindu(CardData["CardNum"], CardData["UseLimitCost"], go.transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_pic").gameObject)
+        else
+            go.transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_label").gameObject:GetComponent("UILabel").text = tostring(CardData["CardNum"]).."/"..tostring(CardData["StarCost"])
+            this:SetCardJindu(CardData["CardNum"], CardData["StarCost"], go.transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_pic").gameObject)
+        end
+        this:SetStar(go,CardData["Star"],1)
+    else
+        if(not isShowInfo) then
+            go.transform:Find("card_weijihuo").gameObject:SetActive(true)
+        end
+        go.transform.name = tostring(CardData["ArmyCardID"])
+        go.transform:Find("card_bg/card_icon"):GetComponent(typeof(UISprite)).spriteName = CardData["IconID"]
+        go.transform:Find("card_name/card_name_label"):GetComponent(typeof(UILabel)).text = CardData["Name"]
+        go.transform:Find("card_bg/lv_frame/lv_bg/lv_label"):GetComponent(typeof(UILabel)).text = "LV."..tostring(CardData["Level"])
+        go.transform:Find("card_jindu_frame/card_ns_widget").gameObject:SetActive(false)
+        this:SetStar(go,CardData["Star"],1)
+    end
 end
 
 --@Des 在单击卡牌时判断面板状态
@@ -532,7 +628,14 @@ function wnd_zhanshu_controller:ClosePanel()
         this.view.btn_soldierctr:GetComponent("UISprite").spriteName = "kapai_anniu_tuiyi"
     end
     this:ChangeCard(this.view.tags["tag_all"], true)
-    this:ShowCardInfo(this.CardItemList[1]["Pic"].transform:Find("card_bg/card_icon").gameObject)
+    for i=1,#this.CardItemList do
+        if(this.CardItemList[i]["Data"]["Active"] == true) then
+            this:ShowCardInfo(this.CardItemList[i]["Pic"].transform:Find("card_bg/card_icon").gameObject)
+            this.ShowItemData = this.CardItemList[i]["Data"]
+            break
+        end
+    end
+   -- this:ShowCardInfo(this.CardItemList[1]["Pic"].transform:Find("card_bg/card_icon").gameObject)
 
     this:TuiyiCtr()
     --instance:Hide(0)
@@ -540,30 +643,26 @@ end
 
 --@Des 转换到编队界面
 function wnd_zhanshu_controller:GotoBiandui()
-    print("运行GOTOBIANDUI")
-    -- this:KillAllToggleAnime()
     this:ClosePanel()
-    local wnd_instance = ui_manager:GetWB("ui_biandui")
-    if(wnd_instance == nil) then
-        ui_manager:ShowWB("ui_biandui")
-    else
-        wnd_instance:Show()
+    instance:Hide(0)
+    local function callback()
+        ui_manager:ShowWB("ui_zhanshu")
     end
+    ui_manager:ShowWB("ui_biandui",instance.wnd_base_id,callback)
 end
 
 --@Des 转换到卡牌信息界面
 function wnd_zhanshu_controller:GOtoCardYc(cardId)
     wnd_cardyc_controller:ShowCard(cardId)
-    local wnd_instance = ui_manager:GetWB("ui_cardyc")
-    if(wnd_instance == nil) then
-        ui_manager:ShowWB("ui_cardyc")
-    else
-        wnd_instance:Show()
+    instance:Hide(0)
+    local function callback()
+        ui_manager:ShowWB("ui_zhanshu")
     end
+    ui_manager:ShowWB("ui_cardyc",instance.wnd_base_id,callback)
 end
 ------------------------------------------
 
----------退役部分---------------
+---------退役部分--------------------------
 --@Des 点击退役按钮
 function wnd_zhanshu_controller:TuiyiCtr()
     local CardToCoinItemLst = {}
@@ -676,23 +775,26 @@ end
 --@Des 设置动画渐变转换事件
 function wnd_zhanshu_controller:ToggleIndicator()
     for i = 1,#this.CardItemList,1 do
-        local cardItem = this.CardItemList[i]["Pic"]
-        local cardData = this.CardItemList[i]["Data"]
-        local card_ns_icon = cardItem.transform:Find("card_jindu_frame/card_ns_widget/card_ns_icon").gameObject
-        local card_ns_pic = cardItem.transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_pic").gameObject
-        local card_ns_label = cardItem.transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_label").gameObject
-        if(card_ns_icon:GetComponent("UISprite").spriteName =="duihuanshangdian_tubiao_keshengkapai") then
-            card_ns_icon:GetComponent("UISprite").spriteName = "duihuanshangdian_tubiao_keshengxing"
-            card_ns_pic:GetComponent("UISprite").spriteName = "duihuanshangdian_juxing_shuzhi_shengxing"
-            card_ns_label:GetComponent("UILabel").text = tostring(cardData["CardNum"]).."/"..tostring(cardData["StarCost"])
-            this:SetCardJindu(cardData["CardNum"], cardData["StarCost"], cardItem.transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_pic").gameObject)
-        else
-            card_ns_icon:GetComponent("UISprite").spriteName = "duihuanshangdian_tubiao_keshengkapai"
-            card_ns_pic:GetComponent("UISprite").spriteName = "duihuanshangdian_juxing_shuzhi_shengkapai"
-            card_ns_label:GetComponent("UILabel").text = tostring(cardData["CardNum"]).."/"..tostring(cardData["UseLimitCost"])
-            this:SetCardJindu(cardData["CardNum"], cardData["UseLimitCost"], cardItem.transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_pic").gameObject)
+        if(this.CardItemList[i]["Data"]["Active"] == true) then
+            local cardItem = this.CardItemList[i]["Pic"]
+            local cardData = this.CardItemList[i]["Data"]
+            local card_ns_icon = cardItem.transform:Find("card_jindu_frame/card_ns_widget/card_ns_icon").gameObject
+            local card_ns_pic = cardItem.transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_pic").gameObject
+            local card_ns_label = cardItem.transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_label").gameObject
+            if(card_ns_icon:GetComponent("UISprite").spriteName =="duihuanshangdian_tubiao_keshengkapai") then
+                card_ns_icon:GetComponent("UISprite").spriteName = "duihuanshangdian_tubiao_keshengxing"
+                card_ns_pic:GetComponent("UISprite").spriteName = "duihuanshangdian_juxing_shuzhi_shengxing"
+                card_ns_label:GetComponent("UILabel").text = tostring(cardData["CardNum"]).."/"..tostring(cardData["StarCost"])
+                this:SetCardJindu(cardData["CardNum"], cardData["StarCost"], cardItem.transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_pic").gameObject)
+            else
+                card_ns_icon:GetComponent("UISprite").spriteName = "duihuanshangdian_tubiao_keshengkapai"
+                card_ns_pic:GetComponent("UISprite").spriteName = "duihuanshangdian_juxing_shuzhi_shengkapai"
+                card_ns_label:GetComponent("UILabel").text = tostring(cardData["CardNum"]).."/"..tostring(cardData["UseLimitCost"])
+                this:SetCardJindu(cardData["CardNum"], cardData["UseLimitCost"], cardItem.transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_pic").gameObject)
+            end
         end
     end
+
 
     local cardData = {}
     for k,v in pairs(this.CardItemList) do
@@ -700,6 +802,7 @@ function wnd_zhanshu_controller:ToggleIndicator()
             cardData = v["Data"]
         end
     end
+
     local card_ns_icon = this.view.cardinfo_item.transform:Find("card_jindu_frame/card_ns_widget/card_ns_icon").gameObject
     local card_ns_pic = this.view.cardinfo_item.transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_pic").gameObject
     local card_ns_label = this.view.cardinfo_item.transform:Find("card_jindu_frame/card_ns_widget/card_ns_frame/card_ns_label").gameObject
@@ -716,11 +819,15 @@ function wnd_zhanshu_controller:ToggleIndicator()
     end
 end
 
+
+
 --@Des 绑定所有淡入淡出动画
 function wnd_zhanshu_controller:BindingAll()
     for i = 1,#this.CardItemList,1 do
-        local picwidget = this.CardItemList[i]["Pic"].transform:Find("card_jindu_frame/card_ns_widget").gameObject:GetComponent(typeof(UIWidget))
-        this:BindingToggleAnime(picwidget)
+        if(this.CardItemList[i]["Data"]["Active"]) then
+            local picwidget = this.CardItemList[i]["Pic"].transform:Find("card_jindu_frame/card_ns_widget").gameObject:GetComponent(typeof(UIWidget))
+            this:BindingToggleAnime(picwidget)
+        end
     end
 end
 

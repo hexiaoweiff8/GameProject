@@ -61,9 +61,7 @@ function wnd_base:Show(pre_wnd_base_id,duration)
     if duration == nil then
         duration = 0.5
     end
-    if pre_wnd_base_id ~= nil then
-        self.pre_wnd_base_id = pre_wnd_base_id
-    end
+    self.pre_wnd_base_id = pre_wnd_base_id
     local isWithBg
     if self.wnd_base_baffleType == wnd_base_baffleType.WITHBG then
         isWithBg = true

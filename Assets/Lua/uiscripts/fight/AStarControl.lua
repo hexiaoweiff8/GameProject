@@ -32,9 +32,9 @@ end
 ---
 ---获取所有阵型表
 ---
-function AStarControl:getAllZhengXingList(paiKutb, paiKuLeveltb)
+function AStarControl:getAllZhengXingList(paiKutb)
     if self.AstarFight then
-        return self.AstarFight.setAllZhenxingList(paiKutb, paiKuLeveltb)
+        return self.AstarFight.setAllZhenxingList(paiKutb)
     end
     Debugger.LogWarning("获取所有阵型表出错，可能是未初始化AStarFight！！！")
 end
@@ -77,28 +77,6 @@ function AStarControl:setZhangAi(position, index)
     Debugger.LogWarning("设置阵型信息出错，可能是未初始化AStarFight！！！")
 
 end
-
-
----
----设置前锋模型阵型信息
----
-function AStarControl:setQianFengInfo(go, id, index)
-    if self.AstarFight then
-        self.AstarFight:setQianFengInfo(go, id, index)
-        return
-    end
-    Debugger.LogWarning("设置阵型信息出错，可能是未初始化AStarFight！！！")
-end
-
-function AStarControl:setQianFengZhangAi(position, index)
-    if self.AstarFight then
-        self.AstarFight:isQianFengZhangAi(position, index)
-        return
-    end
-    Debugger.LogWarning("设置阵型信息出错，可能是未初始化AStarFight！！！")
-
-end
-
 
 function AStarControl:OnDestroyDone()
     self.AstarFight = nil

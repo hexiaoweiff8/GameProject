@@ -87,21 +87,12 @@ Const = class("Const")
     }
 
 
-    ---我的预摆放模型的位置
-    Const.MyPreModelPosition = {
-        [1] = Vector3(-300,0,0),
-        [2] = Vector3(-100,0,0),
-        [3] = Vector3(-300,0,-50),
-        [4] = Vector3(-100,0,-50),
-        [5] = Vector3(-300,0,-100),
-        [6] = Vector3(-100,0,-100),
-    }
 
     Const.MAX_FEI = 100
     Const.START_FEI = 60
     Const.FEI_GROW_SPEED = 5
-
-
     Const.COSTUNIT = 10
+    Const.IS_AI_TEST = false
+
 
 return Const

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using JetBrains.Annotations;
+using UnityEngine;
 using System.Collections;
 
 #if UNITY_EDITOR
@@ -7,10 +8,30 @@ using UnityEditor;
 
 [ExecuteInEditMode]
 [AddComponentMenu("QK/PTZCamera")]
-public class PTZCamera : MonoBehaviour {
+public class PTZCamera : MonoBehaviour
+{
+    private static PTZCamera instence;
+    public PTZCamera Instence
+    {
+        get
+        {
+            
+            if (instence == null)
+            {
+                instence = GameObject.Find("PTZCamera").GetComponent<PTZCamera>();
+                if (instence == null)
+                {
+                    Debug.LogError("PTZCamera 为空！！");
+                }
+            }
+            return instence;
+        }
+        
+    }
 
     void Awake()
     {
+        instence = this;
         m_Cameras = GetComponentsInChildren<Camera>();
         UpdateAll();
     }
@@ -74,7 +95,7 @@ public class PTZCamera : MonoBehaviour {
         UpdateNearClipPlane();
     }
 
-#if UNITY_EDITOR
+//#if UNITY_EDITOR
     void Update()
     {
         m_findNewCameraTime += Time.deltaTime;
@@ -107,7 +128,7 @@ public class PTZCamera : MonoBehaviour {
     }
 
     float m_findNewCameraTime = 0;
-#endif
+//#endif
 
     [SerializeField]
     [HideInInspector]
@@ -122,4 +143,40 @@ public class PTZCamera : MonoBehaviour {
      float m_FarClipPlane = 10000f;
 
     Camera[] m_Cameras;
+
+    public static void HideShadowCamera()
+    {
+        //foreach (var ca in instence.m_Cameras)
+        //{
+        //    if (ca.gameObject.name == "ShadowCamera")
+        //    {
+        //        ca.gameObject.SetActive(false);
+        //        return;
+        //    }
+        //}
+       
+        if (instence.transform.FindChild("ShadowCamera").gameObject != null)
+        {
+            instence.transform.FindChild("ShadowCamera").gameObject.SetActive(false) ;
+        }
+        
+
+    }
+
+    public static void ShowShadowCamera()
+    {
+        //foreach (var ca in instence.m_Cameras)
+        //{
+        //    if (ca.gameObject.name == "ShadowCamera")
+        //    {
+        //        ca.gameObject.SetActive(true);
+        //        return;
+        //    }
+        //}
+        if (instence.transform.FindChild("ShadowCamera").gameObject != null)
+        {
+            instence.transform.FindChild("ShadowCamera").gameObject.SetActive(true) ;
+        }
+    }
+
 }

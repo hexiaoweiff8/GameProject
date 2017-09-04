@@ -72,6 +72,7 @@ function wnd_cardyc_controller:OnShowDone()
     self:refresh_leftCard_Data()
     UIEventListener.Get(view.btn_Back).onClick = function(go)
         self:Hide(0)
+        ui_manager:go_back()
         --self:Destroy(0)
         RefreshManager.RefreshRedDot(self.wnd_base_id)
         --if ui_manager._shown_wnd_bases[WNDTYPE.Prefight] == nil then

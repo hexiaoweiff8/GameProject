@@ -217,7 +217,7 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
             {
                 quality = Diameter*Diameter;
             }
-            return quality; 
+            return quality + plusQuality; 
         }
         set { quality = value; }
     }
@@ -279,7 +279,13 @@ public abstract class PositionObject : MonoBehaviour, IBaseMember, IGraphicsHold
     /// <summary>
     /// 物体质量
     /// </summary>
-    private float quality = 0;
+    protected float quality = 0;
+
+    /// <summary>
+    /// 附加质量
+    /// 用于挤开其他未到达目标单位
+    /// </summary>
+    protected float plusQuality = 0f;
 
     ///// <summary>
     ///// 单元直径

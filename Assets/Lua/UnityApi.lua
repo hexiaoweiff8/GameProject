@@ -15165,17 +15165,11 @@ function Clear() end
 ----Void AstarFight:isZhangAi(Vector3 mapPosition,Int32 index)
 function isZhangAi() end 
 
-----Void AstarFight:isQianFengZhangAi(Vector3 mapPosition,Int32 index)
-function isQianFengZhangAi() end 
-
-----Dictionary`2 AstarFight.setAllZhenxingList(Int32[] cardID,Int32[] level)
+----Dictionary`2 AstarFight.setAllZhenxingList(Int32[] cardID)
 function AstarFight.setAllZhenxingList() end 
 
 ----Void AstarFight:setZhenxingInfo(Transform go,Int32 cardID,Int32 index)
 function setZhenxingInfo() end 
-
-----Void AstarFight:setQianFengInfo(Transform go,Int32 cardID,Int32 index)
-function setQianFengInfo() end 
 
 ----Vector3 AstarFight:getNum(Vector3 p)
 function getNum() end 
@@ -16511,6 +16505,16 @@ function SetMemberDeadAction() end
 ----HurtType FightManager.GetDemageHurtType(TriggerData trigger)
 function FightManager.GetDemageHurtType() end 
 
+MemberType = {} 
+
+Base = nil;
+
+Turret = nil;
+
+Soldier = nil;
+
+Tank = nil;
+
 MapDataParamsPacker = {} 
 --*
 --[Comment]
@@ -17280,6 +17284,70 @@ hideFlags = nil
 --*
 ----Void ShadowObj.ObjAddShadow(Transform tran)
 function ShadowObj.ObjAddShadow() end 
+
+PTZCamera = {} 
+--*
+--[Comment]
+--consturctor for PTZCamera overrides:
+--*
+--PTZCamera.New()
+--*
+
+function PTZCamera.New() end
+--*
+--[Comment]
+-- property: PTZCamera PTZCamera.Instence	get	
+Instence = nil 
+--*
+--[Comment]
+-- property: Single PTZCamera.Field	get	set	
+Field = nil 
+--*
+--[Comment]
+-- property: Single PTZCamera.NearClipPlane	get	set	
+NearClipPlane = nil 
+--*
+--[Comment]
+-- property: Single PTZCamera.FarClipPlane	get	set	
+FarClipPlane = nil 
+--*
+--[Comment]
+-- property: Boolean PTZCamera.useGUILayout	get	set	
+useGUILayout = nil 
+--*
+--[Comment]
+-- property: Boolean PTZCamera.enabled	get	set	
+enabled = nil 
+--*
+--[Comment]
+-- property: Boolean PTZCamera.isActiveAndEnabled	get	
+isActiveAndEnabled = nil 
+--*
+--[Comment]
+-- property: Transform PTZCamera.transform	get	
+transform = nil 
+--*
+--[Comment]
+-- property: GameObject PTZCamera.gameObject	get	
+gameObject = nil 
+--*
+--[Comment]
+-- property: String PTZCamera.tag	get	set	
+tag = nil 
+--*
+--[Comment]
+-- property: String PTZCamera.name	get	set	
+name = nil 
+--*
+--[Comment]
+-- property: HideFlags PTZCamera.hideFlags	get	set	
+hideFlags = nil 
+--*
+----Void PTZCamera.HideShadowCamera()
+function PTZCamera.HideShadowCamera() end 
+
+----Void PTZCamera.ShowShadowCamera()
+function PTZCamera.ShowShadowCamera() end 
 
 SceneManager = {} 
 --*

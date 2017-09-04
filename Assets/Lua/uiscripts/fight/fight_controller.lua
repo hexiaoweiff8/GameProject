@@ -14,13 +14,13 @@ local cardInHand
 local power
 local enemyCard
 local _isPause
-
-local FPSFrames
-local FPSTime
-
+local _isJumpToMyMain
+local _isJumpToMyFirst
+local _FPSFrames
+local _FPSTime
 function fight_controller:OnShowDone()
 
-
+    PTZCamera.ShowShadowCamera()--开启阴影相机
     _view = require("uiscripts/fight/fight_view")
     _data = require("uiscripts/fight/fight_model")
     restCard = require("uiscripts/fight/restCard/restCard_controller")
@@ -32,22 +32,17 @@ function fight_controller:OnShowDone()
     require("uiscripts/fight/QianFengModel")
     require("uiscripts/fight/touchControl")
     require("uiscripts/fight/modelControl")
-    require("uiscripts/fight/AStarControl")
-    require("uiscripts/fight/CanNotArea")
-    require("uiscripts/commonGameObj/Model")
     _isPause = false
-    FPSFrames = 0
-    FPSTime = 0
+    _isJumpToMyMain = false
+    _isJumpToMyFirst = false
+    _FPSFrames = 0
+    _FPSTime = 0
     ---
     ---初始化view和数据
     ---
     _view:init(self)
     _data:getDatas()
 
-    CanNotArea:Init()
-    local maxDropX = CanNotArea:GetMaxDropX()
-    AStarControl:Init(maxDropX)
-    Model:setZhenXingData(_data.AllCardIDtb, _data.AllCardLeveltb)
     QianFengModel:Init(_data.QianFengCard)
     QianFengModel:Start()
     ---
@@ -67,27 +62,23 @@ function fight_controller:OnShowDone()
     self:StartTimer()
 
     self:initPause()
+
 end
 
 ---初始化跳转按钮
 function fight_controller:initJumpButton()
-
-    ---双方主基地
-    self.myMainBuild = GameObject.Find("/BuildingParent").transform:GetChild(2)
-    self.myFirstSoldier = GameObject.Find("/BuildingParent").transform:GetChild(3)
-    UIEventListener.Get(_view.jumpToMyMain).onPress = function (go, args)
-        if args then
-            if self.myMainBuild then
-                _view.UIFollow.Target = self.myMainBuild
-            end
-        end
+    EasyTouch.On_TouchDown = EasyTouch.On_TouchDown + function()
+        _isJumpToMyMain = false
+        _isJumpToMyFirst = false
     end
-    UIEventListener.Get(_view.jumpToFirst).onPress = function (go, args)
-        if args then
-            if self.myFirstSoldier then
-                _view.UIFollow.Target = self.myFirstSoldier
-            end
-        end
+    ---双方主基地
+    self.myMainBuildPosition = FightManager.Single:GetPos(1,FightManager.MemberType.Base)---获取我方基地的位置
+    self.myFirstSoldierPosition = FightManager.Single:GetPos(2,FightManager.MemberType.Base)
+    UIEventListener.Get(_view.jumpToMyMain).onClick = function (go)
+        _isJumpToMyMain = true
+    end
+    UIEventListener.Get(_view.jumpToFirst).onClick = function (go)
+        _isJumpToMyFirst = true
     end
 end
 
@@ -118,7 +109,10 @@ end
 
 function fight_controller:Update()
 
-    if not CanNotArea.cannotRect then
+    if not CanNotArea  then
+        return
+    end
+    if  not CanNotArea.cannotRect then
         return
     end
     if _isPause then
@@ -129,12 +123,15 @@ function fight_controller:Update()
     ---
     userInfo:refreshHP()
 
-
     ---
     ---控制跳转我的主基地按钮的显隐
     ---
-    local myMainBuild_UIPosition = _view.nowWorldCamera:WorldToScreenPoint(self.myMainBuild.position)
 
+
+    if _isJumpToMyMain then
+        _view.BoxScrollObject:MoveTo(_view.PTZCameraTf.position - Vector3(20, 0, 0))
+    end
+    local myMainBuild_UIPosition = _view.nowWorldCamera:WorldToScreenPoint(self.myMainBuildPosition)
     if myMainBuild_UIPosition.x < UnityEngine.Screen.width/7 then
         if not _view.jumpToMyMain.activeSelf then
             _view.jumpToMyMain:SetActive(true)
@@ -142,13 +139,16 @@ function fight_controller:Update()
     else
         if _view.jumpToMyMain.activeSelf then
             _view.jumpToMyMain:SetActive(false)
-            _view.UIFollow:Stop()
+            _isJumpToMyMain = false
         end
     end
     ---
     ---控制跳转我的排头兵按钮的显隐
     ---
-    local myFirstSoldier_UIPosition = _view.nowWorldCamera:WorldToScreenPoint(self.myFirstSoldier.position)
+    if _isJumpToMyFirst then
+        _view.BoxScrollObject:MoveTo(_view.PTZCameraTf.position + Vector3(20, 0, 0))
+    end
+    local myFirstSoldier_UIPosition = _view.nowWorldCamera:WorldToScreenPoint(self.myFirstSoldierPosition)
     if myFirstSoldier_UIPosition.x > UnityEngine.Screen.width*6/7 then
         if not _view.jumpToFirst.activeSelf then
             _view.jumpToFirst:SetActive(true)
@@ -156,7 +156,7 @@ function fight_controller:Update()
     else
         if _view.jumpToFirst.activeSelf then
             _view.jumpToFirst:SetActive(false)
-            _view.UIFollow:Stop()
+            _isJumpToMyFirst = false
         end
     end
 
@@ -189,10 +189,12 @@ function fight_controller:Update()
 
 
     ---计算FPS
-    FPSFrames = FPSFrames + 1
-    FPSTime = FPSTime + Time.deltaTime
-    if FPSTime >= 1 then
-        _view.FPSLable:GetComponent("UILabel").text = string.format("fps:%3d",FPSFrames/FPSTime)
+    _FPSFrames = _FPSFrames + 1
+    _FPSTime = _FPSTime + Time.deltaTime
+    if _FPSTime >= 1 then
+        _view.FPSLable:GetComponent("UILabel").text = string.format("fps:%3d",_FPSFrames/_FPSTime)
+        _FPSFrames = 0
+        _FPSTime = 0
     end
 end
 
@@ -257,7 +259,7 @@ end
 
 
 function fight_controller:OnHideDone()
-    print("OnHideDone")
+    print("fight_controller OnHideDone")
 end
 function fight_controller:OnDestroyDone()
     restCard:OnDestroyDone()
@@ -280,6 +282,10 @@ function fight_controller:OnDestroyDone()
     power = nil
     enemyCard = nil
     _isPause = nil
+    _isJumpToMyMain = nil
+    _isJumpToMyFirst = nil
+    _FPSFrames = nil
+    _FPSTime = nil
     Memory.free("uiscripts/fight/fight_view")
     Memory.free("uiscripts/fight/fight_model")
     Memory.free("uiscripts/fight/restCard/restCard_controller")
@@ -293,9 +299,10 @@ function fight_controller:OnDestroyDone()
     Memory.free("uiscripts/fight/modelControl")
     Memory.free("uiscripts/fight/AStarControl")
     Memory.free("uiscripts/fight/CanNotArea")
-    Memory.free("uiscripts/commonGameObj/Model")
     Memory.free("uiscripts/fight/fight_controller")
     fight_controller = nil
+
+    PTZCamera.HideShadowCamera()--关闭阴影相机
 end
 
 return fight_controller

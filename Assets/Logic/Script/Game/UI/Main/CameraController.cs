@@ -9,10 +9,12 @@ public class CameraController : MonoBehaviour
     public static Camera MainSceneCamera;
 
     #region Private References      
-    [SerializeField, Range(0.0f, 1.0f)]
-    private float _lerpRate;
+    //[SerializeField, Range(0.0f, 1.0f)]
+    //private float _lerpRate;
+    [SerializeField, Range(0.0f, 5.0f)]
+    private float _lerpTime = 0.25f;
     [SerializeField, Range(0.01f, 1.0f)]
-    private float _moveSpeed = 0.4f;
+    private float _moveSpeed = 0.17f;
 
     private float _xMovement;
     private float _yMovement;
@@ -23,8 +25,8 @@ public class CameraController : MonoBehaviour
     private Vector3 origCameraPosition;
     private Quaternion origCameraRotation;
     //当前状态枚举 
-    private static UIState _uiState = UIState.Free;
-    public static CameraState _cameraState = CameraState.isStatic;
+    private static UIState _uiState;
+    public static CameraState _cameraState;
     //当前是否正在播放相机动画
     private static bool isPlayingAnime = false;
     //通过场景交互打开游戏UI时的标记
@@ -53,6 +55,11 @@ public class CameraController : MonoBehaviour
             return;
         _xMovement += xMovement;
         _yMovement += yMovement;
+
+        if (_xMovement > 10)
+            _xMovement = 10;
+        if (_xMovement < -10)
+            _xMovement = -10;
     }
     private void Rotate(float xMovement, float yMovement)
     {
@@ -93,7 +100,7 @@ public class CameraController : MonoBehaviour
         isPlayingAnime = true;
         origCameraRotation = transform.rotation;
         origCameraPosition = transform.position;
-        transform.DOMove(hit.transform.Find("viewPoint").position, 1f)
+        transform.DOMove(hit.transform.Find("viewPoint").position, 0.5f)
             .OnComplete(() =>
             {
                 isPlayingAnime = false;
@@ -102,7 +109,7 @@ public class CameraController : MonoBehaviour
                 AppFacade.Instance.GetManager<LuaManager>().CallFunction("showWND", hit.transform.name);
             });
         //transform.DOLookAt(hit.transform.position - hit.transform.Find("viewPoint").position, 1f);
-        transform.DORotateQuaternion(hit.transform.Find("viewPoint").rotation, 1f);
+        transform.DORotateQuaternion(hit.transform.Find("viewPoint").rotation, 0.5f);
         //transform.DOLookAt(hit.transform.Find("viewPoint").forward, 1f);
         _uiState = UIState.InSubMenu;
     }
@@ -114,13 +121,13 @@ public class CameraController : MonoBehaviour
         if (_uiState == UIState.InSubMenu)
         {
             isPlayingAnime = true;
-            transform.DOMove(origCameraPosition, 1f)
+            transform.DOMove(origCameraPosition, 0.5f)
                 .OnComplete(() =>
                 {
                     isPlayingAnime = false;
                     isFacing2Obj = false;
                 });
-            transform.DORotateQuaternion(origCameraRotation, 1f);
+            transform.DORotateQuaternion(origCameraRotation, 0.5f);
             _uiState = UIState.Free;
         }
     }
@@ -142,8 +149,11 @@ public class CameraController : MonoBehaviour
         //transform.eulerAngles += new Vector3(0, _xRotation, 0);
 
         //水平轴值影响水平方向移动
-        _xMovement = Mathf.Lerp(_xMovement, 0, _lerpRate);
-        transform.position += new Vector3(_xMovement * _moveSpeed, 0, 0);
+        //_damp = transform.position.x * _dampScale;
+
+        _xMovement = Mathf.Lerp(_xMovement, 0, Time.deltaTime / _lerpTime);
+
+        transform.position += new Vector3(_xMovement * (_moveSpeed/* - _damp*/), 0, 0);
     }
 
     /* 鼠标移动/手指触摸时进行射线检测 */
@@ -180,7 +190,7 @@ public class CameraController : MonoBehaviour
             } 
         }
     }
-#endregion
+    #endregion
 
     #region Unity CallBacks
     void Start()
@@ -195,6 +205,8 @@ public class CameraController : MonoBehaviour
 #if UNITY_ANDROID
         InputManager.FingerMoved += Move;
 #endif
+        _uiState = UIState.Free;
+        _cameraState = CameraState.isStatic;
     }
     void Update()
     {
@@ -207,8 +219,12 @@ public class CameraController : MonoBehaviour
     }
     void OnDestroy()
     {
-        InputManager.MouseMoved -= Rotate;
-        InputManager.FingerMoved -= Rotate;
+#if UNITY_EDITOR
+        InputManager.MouseMoved -= Move;
+#endif
+#if UNITY_ANDROID
+        InputManager.FingerMoved -= Move;
+#endif
 
         HandleOnCameraToggle2Static.Clear();
         HandleOnCameraToggle2Static = null;

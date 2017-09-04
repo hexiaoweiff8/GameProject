@@ -4,8 +4,8 @@
 ---
 QianFengModel = {}
 
-local modelList = {}
-local unitLists = {}
+local modelList
+local unitLists
 function QianFengModel:Init(QianFengCardIDTbl)
     modelList = {}
     unitLists = {}
@@ -52,8 +52,8 @@ function QianFengModel:Start()
 end
 
 function QianFengModel:OnDestroyDone()
-    modelList = {}
-    unitLists = {}
+    modelList = nil
+    unitLists = nil
     QianFengModel = nil
 end
 return QianFengModel

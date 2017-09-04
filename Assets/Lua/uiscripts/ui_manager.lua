@@ -3,6 +3,9 @@
 -- 此文件由[BabeLua]插件自动生成
 local class = require("common/middleclass")
 ui_manager = class("ui_manager")
+
+function go_back()
+end
 function ui_manager:initialize()
     -- 所有已加载的 wnd_base
     self._all_wnd_bases = {}
@@ -14,14 +17,28 @@ function ui_manager:initialize()
     self._background_sequence = stack:create()
     --UIRoot
     self.ui_layer = GameObject.Find("UIRoot").transform
+    --返回回调的参数
+    self.callback_args = {}
+    --返回的回调函数
+    self.callback_func= go_back()
 end
+
+
 function ui_manager:reset()
     self._all_wnd_bases = {}
     self._shown_wnd_bases = {}
     self._popup_back_sequence:clear()
     self._background_sequence:clear()
 end
-function ui_manager:ShowWB(wnd_base, duration, is_close_curPop, pre_wnd_base_id)
+function ui_manager:ShowWB(wnd_base,pre_wnd_base_id,pre_goback_handler,duration,is_close_curPop,args)
+    cakkback_func = pre_goback_handler
+    self.callback_func = pre_goback_handler
+    self.callback_args = args
+
+    if ui_manager._shown_wnd_bases[wnd_base] ~= nil then
+        ui_manager._shown_wnd_bases[wnd_base]:Show()
+        return
+    end
 
     if type(wnd_base) == "string" then
         wnd_base = _all_Reg_Wnd_list[wnd_base]
@@ -52,9 +69,7 @@ function ui_manager:ShowWB(wnd_base, duration, is_close_curPop, pre_wnd_base_id)
     wnd_base:Show(duration)
     ui_manager._all_wnd_bases[wnd_base_id] = wnd_base
     ui_manager._shown_wnd_bases[wnd_base_id] = wnd_base
-    if(pre_wnd_base_id ~= nil)then
-        wnd_base.pre_wnd_base_id = pre_wnd_base_id
-    end
+    wnd_base.pre_wnd_base_id = pre_wnd_base_id
 end
 function ui_manager:DestroyWB(wnd_base, duration, isPop)
     if type(wnd_base) == "string" then
@@ -145,39 +160,9 @@ function ui_manager:get_wnd_base_root(_wnd_base_type)
         return self.ui_layer
     end
 end
-function ui_manager:do_go_back(args)
-    if not self.current_wnd_base then return false end
-    if self._NORMAL_back_sequence:getn() <= 1 then
-        -- 如果当前BackSequenceData 不存在返回数据
-        -- 检测lastwnd_base
-        local pre_wnd_base_id = self.last_wnd_base and self.last_wnd_base.wnd_base_id or WNDTYPE.None
-        if pre_wnd_base_id == WNDTYPE.None then
-            pre_wnd_base_id = self.current_wnd_base.pre_wnd_base_id
-        end
-        if pre_wnd_base_id ~= WNDTYPE.None then
-            self:ShowWB(self.last_wnd_base, false, args)
-            return true
-        else
-            return false
-        end
-    else
-        self._NORMAL_back_sequence:pop()
-        local back_wnd_base = self._NORMAL_back_sequence:peek()
-        if back_wnd_base then
-            self:ShowWB(back_wnd_base, false, args)
-        else
-            return false
-        end
-    end
-end
-function ui_manager:go_back(pre_goback_handler, args)
-    if pre_goback_handler then
-        local need_return = pre_goback_handler()
-        if not need_return then
-            return false
-        end
-    end
-    return self:do_go_back(args)
+--界面的返回函数 如果界面有返回按钮统一走这个接口
+function ui_manager:go_back()
+    return self:callback_func(args)
 end
 function ui_manager:destroy_all_shown_pop(duration)
     if duration == nil then

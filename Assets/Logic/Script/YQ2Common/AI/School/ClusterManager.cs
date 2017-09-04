@@ -26,7 +26,6 @@ public class ClusterManager : ILoopItem
     private static ClusterManager single = null;
 
     // -------------------------公有属性-------------------------------
-    //public Vector3 MovementPlanePosition;
 
     /// <summary>
     /// 地图宽度
@@ -37,37 +36,16 @@ public class ClusterManager : ILoopItem
     /// 地图高度
     /// </summary>
     public float MapHeight;
-    
-    ///// <summary>
-    ///// 判定前方角度
-    ///// 在单位前方ForwardAngle角度内为该单位forward
-    ///// </summary>
-    //public float ForwardAngle = 90;
 
     /// <summary>
     /// 碰撞拥挤权重
     /// </summary>
     public float CollisionWeight = 5f;
 
-    ///// <summary>
-    ///// 碰撞挤开系数
-    ///// </summary>
-    //public float CollisionThrough = 3f;
-
-    /// <summary>
-    /// 摩擦力系数
-    /// </summary>
-    //public float Friction = 5;
-
     /// <summary>
     /// 单位格子宽度
     /// </summary>
     public int UnitWidth = 1;
-
-    ///// <summary>
-    ///// 组列表(全局)
-    ///// </summary>
-    //public static List<ClusterGroup> GroupList = new List<ClusterGroup>();
 
 
     // -------------------------私有属性-------------------------------
@@ -141,9 +119,6 @@ public class ClusterManager : ILoopItem
         // 防止内存泄漏
     }
 
-
-
-
     /// <summary>
     /// 加入单位
     /// </summary>
@@ -175,25 +150,13 @@ public class ClusterManager : ILoopItem
     /// <param name="map">地图二维数据</param>
     public void Init(float x, float y, int w, int h, int unitw, int[][] map)
     {
-        targetList = new TargetList<PositionObject>(x, y, w, h, unitw);
-        targetList.MapInfo = new MapInfo<PositionObject>();
+        targetList = new TargetList<PositionObject>(x, y, w, h, unitw)
+        {MapInfo = new MapInfo<PositionObject>()};
         targetList.MapInfo.AddMap(unitw, w, h, map);
         MapHeight = h;
         MapWidth = w;
         UnitWidth = unitw;
     }
-
-    /// <summary>
-    /// 清理现有对象
-    /// </summary>
-    //public static void ClearAllGroup()
-    //{
-    //    foreach (var group in GroupList)
-    //    {
-    //        group.CleanGroup();
-    //    }
-    //    GroupList.Clear();
-    //}
 
     /// <summary>
     /// 暂停
@@ -228,16 +191,6 @@ public class ClusterManager : ILoopItem
     /// </summary>
     public void ClearAll()
     {
-        // 清除已有所有单元
-        //foreach (var group in GroupList)
-        //{
-        //    group.CleanGroup();
-        //}
-
-        //if (GroupList != null)
-        //{
-        //    GroupList.Clear();
-        //}
         // 清除数据
         if (targetList != null)
         {
@@ -251,24 +204,6 @@ public class ClusterManager : ILoopItem
             targetList.Clear();
         }
     }
-
-    ///// <summary>
-    ///// 根据ID查询group
-    ///// </summary>
-    ///// <param name="groupId">被查询groupId</param>
-    ///// <returns>返回查询到的groupId 如果不存在则返回null</returns>
-    //public ClusterGroup GetGroupById(int groupId)
-    //{
-    //    for (var i = 0; i < GroupList.Count; i++)
-    //    {
-    //        var tmpGroup = GroupList[i];
-    //        if (tmpGroup.GroupId == groupId)
-    //        {
-    //            return tmpGroup;
-    //        }
-    //    }
-    //    return null;
-    //}
 
     /// <summary>
     /// 获取图形范围内的单位
@@ -347,8 +282,6 @@ public class ClusterManager : ILoopItem
         if (memberList == null || memberList.Count == 0 || pause)
         { return; }
 
-        // 前方角度/2
-        //var cosForwardAngle = (float)Math.Cos(ForwardAngle / 2f);
         // 遍历所有成员
         for (var i = 0; i < memberList.Count; i++)
         {
@@ -358,11 +291,6 @@ public class ClusterManager : ILoopItem
             {
                 OneMemberMove(member as ClusterData);
             }
-            //else if (member is FixtureData)
-            //{
-            //    // 不移动
-            //    // TODO 是否对周围产生斥力?
-            //}
         }
 
         // 清空对比列表
@@ -379,8 +307,6 @@ public class ClusterManager : ILoopItem
         {
             return;
         }
-
-
         // 计算周围单位碰撞
         GetCloseMemberGrivity2(member);
 
@@ -454,11 +380,11 @@ public class ClusterManager : ILoopItem
         return result;
     }
 
-    /// <summary>
-    /// 获取同区域内成员引力斥力
-    /// </summary>
-    /// <param name="member"></param>
-    /// <returns></returns>
+    ///// <summary>
+    ///// 获取同区域内成员引力斥力
+    ///// </summary>
+    ///// <param name="member"></param>
+    ///// <returns></returns>
     //private void GetCloseMemberGrivity(ClusterData member)
     //{
     //    if (member == null)
@@ -608,7 +534,7 @@ public class ClusterManager : ILoopItem
     /// </summary>
     /// <param name="member"></param>
     /// <returns></returns>
-    private void GetCloseMemberGrivity2(ClusterData member)
+    private void GetCloseMemberGrivity2(PositionObject member)
     {
         if (member == null)
         {
@@ -617,19 +543,9 @@ public class ClusterManager : ILoopItem
         // 遍历附近单位(不论敌友), 检测碰撞并排除碰撞, (挤开效果), 列表中包含障碍物
         var graphics = member.MyCollisionGraphics;
         var closeMemberList = targetList.QuadTree.GetScope(graphics);
-        // 目标方向
-        //var targetDir = member.TargetPos - member.Position;
-        // 释放压力方向
-        //var pressureReleaseDir = Vector3.zero;
-        // 是否需要躲避
-        //var collisionCount = 0;
         // 碰撞前进方向
         var collisionThoughDir = Vector3.zero;
-        // 碰撞不能前进方向(不能移动的物体)
-        //var collisionCouldNotThoughDir = Vector3.zero;
-        //var collisionCouldNotThoughCount = 0;
-        // 当前单位的体积*速度
-        //var memberEnergy = member.Quality * member.MaxSpeed;
+
         if (closeMemberList != null)
         {
             for (var k = 0; k < closeMemberList.Count; k++)
@@ -641,7 +557,7 @@ public class ClusterManager : ILoopItem
                     continue;
                 }
 
-                // 计算周围人员的位置, 相对位置的倒数相加, 并且不往来时方向移动
+                // 计算周围人员的位置
                 var diffPosition = member.Position - closeMember.Position;
                 // 判断两对象是否已计算过, 如果计算过不再计算
                 var compereId1 = Utils.GetKey(member.Id, closeMember.Id);
@@ -649,6 +565,7 @@ public class ClusterManager : ILoopItem
                 if (!areadyCollisionList.ContainsKey(compereId1) &&
                     !areadyCollisionList.ContainsKey(compereId2))
                 {
+                    // TODO 如果该单位在我前方左右90°以内则向反方向闪避(闪避力与自身体积与对方体积比成反比)
                     // 获取附近单位的图形
                     var closeGraphics = closeMember.MyCollisionGraphics;
                     // 检测当前单位是否与其有碰撞
@@ -667,43 +584,15 @@ public class ClusterManager : ILoopItem
                             var diffCollisionThoughDir = diffPosition.normalized * (insertDis) * 0.5f;
                             
                             collisionThoughDir += diffCollisionThoughDir / qualityRate;
-                                                  //*CollisionThrough
-                                                  //*Utils.GetRange(0.1f, 5f, closeMemberEnergy/memberEnergy)
-                                                  //*Time.deltaTime;
                             // 碰撞单位是否可移动
                             if (closeMember.CouldMove)
                             {
                                 var offPos = diffCollisionThoughDir*qualityRate;
-                                //if (offPos.magnitude > insertDis)
-                                //{
-                                //    offPos = offPos.normalized * insertDis * 2;
-                                //}
-                                //else
-                                //{
-                                //    offPos = offPos * 0.1f;
-                                //}
                                 // 直接设置未碰撞位置
                                 closeMember.Position -= offPos;
-                                // 影响速度
-                                //closeMember.SpeedDirection -= diffCollisionThoughDir * qualityRate;
                             }
                             member.Position += diffCollisionThoughDir;
                         }
-
-                        // 求出射角度, 出射角度*出射量
-                        // 使用向量法线计算求出出射标准向量
-                        //var outDir =
-                        //    ((member.SpeedDirection +
-                        //      Vector3.Dot(member.SpeedDirection, diffPosition)*diffPosition)*2 -
-                        //     member.SpeedDirection).normalized;
-
-
-                        //departSpeed *= 0.5f;
-
-                        // 当前对象的弹出角度为镜面弹射角度
-                        //var partForMember = -outDir * departSpeed.magnitude / qualityRate;
-                        //var partForMember = -departSpeed / qualityRate;
-                        //Debug.Log(partForMember);
                         // 影响速度
                         member.SpeedDirection += collisionThoughDir;
 
@@ -717,11 +606,6 @@ public class ClusterManager : ILoopItem
                 }
             }
         }
-        //// 碰撞移动
-        //if (collisionThoughDir != Vector3.zero)
-        //{
-        //    member.Position += collisionThoughDir * Time.deltaTime;
-        //}
     }
 
     /// <summary>
@@ -785,16 +669,6 @@ public class ClusterManager : ILoopItem
                 }
             }
         }
-
-        // 判断组队是否到达
-        //if (!member.Group.IsComplete && member.Group.CompleteMemberCount * 100 / member.Group.MemberList.Count > member.Group.ProportionOfComplete)
-        //{
-        //    if (member.Group.Complete != null)
-        //    {
-        //        member.Group.IsComplete = true;
-        //        member.Group.Complete(member.Group);
-        //    }
-        //}
     }
 
 
@@ -843,20 +717,5 @@ public class ClusterManager : ILoopItem
             }
         }
     }
-
-
-    ///// <summary>
-    ///// 绘制矩形
-    ///// </summary>
-    ///// <param name="rectangle">被绘制矩形</param>
-    ///// <param name="color">绘制颜色</param>
-    //private void DrawRect(RectGraphics rectangle, Color color)
-    //{
-    //    var pos = rectangle.Postion;
-    //    Debug.DrawLine(new Vector3(pos.x, 0, pos.y), new Vector3(pos.x, 0, pos.y + rectangle.Height), color);
-    //    Debug.DrawLine(new Vector3(pos.x, 0, pos.y), new Vector3(pos.x + rectangle.Width, 0, pos.y), color);
-    //    Debug.DrawLine(new Vector3(pos.x + rectangle.Width, 0, pos.y + rectangle.Height), new Vector3(pos.x, 0, pos.y + rectangle.Height), color);
-    //    Debug.DrawLine(new Vector3(pos.x + rectangle.Width, 0, pos.y + rectangle.Height), new Vector3(pos.x + rectangle.Width, 0, pos.y), color);
-    //}
 
 }

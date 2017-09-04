@@ -12,16 +12,6 @@ local bianduiModel = require("uiscripts/biandui/wnd_biandui_model")
 function fight_model:getDatas()
 
 
-    ----临时变量---
-    self.MyZhuJiDi_HP = 100
-
-    self.enemyCardNum = 0
-    ---临时我的主基地的位置
-    self.myMainPosition = Vector3(0,0,0)
-    ---临时排头兵的位置
-    self.firstPosition = Vector3(0,0,0)
-
-
 ---游戏暂停控制---
     -- 是否暂停
     self.ispause = false
@@ -35,11 +25,8 @@ function fight_model:getDatas()
     self.nowHandpaiKutb = {}
     --下一张牌
     self.nextCard = nil
-    self.enemyNextCard = nil
     --所有卡牌id表
     self.AllCardIDtb = {}
-    --所有卡牌等级表
-    self.AllCardLeveltb = {}
     --我的大营中的卡牌表
     self.DaYingCard = bianduiModel:GetDayingData()
     --我的前锋卡牌表
@@ -62,31 +49,6 @@ end
 ---获取游戏中要用到的所有卡牌信息
 function fight_model:initAllCardsTbl()
     local cardTbl = cardModel:getCardTbl()
-    --sdata_cardplanmine_data:Foreach(
-    --function (key, value)
-    --    local card = {
-    --        id = 0,
-    --        num = 0,
-    --        lv = 0,
-    --        starLv = 0,
-    --        rarity = 0,
-    --        TrainCost = 0
-    --    }
-    --
-    --    if cardTbl[value[1]] and value[2] > 0 then
-    --        card.id = value[1]
-    --        card.num = value[2]
-    --        card.lv = cardTbl[value[1]].lv
-    --        card.starLv = cardTbl[value[1]].star
-    --        card.rarity = cardTbl[value[1]].rlv
-    --        card.TrainCost = cardUtil:getTrainCost(card.id)
-    --        table.insert(self.paiKutb, card)
-    --    else
-    --        Debugger.LogWarning(value[1].." 卡牌不存在！！！")
-    --    end
-    --
-    --end)
-
     for i = 1, #self.DaYingCard do
         local card = {
             id = 0,
@@ -145,50 +107,11 @@ function fight_model:initAllCardsTbl()
         end
     end
 
-    sdata_cardplanenemy_data:Foreach(
-    function (key, value)
-        local card = {
-            id = 0,
-            num = 0,
-            lv = 0,
-            starLv = 0,
-            rarity = 0,
-            TrainCost = 0
-        }
-        if cardTbl[value[1]] and value[2] > 0 then
-
-            card.id = value[1]
-            card.num = value[2]
-            if cardTbl[value[1]] then
-                card.lv = cardTbl[value[1]].lv
-                card.starLv = cardTbl[value[1]].star
-                card.rarity = cardTbl[value[1]].rlv
-            else
-                card.lv = 1
-                card.starLv = 1
-                card.rarity = 1
-            end
-            card.TrainCost = cardUtil:getTrainCost(card.id)
-            table.insert(self.enemyPaiKutb, card)
-
-
-        else
-            Debugger.LogWarning(value[1].." 卡牌不存在！！！")
-        end
-
-    end)
-
     ---获取全部卡牌ID和等级表
     for i = 1, #self.paiKutb do
-        self.AllCardLeveltb[#self.AllCardLeveltb + 1] = self.paiKutb[i].lv
         self.AllCardIDtb[#self.AllCardIDtb + 1] = self.paiKutb[i].id
     end
-    for i = 1, #self.enemyPaiKutb do
-        self.AllCardLeveltb[#self.AllCardLeveltb + 1] = self.enemyPaiKutb[i].lv
-        self.AllCardIDtb[#self.AllCardIDtb + 1] = self.enemyPaiKutb[i].id
-    end
     for i = 1,#self.QianFengPaiKutb do
-        self.AllCardLeveltb[#self.AllCardLeveltb + 1] = self.QianFengPaiKutb[i].lv
         self.AllCardIDtb[#self.AllCardIDtb + 1] = self.QianFengPaiKutb[i].id
     end
 end

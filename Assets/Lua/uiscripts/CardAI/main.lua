@@ -11,11 +11,11 @@ local EATCARD_CALLBACK
 local time
 
 function AIMain:Init(cardTbl,cardNumTbl,DropCardCallBack,EatCardCallBack)
-
-    printf(inspect(cardTbl))
-    printf(inspect(cardNumTbl))
-
-
+    printw("****************AI:Init*******************")
+    print("AI卡牌信息表")
+    print(inspect(cardTbl))
+    print("AI大营卡牌数量表")
+    print(inspect(cardNumTbl))
     require("uiscripts/CardAI/ACTION")
     require("uiscripts/CardAI/TEST")
     _DATAUtil = require("uiscripts/CardAI/DATA/DATAUtil")

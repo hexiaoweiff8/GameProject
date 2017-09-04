@@ -175,6 +175,7 @@ message BattleRole {
     repeated Card card              =2;
     repeated Equip equip            =3;
     repeated Sci sci                =4;
+    required Battle battle          =5;
 }
 
 message EnterPvp {
@@ -185,3 +186,26 @@ message CardToCoin {
     repeated Card lst               =1;
     required Currency currency      =2;
 }
+
+message GetPvpConti {
+    required Battle battle          =1;
+    repeated Card card              =2;
+    repeated Equip equip            =3;
+    required Currency currency      =4;
+    repeated Item item              =5;
+}
+
+message GetPvpTotal {
+    required Battle battle          =1;
+    repeated Card card              =2;
+    repeated Equip equip            =3;
+    required Currency currency      =4;
+    repeated Item item              =5;
+}
+
+
+message ExitPvp {
+    required Battle battle          =1;
+}
+
+

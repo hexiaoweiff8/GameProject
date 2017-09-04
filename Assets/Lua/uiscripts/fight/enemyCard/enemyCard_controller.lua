@@ -20,17 +20,27 @@ function enemyCard_controller:Init(view)
     _view:initView(view)
 
     _data:InitDATA()
-    ---
-    ---初始化AI数据
-    ---假的（读表）
-    ---
-    local cardNumTbl = {}
-    sdata_cardplanenemy_data:Foreach(
-    function (key, value)
-        cardNumTbl[value[1]] = value[2]
-    end)
-    _CardAI:Init(cardModel:getCardTbl(), cardNumTbl, self.AIDropCard,self.EatCard)
-    _CardAI:SetTestModel(true,_view)
+    if Const.IS_AI_TEST then
+        ---
+        ---初始化AI数据
+        ---假的（读表）
+        ---
+        local cardNumTbl = {}
+        sdata_cardplanenemy_data:Foreach(
+        function (key, value)
+            local card = {
+                cardId = value[1],
+                num = value[2]
+            }
+            table.insert(cardNumTbl, card)
+        end)
+        _CardAI:Init(cardModel:getCardTbl(), cardNumTbl, self.AIDropCardCallBack,self.AIEatCardCallBack)
+        _CardAI:SetTestModel(true,_view)
+    else
+        _CardAI:Init(_data.enemyAllCardInfo, _data.enemyDaYingCardTbl, self.AIDropCardCallBack,self.AIEatCardCallBack)
+        _CardAI:SetTestModel(true,_view)
+    end
+
 
 end
 
@@ -48,12 +58,12 @@ function enemyCard_controller:Update()
 
 end
 
-function enemyCard_controller:AIDropCard(cardID)
+function enemyCard_controller:AIDropCardCallBack(cardID)
     ModelControl:createEnemyModel(cardID)
     enemyCard_controller:addEnemyCardHistoryUI(cardID)
     _data.enemyNowFei = _data.enemyNowFei - cardUtil:getTrainCost(cardID)
 end
-function enemyCard_controller:EatCard(cardID)
+function enemyCard_controller:AIEatCardCallBack(cardID)
     _data.enemyNowFei = _data.enemyNowFei + cardUtil:getTrainCost(cardID) * 0.5
 end
 

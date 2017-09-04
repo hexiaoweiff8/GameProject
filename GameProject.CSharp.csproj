@@ -783,6 +783,7 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\EasyTouchWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\FightDataStatisticalWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\FightManagerWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\FightManager_MemberTypeWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\FightParameterWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\FightUnitFactoryWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\FileSystem_RES_LOCATIONWrap.cs" />
@@ -809,6 +810,7 @@
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\MoveRecordWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\NGUIToolsWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\NetworkManagerWrap.cs" />
+    <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\PTZCameraWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\PacketManageWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\PacketRoutingWrap.cs" />
     <Compile Include="Assets\QKLibs\Asset_ulua\Source\Generate\PositionObjectWrap.cs" />

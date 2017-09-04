@@ -138,17 +138,8 @@ public class HealthChangeFormulaItem : AbstractFormulaItem
             // 计算伤害/治疗量
             var changeValue = 0f;
             // 区分伤害类型, 固定伤害, 计算伤害
-            switch (CalculationType)
-            {
-                case HealthChangeCalculationType.Fix:
-                    changeValue = myValue;
-                    break;
-
-                case HealthChangeCalculationType.Calculation:
-                    changeValue = HurtResult.GetHurtForSkill(paramsPacker.ReleaseMember, targetDisPlayOwner,
-                        myDemageOrCure, myHealthChageType, myValue);
-                    break;
-            }
+            changeValue = HurtResult.GetHurtForSkill(paramsPacker.ReleaseMember, targetDisPlayOwner,
+                myDemageOrCure, myHealthChageType, CalculationType, myValue);
             // 伤害系数
             changeValue *= myCoefficient;
 

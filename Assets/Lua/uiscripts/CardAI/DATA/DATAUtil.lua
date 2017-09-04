@@ -42,7 +42,9 @@ function DATAUtil:Init_DATA(cardTbl,cardNumTbl)
 end
 
 function DATAUtil:Init_Tbls(cardTbl,cardNumTbl)
-    for cardId,num in pairs(cardNumTbl) do
+    for _,card in pairs(cardNumTbl) do
+        local cardId = card.cardId
+        local num = card.num
         if cardTbl[cardId] then
             ---初始化各种类卡牌数量表
             _DATA.CARD_NUM[cardId] = num
@@ -162,7 +164,7 @@ function DATAUtil:ComputeCardFight(cardId,cardLv)
     local CRITDAMAGE = cardUtil:getCardProp("CritDamage", cardId, cardLv)
     local ARMYUNIT = cardUtil:getCardArmyUnit(cardId)
     local fight = HP/(1-DEFENCE/(DEFENCE+2000))*(ATTACK*CLIPSIZE/(ATTACKRATE*CLIPSIZE+RELOADTIME))*HIT*(1+CRIT*(CRITDAMAGE-1))*ARMYUNIT
-    print(cardId,HP,DEFENCE,ATTACK,CLIPSIZE,ATTACKRATE,RELOADTIME,HIT,CRIT,CRITDAMAGE,ARMYUNIT,fight)
+    --print(cardId,HP,DEFENCE,ATTACK,CLIPSIZE,ATTACKRATE,RELOADTIME,HIT,CRIT,CRITDAMAGE,ARMYUNIT,fight)
     return fight
 end
 

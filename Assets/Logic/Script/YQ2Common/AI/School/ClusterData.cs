@@ -147,7 +147,11 @@ public class ClusterData: PositionObject
             targetPos = targetQueue.Pop();
             result = true;
         }
-
+        plusQuality += quality * 0.5f;
+        if (!result)
+        {
+            plusQuality = 0;
+        }
         return result;
     }
 
@@ -157,6 +161,7 @@ public class ClusterData: PositionObject
     public void ClearTarget()
     {
         targetQueue.Clear();
+        plusQuality = 0;
     }
 
 //#if UNITY_EDITOR

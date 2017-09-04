@@ -155,31 +155,7 @@ public class AstarFight : MonoBehaviour
     /// 按半径扩大的4边上的点阵数组，保存10组，不够再动态计算
     /// </summary>
     private readonly int[][] serchPathArray = new int[10][];
-
-
-    //////////前锋模型数据//////////////////////
-    /// <summary>
-    /// 4个触摸+敌方 5个物体父物体
-    /// </summary>
-    private readonly Transform[] QianFengParentArray = new Transform[6];
-
-    /// <summary>
-    /// 4个触摸+敌方 5个物体宽高
-    /// </summary>
-    private readonly int[][] QianFengWidthHeightArray = new int[6][];
-
-    /// <summary>
-    /// 前锋模型阵型列表
-    /// </summary>
-    private readonly int[][] QianFengZXList = new int[6][];
-
-    /// <summary>
-    /// 前锋模型向中点偏移距离
-    /// </summary>
-    private readonly Vector3[] QianFengZhenXingOffsetArray = new Vector3[6];
-
-
-
+    
     void Start()
     {
         // 保存实例化对象
@@ -274,7 +250,7 @@ public class AstarFight : MonoBehaviour
         UnitWidth = (int)SData_Constant.Single.GetDataOfID(Utils.UnitWidthId).Value;
         LoadMap.Init(mapInfoData, UnitWidth);
         // 初始化集群管理
-        var loadMapPos = LoadMap.GetLeftBottom();
+        var loadMapPos = LoadMap.GetCenter();
         ClusterManager.Single.Init(loadMapPos.x, loadMapPos.z, MapWidth, MapHeight, UnitWidth, mapInfoData);
 
     }
@@ -511,167 +487,13 @@ public class AstarFight : MonoBehaviour
             }
         }
     }
-    //TODODO  超过红色max的坐标提前转换到max内
-    /// <summary>
-    /// 设置阵型中每个物体的位置确保不压障碍
-    /// </summary>
-    /// <param name="mapPosition">物体起始点，我方为世界坐标，敌人方为格子坐标</param>
-    /// <param name="index">多点触摸模式下的触摸Index，为4是为敌方</param>
-    /// <returns>最优的可下兵的点</returns>
-    public void isQianFengZhangAi(Vector3 mapPosition, int index)
-    {
-        //触摸点所对应格子坐标
-        int[] gridPosition = new int[2];
-        mapPosition += QianFengZhenXingOffsetArray[index];
-        gridPosition = Utils.PositionToNum(LoadMap.MapPlane.transform.position, mapPosition, UnitWidth, MapWidth, MapHeight);
-        
-        int tempCount = 0, tempCount2 = 0;
-        int an = QianFengZXList[index].Length;
-        int _width = QianFengWidthHeightArray[index][0];//物体宽
-        int _height = QianFengWidthHeightArray[index][1];//物体高
-        int[] bianjie = { (-1 + _width), (-1 + _height), (MapWidth - _width), (MapHeight - _height), (maxX - _width) };
-        if (gridPosition[0] > bianjie[4] + 13) //如果超过最远下兵范围
-        {
-            gridPosition[0] = bianjie[4] + 13;
-        }
-
-        //把自己所占格子加入列表,用来给阵型中其他的物体做重叠判断
-        int[] tempA3 = new int[QianFengZXList[index].Length * _width * _height];
-        for (int i = 0; i < an; i += 2)
-        {
-            //计算阵型中的点在当前触摸点偏移后的格子坐标
-            var tempA1 = new[] { QianFengZXList[index][i] + gridPosition[0], QianFengZXList[index][i + 1] + gridPosition[1] };
-            tempList2.Clear();
-            var spani = 0;//搜索半径
-            while (true)
-            {
-                int[] tempArray;
-                if (spani < 10)
-                {
-                    tempArray = serchPathArray[spani];//取出缓存的点阵
-                }
-                else
-                {
-                    // 以触摸点为中心循环扩大搜索半径来搜索可下兵的点，tempList记录搜索正方形范围边上的所有点
-                    tempArray = new int[2 * spani * 8];
-                    var a1 = -spani;
-                    var b1 = -spani;
-                    var a2 = spani;
-                    var b2 = spani;
-                    //获取搜索区域边上的点
-                    var tempCount333 = 0;
-                    for (int i2 = 1; i2 < 2 * spani + 1; i2++)
-                    {
-                        tempArray[tempCount333++] = a1;
-                        tempArray[tempCount333++] = b1 + i2;
-                        tempArray[tempCount333++] = a1 + i2;
-                        tempArray[tempCount333++] = b1;
-                        tempArray[tempCount333++] = a2;
-                        tempArray[tempCount333++] = b2 - i2;
-                        tempArray[tempCount333++] = a2 - i2;
-                        tempArray[tempCount333++] = b2;
-                    }
-                    int templ = tempArray.Length;
-                    tempArray[templ - 4] = a1;
-                    tempArray[templ - 3] = b1;
-                    tempArray[templ - 2] = a2;
-                    tempArray[templ - 1] = b2;
-                }
-
-                //遍历点阵
-                for (int i3 = 0; i3 < tempArray.Length; i3 += 2)
-                {
-                    var state = false;
-                    var tempA2 = new[] { tempA1[0] + tempArray[i3], tempA1[1] + tempArray[i3 + 1] };
-                    if (!(tempA2[0] > bianjie[0] && tempA2[1] > bianjie[1] && tempA2[0] < bianjie[2] &&
-                          tempA2[1] < bianjie[3]))//如果超过上下左右边界或者超过最远下兵距离
-                    {
-                        continue;
-                    }
-                    //测试自己所占格子是否有障碍
-                    for (int j = 0; j < _width; j++)
-                    {
-                        for (int k = 0; k < _height; k++)
-                        {
-                            var x = tempA2[0] + j;
-                            var y = tempA2[1] + k;
-                            if (mapInfoData[y][x] == 1)
-                            {
-                                state = true;
-                                break;
-                            }
-                            else
-                            {
-                                //测试是否和阵型中其他的物体重叠
-                                for (int l = 0; l < tempCount2; l += 2)
-                                {
-                                    if (tempA3[l] == x && tempA3[l + 1] == y)
-                                    {
-                                        state = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        if (state)//如果有重叠的点或障碍
-                        {
-                            break;
-                        }
-                    }
-                    if (!state)//如果该点可下兵
-                    {
-                        //把所有可下兵格子加入列表，用来计算最近格子
-                        tempList2.Add(tempA2[0]);
-                        tempList2.Add(tempA2[1]);
-                    }
-                }
-                if (tempList2.Count > 0)//如果有可下兵的格子
-                {
-                    float min = 9999;
-                    int tempInt2 = 0;
-                    //计算哪个点离触摸点最近
-                    for (int i33 = 0; i33 < tempList2.Count; i33 += 2)
-                    {
-                        var tempFloat = (float)(Math.Pow(tempA1[0] - tempList2[i33], 2) + Math.Pow(tempA1[1] - tempList2[i33 + 1], 2));
-
-                        if (tempFloat < min)
-                        {
-                            min = tempFloat;
-                            tempInt2 = i33;
-                        }
-                    }
-
-                    //根据计算出来的各个格子位置设置lua传来的物体所有子物体位置
-                    QianFengParentArray[index].GetChild(tempCount++).position = Utils.NumToPosition(LoadMap.transform.position,
-                        new Vector2(tempList2[tempInt2], tempList2[tempInt2 + 1]), UnitWidth, MapWidth, MapHeight);
-                    if (tempCount < an)//如果不是阵型中最后一个物体
-                    {
-                        //把自己所占格子加入列表,用来给阵型中其他的物体做重叠判断
-                        for (int j = 0; j < _width; j++)
-                        {
-                            for (int k = 0; k < _height; k++)
-                            {
-                                tempA3[tempCount2++] = tempList2[tempInt2] + j;
-                                tempA3[tempCount2++] = tempList2[tempInt2 + 1] + k;
-                            }
-                        }
-                    }
-                    break;
-                }
-                else//如果没有可下兵的格子则扩大半径循环查找
-                {
-                    spani++;
-                }
-            }
-        }
-    }
+ 
     /// <summary>
     /// 通过物体宽高计算阵型所对应物体占的格子,存入到字典中
     /// </summary>
     /// <param name="cardID">该局所有卡牌ID</param>
-    /// <param name="level">该局所有卡牌等级</param>
     /// <returns></returns>
-    public static Dictionary<int, int[]> setAllZhenxingList(int[] cardID, int[] level)
+    public static Dictionary<int, int[]> setAllZhenxingList(int[] cardID)
     {
         for (int starti = 0; starti < cardID.Length; starti++)
         {
@@ -681,7 +503,7 @@ public class AstarFight : MonoBehaviour
                 continue;
             }
             var cardData = SData_armycardbase_c.Single.GetDataOfID(_cardID);
-            int armyID = int.Parse(string.Format("{0}{1:D3}", cardData.ArmyID, level[starti]));
+            int armyID = int.Parse(string.Format("{0}{1:D3}", cardData.ArmyID, 1));
 
             var armyData = SData_armybase_c.Single.GetDataOfID(armyID);
             int _width = (int)Math.Ceiling(armyData.SpaceSet);//物体宽
@@ -894,20 +716,6 @@ public class AstarFight : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 设置前锋阵型数据
-    /// </summary>
-    /// <param name="go"></param>
-    /// <param name="cardID"></param>
-    /// <param name="index"></param>
-    public void setQianFengInfo(Transform go, int cardID, int index)
-    {
-        QianFengZXList[index] = allZhenxingList[cardID];
-        QianFengZhenXingOffsetArray[index] = allCenternOffset[cardID];
-        int armyID = int.Parse(string.Format("{0}{1:D3}", SData_armycardbase_c.Single.GetDataOfID(cardID).ArmyID, 1));
-        QianFengWidthHeightArray[index] = new[] { (int)Math.Ceiling(SData_armybase_c.Single.GetDataOfID(armyID).SpaceSet), (int)SData_armybase_c.Single.GetDataOfID(armyID).SpaceSet };
-        QianFengParentArray[index] = go;
-    }
 
     /// <summary>
     /// 向lua传回世界坐标转换为格子坐标

@@ -296,7 +296,7 @@ public abstract class BaseScriptEditor : EditorWindow
         }
         else
         {
-            Debug.LogError("脚本保存成功:" + filePath);
+            Debug.Log("脚本保存成功:" + filePath);
         }
     }
 

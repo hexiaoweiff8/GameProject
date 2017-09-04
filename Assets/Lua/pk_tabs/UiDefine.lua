@@ -13,9 +13,6 @@ local data ={
 		["ui_chongzhu"]={"ui_chongzhu","ui_chongzhu;herou;ui_fightu;commonu",10000,3,0,4,3,0},
 		["ui_kejitree"]={"ui_kejitree","ui_kejitree;herou;ui_fightu;commonu;ui_equip",10000,2,0,2,1,0},
 		["ui_keji_jiasu"]={"ui_keji_jiasu","ui_keji_jiasu",10000,3,0,4,3,0},
-		["ui_cardyc"]={"ui_cardyc","ui_cardyc;commonu;ui_fightu;herou;xuebaotujidui;ui_toast;jianchihuxiaodui;yutu;dianmu;huopaozhuanjia;youfu;wurenji;baoliezhe;yuyingzhanji",10000,0,0,4,1,1},
-		["ui_fightU"]={"ui_fightU","ui_fightu;ui_toast;commonu;herou;core;jianchihuxiaodui;yutu;dianmu;huopaozhuanjia;youfu;wurenji;baoliezhe;yuyingzhanji",10000,2,0,1,1,0},
-		["ui_equip2"]={"ui_equip2","ui_equip;herou;ui_fightu;commonu;ui_cangku;ui_toast;xuebaotujidui;ui_tips",10000,2,0,2,2,1},
 		["ui_cardyc"]={"ui_cardyc","ui_cardyc;commonu;ui_fightu;herou;xuebaotujidui;ui_toast;jianchihuxiaodui;yutu;dianmu;huopaozhuanjia;youfu;wurenji;baoliezhe",10000,0,0,2,1,1},
 		["ui_fightU"]={"ui_fightU","ui_fightu;ui_toast;commonu;herou;core;jianchihuxiaodui;yutu;dianmu;huopaozhuanjia;youfu;wurenji;baoliezhe",10000,2,0,1,1,0},
 		["ui_equip"]={"ui_equip","ui_equip;herou;ui_fightu;commonu;ui_cangku;ui_toast;xuebaotujidui;ui_tips",10000,2,0,2,2,1},
@@ -27,13 +24,11 @@ local data ={
 		["ui_chatWindow"]={"ui_chatWindow","ui_chatwindow",10000,2,0,4,1,1},
 		["ui_pve"]={"ui_pve","ui_pve;ui_toast",10000,2,0,4,1,1},
 		["ui_main"]={"ui_main","ui_main;ui_toast;ui_resident",10000,2,0,1,1,1},
-		["ui_pvpList"]={"ui_pvpList","ui_pvplist;ui_equip",10000,2,0,2,1,1},
 		["ui_mail"]={"ui_mail","ui_mail",10000,2,0,4,1,1},
-		["ui_pvpgz"]={"ui_pvpgz","ui_pvpgz;ui_tips",10000,2,0,4,1,1},
-		["ui_biandui"]={"ui_biandui","ui_biandui;ui_skill;jianchihuxiaodui;yutu;dianmu;huopaozhuanjia;youfu;wurenji;baoliezhe;yuyingzhanji;commonu;ui_toast",10000,2,0,4,1,1},
+		["ui_biandui"]={"ui_biandui","ui_biandui;ui_skill;jianchihuxiaodui;yutu;dianmu;huopaozhuanjia;youfu;wurenji;baoliezhe;commonu;ui_toast",10000,2,0,2,1,1},
 		["ui_dailyMission"]={"ui_dailyMission","ui_dailymission",10000,2,0,4,1,1},
 		["ui_login_reg"]={"ui_login_reg","ui_login_reg;ui_toast",10000,2,0,4,1,0},
-		["ui_zhanshu"]={"ui_zhanshu","ui_zhanshu;commonu;ui_toast",10000,2,0,4,1,1},
+		["ui_zhanshu"]={"ui_zhanshu","ui_zhanshu;commonu;ui_toast",10000,2,0,2,1,1},
 	}
 }
 return data

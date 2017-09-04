@@ -198,6 +198,15 @@ public class LoadMap : MonoBehaviour
     }
 
     /// <summary>
+    /// 获取中心点
+    /// </summary>
+    /// <returns></returns>
+    public Vector3 GetCenter()
+    {
+        return transform.localPosition;
+    }
+
+    /// <summary>
     /// 获取地面地图数据
     /// </summary>
     /// <returns></returns>
