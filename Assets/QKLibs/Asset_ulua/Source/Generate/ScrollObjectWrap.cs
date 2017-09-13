@@ -250,10 +250,10 @@ public class ScrollObjectWrap
 
 		try
 		{
-			o = ToLua.ToObject(L, 1);
-			ScrollObject obj = (ScrollObject)o;
-			bool ret = obj.showHandles;
-			LuaDLL.lua_pushboolean(L, ret);
+            //o = ToLua.ToObject(L, 1);
+            //ScrollObject obj = (ScrollObject)o;
+            //bool ret = obj.showHandles;
+            //LuaDLL.lua_pushboolean(L, ret);
 			return 1;
 		}
 		catch(Exception e)

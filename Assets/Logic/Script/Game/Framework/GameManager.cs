@@ -35,6 +35,10 @@ public class GameManager : Manager
             && Directory.Exists(Tools.DataPath + "lua/")
             && File.Exists(Tools.DataPath + "files.txt");
 
+        Debug.LogError(string.Format("加载路径:{0},{1}, lua:{2}, files.txt:{3}", Tools.DataPath, 
+            Directory.Exists(Tools.DataPath),
+            Directory.Exists(Tools.DataPath + "lua/"),
+            File.Exists(Tools.DataPath + "files.txt")));
         if (isExists || GameSetting.DevelopMode)
         {
             StartCoroutine(OnUpdateResource());

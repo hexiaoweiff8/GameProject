@@ -2,6 +2,7 @@
 
 public class ConsoleInput : UIInput {
 
+#if UNITY_EDITOR
     /*在InputField拥有焦点时监听键盘按键事件*/
     public override bool ProcessEvent(Event ev)
     {
@@ -37,6 +38,7 @@ public class ConsoleInput : UIInput {
 
         return true;
     }
+#endif
 
     //protected override void Update()
     //{

@@ -80,18 +80,23 @@ public class CameraController : MonoBehaviour
             UICamera.hoveredObject.GetComponent<Collider>() == null &&
             Physics.Raycast(MainSceneCamera.ScreenPointToRay(Input.mousePosition), out hit))
         {
+            if (hit.collider.tag == "Clickable")
+            {
+                HandleOnRaycastHit(hit);
+            }
+        }
 #endif
 #if UNITY_ANDROID
         if (Input.touchCount > 0 &&
             !UICamera.Raycast(Input.GetTouch(0).position) &&
             Physics.Raycast(MainSceneCamera.ScreenPointToRay(Input.GetTouch(0).position), out hit))
         {
-#endif
             if (hit.collider.tag == "Clickable")
             {
                 HandleOnRaycastHit(hit);
             }
         }
+#endif
     }
 
     /* 播放镜头拉近动画,打开UI界面 */
